@@ -1,0 +1,228 @@
+"use client"
+
+import { useState } from "react"
+import { Card } from "@/components/ui/card"
+import { Button } from "@/components/ui/button"
+import { Badge } from "@/components/ui/badge"
+import { Clock, CheckCircle2, User, MapPin, ChefHat, Utensils } from "lucide-react"
+
+export default function PedidosPage() {
+  const [filter, setFilter] = useState<"all" | "pending" | "preparing" | "delivered">("all")
+
+  const orders = [
+    {
+      id: "P-2024-001",
+      guest: "Carlos García",
+      room: "204",
+      items: [
+        { name: "Club Sandwich", quantity: 1, price: 15.5 },
+        { name: "Coca-Cola", quantity: 2, price: 3.0 },
+      ],
+      total: 18.5,
+      status: "preparing",
+      orderedAt: "2024-01-13 19:20",
+      estimatedDelivery: "19:30 - 19:50",
+    },
+    {
+      id: "P-2024-002",
+      guest: "Isabella Von Habsburg",
+      room: "501",
+      items: [
+        { name: "Sushi Platter", quantity: 1, price: 35.0 },
+        { name: "Vino Blanco Premium", quantity: 1, price: 45.0 },
+      ],
+      total: 80.0,
+      status: "pending",
+      orderedAt: "2024-01-13 20:15",
+      estimatedDelivery: "20:45 - 21:05",
+    },
+    {
+      id: "P-2024-003",
+      guest: "Ana Martínez",
+      room: "305",
+      items: [
+        { name: "Caesar Salad", quantity: 1, price: 12.5 },
+        { name: "Agua Mineral", quantity: 1, price: 2.5 },
+      ],
+      total: 15.0,
+      status: "delivered",
+      orderedAt: "2024-01-13 18:00",
+      deliveredAt: "18:25",
+    },
+    {
+      id: "P-2024-004",
+      guest: "Roberto Fernández",
+      room: "108",
+      items: [
+        { name: "Hamburguesa Gourmet", quantity: 2, price: 18.0 },
+        { name: "Papas Fritas", quantity: 2, price: 6.0 },
+        { name: "Cerveza Artesanal", quantity: 2, price: 8.0 },
+      ],
+      total: 32.0,
+      status: "preparing",
+      orderedAt: "2024-01-13 19:45",
+      estimatedDelivery: "20:15 - 20:35",
+    },
+  ]
+
+  const filteredOrders = filter === "all" ? orders : orders.filter((o) => o.status === filter)
+
+  const getStatusBadge = (status: string) => {
+    const statusConfig = {
+      pending: { label: "Pendiente", className: "bg-yellow-500/10 text-yellow-700 border-yellow-500/20" },
+      preparing: { label: "En Preparación", className: "bg-blue-500/10 text-blue-700 border-blue-500/20" },
+      delivered: { label: "Entregado", className: "bg-green-500/10 text-green-700 border-green-500/20" },
+    }
+    return statusConfig[status as keyof typeof statusConfig] || statusConfig.pending
+  }
+
+  return (
+    <div className="p-8 space-y-6">
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-3xl font-bold">Pedidos de Room Service</h1>
+          <p className="text-muted-foreground">Gestiona las órdenes de comida a las habitaciones</p>
+        </div>
+      </div>
+
+      {/* Stats */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <Card className="p-4">
+          <div className="flex items-center gap-3">
+            <div className="p-2 bg-yellow-500/10 rounded-lg">
+              <Clock className="w-5 h-5 text-yellow-600" />
+            </div>
+            <div>
+              <p className="text-sm text-muted-foreground">Pendientes</p>
+              <p className="text-2xl font-bold">{orders.filter((o) => o.status === "pending").length}</p>
+            </div>
+          </div>
+        </Card>
+        <Card className="p-4">
+          <div className="flex items-center gap-3">
+            <div className="p-2 bg-blue-500/10 rounded-lg">
+              <ChefHat className="w-5 h-5 text-blue-600" />
+            </div>
+            <div>
+              <p className="text-sm text-muted-foreground">En Preparación</p>
+              <p className="text-2xl font-bold">{orders.filter((o) => o.status === "preparing").length}</p>
+            </div>
+          </div>
+        </Card>
+        <Card className="p-4">
+          <div className="flex items-center gap-3">
+            <div className="p-2 bg-green-500/10 rounded-lg">
+              <CheckCircle2 className="w-5 h-5 text-green-600" />
+            </div>
+            <div>
+              <p className="text-sm text-muted-foreground">Entregados Hoy</p>
+              <p className="text-2xl font-bold">{orders.filter((o) => o.status === "delivered").length}</p>
+            </div>
+          </div>
+        </Card>
+        <Card className="p-4">
+          <div className="flex items-center gap-3">
+            <div className="p-2 bg-purple-500/10 rounded-lg">
+              <Utensils className="w-5 h-5 text-purple-600" />
+            </div>
+            <div>
+              <p className="text-sm text-muted-foreground">Ingresos Hoy</p>
+              <p className="text-2xl font-bold">€{orders.reduce((sum, o) => sum + o.total, 0).toFixed(2)}</p>
+            </div>
+          </div>
+        </Card>
+      </div>
+
+      {/* Filters */}
+      <div className="flex gap-2">
+        <Button variant={filter === "all" ? "default" : "outline"} onClick={() => setFilter("all")}>
+          Todos
+        </Button>
+        <Button variant={filter === "pending" ? "default" : "outline"} onClick={() => setFilter("pending")}>
+          Pendientes
+        </Button>
+        <Button variant={filter === "preparing" ? "default" : "outline"} onClick={() => setFilter("preparing")}>
+          En Preparación
+        </Button>
+        <Button variant={filter === "delivered" ? "default" : "outline"} onClick={() => setFilter("delivered")}>
+          Entregados
+        </Button>
+      </div>
+
+      {/* Orders List */}
+      <div className="space-y-4">
+        {filteredOrders.map((order) => {
+          const statusBadge = getStatusBadge(order.status)
+
+          return (
+            <Card key={order.id} className="p-6">
+              <div className="flex items-start justify-between mb-4">
+                <div className="flex-1">
+                  <div className="flex items-center gap-3 mb-3">
+                    <h3 className="text-lg font-semibold">Pedido #{order.id}</h3>
+                    <Badge variant="outline" className={statusBadge.className}>
+                      {statusBadge.label}
+                    </Badge>
+                  </div>
+                  <div className="flex flex-wrap gap-4 text-sm mb-4">
+                    <div className="flex items-center gap-2">
+                      <User className="w-4 h-4 text-muted-foreground" />
+                      <span>{order.guest}</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <MapPin className="w-4 h-4 text-muted-foreground" />
+                      <span>Habitación {order.room}</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Clock className="w-4 h-4 text-muted-foreground" />
+                      <span>Pedido: {order.orderedAt}</span>
+                    </div>
+                  </div>
+                  <div className="bg-muted/50 rounded-lg p-4 mb-3">
+                    <h4 className="font-semibold mb-2">Items:</h4>
+                    {order.items.map((item, idx) => (
+                      <div key={idx} className="flex justify-between text-sm mb-1">
+                        <span>
+                          {item.quantity}x {item.name}
+                        </span>
+                        <span className="font-medium">€{(item.quantity * item.price).toFixed(2)}</span>
+                      </div>
+                    ))}
+                    <div className="border-t pt-2 mt-2 flex justify-between font-semibold">
+                      <span>Total</span>
+                      <span>€{order.total.toFixed(2)}</span>
+                    </div>
+                  </div>
+                  {order.status !== "delivered" && (
+                    <div className="text-sm text-muted-foreground">
+                      <Clock className="w-4 h-4 inline mr-1" />
+                      Entrega estimada: {order.estimatedDelivery}
+                    </div>
+                  )}
+                  {order.status === "delivered" && (
+                    <div className="text-sm text-green-600">
+                      <CheckCircle2 className="w-4 h-4 inline mr-1" />
+                      Entregado a las {order.deliveredAt}
+                    </div>
+                  )}
+                </div>
+                <div className="flex flex-col gap-2">
+                  {order.status === "pending" && (
+                    <Button size="sm" variant="default">
+                      Iniciar Preparación
+                    </Button>
+                  )}
+                  {order.status === "preparing" && (
+                    <Button size="sm" variant="default">
+                      Marcar Entregado
+                    </Button>
+                  )}
+                </div>
+              </div>
+            </Card>
+          )
+        })}
+      </div>
+    </div>
+  )
+}
