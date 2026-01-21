@@ -41,7 +41,9 @@ export default function HomePage() {
   const handleAdminLogin = (e: React.FormEvent) => {
     e.preventDefault()
 
-    if (adminUser === "admin" && adminPassword === "1234") {
+    if (adminUser === "system" && adminPassword === "1234") {
+      router.push("/system/organizations")
+    } else if (adminUser === "admin" && adminPassword === "1234") {
       router.push("/admin")
     } else if (adminUser === "staff" && adminPassword === "1234") {
       router.push("/staff/tasks")
@@ -61,7 +63,7 @@ export default function HomePage() {
   return (
     <div className="min-h-screen relative flex items-center justify-center p-4 overflow-hidden">
       <video autoPlay muted loop playsInline className="absolute inset-0 w-full h-full object-cover">
-        <source src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/TheHost%20Background-lizASktvrNvDnvWKJbQZRboN5qyQo6.mp4" type="video/mp4" />
+        <source src="/images/thehost-20background.mp4" type="video/mp4" />
       </video>
 
       <div className="absolute inset-0 bg-black/40" />

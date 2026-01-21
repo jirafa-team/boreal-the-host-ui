@@ -22,8 +22,33 @@ export default function TaskDetailPage() {
       "Tareas específicas: Cambiar sábanas del dormitorio, limpiar baño completo, pasar aspiradora, organizar amenities",
   })
 
+  const [comment, setComment] = useState("")
+  const [commentError, setCommentError] = useState("")
+
+  const validateComment = () => {
+    if (task.status === "in-progress") {
+      if (!comment.trim()) {
+        setCommentError("Por favor, escribe un comentario antes de completar o cancelar la tarea")
+        return false
+      }
+      if (comment.trim().length < 5) {
+        setCommentError("El comentario debe tener al menos 5 caracteres")
+        return false
+      }
+    }
+    setCommentError("")
+    return true
+  }
+
   const handleStatusChange = (newStatus: string) => {
+    if ((newStatus === "completed" || newStatus === "cancelled") && task.status === "in-progress") {
+      if (!validateComment()) {
+        return
+      }
+    }
     setTask({ ...task, status: newStatus })
+    setComment("")
+    setCommentError("")
   }
 
   const getStatusColor = (status: string) => {
@@ -103,7 +128,8 @@ export default function TaskDetailPage() {
             {task.status !== "completed" && task.status !== "cancelled" && (
               <button
                 onClick={() => handleStatusChange("completed")}
-                className="flex items-center justify-center gap-2 bg-green-600 text-white py-3 rounded-lg font-semibold hover:bg-green-700 transition-colors"
+                className="flex items-center justify-center gap-2 bg-green-600 text-white py-3 rounded-lg font-semibold hover:bg-green-700 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed"
+                disabled={task.status === "in-progress" && !comment.trim()}
               >
                 <CheckCircle2 className="w-5 h-5" />
                 Completar
@@ -114,7 +140,8 @@ export default function TaskDetailPage() {
             {task.status !== "completed" && task.status !== "cancelled" && (
               <button
                 onClick={() => handleStatusChange("cancelled")}
-                className="flex items-center justify-center gap-2 bg-red-600 text-white py-3 rounded-lg font-semibold hover:bg-red-700 transition-colors"
+                className="flex items-center justify-center gap-2 bg-red-600 text-white py-3 rounded-lg font-semibold hover:bg-red-700 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed"
+                disabled={task.status === "in-progress" && !comment.trim()}
               >
                 <X className="w-5 h-5" />
                 Cancelar
@@ -165,6 +192,34 @@ export default function TaskDetailPage() {
           <p className="text-gray-600 text-sm mb-3">{task.description}</p>
           <p className="text-gray-700 text-sm border-l-4 border-blue-500 pl-3">{task.details}</p>
         </div>
+
+        {/* Comments Section - Only show when in-progress */}
+        {task.status === "in-progress" && (
+          <div className="bg-white rounded-lg p-4 shadow-sm">
+            <h3 className="font-semibold text-gray-900 mb-3">Comentarios de la Tarea</h3>
+            <div className="space-y-3">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Comentario <span className="text-red-500">*</span>
+                </label>
+                <textarea
+                  value={comment}
+                  onChange={(e) => {
+                    setComment(e.target.value)
+                    if (commentError) setCommentError("")
+                  }}
+                  placeholder="Describe lo que has hecho, cualquier incidencia, o notas importantes sobre esta tarea..."
+                  className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none ${
+                    commentError ? "border-red-500 bg-red-50" : "border-gray-300"
+                  }`}
+                  rows={4}
+                />
+                {commentError && <p className="text-red-600 text-sm mt-1">{commentError}</p>}
+                <p className="text-xs text-gray-500 mt-1">{comment.length} caracteres (mínimo 5)</p>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   )

@@ -1,8 +1,6 @@
 "use client"
 
-import type React from "react"
-
-import { useState } from "react"
+import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import {
@@ -18,6 +16,8 @@ import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Plus, Dumbbell, Waves, Sparkles, Video, Coffee, UtensilsCrossed, LayoutGrid, Clock } from "lucide-react"
 
+import React from "react"
+
 type Facility = {
   id: string
   name: string
@@ -25,6 +25,8 @@ type Facility = {
   capacity: number
   icon: typeof Dumbbell
   color: string
+  startTime: string
+  endTime: string
 }
 
 type Booking = {
@@ -37,13 +39,13 @@ type Booking = {
 }
 
 const mockFacilities: Facility[] = [
-  { id: "1", name: "Gimnasio", type: "fitness", capacity: 15, icon: Dumbbell, color: "bg-orange-500" },
-  { id: "2", name: "Piscina", type: "recreation", capacity: 30, icon: Waves, color: "bg-blue-500" },
-  { id: "3", name: "Spa", type: "wellness", capacity: 8, icon: Sparkles, color: "bg-purple-500" },
-  { id: "4", name: "Sala de Conferencias A", type: "business", capacity: 50, icon: Video, color: "bg-teal-500" },
-  { id: "5", name: "Sala de Conferencias B", type: "business", capacity: 25, icon: Video, color: "bg-cyan-500" },
-  { id: "6", name: "Cafetería", type: "dining", capacity: 40, icon: Coffee, color: "bg-amber-500" },
-  { id: "7", name: "Restaurante Premium", type: "dining", capacity: 60, icon: UtensilsCrossed, color: "bg-rose-500" },
+  { id: "1", name: "Gimnasio", type: "fitness", capacity: 15, icon: Dumbbell, color: "bg-orange-500", startTime: "06:00", endTime: "22:00" },
+  { id: "2", name: "Piscina", type: "recreation", capacity: 30, icon: Waves, color: "bg-blue-500", startTime: "08:00", endTime: "20:00" },
+  { id: "3", name: "Spa", type: "wellness", capacity: 8, icon: Sparkles, color: "bg-purple-500", startTime: "09:00", endTime: "21:00" },
+  { id: "4", name: "Sala de Conferencias A", type: "business", capacity: 50, icon: Video, color: "bg-teal-500", startTime: "07:00", endTime: "23:00" },
+  { id: "5", name: "Sala de Conferencias B", type: "business", capacity: 25, icon: Video, color: "bg-cyan-500", startTime: "07:00", endTime: "23:00" },
+  { id: "6", name: "Cafetería", type: "dining", capacity: 40, icon: Coffee, color: "bg-amber-500", startTime: "06:30", endTime: "23:00" },
+  { id: "7", name: "Restaurante Premium", type: "dining", capacity: 60, icon: UtensilsCrossed, color: "bg-rose-500", startTime: "12:00", endTime: "23:30" },
 ]
 
 const mockBookings: Booking[] = [
@@ -63,18 +65,22 @@ const mockBookings: Booking[] = [
 ]
 
 export default function FacilitiesPage() {
-  const [facilities, setFacilities] = useState<Facility[]>(mockFacilities)
-  const [bookings, setBookings] = useState<Booking[]>(mockBookings)
-  const [viewMode, setViewMode] = useState<"list" | "timeline">("timeline")
-  const [newBooking, setNewBooking] = useState({
+  const [facilities, setFacilities] = React.useState<Facility[]>(mockFacilities)
+  const [bookings, setBookings] = React.useState<Booking[]>(mockBookings)
+  const [viewMode, setViewMode] = React.useState<"list" | "timeline">("timeline")
+  const [newBooking, setNewBooking] = React.useState({
     facilityId: "",
     clientName: "",
     clientRoom: "",
     time: "",
     duration: 60,
   })
-  const [dialogOpen, setDialogOpen] = useState(false)
-  const [addFacilityOpen, setAddFacilityOpen] = useState(false)
+  const [dialogOpen, setDialogOpen] = React.useState(false)
+  const [addFacilityOpen, setAddFacilityOpen] = React.useState(false)
+  const [editingFacility, setEditingFacility] = React.useState<Facility | null>(null)
+  const [editDialogOpen, setEditDialogOpen] = React.useState(false)
+  const [selectedSlotBookings, setSelectedSlotBookings] = React.useState<Booking[]>([])
+  const [bookingsDetailOpen, setBookingsDetailOpen] = React.useState(false)
 
   const timeSlots = Array.from({ length: 17 }, (_, i) => {
     const hour = i + 7
@@ -128,11 +134,65 @@ export default function FacilitiesPage() {
       name: formData.get("name") as string,
       type: formData.get("type") as string,
       capacity: Number.parseInt(formData.get("capacity") as string),
+      startTime: formData.get("startTime") as string,
+      endTime: formData.get("endTime") as string,
       icon: Dumbbell,
       color: "bg-gray-500",
     }
     setFacilities([...facilities, newFacility])
     setAddFacilityOpen(false)
+  }
+
+  const handleEditFacility = (facility: Facility) => {
+    setEditingFacility(facility)
+    setEditDialogOpen(true)
+  }
+
+  const handleSaveEdit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault()
+    if (!editingFacility) return
+    const formData = new FormData(e.currentTarget)
+    const updatedFacility: Facility = {
+      ...editingFacility,
+      name: formData.get("name") as string,
+      type: formData.get("type") as string,
+      capacity: Number.parseInt(formData.get("capacity") as string),
+      startTime: formData.get("startTime") as string,
+      endTime: formData.get("endTime") as string,
+    }
+    setFacilities(facilities.map((f) => (f.id === editingFacility.id ? updatedFacility : f)))
+    setEditDialogOpen(false)
+    setEditingFacility(null)
+  }
+
+  // Get all bookings for a facility at a specific time slot
+  const getBookingsAtSlot = (facilityId: string, timeSlot: string): Booking[] => {
+    return bookings.filter((b) => {
+      if (b.facilityId !== facilityId) return false
+      const bookingStart = parseInt(b.time.split(":")[0])
+      const bookingEnd = bookingStart + b.duration / 60
+      const slotTime = parseInt(timeSlot.split(":")[0])
+      return slotTime >= bookingStart && slotTime < bookingEnd
+    })
+  }
+
+  // Get occupancy percentage for a facility at a time slot
+  const getOccupancyPercentage = (facilityId: string, timeSlot: string): number => {
+    const facility = facilities.find((f) => f.id === facilityId)
+    if (!facility) return 0
+    const slotBookings = getBookingsAtSlot(facilityId, timeSlot)
+    return Math.round((slotBookings.length / facility.capacity) * 100)
+  }
+
+  // Show bookings detail modal
+  const handleShowBookingsDetail = (bookingsList: Booking[]) => {
+    setSelectedSlotBookings(bookingsList)
+    setBookingsDetailOpen(true)
+  }
+
+  // Determine if facility is multi-party (gym, pool, spa) or single-party (conference room)
+  const isMultiPartyFacility = (facilityType: string): boolean => {
+    return ["fitness", "recreation", "wellness", "dining"].includes(facilityType)
   }
 
   return (
@@ -191,6 +251,16 @@ export default function FacilitiesPage() {
                 <div>
                   <Label htmlFor="capacity">Capacidad</Label>
                   <Input id="capacity" name="capacity" type="number" placeholder="15" required />
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <Label htmlFor="startTime">Hora de Apertura</Label>
+                    <Input id="startTime" name="startTime" type="time" required />
+                  </div>
+                  <div>
+                    <Label htmlFor="endTime">Hora de Cierre</Label>
+                    <Input id="endTime" name="endTime" type="time" required />
+                  </div>
                 </div>
                 <Button type="submit" className="w-full">
                   Agregar Facility
@@ -291,27 +361,135 @@ export default function FacilitiesPage() {
         </div>
       </div>
 
-      {/* List View */}
+      {/* Edit Facility Dialog */}
+      <Dialog open={editDialogOpen} onOpenChange={setEditDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Editar Facility</DialogTitle>
+            <DialogDescription>Actualiza los detalles del servicio o espacio</DialogDescription>
+          </DialogHeader>
+          <form onSubmit={handleSaveEdit} className="space-y-4">
+            <div>
+              <Label htmlFor="edit-name">Nombre</Label>
+              <Input id="edit-name" name="name" defaultValue={editingFacility?.name} required />
+            </div>
+            <div>
+              <Label htmlFor="edit-type">Tipo</Label>
+              <Select name="type" defaultValue={editingFacility?.type} required>
+                <SelectTrigger>
+                  <SelectValue placeholder="Seleccionar tipo" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="fitness">Fitness</SelectItem>
+                  <SelectItem value="recreation">Recreación</SelectItem>
+                  <SelectItem value="wellness">Bienestar</SelectItem>
+                  <SelectItem value="business">Negocios</SelectItem>
+                  <SelectItem value="dining">Gastronomía</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div>
+              <Label htmlFor="edit-capacity">Capacidad</Label>
+              <Input id="edit-capacity" name="capacity" type="number" defaultValue={editingFacility?.capacity} required />
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <Label htmlFor="edit-startTime">Hora de Apertura</Label>
+                <Input id="edit-startTime" name="startTime" type="time" defaultValue={editingFacility?.startTime} required />
+              </div>
+              <div>
+                <Label htmlFor="edit-endTime">Hora de Cierre</Label>
+                <Input id="edit-endTime" name="endTime" type="time" defaultValue={editingFacility?.endTime} required />
+              </div>
+            </div>
+            <Button type="submit" className="w-full">
+              Guardar Cambios
+            </Button>
+          </form>
+        </DialogContent>
+      </Dialog>
+
+      {/* Bookings Detail Dialog */}
+      <Dialog open={bookingsDetailOpen} onOpenChange={setBookingsDetailOpen}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>Participantes del horario</DialogTitle>
+            <DialogDescription>Listado de todos los usuarios reservados en este horario</DialogDescription>
+          </DialogHeader>
+          <div className="space-y-3 max-h-[400px] overflow-y-auto">
+            {selectedSlotBookings.length > 0 ? (
+              <>
+                <div className="bg-muted p-3 rounded-lg">
+                  <p className="text-sm font-medium">
+                    {selectedSlotBookings.length} de {facilities.find((f) => f.id === selectedSlotBookings[0]?.facilityId)?.capacity || 0} lugares ocupados
+                  </p>
+                  <div className="w-full bg-background rounded-full h-2 mt-2">
+                    <div
+                      className={`h-2 rounded-full transition-all ${
+                        (selectedSlotBookings.length / (facilities.find((f) => f.id === selectedSlotBookings[0]?.facilityId)?.capacity || 1)) * 100 > 80
+                          ? "bg-red-500"
+                          : (selectedSlotBookings.length / (facilities.find((f) => f.id === selectedSlotBookings[0]?.facilityId)?.capacity || 1)) * 100 > 50
+                            ? "bg-amber-500"
+                            : "bg-green-500"
+                      }`}
+                      style={{
+                        width: `${(selectedSlotBookings.length / (facilities.find((f) => f.id === selectedSlotBookings[0]?.facilityId)?.capacity || 1)) * 100}%`,
+                      }}
+                    />
+                  </div>
+                </div>
+                {selectedSlotBookings.map((booking, idx) => (
+                  <Card key={idx} className="p-3">
+                    <p className="font-semibold text-sm">{booking.clientName}</p>
+                    <div className="flex items-center justify-between text-xs text-muted-foreground mt-2">
+                      <span>Habitación {booking.clientRoom}</span>
+                      <Badge className={booking.status === "confirmed" ? "bg-green-600" : "bg-amber-600"}>
+                        {booking.status === "confirmed" ? "Confirmado" : "Pendiente"}
+                      </Badge>
+                    </div>
+                    <p className="text-xs text-muted-foreground mt-1">
+                      {booking.time} - {booking.duration / 60}h
+                    </p>
+                  </Card>
+                ))}
+              </>
+            ) : (
+              <p className="text-sm text-muted-foreground text-center py-4">No hay participantes en este horario</p>
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
       {viewMode === "list" && (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {facilities.map((facility) => {
             const Icon = facility.icon
             const facilityBookings = bookings.filter((b) => b.facilityId === facility.id)
             return (
-              <Card key={facility.id} className="p-6 hover:shadow-lg transition-shadow">
-                <div className="flex items-start gap-4">
-                  <div className={`${facility.color} p-3 rounded-lg`}>
+              <Card key={facility.id} className="p-6 hover:shadow-lg transition-shadow relative">
+                <div className="absolute top-6 right-6 space-y-2">
+                  <div className="bg-primary text-primary-foreground p-3 rounded-lg text-sm font-semibold">
+                    Capacidad: {facility.capacity}
+                  </div>
+                  <div className="bg-primary/80 text-primary-foreground p-3 rounded-lg text-sm font-medium">
+                    {facility.startTime} - {facility.endTime}
+                  </div>
+                </div>
+
+                <div className="flex items-start gap-4 mb-4">
+                  <div className={`${facility.color} p-3 rounded-lg shrink-0`}>
                     <Icon className="w-6 h-6 text-white" />
                   </div>
                   <div className="flex-1">
                     <h3 className="font-semibold text-lg">{facility.name}</h3>
-                    <p className="text-sm text-muted-foreground capitalize mb-3">{facility.type}</p>
-                    <div className="flex items-center justify-between text-sm">
-                      <span className="text-muted-foreground">Capacidad: {facility.capacity}</span>
-                      <span className="font-medium">{facilityBookings.length} reservas hoy</span>
-                    </div>
+                    <p className="text-sm text-muted-foreground capitalize">{facility.type}</p>
                   </div>
                 </div>
+                <Button
+                  onClick={() => handleEditFacility(facility)}
+                  className="w-full px-3 py-2 text-sm font-medium rounded-lg bg-primary/10 text-primary hover:bg-primary/20 transition-colors"
+                >
+                  Editar
+                </Button>
               </Card>
             )
           })}
@@ -339,7 +517,7 @@ export default function FacilitiesPage() {
                 return (
                   <div key={facility.id} className={`flex ${idx % 2 === 0 ? "bg-background" : "bg-muted/30"}`}>
                     {/* Info de facility */}
-                    <div className="w-64 p-4 border-r border-border flex items-center gap-3 shrink-0">
+                    <div className="w-64 p-4 border-r border-border flex items-center gap-3 shrink-0 group relative">
                       <div className={`${facility.color} p-2 rounded-lg shrink-0`}>
                         <Icon className="w-5 h-5 text-white" />
                       </div>
@@ -347,13 +525,22 @@ export default function FacilitiesPage() {
                         <p className="font-semibold text-sm truncate">{facility.name}</p>
                         <p className="text-xs text-muted-foreground capitalize">{facility.type}</p>
                         <p className="text-xs text-muted-foreground mt-0.5">Cap. {facility.capacity}</p>
+                        <p className="text-xs text-muted-foreground mt-0.5">{facility.startTime} - {facility.endTime}</p>
                       </div>
+                      <Button
+                        onClick={() => handleEditFacility(facility)}
+                        className="absolute right-2 top-2 opacity-0 group-hover:opacity-100 transition-opacity px-2 py-1 text-xs rounded bg-primary/10 text-primary hover:bg-primary/20"
+                      >
+                        Editar
+                      </Button>
                     </div>
 
                     <div className="flex">
                       {timeSlots.map((slot) => {
                         const bookingAtStart = isBookingStart(facility.id, slot)
                         const booking = getBookingForSlot(facility.id, slot)
+                        const slotBookings = getBookingsAtSlot(facility.id, slot)
+                        const occupancy = getOccupancyPercentage(facility.id, slot)
 
                         // Si hay una reserva que empieza en este slot
                         if (bookingAtStart) {
@@ -372,50 +559,121 @@ export default function FacilitiesPage() {
                                     ? "bg-gradient-to-br from-green-500/30 to-green-600/20 border-2 border-green-500"
                                     : "bg-gradient-to-br from-amber-500/30 to-amber-600/20 border-2 border-amber-500"
                                 } p-3 flex flex-col justify-center hover:shadow-lg transition-all cursor-pointer hover:scale-[1.02] min-h-[72px]`}
+                                onClick={() => slotBookings.length > 0 && handleShowBookingsDetail(slotBookings)}
                               >
-                                <p className="text-sm font-bold truncate text-foreground">
-                                  {bookingAtStart.clientName}
-                                </p>
-                                <p className="text-[10px] text-muted-foreground truncate">
-                                  Hab. {bookingAtStart.clientRoom}
-                                </p>
-                                <p className="text-[10px] text-muted-foreground font-medium mt-0.5">
-                                  {bookingAtStart.duration / 60}h
-                                </p>
+                                {/* Multi-party facilities show only capacity info */}
+                                {isMultiPartyFacility(facility.type) ? (
+                                  <div className="flex flex-col items-center justify-center gap-2">
+                                    <p className="text-lg font-bold text-foreground">
+                                      {slotBookings.length}/{facility.capacity}
+                                    </p>
+                                    <p className="text-[10px] text-muted-foreground">
+                                      Ocupación: {occupancy}%
+                                    </p>
+                                  </div>
+                                ) : (
+                                  <>
+                                    <p className="text-sm font-bold truncate text-foreground">
+                                      {slotBookings.length > 1 ? `${slotBookings.length} participantes` : bookingAtStart.clientName}
+                                    </p>
+                                    <p className="text-[10px] text-muted-foreground truncate">
+                                      {slotBookings.length > 1 ? `Ocupación: ${occupancy}%` : `Hab. ${bookingAtStart.clientRoom}`}
+                                    </p>
+                                    <div className="text-[10px] text-muted-foreground font-medium mt-0.5 flex items-center gap-2">
+                                      <span>{bookingAtStart.duration / 60}h</span>
+                                      {slotBookings.length > 0 && (
+                                        <span className="text-xs px-1.5 py-0.5 rounded bg-primary/20 text-primary">
+                                          {slotBookings.length}/{facility.capacity}
+                                        </span>
+                                      )}
+                                    </div>
+                                  </>
+                                )}
+                                
+                                {/* Barra de ocupación */}
+                                {slotBookings.length > 0 && (
+                                  <div className="mt-2 w-full bg-black/10 rounded-full h-1.5">
+                                    <div
+                                      className={`h-1.5 rounded-full transition-all ${
+                                        occupancy > 80
+                                          ? "bg-red-500"
+                                          : occupancy > 50
+                                            ? "bg-amber-500"
+                                            : "bg-green-500"
+                                      }`}
+                                      style={{ width: `${occupancy}%` }}
+                                    />
+                                  </div>
+                                )}
                               </div>
 
                               {/* Tooltip mejorado */}
                               <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 hidden group-hover:block z-20">
-                                <div className="bg-popover border border-border rounded-lg shadow-xl p-4 min-w-[220px]">
-                                  <p className="font-bold text-sm mb-2">{bookingAtStart.clientName}</p>
-                                  <div className="space-y-1">
-                                    <p className="text-xs text-muted-foreground flex items-center gap-2">
-                                      <span className="font-medium">Habitación:</span> {bookingAtStart.clientRoom}
-                                    </p>
-                                    <p className="text-xs text-muted-foreground flex items-center gap-2">
-                                      <span className="font-medium">Hora:</span> {bookingAtStart.time}
-                                    </p>
-                                    <p className="text-xs text-muted-foreground flex items-center gap-2">
-                                      <span className="font-medium">Duración:</span> {bookingAtStart.duration / 60}{" "}
-                                      hora(s)
-                                    </p>
-                                  </div>
-                                  <div className="mt-2 pt-2 border-t border-border">
-                                    <p
-                                      className={`text-xs font-semibold ${
-                                        bookingAtStart.status === "confirmed" ? "text-green-600" : "text-amber-600"
-                                      }`}
-                                    >
-                                      {bookingAtStart.status === "confirmed" ? "✓ Confirmada" : "⏳ Pendiente"}
-                                    </p>
-                                  </div>
+                                <div className="bg-popover border border-border rounded-lg shadow-xl p-4 min-w-[280px]">
+                                  <p className="font-bold text-sm mb-3">Detalles del horario {slot}</p>
+                                  {slotBookings.length > 0 ? (
+                                    <div className="space-y-2">
+                                      <p className="text-xs text-muted-foreground">
+                                        <span className="font-medium">Ocupación:</span> {slotBookings.length}/{facility.capacity} ({occupancy}%)
+                                      </p>
+                                      {slotBookings.length <= 3 ? (
+                                        <div className="space-y-2">
+                                          {slotBookings.map((b, idx) => (
+                                            <div key={idx} className="text-xs text-muted-foreground border-t border-border pt-2">
+                                              <p className="font-medium text-foreground">{b.clientName}</p>
+                                              <p>Hab. {b.clientRoom}</p>
+                                            </div>
+                                          ))}
+                                        </div>
+                                      ) : (
+                                        <Button
+                                          onClick={() => handleShowBookingsDetail(slotBookings)}
+                                          className="mt-2 text-xs text-primary hover:underline font-medium"
+                                        >
+                                          Ver los {slotBookings.length} participantes →
+                                        </Button>
+                                      )}
+                                    </div>
+                                  ) : (
+                                    <p className="text-xs text-muted-foreground">Sin reservas</p>
+                                  )}
                                 </div>
                               </div>
                             </div>
                           )
                         }
-                        // Si hay una reserva que cubre este slot pero no empieza aquí, no renderizar nada
+                        // Si hay una reserva que cubre este slot pero no empieza aquí, mostrar barra de ocupación
                         else if (booking) {
+                          const slotBookingsAtTime = getBookingsAtSlot(facility.id, slot)
+                          const occupancyAtTime = getOccupancyPercentage(facility.id, slot)
+                          
+                          if (slotBookingsAtTime.length > 0) {
+                            return (
+                              <div
+                                key={slot}
+                                className="w-32 border-r border-border p-2 shrink-0 min-h-[88px] flex items-center justify-center cursor-pointer hover:bg-primary/5 transition-colors"
+                                onClick={() => handleShowBookingsDetail(slotBookingsAtTime)}
+                              >
+                                <div className="w-full space-y-2">
+                                  <p className="text-xs font-medium text-foreground text-center">
+                                    {slotBookingsAtTime.length}/{facility.capacity}
+                                  </p>
+                                  <div className="w-full bg-black/10 rounded-full h-2">
+                                    <div
+                                      className={`h-2 rounded-full transition-all ${
+                                        occupancyAtTime > 80
+                                          ? "bg-red-500"
+                                          : occupancyAtTime > 50
+                                            ? "bg-amber-500"
+                                            : "bg-green-500"
+                                      }`}
+                                      style={{ width: `${occupancyAtTime}%` }}
+                                    />
+                                  </div>
+                                </div>
+                              </div>
+                            )
+                          }
                           return null
                         }
                         // Slot libre

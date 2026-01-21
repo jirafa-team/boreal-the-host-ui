@@ -152,11 +152,11 @@ export default function EventDetailPage() {
           </div>
 
           <div className="flex gap-2">
-            <Button variant="outline" size="sm" className="gap-2">
+            <Button variant="outline" size="sm" className="gap-2 bg-transparent">
               <Edit className="w-4 h-4" />
               Editar
             </Button>
-            <Button variant="outline" size="sm" className="gap-2 text-destructive hover:text-destructive">
+            <Button variant="outline" size="sm" className="gap-2 text-destructive hover:text-destructive bg-transparent">
               <Trash2 className="w-4 h-4" />
               Eliminar
             </Button>
@@ -164,9 +164,9 @@ export default function EventDetailPage() {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="space-y-6">
         {/* Main Content */}
-        <div className="lg:col-span-2 space-y-6">
+        <div className="space-y-6">
           {/* Event Image */}
           <Card className="overflow-hidden">
             <img src={event.image || "/placeholder.svg"} alt={event.name} className="w-full h-64 object-cover" />
@@ -224,139 +224,54 @@ export default function EventDetailPage() {
               <p className="text-muted-foreground leading-relaxed">{event.description}</p>
             </div>
           </Card>
+        </div>
 
-          {/* Attendees List */}
-          <Card className="p-6">
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-xl font-bold text-foreground">Clientes Registrados</h2>
-              <Button variant="outline" size="sm" className="gap-2">
-                <Mail className="w-4 h-4" />
-                Enviar Email a Todos
-              </Button>
-            </div>
+        {/* Attendees List - Full Width */}
+        <Card className="p-6">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-xl font-bold text-foreground">Clientes Registrados</h2>
+            <Button variant="outline" size="sm" className="gap-2 bg-transparent">
+              <Mail className="w-4 h-4" />
+              Enviar Email a Todos
+            </Button>
+          </div>
 
-            <div className="space-y-3">
-              {attendees.map((attendee) => (
-                <Card key={attendee.id} className="p-4 hover:bg-accent/50 transition-colors">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                      <Avatar>
-                        <AvatarImage src={attendee.avatar || "/placeholder.svg"} />
-                        <AvatarFallback className="bg-primary text-primary-foreground">
-                          {attendee.name
-                            .split(" ")
-                            .map((n) => n[0])
-                            .join("")}
-                        </AvatarFallback>
-                      </Avatar>
-                      <div>
-                        <div className="flex items-center gap-2">
-                          <p className="font-semibold text-foreground">{attendee.name}</p>
-                          {attendee.vip && (
-                            <Badge variant="secondary" className="text-xs">
-                              VIP
-                            </Badge>
-                          )}
-                        </div>
-                        <p className="text-sm text-muted-foreground">{attendee.email}</p>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {attendees.map((attendee) => (
+              <Card key={attendee.id} className="p-4 hover:bg-accent/50 transition-colors">
+                <div className="flex flex-col gap-3">
+                  <div className="flex items-center gap-3">
+                    <Avatar>
+                      <AvatarImage src={attendee.avatar || "/placeholder.svg"} />
+                      <AvatarFallback className="bg-primary text-primary-foreground">
+                        {attendee.name
+                          .split(" ")
+                          .map((n) => n[0])
+                          .join("")}
+                      </AvatarFallback>
+                    </Avatar>
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2">
+                        <p className="font-semibold text-foreground text-sm">{attendee.name}</p>
+                        {attendee.vip && (
+                          <Badge variant="secondary" className="text-xs">
+                            VIP
+                          </Badge>
+                        )}
                       </div>
-                    </div>
-
-                    <div className="text-right">
-                      <p className="text-sm font-medium text-foreground">Habitación {attendee.room}</p>
-                      <p className="text-xs text-muted-foreground">Registrado: {attendee.registeredAt}</p>
+                      <p className="text-xs text-muted-foreground">{attendee.email}</p>
                     </div>
                   </div>
-                </Card>
-              ))}
-            </div>
-          </Card>
-        </div>
 
-        {/* Sidebar */}
-        <div className="space-y-6">
-          {/* Occupancy Card */}
-          <Card className="p-6">
-            <h3 className="font-bold text-foreground mb-4">Estado de Ocupación</h3>
-
-            <div className="space-y-4">
-              <div>
-                <div className="flex items-center justify-between text-sm mb-2">
-                  <span className="text-muted-foreground">Registrados</span>
-                  <span className={`font-bold text-lg ${isNearCapacity ? "text-orange-600" : "text-foreground"}`}>
-                    {event.registered}
-                  </span>
+                  <div className="text-xs space-y-1">
+                    <p className="text-muted-foreground">Habitación <span className="font-medium text-foreground">{attendee.room}</span></p>
+                    <p className="text-muted-foreground">Reg. {attendee.registeredAt}</p>
+                  </div>
                 </div>
-                <div className="flex items-center justify-between text-sm mb-2">
-                  <span className="text-muted-foreground">Capacidad Total</span>
-                  <span className="font-semibold text-foreground">{event.capacity}</span>
-                </div>
-                <div className="flex items-center justify-between text-sm mb-3">
-                  <span className="text-muted-foreground">Disponibles</span>
-                  <span className="font-semibold text-green-600">{event.capacity - event.registered}</span>
-                </div>
-
-                <div className="w-full h-3 bg-muted rounded-full overflow-hidden">
-                  <div
-                    className={`h-full transition-all ${isNearCapacity ? "bg-orange-500" : "bg-primary"}`}
-                    style={{ width: `${occupancyPercent}%` }}
-                  />
-                </div>
-                <p className="text-center text-sm font-semibold text-foreground mt-2">{occupancyPercent}% ocupado</p>
-              </div>
-
-              {isNearCapacity && (
-                <div className="p-3 bg-orange-50 border border-orange-200 rounded-lg">
-                  <p className="text-xs text-orange-800 font-medium">⚠️ Cerca de capacidad máxima</p>
-                </div>
-              )}
-            </div>
-          </Card>
-
-          {/* Stats Card */}
-          <Card className="p-6">
-            <h3 className="font-bold text-foreground mb-4">Estadísticas</h3>
-
-            <div className="space-y-3">
-              <div className="flex items-center justify-between">
-                <span className="text-sm text-muted-foreground">Clientes VIP</span>
-                <span className="font-semibold text-foreground">
-                  {attendees.filter((a) => a.vip).length}
-                </span>
-              </div>
-
-              <div className="flex items-center justify-between">
-                <span className="text-sm text-muted-foreground">Total Registrados</span>
-                <span className="font-semibold text-foreground">{attendees.length}</span>
-              </div>
-
-              <div className="flex items-center justify-between">
-                <span className="text-sm text-muted-foreground">Tasa de Registro</span>
-                <span className="font-semibold text-primary">{occupancyPercent}%</span>
-              </div>
-            </div>
-          </Card>
-
-          {/* Actions Card */}
-          <Card className="p-6">
-            <h3 className="font-bold text-foreground mb-4">Acciones Rápidas</h3>
-
-            <div className="space-y-2">
-              <Button variant="outline" className="w-full justify-start gap-2" size="sm">
-                <Mail className="w-4 h-4" />
-                Enviar Recordatorio
-              </Button>
-              <Button variant="outline" className="w-full justify-start gap-2" size="sm">
-                <Users className="w-4 h-4" />
-                Exportar Lista
-              </Button>
-              <Button variant="outline" className="w-full justify-start gap-2" size="sm">
-                <Edit className="w-4 h-4" />
-                Editar Detalles
-              </Button>
-            </div>
-          </Card>
-        </div>
+              </Card>
+            ))}
+          </div>
+        </Card>
       </div>
     </div>
   )

@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { Calendar, Plus, Search, MapPin, Clock, Edit, Trash2, Eye } from 'lucide-react'
+import { Calendar, Plus, Search, MapPin, Clock, Edit, Trash2, Eye } from "lucide-react"
 import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -18,7 +18,8 @@ import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import Link from "next/link"
-import { useRouter } from 'next/navigation'
+import { useRouter } from "next/navigation"
+import { useLanguage } from "@/lib/i18n-context"
 
 type Event = {
   id: number
@@ -36,7 +37,10 @@ type Event = {
 
 export default function EventsManagement() {
   const router = useRouter()
+  const { t } = useLanguage()
   const [searchQuery, setSearchQuery] = useState("")
+  const [selectedDate, setSelectedDate] = useState("")
+  const [selectedLocation, setSelectedLocation] = useState("")
   const [createDialogOpen, setCreateDialogOpen] = useState(false)
   const [events, setEvents] = useState<Event[]>([
     {
@@ -87,6 +91,11 @@ export default function EventsManagement() {
     category: "conference" as Event["category"],
   })
 
+  const [dateFilter, setDateFilter] = useState({
+    start: "",
+    end: "",
+  })
+
   const handleCreateEvent = () => {
     const event: Event = {
       id: events.length + 1,
@@ -125,43 +134,50 @@ export default function EventsManagement() {
 
   const getCategoryLabel = (category: Event["category"]) => {
     const labels = {
-      conference: "Conferencia",
-      workshop: "Workshop",
-      social: "Social",
-      dining: "Gastronomía",
+      conference: t("admin.categoryConference"),
+      workshop: t("admin.categoryWorkshop"),
+      social: t("admin.categorySocial"),
+      dining: t("admin.categoryDining"),
     }
     return labels[category]
   }
 
   const filteredEvents = events.filter(
-    (event) =>
-      event.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      event.location.toLowerCase().includes(searchQuery.toLowerCase()),
+    (event) => {
+      const matchesSearch = 
+        event.name.toLowerCase().includes(searchQuery.toLowerCase())
+      
+      const matchesDate = !selectedDate || event.date === selectedDate
+      
+      const matchesLocation = !selectedLocation || selectedLocation === "all" || event.location === selectedLocation
+      
+      return matchesSearch && matchesDate && matchesLocation
+    }
   )
 
   return (
     <div className="p-8">
       <div className="mb-8">
         <div className="flex items-center justify-between mb-2">
-          <h1 className="text-3xl font-bold text-foreground">Gestión de Eventos</h1>
+          <h1 className="text-3xl font-bold text-foreground">{t("admin.eventsTitle")}</h1>
           <Dialog open={createDialogOpen} onOpenChange={setCreateDialogOpen}>
             <DialogTrigger asChild>
               <Button className="gap-2">
                 <Plus className="w-4 h-4" />
-                Crear Evento
+                {t("admin.createEvent")}
               </Button>
             </DialogTrigger>
             <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
               <DialogHeader>
-                <DialogTitle>Crear Nuevo Evento</DialogTitle>
-                <DialogDescription>Completa los datos del evento que será visible para los clientes</DialogDescription>
+                <DialogTitle>{t("admin.createEvent")}</DialogTitle>
+                <DialogDescription>{t("admin.completeEventData")}</DialogDescription>
               </DialogHeader>
               <div className="space-y-4 py-4">
                 <div className="space-y-2">
-                  <Label htmlFor="name">Nombre del Evento</Label>
+                  <Label htmlFor="name">{t("admin.eventName")}</Label>
                   <Input
                     id="name"
-                    placeholder="Ej: Conferencia Anual 2024"
+                    placeholder={t("admin.eventNamePlaceholder")}
                     value={newEvent.name}
                     onChange={(e) => setNewEvent({ ...newEvent, name: e.target.value })}
                   />
@@ -251,66 +267,96 @@ export default function EventsManagement() {
       </div>
 
       <Card className="p-6 mb-6">
-        <div className="relative">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-          <Input
-            placeholder="Buscar eventos por nombre o ubicación..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="pl-10"
-          />
+        <div className="flex gap-4 items-end">
+          <div className="relative flex-1">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+            <Input
+              placeholder="Buscar eventos por nombre..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="pl-10"
+            />
+          </div>
+
+          <div className="flex-1">
+            <Label htmlFor="date-filter" className="text-xs mb-1 block">Fecha</Label>
+            <Input
+              id="date-filter"
+              type="date"
+              value={selectedDate}
+              onChange={(e) => setSelectedDate(e.target.value)}
+            />
+          </div>
+          
+          <div className="flex-1">
+            <Label htmlFor="location-filter" className="text-xs mb-1 block">Ubicación</Label>
+            <Select value={selectedLocation} onValueChange={setSelectedLocation}>
+              <SelectTrigger id="location-filter">
+                <SelectValue placeholder="Seleccionar ubicación" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Todas</SelectItem>
+                {Array.from(new Set(events.map((e) => e.location))).map((location) => (
+                  <SelectItem key={location} value={location}>
+                    {location}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+          
+          {(selectedDate || selectedLocation) && (
+            <Button 
+              variant="outline" 
+              size="sm"
+              onClick={() => {
+                setSelectedDate("")
+                setSelectedLocation("")
+              }}
+            >
+              Limpiar
+            </Button>
+          )}
         </div>
       </Card>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {filteredEvents.map((event) => {
           const occupancyPercent = Math.round((event.registered / event.capacity) * 100)
           const isNearCapacity = occupancyPercent >= 80
 
           return (
-            <Card key={event.id} className="p-6 hover:shadow-lg transition-shadow">
-              <div className="flex items-start justify-between mb-4">
-                <div className="flex-1">
-                  <div className="flex items-center gap-3 mb-2">
-                    <div className={`w-3 h-3 rounded-full ${getCategoryColor(event.category)}`} />
-                    <Badge variant="outline" className="text-xs">
-                      {getCategoryLabel(event.category)}
-                    </Badge>
-                  </div>
-                  <h3 className="text-xl font-bold text-foreground mb-1">{event.name}</h3>
-                  <p className="text-sm text-muted-foreground line-clamp-2">{event.description}</p>
-                </div>
+            <Card key={event.id} className="p-6 hover:shadow-lg transition-shadow flex flex-col overflow-hidden">
+              {/* Chips de ubicación y fecha/hora en la parte superior */}
+              <div className="flex gap-2 mb-4">
+                <Badge className="bg-primary text-primary-foreground text-xs gap-1.5 flex items-center">
+                  <MapPin className="w-3.5 h-3.5" />
+                  {event.location}
+                </Badge>
+                <Badge className="bg-primary/80 text-primary-foreground text-xs gap-1.5 flex items-center">
+                  <Calendar className="w-3.5 h-3.5" />
+                  {new Date(event.date).toLocaleDateString("es-ES", {
+                    month: "short",
+                    day: "numeric",
+                  })}
+                  <span className="text-primary-foreground/70">•</span>
+                  <Clock className="w-3.5 h-3.5" />
+                  {event.time}
+                </Badge>
               </div>
 
-              <div className="space-y-3 mb-4">
-                <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                  <Calendar className="w-4 h-4" />
-                  <span>
-                    {new Date(event.date).toLocaleDateString("es-ES", {
-                      weekday: "long",
-                      year: "numeric",
-                      month: "long",
-                      day: "numeric",
-                    })}
-                  </span>
-                </div>
-
-                <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                  <Clock className="w-4 h-4" />
-                  <span>{event.time}</span>
-                </div>
-
-                <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                  <MapPin className="w-4 h-4" />
-                  <span>{event.location}</span>
-                </div>
+              {/* Header con nombre y descripción */}
+              <div className="mb-4">
+                <h3 className="text-xl font-bold text-foreground">{event.name}</h3>
+                <p className="text-sm text-muted-foreground mt-1 line-clamp-2">{event.description}</p>
               </div>
 
-              <div className="space-y-2 mb-4">
+              {/* Ocupación */}
+              <div className="space-y-2 mb-4 flex-grow">
                 <div className="flex items-center justify-between text-sm">
                   <span className="text-muted-foreground">Ocupación</span>
                   <span className={`font-semibold ${isNearCapacity ? "text-orange-600" : "text-foreground"}`}>
-                    {event.registered} / {event.capacity} ({occupancyPercent}%)
+                    {event.registered}/{event.capacity} ({occupancyPercent}%)
                   </span>
                 </div>
                 <div className="w-full h-2 bg-muted rounded-full overflow-hidden">
@@ -321,7 +367,8 @@ export default function EventsManagement() {
                 </div>
               </div>
 
-              <div className="flex gap-2">
+              {/* Botones de acción */}
+              <div className="flex gap-2 mt-auto">
                 <Button
                   variant="outline"
                   size="sm"

@@ -17,21 +17,33 @@ import {
   LogOut,
   Ticket,
   ShoppingBag,
+  UserCog,
+  Home,
+  Globe,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { useLanguage } from "@/lib/i18n-context"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const [sidebarOpen, setSidebarOpen] = useState(true)
   const pathname = usePathname()
-  const { t } = useLanguage()
+  const { t, language, setLanguage } = useLanguage()
+
+  const languages = [
+    { code: "es", name: "Español", flag: "🇪🇸" },
+    { code: "en", name: "English", flag: "🇬🇧" },
+    { code: "pt", name: "Português", flag: "🇵🇹" },
+    { code: "fr", name: "Français", flag: "🇫🇷" },
+  ]
 
   const navSections = [
     {
       title: t("admin.general"),
       items: [
+        { href: "/admin/home", label: t("admin.home"), icon: Home },
         { href: "/admin", label: t("admin.dashboard"), icon: BarChart3 },
         { href: "/admin/sales-assistant", label: t("admin.salesAssistant"), icon: TrendingUp },
       ],
@@ -47,7 +59,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       title: t("admin.services"),
       items: [
         { href: "/admin/facilities", label: t("admin.facilities"), icon: Building2 },
-        { href: "/admin/housekeeping", label: t("admin.housekeeping"), icon: Sparkles },
+        { href: "/admin/staff", label: t("admin.staff"), icon: Sparkles },
         { href: "/admin/events", label: t("admin.events"), icon: Calendar },
         { href: "/admin/tickets", label: t("admin.tickets"), icon: Ticket },
         { href: "/admin/pedidos", label: t("admin.orders"), icon: ShoppingBag },
@@ -59,6 +71,12 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         { href: "/admin/clients", label: t("admin.clients"), icon: Users },
         { href: "/admin/notifications", label: t("admin.notifications"), icon: Bell },
         { href: "/admin/recommendations", label: t("admin.recommendations"), icon: Compass },
+      ],
+    },
+    {
+      title: t("admin.management"),
+      items: [
+        { href: "/admin/users", label: t("admin.users"), icon: UserCog },
       ],
     },
   ]
@@ -120,6 +138,27 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             {sidebarOpen && <span>{t("admin.logout")}</span>}
           </Link>
         </div>
+
+        {sidebarOpen && (
+          <div className="p-2 border-t border-white/10">
+            <Select value={language} onValueChange={(value) => setLanguage(value as any)}>
+              <SelectTrigger className="bg-white/10 text-white border-white/20 hover:bg-white/20">
+                <Globe className="w-4 h-4 mr-2" />
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {languages.map((lang) => (
+                  <SelectItem key={lang.code} value={lang.code}>
+                    <span className="flex items-center gap-2">
+                      <span>{lang.flag}</span>
+                      <span>{lang.name}</span>
+                    </span>
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+        )}
       </aside>
 
       <main className="flex-1 overflow-auto">{children}</main>

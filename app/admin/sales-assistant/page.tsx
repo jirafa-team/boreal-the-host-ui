@@ -17,6 +17,7 @@ import {
   Clock,
 } from "lucide-react"
 import { useState } from "react"
+import { useLanguage } from "@/lib/i18n-context"
 
 type OfferStatus = "pending" | "accepted" | "rejected"
 
@@ -36,6 +37,9 @@ interface Offer {
 }
 
 export default function SalesAssistantPage() {
+  const [activeTab, setActiveTab] = useState<"pending" | "history">("pending")
+  const { t, language } = useLanguage()
+
   const [offers, setOffers] = useState<Offer[]>([
     {
       id: "1",
@@ -169,13 +173,11 @@ export default function SalesAssistantPage() {
     },
   ])
 
-  const [activeTab, setActiveTab] = useState<"pending" | "history">("pending")
-
   const handleAccept = (offerId: string) => {
     setOffers((prev) =>
       prev.map((offer) =>
         offer.id === offerId
-          ? { ...offer, status: "accepted", responseDate: new Date().toLocaleDateString("es-AR") }
+          ? { ...offer, status: "accepted", responseDate: new Date().toLocaleDateString(language === "es" ? "es-ES" : language === "pt" ? "pt-BR" : language === "en" ? "en-GB" : "fr-FR") }
           : offer,
       ),
     )
@@ -192,9 +194,9 @@ export default function SalesAssistantPage() {
   }
 
   const getProbabilityColor = (probability: number) => {
-    if (probability >= 80) return "text-green-600 bg-green-500/10 border-green-500/20"
-    if (probability >= 60) return "text-yellow-600 bg-yellow-500/10 border-yellow-500/20"
-    return "text-orange-600 bg-orange-500/10 border-orange-500/20"
+    if (probability >= 80) return "text-[#D946A6] bg-[#D946A6]/10 border-[#D946A6]/20"
+    if (probability >= 60) return "text-[#D946A6] bg-[#D946A6]/10 border-[#D946A6]/20"
+    return "text-[#D946A6] bg-[#D946A6]/10 border-[#D946A6]/20"
   }
 
   const pendingOffers = offers.filter((o) => o.status === "pending").sort((a, b) => b.probability - a.probability)
@@ -206,8 +208,8 @@ export default function SalesAssistantPage() {
   return (
     <div className="p-6 space-y-6">
       <div>
-        <h1 className="text-3xl font-bold text-gray-900">Sales Assistant</h1>
-        <p className="text-gray-600 mt-1">Ofertas individualizadas ordenadas por probabilidad de interés</p>
+        <h1 className="text-3xl font-bold text-gray-900">{t("admin.salesAssistantTitle")}</h1>
+        <p className="text-gray-600 mt-1">{t("admin.offersPersonalized")}</p>
       </div>
 
       {/* Stats Cards */}
@@ -216,7 +218,7 @@ export default function SalesAssistantPage() {
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-muted-foreground mb-1">Ofertas Pendientes</p>
+                <p className="text-sm text-muted-foreground mb-1">{t("admin.pendingOffers")}</p>
                 <p className="text-3xl font-bold text-foreground">{pendingOffers.length}</p>
               </div>
               <div className="w-12 h-12 rounded-full bg-blue-500/10 flex items-center justify-center">
@@ -230,7 +232,7 @@ export default function SalesAssistantPage() {
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-muted-foreground mb-1">Valor Pendiente</p>
+                <p className="text-sm text-muted-foreground mb-1">{t("admin.pendingValue")}</p>
                 <p className="text-3xl font-bold text-foreground">${pendingValue.toLocaleString()}</p>
               </div>
               <div className="w-12 h-12 rounded-full bg-purple-500/10 flex items-center justify-center">
@@ -244,7 +246,7 @@ export default function SalesAssistantPage() {
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-muted-foreground mb-1">Aceptadas</p>
+                <p className="text-sm text-muted-foreground mb-1">{t("admin.accepted")}</p>
                 <p className="text-3xl font-bold text-green-600">
                   {offers.filter((o) => o.status === "accepted").length}
                 </p>
@@ -260,7 +262,7 @@ export default function SalesAssistantPage() {
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-muted-foreground mb-1">Valor Aceptado</p>
+                <p className="text-sm text-muted-foreground mb-1">{t("admin.acceptedValue")}</p>
                 <p className="text-3xl font-bold text-green-600">${acceptedValue.toLocaleString()}</p>
               </div>
               <div className="w-12 h-12 rounded-full bg-green-500/10 flex items-center justify-center">
@@ -278,7 +280,7 @@ export default function SalesAssistantPage() {
             activeTab === "pending" ? "text-blue-600 border-b-2 border-blue-600" : "text-gray-600 hover:text-gray-900"
           }`}
         >
-          Ofertas Pendientes ({pendingOffers.length})
+          {t("admin.activeOffers")} ({pendingOffers.length})
         </button>
         <button
           onClick={() => setActiveTab("history")}
@@ -286,13 +288,13 @@ export default function SalesAssistantPage() {
             activeTab === "history" ? "text-blue-600 border-b-2 border-blue-600" : "text-gray-600 hover:text-gray-900"
           }`}
         >
-          Histórico ({historyOffers.length})
+          {t("admin.history")} ({historyOffers.length})
         </button>
       </div>
 
       <Card>
         <CardHeader>
-          <CardTitle>{activeTab === "pending" ? "Ofertas Activas" : "Histórico de Ofertas"}</CardTitle>
+          <CardTitle>{activeTab === "pending" ? t("admin.activeOffers") : t("admin.history")}</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="space-y-3">
@@ -309,10 +311,10 @@ export default function SalesAssistantPage() {
                     <h3 className="font-semibold text-foreground">{offer.service}</h3>
                     <div className="flex items-center gap-2 mt-1 flex-wrap">
                       <p className="text-sm text-muted-foreground">
-                        {offer.clientName} • Hab. {offer.room}
+                        {offer.clientName} • {t("admin.roomLabel")} {offer.room}
                       </p>
                       <Badge className={getProbabilityColor(offer.probability)} variant="outline">
-                        {offer.probability}% probabilidad
+                        {offer.probability}{t("admin.probability")}
                       </Badge>
                     </div>
                   </div>
@@ -325,34 +327,34 @@ export default function SalesAssistantPage() {
                     <div className="flex gap-2 shrink-0">
                       <Button
                         size="sm"
-                        variant="outline"
-                        className="text-green-600 border-green-600 hover:bg-green-50 bg-transparent"
+                        className="text-white hover:opacity-90 border-0"
+                        style={{ backgroundColor: "#235E20" }}
                         onClick={() => handleAccept(offer.id)}
                       >
                         <CheckCircle className="w-4 h-4 mr-1" />
-                        Aceptar
+                        {t("admin.acceptButton")}
                       </Button>
                       <Button
                         size="sm"
-                        variant="outline"
-                        className="text-red-600 border-red-600 hover:bg-red-50 bg-transparent"
+                        className="text-white hover:opacity-90 border-0"
+                        style={{ backgroundColor: "#AA2C2C" }}
                         onClick={() => handleReject(offer.id)}
                       >
                         <XCircle className="w-4 h-4 mr-1" />
-                        Rechazar
+                        {t("admin.rejectButton")}
                       </Button>
                     </div>
                   ) : (
                     <div className="shrink-0">
                       {offer.status === "accepted" ? (
-                        <Badge className="bg-green-500/10 text-green-600 border-green-500/20">
+                        <Badge className="text-white border-0" style={{ backgroundColor: "#235E20" }}>
                           <CheckCircle className="w-3 h-3 mr-1" />
-                          Aceptada
+                          {t("admin.acceptedLabel")}
                         </Badge>
                       ) : (
-                        <Badge className="bg-red-500/10 text-red-600 border-red-500/20">
+                        <Badge className="text-white border-0" style={{ backgroundColor: "#AA2C2C" }}>
                           <XCircle className="w-3 h-3 mr-1" />
-                          Rechazada
+                          {t("admin.rejectedLabel")}
                         </Badge>
                       )}
                       {offer.responseDate && <p className="text-xs text-muted-foreground mt-1">{offer.responseDate}</p>}
@@ -364,7 +366,9 @@ export default function SalesAssistantPage() {
 
             {(activeTab === "pending" ? pendingOffers : historyOffers).length === 0 && (
               <div className="text-center py-12 text-muted-foreground">
-                <p>No hay ofertas {activeTab === "pending" ? "pendientes" : "en el histórico"}</p>
+                <p>
+                  {activeTab === "pending" ? t("admin.noPendingOffers") : t("admin.noHistoryOffers")}
+                </p>
               </div>
             )}
           </div>
