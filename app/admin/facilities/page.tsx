@@ -14,7 +14,7 @@ import {
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Plus, Dumbbell, Waves, Sparkles, Video, Coffee, UtensilsCrossed, LayoutGrid, Clock } from "lucide-react"
+import { Plus, Dumbbell, Waves, Sparkles, Video, Coffee, UtensilsCrossed, LayoutGrid, Clock, Users } from "lucide-react"
 
 import React from "react"
 
@@ -67,7 +67,7 @@ const mockBookings: Booking[] = [
 export default function FacilitiesPage() {
   const [facilities, setFacilities] = React.useState<Facility[]>(mockFacilities)
   const [bookings, setBookings] = React.useState<Booking[]>(mockBookings)
-  const [viewMode, setViewMode] = React.useState<"list" | "timeline">("timeline")
+  const [viewMode, setViewMode] = React.useState<"list" | "timeline">("list")
   const [newBooking, setNewBooking] = React.useState({
     facilityId: "",
     clientName: "",
@@ -466,15 +466,6 @@ export default function FacilitiesPage() {
             const facilityBookings = bookings.filter((b) => b.facilityId === facility.id)
             return (
               <Card key={facility.id} className="p-6 hover:shadow-lg transition-shadow relative">
-                <div className="absolute top-6 right-6 space-y-2">
-                  <div className="bg-primary text-primary-foreground p-3 rounded-lg text-sm font-semibold">
-                    Capacidad: {facility.capacity}
-                  </div>
-                  <div className="bg-primary/80 text-primary-foreground p-3 rounded-lg text-sm font-medium">
-                    {facility.startTime} - {facility.endTime}
-                  </div>
-                </div>
-
                 <div className="flex items-start gap-4 mb-4">
                   <div className={`${facility.color} p-3 rounded-lg shrink-0`}>
                     <Icon className="w-6 h-6 text-white" />
@@ -484,6 +475,24 @@ export default function FacilitiesPage() {
                     <p className="text-sm text-muted-foreground capitalize">{facility.type}</p>
                   </div>
                 </div>
+
+                {/* Top Right Corner - Time Slot and Capacity */}
+                <div className="absolute top-6 right-6 space-y-2 flex flex-col items-end">
+                  {/* Time Slot - Elegant Dark Pink Chip */}
+                  <Badge className="bg-sky-100 hover:bg-sky-200 text-black text-xs font-bold px-3 py-1.5 shrink-0 border-sky-200">
+                    <Clock className="w-3 h-3 mr-1" />
+                    {facility.startTime} - {facility.endTime}
+                  </Badge>
+
+                  {/* Capacity with Person Icon */}
+                  <div className="flex items-center gap-2 text-sm">
+                    <Users className="w-4 h-4 text-muted-foreground" />
+                    <span className="font-medium text-foreground">
+                      {facility.capacity}
+                    </span>
+                  </div>
+                </div>
+
                 <Button
                   onClick={() => handleEditFacility(facility)}
                   className="w-full px-3 py-2 text-sm font-medium rounded-lg bg-primary/10 text-primary hover:bg-primary/20 transition-colors"

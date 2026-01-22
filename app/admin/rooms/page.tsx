@@ -26,6 +26,7 @@ type LayoutMode = "grid" | "kanban"
 export default function RoomsManagement() {
   const [viewMode, setViewMode] = useState<ViewMode>("week")
   const [layoutMode, setLayoutMode] = useState<LayoutMode>("grid")
+  const [timelineMode, setTimelineMode] = useState<"week" | "month">("week")
   const [currentDate, setCurrentDate] = useState(new Date())
   const [searchTerm, setSearchTerm] = useState("")
   const { t } = useLanguage()
@@ -167,7 +168,7 @@ export default function RoomsManagement() {
           date: new Date(startDate.setHours(i, 0, 0, 0)),
         })
       }
-    } else if (viewMode === "week") {
+    } else if (timelineMode === "week") {
       startDate.setDate(startDate.getDate() - startDate.getDay())
       for (let i = 0; i < 7; i++) {
         const date = new Date(startDate)
@@ -247,25 +248,25 @@ export default function RoomsManagement() {
         {/* Stats Cards - Only show for Grid view */}
         {layoutMode === "grid" && (
           <div className="grid grid-cols-2 md:grid-cols-5 gap-3 mb-6">
-            <Card className="p-4 bg-gradient-to-br from-blue-50 to-white border-l-4 border-blue-500">
+            <Card className="p-4 bg-gradient-to-br from-blue-50 to-white text-center">
+              <p className="text-5xl font-bold text-blue-600 mb-1">{stats.total}</p>
               <p className="text-xs text-muted-foreground font-medium">{t("admin.totalRooms")}</p>
-              <p className="text-2xl font-bold text-blue-600 mt-1">{stats.total}</p>
             </Card>
-            <Card className="p-4 bg-gradient-to-br from-green-50 to-white border-l-4 border-green-500">
+            <Card className="p-4 bg-gradient-to-br from-green-50 to-white text-center">
+              <p className="text-5xl font-bold text-green-600 mb-1">{stats.available}</p>
               <p className="text-xs text-muted-foreground font-medium">{t("admin.availableRooms")}</p>
-              <p className="text-2xl font-bold text-green-600 mt-1">{stats.available}</p>
             </Card>
-            <Card className="p-4 bg-gradient-to-br from-red-50 to-white border-l-4 border-red-500">
+            <Card className="p-4 bg-gradient-to-br from-red-50 to-white text-center">
+              <p className="text-5xl font-bold text-red-600 mb-1">{stats.occupied}</p>
               <p className="text-xs text-muted-foreground font-medium">{t("admin.occupiedRooms")}</p>
-              <p className="text-2xl font-bold text-red-600 mt-1">{stats.occupied}</p>
             </Card>
-            <Card className="p-4 bg-gradient-to-br from-blue-100 to-white border-l-4 border-blue-600">
+            <Card className="p-4 bg-gradient-to-br from-blue-100 to-white text-center">
+              <p className="text-5xl font-bold text-blue-700 mb-1">{stats.reserved}</p>
               <p className="text-xs text-muted-foreground font-medium">{t("admin.reservedRooms")}</p>
-              <p className="text-2xl font-bold text-blue-700 mt-1">{stats.reserved}</p>
             </Card>
-            <Card className="p-4 bg-gradient-to-br from-yellow-50 to-white border-l-4 border-yellow-500">
+            <Card className="p-4 bg-gradient-to-br from-yellow-50 to-white text-center">
+              <p className="text-5xl font-bold text-yellow-600 mb-1">{stats.maintenance}</p>
               <p className="text-xs text-muted-foreground font-medium">{t("admin.maintenanceRooms")}</p>
-              <p className="text-2xl font-bold text-yellow-600 mt-1">{stats.maintenance}</p>
             </Card>
           </div>
         )}
@@ -290,18 +291,16 @@ export default function RoomsManagement() {
           /* Rooms Grid */
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
             {filteredRooms.map((room) => (
-              <Card key={room.id} className="p-4 hover:shadow-lg transition-shadow cursor-pointer">
+              <Card key={room.id} className="p-4 hover:shadow-lg transition-shadow cursor-pointer relative">
                 <div className="flex items-start justify-between mb-3">
                   <div>
                     <h3 className="text-lg font-bold text-foreground">{t("admin.roomNumber")} {room.number}</h3>
                     <p className="text-sm text-muted-foreground">{room.type}</p>
                     <p className="text-xs text-muted-foreground">{t("admin.floorLabel")} {room.floor}</p>
                   </div>
-                </div>
-
-                <div className="space-y-2">
+                  {/* Status Badge - Top Right */}
                   <div
-                    className={`px-3 py-1.5 rounded-lg text-xs font-medium text-center text-white ${
+                    className={`px-3 py-1.5 rounded-lg text-xs font-medium text-white shrink-0 ${
                       room.status === "available"
                         ? "bg-green-600"
                         : room.status === "occupied"
@@ -313,28 +312,28 @@ export default function RoomsManagement() {
                   >
                     {getStatusLabel(room.status)}
                   </div>
+                </div>
 
-                  {room.guest && (
-                    <div className="pt-2 border-t border-border">
-                      <p className="text-xs text-muted-foreground mb-1">{t("admin.roomGuestLabel")}</p>
-                      <button 
-                        onClick={() => {
-                          console.log("[v0] Guest clicked:", room.guest)
-                          // TODO: Add guest detail modal or navigation here
-                        }}
-                        className="text-sm font-medium text-foreground hover:text-primary hover:underline cursor-pointer transition-colors"
-                      >
-                        {room.guest}
-                      </button>
-                      {room.checkIn && room.checkOut && (
-                        <div className="flex items-center gap-2 mt-2 text-xs text-muted-foreground">
-                          <span>{new Date(room.checkIn).toLocaleDateString("es-ES")}</span>
-                          <span>→</span>
-                          <span>{new Date(room.checkOut).toLocaleDateString("es-ES")}</span>
-                        </div>
-                      )}
-                    </div>
-                  )}
+                <div className="space-y-2">
+                  <div className="pt-2 border-t border-border">
+                    <p className="text-xs text-muted-foreground mb-1">{t("admin.roomGuestLabel")}</p>
+                    <button 
+                      onClick={() => {
+                        console.log("[v0] Guest clicked:", room.guest)
+                        // TODO: Add guest detail modal or navigation here
+                      }}
+                      className="text-sm font-medium text-foreground hover:text-primary hover:underline cursor-pointer transition-colors"
+                    >
+                      {room.guest}
+                    </button>
+                    {room.checkIn && room.checkOut && (
+                      <div className="flex items-center gap-2 mt-2 text-xs text-muted-foreground">
+                        <span>{new Date(room.checkIn).toLocaleDateString("es-ES")}</span>
+                        <span>→</span>
+                        <span>{new Date(room.checkOut).toLocaleDateString("es-ES")}</span>
+                      </div>
+                    )}
+                  </div>
                 </div>
               </Card>
             ))}
@@ -342,6 +341,24 @@ export default function RoomsManagement() {
         ) : (
           /* Kanban Timeline View */
           <div className="space-y-4">
+            {/* Timeline Mode Toggle */}
+            <div className="flex gap-2">
+              <Button
+                variant={timelineMode === "week" ? "default" : "outline"}
+                size="sm"
+                onClick={() => setTimelineMode("week")}
+              >
+                {t("admin.weekView")}
+              </Button>
+              <Button
+                variant={timelineMode === "month" ? "default" : "outline"}
+                size="sm"
+                onClick={() => setTimelineMode("month")}
+              >
+                {t("admin.monthView")}
+              </Button>
+            </div>
+
             {/* Timeline Table */}
             <Card className="p-6 overflow-x-auto">
               <div className="min-w-max">
@@ -354,7 +371,7 @@ export default function RoomsManagement() {
                     {dateColumns.map((col, idx) => (
                       <div
                         key={idx}
-                        className={`${viewMode === "day" ? "w-16" : viewMode === "week" ? "w-24" : "w-12"} text-center flex-shrink-0`}
+                        className={`${timelineMode === "week" ? "w-24" : "w-12"} text-center flex-shrink-0`}
                       >
                         <p className="text-xs font-medium text-muted-foreground">{col.label}</p>
                       </div>

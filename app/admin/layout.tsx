@@ -20,6 +20,7 @@ import {
   UserCog,
   Home,
   Globe,
+  ChevronDown,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import Link from "next/link"
@@ -29,6 +30,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const [sidebarOpen, setSidebarOpen] = useState(true)
+  const [expandedSections, setExpandedSections] = useState<Set<string>>(new Set(["general", "spaces"]))
   const pathname = usePathname()
   const { t, language, setLanguage } = useLanguage()
 
@@ -41,14 +43,17 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
   const navSections = [
     {
+      id: "general",
       title: t("admin.general"),
       items: [
         { href: "/admin/home", label: t("admin.home"), icon: Home },
+        { href: "/admin/dashboard", label: t("admin.controlDashboard"), icon: BarChart3 },
         { href: "/admin", label: t("admin.dashboard"), icon: BarChart3 },
         { href: "/admin/sales-assistant", label: t("admin.salesAssistant"), icon: TrendingUp },
       ],
     },
     {
+      id: "spaces",
       title: t("admin.spaces"),
       items: [
         { href: "/admin/rooms", label: t("admin.rooms"), icon: Hotel },
@@ -56,6 +61,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       ],
     },
     {
+      id: "services",
       title: t("admin.services"),
       items: [
         { href: "/admin/facilities", label: t("admin.facilities"), icon: Building2 },
@@ -66,6 +72,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       ],
     },
     {
+      id: "communication",
       title: t("admin.communication"),
       items: [
         { href: "/admin/clients", label: t("admin.clients"), icon: Users },
@@ -74,12 +81,23 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       ],
     },
     {
+      id: "management",
       title: t("admin.management"),
       items: [
         { href: "/admin/users", label: t("admin.users"), icon: UserCog },
       ],
     },
   ]
+
+  const toggleSection = (sectionId: string) => {
+    const newExpanded = new Set(expandedSections)
+    if (newExpanded.has(sectionId)) {
+      newExpanded.delete(sectionId)
+    } else {
+      newExpanded.add(sectionId)
+    }
+    setExpandedSections(newExpanded)
+  }
 
   return (
     <div className="flex h-screen bg-background">
@@ -101,30 +119,61 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
         <nav className="flex-1 p-2 space-y-4 overflow-y-auto">
           {navSections.map((section) => (
-            <div key={section.title}>
-              {sidebarOpen && (
-                <h3 className="px-3 mb-2 text-xs font-semibold text-white/70 uppercase tracking-wider">
-                  {section.title}
-                </h3>
-              )}
-              <div className="space-y-1">
-                {section.items.map((item) => {
-                  const Icon = item.icon
-                  const isActive = pathname === item.href
-                  return (
-                    <Link
-                      key={item.href}
-                      href={item.href}
-                      className={`flex items-center gap-3 px-3 py-2 rounded-lg transition-colors ${
-                        isActive ? "bg-white/20 text-white font-medium" : "text-white/90 hover:bg-white/10"
+            <div key={section.id}>
+              {sidebarOpen ? (
+                <>
+                  <button
+                    onClick={() => toggleSection(section.id)}
+                    className="w-full px-3 mb-2 text-xs font-semibold text-white/70 uppercase tracking-wider hover:text-white/90 flex items-center justify-between transition-colors"
+                  >
+                    <span>{section.title}</span>
+                    <ChevronDown
+                      className={`w-4 h-4 transition-transform ${
+                        expandedSections.has(section.id) ? "rotate-0" : "-rotate-90"
                       }`}
-                    >
-                      <Icon className="w-5 h-5 shrink-0" />
-                      {sidebarOpen && <span>{item.label}</span>}
-                    </Link>
-                  )
-                })}
-              </div>
+                    />
+                  </button>
+                  {expandedSections.has(section.id) && (
+                    <div className="space-y-1">
+                      {section.items.map((item) => {
+                        const Icon = item.icon
+                        const isActive = pathname === item.href
+                        return (
+                          <Link
+                            key={item.href}
+                            href={item.href}
+                            className={`flex items-center gap-3 px-3 py-2 rounded-lg transition-colors ${
+                              isActive ? "bg-white/20 text-white font-medium" : "text-white/90 hover:bg-white/10"
+                            }`}
+                          >
+                            <Icon className="w-5 h-5 shrink-0" />
+                            <span>{item.label}</span>
+                          </Link>
+                        )
+                      })}
+                    </div>
+                  )}
+                </>
+              ) : (
+                <div className="space-y-1">
+                  {section.items.map((item) => {
+                    const Icon = item.icon
+                    const isActive = pathname === item.href
+                    return (
+                      <Link
+                        key={item.href}
+                        href={item.href}
+                        title={item.label}
+                        className={`flex items-center justify-center gap-3 px-3 py-2 rounded-lg transition-colors ${
+                          isActive ? "bg-white/20 text-white font-medium" : "text-white/90 hover:bg-white/10"
+                        }`}
+                      >
+                        <Icon className="w-5 h-5 shrink-0" />
+                      </Link>
+                    )
+                  })}
+                </div>
+              )}
             </div>
           ))}
         </nav>

@@ -465,7 +465,7 @@ export default function StaffManagement() {
   const [viewMode, setViewMode] = useState<"overview" | "kanban">("overview")
   const [collapsedStaff, setCollapsedStaff] = useState<Set<number>>(new Set())
   const [searchName, setSearchName] = useState("")
-  const [filterDepartment, setFilterDepartment] = useState("")
+  const [filterDepartment, setFilterDepartment] = useState("all")
 
   const availableStaff = staff.filter((s) => s.status === "available")
   const busyStaff = staff.filter((s) => s.status === "busy")
@@ -705,10 +705,10 @@ export default function StaffManagement() {
 
       {viewMode === "overview" && (
         <div>
-          {/* Staff List */}
+          {/* Staff List - Grid Layout */}
           <Card className="p-6">
-            <h2 className="text-xl font-bold text-foreground mb-4">Personal de Staff</h2>
-            <div className="space-y-3">
+            <h2 className="text-xl font-bold text-foreground mb-4">{t("admin.staffMembers")}</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
               {staff.map((member) => (
                 <Card
                   key={member.id}
@@ -717,34 +717,28 @@ export default function StaffManagement() {
                   }`}
                   onClick={() => setSelectedStaff(member)}
                 >
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                      <div className="w-12 h-12 bg-gradient-to-br from-primary to-primary/80 rounded-full flex items-center justify-center text-white font-bold shadow-md">
-                        {member.avatar}
-                      </div>
-                      <div>
-                        <h3 className="font-semibold text-foreground">{member.name}</h3>
-                        <p className="text-sm text-muted-foreground">{member.department}</p>
-                        <p className="text-xs text-muted-foreground mt-1">{member.shift}</p>
-                      </div>
+                  <div className="flex flex-col items-center text-center">
+                    <div className="w-12 h-12 bg-gradient-to-br from-primary to-primary/80 rounded-full flex items-center justify-center text-white font-bold shadow-md mb-3">
+                      {member.avatar}
                     </div>
-                    <div className="text-right">
-                      <Badge className={getStatusColor(member.status) + " text-white"}>
-                        {getStatusText(member.status)}
-                      </Badge>
-                      {member.currentRoom && (
-                        <p className="text-xs text-muted-foreground mt-1">Hab. {member.currentRoom}</p>
-                      )}
-                    </div>
+                    <h3 className="font-semibold text-foreground text-sm">{member.name}</h3>
+                    <p className="text-xs text-muted-foreground">{member.department}</p>
+                    <p className="text-xs text-muted-foreground mt-1">{member.shift}</p>
+                    <Badge className={`${getStatusColor(member.status)} text-white mt-3`}>
+                      {getStatusText(member.status)}
+                    </Badge>
+                    {member.currentRoom && (
+                      <p className="text-xs text-muted-foreground mt-2">Hab. {member.currentRoom}</p>
+                    )}
                   </div>
-                  <div className="mt-3 pt-3 border-t border-border">
-                    <div className="flex items-center justify-between text-sm">
-                      <span className="text-muted-foreground">Tareas hoy</span>
+                  <div className="mt-4 pt-4 border-t border-border">
+                    <div className="flex items-center justify-between text-sm mb-2">
+                      <span className="text-muted-foreground">{t("admin.tasksToday")}</span>
                       <span className="font-semibold text-foreground">
                         {member.tasksToday} / {member.maxCapacity}
                       </span>
                     </div>
-                    <div className="w-full bg-muted rounded-full h-2 mt-2">
+                    <div className="w-full bg-muted rounded-full h-2">
                       <div
                         className="bg-primary rounded-full h-2 transition-all"
                         style={{ width: `${(member.tasksToday / member.maxCapacity) * 100}%` }}

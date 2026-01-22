@@ -942,57 +942,21 @@ export default function ClientPage({ searchParams }: { searchParams: { type?: st
                       </DialogContent>
                     </Dialog>
 
-                    <Dialog>
-                      <DialogTrigger asChild>
-                        <Card className="relative overflow-hidden cursor-pointer hover:shadow-lg transition-all h-40">
-                          <Image
-                            src="/beautiful-city-landmarks-attractions.jpg"
-                            alt="Visitas Ciudad"
-                            fill
-                            className="object-cover"
-                          />
-                          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
-                          <div className="absolute bottom-0 left-0 right-0 p-4 text-white">
-                            <p className="text-sm font-bold">Visitas</p>
-                            <p className="text-xs opacity-90">Ciudad</p>
-                          </div>
-                        </Card>
-                      </DialogTrigger>
-                      <DialogContent className="sm:max-w-md max-h-[80vh] overflow-y-auto">
-                        <DialogHeader>
-                          <DialogTitle>Recomendaciones de la Ciudad</DialogTitle>
-                          <DialogDescription>Lugares imprescindibles cerca del hotel</DialogDescription>
-                        </DialogHeader>
-                        <div className="space-y-3 py-4">
-                          {cityRecommendations.map((place, idx) => (
-                            <Card key={idx} className="p-4 hover:shadow-md transition-shadow">
-                              <div className="flex justify-between items-start mb-2">
-                                <div className="flex-1">
-                                  <h4 className="font-bold text-foreground">{place.name}</h4>
-                                  <div className="flex items-center gap-2 mt-1">
-                                    <Badge variant="outline" className="text-xs">
-                                      {place.category}
-                                    </Badge>
-                                    <span className="text-xs text-muted-foreground flex items-center gap-1">
-                                      <MapPin className="w-3 h-3" />
-                                      {place.distance}
-                                    </span>
-                                  </div>
-                                </div>
-                                <div className="flex items-center gap-1 text-amber-500">
-                                  <span className="text-sm font-bold">★</span>
-                                  <span className="text-sm font-semibold">{place.rating}</span>
-                                </div>
-                              </div>
-                              <p className="text-xs text-muted-foreground mb-3">{place.description}</p>
-                              <Button variant="outline" size="sm" className="w-full bg-transparent">
-                                Ver más información
-                              </Button>
-                            </Card>
-                          ))}
+                    <Link href="/client/recommendations">
+                      <Card className="relative overflow-hidden cursor-pointer hover:shadow-lg transition-all h-40">
+                        <Image
+                          src="/beautiful-city-landmarks-attractions.jpg"
+                          alt="Visitas Ciudad"
+                          fill
+                          className="object-cover"
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
+                        <div className="absolute bottom-0 left-0 right-0 p-4 text-white">
+                          <p className="text-sm font-bold">Visitas</p>
+                          <p className="text-xs opacity-90">Ciudad</p>
                         </div>
-                      </DialogContent>
-                    </Dialog>
+                      </Card>
+                    </Link>
                   </div>
                 </div>
               </div>
