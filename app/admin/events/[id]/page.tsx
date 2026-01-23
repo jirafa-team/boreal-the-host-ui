@@ -1,11 +1,17 @@
 "use client"
 
 import { useParams, useRouter } from 'next/navigation'
-import { ArrowLeft, Calendar, Clock, MapPin, Users, Edit, Trash2, Mail } from 'lucide-react'
+import { useSearchParams } from 'next/navigation'
+import { Suspense } from 'react'
+import { ArrowLeft, Calendar, Clock, MapPin, Users, Edit, Trash2, Mail, Search, Plus, X } from 'lucide-react'
 import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { Input } from "@/components/ui/input"
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
+import React, { useState } from 'react'
+import Loading from './loading'
 
 type Event = {
   id: number
@@ -31,12 +37,17 @@ type Attendee = {
   registeredAt: string
   avatar?: string
   vip: boolean
+  type: "hospedado" | "historico" | "invitado"
 }
 
 export default function EventDetailPage() {
   const params = useParams()
   const router = useRouter()
+  const searchParams = useSearchParams()
   const eventId = Number(params.id)
+  const [searchQuery, setSearchQuery] = useState("")
+  const [addGuestDialogOpen, setAddGuestDialogOpen] = useState(false)
+  const [addGuestSearchQuery, setAddGuestSearchQuery] = useState("")
 
   // Mock data - En producción vendría de una API
   const event: Event = {
@@ -64,6 +75,7 @@ export default function EventDetailPage() {
       checkOut: "2024-11-15",
       registeredAt: "2024-11-10 14:30",
       vip: true,
+      type: "hospedado",
     },
     {
       id: 2,
@@ -74,6 +86,7 @@ export default function EventDetailPage() {
       checkOut: "2024-11-14",
       registeredAt: "2024-11-09 09:15",
       vip: false,
+      type: "hospedado",
     },
     {
       id: 3,
@@ -84,6 +97,7 @@ export default function EventDetailPage() {
       checkOut: "2024-11-16",
       registeredAt: "2024-11-08 16:45",
       vip: true,
+      type: "hospedado",
     },
     {
       id: 4,
@@ -94,6 +108,7 @@ export default function EventDetailPage() {
       checkOut: "2024-11-13",
       registeredAt: "2024-11-10 11:20",
       vip: false,
+      type: "historico",
     },
     {
       id: 5,
@@ -104,6 +119,41 @@ export default function EventDetailPage() {
       checkOut: "2024-11-15",
       registeredAt: "2024-11-09 13:00",
       vip: true,
+      type: "invitado",
+    },
+  ]
+
+  // Mock available guests to add
+  const availableGuests: Attendee[] = [
+    {
+      id: 6,
+      name: "Pedro Sánchez",
+      email: "pedro.sanchez@email.com",
+      room: "204",
+      checkIn: "2024-11-13",
+      checkOut: "2024-11-17",
+      registeredAt: "",
+      vip: false,
+    },
+    {
+      id: 7,
+      name: "Laura Gómez",
+      email: "laura.gomez@email.com",
+      room: "506",
+      checkIn: "2024-11-11",
+      checkOut: "2024-11-14",
+      registeredAt: "",
+      vip: true,
+    },
+    {
+      id: 8,
+      name: "David López",
+      email: "david.lopez@email.com",
+      room: "305",
+      checkIn: "2024-11-12",
+      checkOut: "2024-11-16",
+      registeredAt: "",
+      vip: false,
     },
   ]
 
@@ -165,18 +215,18 @@ export default function EventDetailPage() {
       </div>
 
       <div className="space-y-6">
-        {/* Main Content */}
-        <div className="space-y-6">
-          {/* Event Image */}
-          <Card className="overflow-hidden">
-            <img src={event.image || "/placeholder.svg"} alt={event.name} className="w-full h-64 object-cover" />
+        {/* Main Content - Image and Details Side by Side */}
+        <div className="grid grid-cols-2 gap-6">
+          {/* Event Image - 50% width */}
+          <Card className="overflow-hidden h-fit">
+            <img src={event.image || "/placeholder.svg"} alt={event.name} className="w-full h-80 object-cover" />
           </Card>
 
-          {/* Event Details */}
+          {/* Event Details - 50% width */}
           <Card className="p-6">
             <h2 className="text-xl font-bold text-foreground mb-4">Detalles del Evento</h2>
 
-            <div className="space-y-4 mb-6">
+            <div className="space-y-4">
               <div className="flex items-center gap-3">
                 <Calendar className="w-5 h-5 text-muted-foreground" />
                 <div>
@@ -218,60 +268,193 @@ export default function EventDetailPage() {
                 </div>
               </div>
             </div>
-
-            <div className="border-t pt-4">
-              <h3 className="font-semibold text-foreground mb-2">Descripción</h3>
-              <p className="text-muted-foreground leading-relaxed">{event.description}</p>
-            </div>
           </Card>
         </div>
 
+        {/* Description - Full Width */}
+        <Card className="p-6">
+          <h3 className="text-xl font-bold text-foreground mb-4">Descripción</h3>
+          <p className="text-muted-foreground leading-relaxed">{event.description}</p>
+        </Card>
+
         {/* Attendees List - Full Width */}
         <Card className="p-6">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-xl font-bold text-foreground">Clientes Registrados</h2>
-            <Button variant="outline" size="sm" className="gap-2 bg-transparent">
-              <Mail className="w-4 h-4" />
-              Enviar Email a Todos
-            </Button>
-          </div>
+          <div className="space-y-4">
+            {/* Header with search and add button */}
+            <div className="flex items-center justify-between gap-4 flex-wrap">
+              <h2 className="text-xl font-bold text-foreground">Clientes Registrados</h2>
+              <div className="flex gap-2">
+                <div className="relative flex-1 min-w-64">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                  <Input
+                    placeholder="Buscar cliente..."
+                    className="pl-10"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                  />
+                </div>
+                <Button
+                  size="sm"
+                  className="gap-2 bg-blue-600 hover:bg-blue-700 text-white"
+                  onClick={() => setAddGuestDialogOpen(true)}
+                >
+                  <Plus className="w-4 h-4" />
+                  Agregar Cliente
+                </Button>
+                <Button variant="outline" size="sm" className="gap-2 bg-transparent">
+                  <Mail className="w-4 h-4" />
+                  Email a Todos
+                </Button>
+              </div>
+            </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {attendees.map((attendee) => (
-              <Card key={attendee.id} className="p-4 hover:bg-accent/50 transition-colors">
-                <div className="flex flex-col gap-3">
-                  <div className="flex items-center gap-3">
-                    <Avatar>
-                      <AvatarImage src={attendee.avatar || "/placeholder.svg"} />
-                      <AvatarFallback className="bg-primary text-primary-foreground">
-                        {attendee.name
-                          .split(" ")
-                          .map((n) => n[0])
-                          .join("")}
-                      </AvatarFallback>
-                    </Avatar>
-                    <div className="flex-1">
-                      <div className="flex items-center gap-2">
-                        <p className="font-semibold text-foreground text-sm">{attendee.name}</p>
+            {/* Attendees Grid - 5 columns */}
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3">
+              {attendees
+                .filter((attendee) =>
+                  attendee.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                  attendee.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                  attendee.room.includes(searchQuery)
+                )
+                .map((attendee) => {
+                  const typeConfig = {
+                    hospedado: { bg: "bg-blue-500", text: "text-white", label: "Hospedado", icon: "🏨" },
+                    historico: { bg: "bg-purple-500", text: "text-white", label: "Histórico", icon: "📋" },
+                    invitado: { bg: "bg-emerald-500", text: "text-white", label: "Invitado", icon: "🎫" },
+                  }
+                  const config = typeConfig[attendee.type]
+
+                  return (
+                    <Card
+                      key={attendee.id}
+                      className={`p-2 hover:shadow-md transition-all border flex flex-col relative h-full`}
+                    >
+                      <div className="flex items-start justify-between mb-1.5">
+                        <Avatar className="h-8 w-8">
+                          <AvatarImage src={attendee.avatar || "/placeholder.svg"} />
+                          <AvatarFallback className="bg-gray-200 font-semibold text-xs">
+                            {attendee.name
+                              .split(" ")
+                              .map((n) => n[0])
+                              .join("")}
+                          </AvatarFallback>
+                        </Avatar>
                         {attendee.vip && (
-                          <Badge variant="secondary" className="text-xs">
+                          <Badge className="bg-amber-500 text-white text-xs font-bold px-1 h-5">
                             VIP
                           </Badge>
                         )}
                       </div>
-                      <p className="text-xs text-muted-foreground">{attendee.email}</p>
-                    </div>
-                  </div>
 
-                  <div className="text-xs space-y-1">
-                    <p className="text-muted-foreground">Habitación <span className="font-medium text-foreground">{attendee.room}</span></p>
-                    <p className="text-muted-foreground">Reg. {attendee.registeredAt}</p>
-                  </div>
-                </div>
-              </Card>
-            ))}
+                      <p className="font-semibold text-xs text-foreground line-clamp-1 leading-tight">{attendee.name}</p>
+                      <p className="text-xs text-muted-foreground line-clamp-1 leading-tight mb-1.5">{attendee.email}</p>
+
+                      <Badge className={`${config.bg} ${config.text} text-xs font-medium text-center mb-2`}>
+                        {config.label}
+                      </Badge>
+
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="absolute bottom-2 right-2 h-6 w-6 p-0 hover:bg-destructive/10 text-destructive hover:text-destructive"
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                      </Button>
+                    </Card>
+                  )
+                })}
+            </div>
+            {attendees.filter((attendee) =>
+              attendee.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+              attendee.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
+              attendee.room.includes(searchQuery)
+            ).length === 0 && (
+              <div className="text-center py-8">
+                <p className="text-muted-foreground">No se encontraron clientes</p>
+              </div>
+            )}
           </div>
         </Card>
+
+        {/* Modal para agregar clientes */}
+        <Suspense fallback={<Loading />}>
+          <Dialog open={addGuestDialogOpen} onOpenChange={setAddGuestDialogOpen}>
+            <DialogContent className="sm:max-w-md max-h-[80vh] overflow-y-auto">
+              <DialogHeader>
+                <DialogTitle>Agregar Cliente al Evento</DialogTitle>
+                <DialogDescription>
+                  Selecciona un cliente hospedado para agregarlo a este evento
+                </DialogDescription>
+              </DialogHeader>
+
+              <div className="space-y-4">
+                {/* Buscador */}
+                <div className="relative">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                  <Input
+                    placeholder="Buscar cliente..."
+                    className="pl-10"
+                    value={addGuestSearchQuery}
+                    onChange={(e) => setAddGuestSearchQuery(e.target.value)}
+                  />
+                </div>
+
+                {/* Lista de clientes disponibles */}
+                <div className="space-y-2 max-h-[50vh] overflow-y-auto">
+                  {availableGuests
+                    .filter((guest) =>
+                      guest.name.toLowerCase().includes(addGuestSearchQuery.toLowerCase()) ||
+                      guest.email.toLowerCase().includes(addGuestSearchQuery.toLowerCase()) ||
+                      guest.room.includes(addGuestSearchQuery)
+                    )
+                    .map((guest) => (
+                      <Card
+                        key={guest.id}
+                        className="p-3 cursor-pointer hover:bg-primary/5 transition-colors border"
+                      >
+                        <div className="flex items-start justify-between gap-3">
+                          <div className="flex-1 min-w-0">
+                            <p className="font-semibold text-sm text-foreground">{guest.name}</p>
+                            <p className="text-xs text-muted-foreground">{guest.email}</p>
+                            <div className="flex gap-2 mt-1">
+                              <Badge variant="outline" className="text-xs">
+                                Hab. {guest.room}
+                              </Badge>
+                              {guest.vip && (
+                                <Badge className="bg-amber-500 text-white text-xs">VIP</Badge>
+                              )}
+                            </div>
+                          </div>
+                          <Button
+                            size="sm"
+                            className="gap-1.5 bg-emerald-600 hover:bg-emerald-700 text-white shrink-0"
+                            onClick={() => {
+                              alert(`${guest.name} ha sido agregado al evento`)
+                              setAddGuestDialogOpen(false)
+                              setAddGuestSearchQuery("")
+                            }}
+                          >
+                            <Plus className="w-3 h-3" />
+                            Agregar
+                          </Button>
+                        </div>
+                      </Card>
+                    ))}
+                </div>
+
+                {availableGuests.filter((guest) =>
+                  guest.name.toLowerCase().includes(addGuestSearchQuery.toLowerCase()) ||
+                  guest.email.toLowerCase().includes(addGuestSearchQuery.toLowerCase()) ||
+                  guest.room.includes(addGuestSearchQuery)
+                ).length === 0 && (
+                  <div className="text-center py-6">
+                    <p className="text-sm text-muted-foreground">No se encontraron clientes disponibles</p>
+                  </div>
+                )}
+              </div>
+            </DialogContent>
+          </Dialog>
+        </Suspense>
       </div>
     </div>
   )

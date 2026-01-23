@@ -44,7 +44,7 @@ export default function HomePage() {
     if (adminUser === "system" && adminPassword === "1234") {
       router.push("/system/organizations")
     } else if (adminUser === "admin" && adminPassword === "1234") {
-      router.push("/admin")
+      router.push("/admin/home")
     } else if (adminUser === "staff" && adminPassword === "1234") {
       router.push("/staff/tasks")
     } else {

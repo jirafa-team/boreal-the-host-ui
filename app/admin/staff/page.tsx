@@ -1,5 +1,9 @@
 "use client"
 
+import { CardContent } from "@/components/ui/card"
+
+import { CardHeader } from "@/components/ui/card"
+
 import { useState } from "react"
 import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
@@ -867,7 +871,46 @@ export default function StaffManagement() {
                                               !
                                             </Badge>
                                           )}
-                                        </div>
+      </div>
+
+      {/* KPI Card */}
+      <Card className="border-0 shadow-lg bg-gradient-to-br from-slate-50 to-slate-100">
+        <CardHeader className="text-center pb-6 border-b">
+          <h2 className="text-2xl font-bold text-foreground">
+            Equipo de Personal <span className="text-muted-foreground">({staff.length})</span>
+          </h2>
+        </CardHeader>
+        <CardContent className="pt-8">
+          <div className="grid grid-cols-3 gap-8">
+            {/* Panel 1: Available */}
+            <div className="flex flex-col items-center justify-center py-8 px-4 rounded-lg bg-white border border-green-200 hover:shadow-md transition-shadow">
+              <div className="text-5xl font-bold text-green-600 mb-3">{availableStaff.length}</div>
+              <div className="flex items-center gap-2 text-green-700 font-semibold">
+                <CheckCircle2 className="w-5 h-5" />
+                Disponibles
+              </div>
+            </div>
+
+            {/* Panel 2: Busy */}
+            <div className="flex flex-col items-center justify-center py-8 px-4 rounded-lg bg-white border border-yellow-200 hover:shadow-md transition-shadow">
+              <div className="text-5xl font-bold text-yellow-600 mb-3">{busyStaff.length}</div>
+              <div className="flex items-center gap-2 text-yellow-700 font-semibold">
+                <Clock className="w-5 h-5" />
+                Ocupadas
+              </div>
+            </div>
+
+            {/* Panel 3: Off */}
+            <div className="flex flex-col items-center justify-center py-8 px-4 rounded-lg bg-white border border-gray-200 hover:shadow-md transition-shadow">
+              <div className="text-5xl font-bold text-gray-600 mb-3">{staff.filter((s) => s.status === "off").length}</div>
+              <div className="flex items-center gap-2 text-gray-700 font-semibold">
+                <AlertCircle className="w-5 h-5" />
+                Libres
+              </div>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
                                         <p className="text-[10px] text-muted-foreground truncate">{task.guestName}</p>
                                         <Badge className={getRequestStatusColor(task.status) + " text-[10px] px-1 py-0"}>
                                           {getRequestStatusText(task.status)}

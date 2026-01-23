@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { Calendar, Plus, Search, MapPin, Clock, Edit, Trash2, Eye } from "lucide-react"
+import { Calendar, Plus, Search, MapPin, Clock, Edit, Trash2, Eye, Users } from "lucide-react"
 import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -35,6 +35,17 @@ type Event = {
   image?: string
 }
 
+type Person = {
+  id: number
+  name: string
+  email: string
+  phone: string
+  room: string
+  checkIn: string
+  checkOut: string
+  status: "checked-in" | "reserved" | "checked-out"
+}
+
 export default function EventsManagement() {
   const router = useRouter()
   const { t } = useLanguage()
@@ -42,6 +53,62 @@ export default function EventsManagement() {
   const [selectedDate, setSelectedDate] = useState("")
   const [selectedLocation, setSelectedLocation] = useState("")
   const [createDialogOpen, setCreateDialogOpen] = useState(false)
+  const [addPeopleDialogOpen, setAddPeopleDialogOpen] = useState(false)
+  const [addPeopleSearchQuery, setAddPeopleSearchQuery] = useState("")
+  const [selectedEventForPeople, setSelectedEventForPeople] = useState<Event | null>(null)
+
+  const [availablePeople] = useState<Person[]>([
+    {
+      id: 1,
+      name: "Carlos Mendoza",
+      email: "carlos.mendoza@email.com",
+      phone: "+34 612 345 678",
+      room: "501",
+      checkIn: "2025-01-10",
+      checkOut: "2025-01-15",
+      status: "checked-in",
+    },
+    {
+      id: 2,
+      name: "María García",
+      email: "maria.garcia@email.com",
+      phone: "+34 698 765 432",
+      room: "302",
+      checkIn: "2025-01-12",
+      checkOut: "2025-01-14",
+      status: "checked-in",
+    },
+    {
+      id: 3,
+      name: "John Smith",
+      email: "john.smith@email.com",
+      phone: "+1 555 123 4567",
+      room: "204",
+      checkIn: "2025-01-08",
+      checkOut: "2025-01-18",
+      status: "checked-in",
+    },
+    {
+      id: 4,
+      name: "Sophie Dubois",
+      email: "sophie.dubois@email.com",
+      phone: "+33 6 12 34 56 78",
+      room: "405",
+      checkIn: "2025-01-15",
+      checkOut: "2025-01-20",
+      status: "reserved",
+    },
+    {
+      id: 5,
+      name: "Marco Rossi",
+      email: "marco.rossi@email.com",
+      phone: "+39 333 123 4567",
+      room: "103",
+      checkIn: "2025-01-09",
+      checkOut: "2025-01-16",
+      status: "checked-in",
+    },
+  ])
   const [events, setEvents] = useState<Event[]>([
     {
       id: 1,
@@ -328,18 +395,18 @@ export default function EventsManagement() {
           return (
             <Card key={event.id} className="p-6 hover:shadow-lg transition-shadow flex flex-col overflow-hidden">
               {/* Chips de ubicación y fecha/hora en la parte superior */}
-              <div className="flex gap-2 mb-4">
-                <Badge className="bg-primary text-primary-foreground text-xs gap-1.5 flex items-center">
+              <div className="flex gap-2 mb-4 flex-wrap">
+                <Badge className="bg-amber-700 hover:bg-amber-800 text-white text-xs gap-1.5 flex items-center font-bold">
                   <MapPin className="w-3.5 h-3.5" />
                   {event.location}
                 </Badge>
-                <Badge className="bg-primary/80 text-primary-foreground text-xs gap-1.5 flex items-center">
+                <Badge className="bg-sky-100 hover:bg-sky-200 text-black text-xs font-bold gap-1.5 flex items-center border-sky-200">
                   <Calendar className="w-3.5 h-3.5" />
                   {new Date(event.date).toLocaleDateString("es-ES", {
                     month: "short",
                     day: "numeric",
                   })}
-                  <span className="text-primary-foreground/70">•</span>
+                  <span className="text-black/70">•</span>
                   <Clock className="w-3.5 h-3.5" />
                   {event.time}
                 </Badge>
@@ -368,26 +435,44 @@ export default function EventsManagement() {
               </div>
 
               {/* Botones de acción */}
-              <div className="flex gap-2 mt-auto">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="flex-1 gap-2 bg-transparent"
-                  onClick={() => router.push(`/admin/events/${event.id}`)}
-                >
-                  <Eye className="w-4 h-4" />
-                  Ver Detalles
-                </Button>
-                <Button variant="outline" size="sm" className="gap-2 bg-transparent">
-                  <Edit className="w-4 h-4" />
-                </Button>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="gap-2 text-destructive hover:text-destructive bg-transparent"
-                >
-                  <Trash2 className="w-4 h-4" />
-                </Button>
+              <div className="flex gap-2 mt-auto flex-col">
+                <div className="flex gap-2">
+                  <Button
+                    size="sm"
+                    className="flex-1 gap-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg"
+                    onClick={() => router.push(`/admin/events/${event.id}`)}
+                  >
+                    <Eye className="w-4 h-4" />
+                    Ver Detalles
+                  </Button>
+                  <Button
+                    size="sm"
+                    className="flex-1 gap-2 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold rounded-lg"
+                    onClick={() => {
+                      setSelectedEventForPeople(event)
+                      setAddPeopleDialogOpen(true)
+                    }}
+                  >
+                    <Users className="w-4 h-4" />
+                    Agregar Personas
+                  </Button>
+                </div>
+                <div className="flex gap-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="flex-1 gap-2 bg-transparent"
+                  >
+                    <Edit className="w-4 h-4" />
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="flex-1 gap-2 text-destructive hover:text-destructive bg-transparent"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </Button>
+                </div>
               </div>
             </Card>
           )
@@ -401,6 +486,96 @@ export default function EventsManagement() {
           <p className="text-sm text-muted-foreground">Intenta con otro término de búsqueda</p>
         </Card>
       )}
+
+      {/* Modal para agregar personas al evento */}
+      <Dialog open={addPeopleDialogOpen} onOpenChange={setAddPeopleDialogOpen}>
+        <DialogContent className="sm:max-w-md max-h-[80vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Agregar Personas al Evento</DialogTitle>
+            <DialogDescription>
+              {selectedEventForPeople && `Evento: ${selectedEventForPeople.name}`}
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-4">
+            {/* Buscador */}
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+              <Input
+                placeholder="Buscar por nombre, email o habitación..."
+                className="pl-10"
+                value={addPeopleSearchQuery}
+                onChange={(e) => setAddPeopleSearchQuery(e.target.value)}
+              />
+            </div>
+
+            {/* Lista de personas */}
+            <div className="space-y-2 max-h-[50vh] overflow-y-auto">
+              {availablePeople
+                .filter((person) =>
+                  person.name.toLowerCase().includes(addPeopleSearchQuery.toLowerCase()) ||
+                  person.email.toLowerCase().includes(addPeopleSearchQuery.toLowerCase()) ||
+                  person.room.includes(addPeopleSearchQuery)
+                )
+                .map((person) => (
+                  <Card
+                    key={person.id}
+                    className="p-3 cursor-pointer hover:bg-primary/5 transition-colors border"
+                    onClick={() => {
+                      alert(`${person.name} ha sido agregado al evento`)
+                      setAddPeopleDialogOpen(false)
+                      setAddPeopleSearchQuery("")
+                    }}
+                  >
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="flex-1 min-w-0">
+                        <p className="font-semibold text-sm text-foreground">{person.name}</p>
+                        <p className="text-xs text-muted-foreground">{person.email}</p>
+                        <div className="flex gap-2 mt-1 flex-wrap">
+                          <Badge variant="outline" className="text-xs">
+                            Hab. {person.room}
+                          </Badge>
+                          <Badge
+                            variant="secondary"
+                            className={`text-xs ${
+                              person.status === "checked-in"
+                                ? "bg-green-100 text-green-800"
+                                : "bg-blue-100 text-blue-800"
+                            }`}
+                          >
+                            {person.status === "checked-in" ? "Hospedado" : "Reservado"}
+                          </Badge>
+                        </div>
+                      </div>
+                      <Button
+                        size="sm"
+                        className="gap-1.5 bg-emerald-600 hover:bg-emerald-700 text-white shrink-0"
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          alert(`${person.name} ha sido agregado al evento`)
+                          setAddPeopleDialogOpen(false)
+                          setAddPeopleSearchQuery("")
+                        }}
+                      >
+                        <Plus className="w-3 h-3" />
+                        Agregar
+                      </Button>
+                    </div>
+                  </Card>
+                ))}
+            </div>
+
+            {availablePeople.filter((person) =>
+              person.name.toLowerCase().includes(addPeopleSearchQuery.toLowerCase()) ||
+              person.email.toLowerCase().includes(addPeopleSearchQuery.toLowerCase())
+            ).length === 0 && (
+              <div className="text-center py-6">
+                <p className="text-sm text-muted-foreground">No se encontraron personas</p>
+              </div>
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }
