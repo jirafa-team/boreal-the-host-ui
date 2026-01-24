@@ -6,7 +6,7 @@ import { useState } from "react"
 import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { Clock, AlertCircle, CheckCircle2, User, MapPin, Calendar } from "lucide-react"
+import { Clock, AlertCircle, CheckCircle2, User, MapPin, Calendar, TicketPlus } from "lucide-react"
 import {
   Dialog,
   DialogContent,
@@ -162,6 +162,15 @@ export default function TicketsPage() {
           <h1 className="text-3xl font-bold">Tickets de Soporte</h1>
           <p className="text-muted-foreground">Gestiona los reportes y solicitudes de los huéspedes</p>
         </div>
+        <button 
+          className="relative group w-10 h-10 rounded-full bg-primary hover:bg-primary/90 text-white flex items-center justify-center transition-all shadow-md hover:shadow-lg"
+          title="Nuevo ticket"
+        >
+          <TicketPlus className="w-5 h-5" />
+          <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-1.5 bg-gray-900 text-white text-xs rounded pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
+            Nuevo Ticket
+          </div>
+        </button>
       </div>
 
       {/* Stats as Filters */}

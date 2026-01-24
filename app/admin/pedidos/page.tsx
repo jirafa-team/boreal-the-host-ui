@@ -4,7 +4,7 @@ import { useState } from "react"
 import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { Clock, CheckCircle2, User, MapPin, ChefHat, Utensils, AlertTriangle, AlertCircle, Grid3x3, Table } from "lucide-react"
+import { Clock, CheckCircle2, User, MapPin, ChefHat, Utensils, AlertTriangle, AlertCircle, Grid3x3, Table, ShoppingCart } from "lucide-react"
 
 export default function PedidosPage() {
   const [filter, setFilter] = useState<"all" | "pending" | "preparing" | "delivered">("all")
@@ -124,6 +124,15 @@ export default function PedidosPage() {
           <h1 className="text-3xl font-bold">Pedidos de Room Service</h1>
           <p className="text-muted-foreground">Gestiona las órdenes de comida a las habitaciones</p>
         </div>
+        <button 
+          className="relative group w-10 h-10 rounded-full bg-primary hover:bg-primary/90 text-white flex items-center justify-center transition-all shadow-md hover:shadow-lg"
+          title="Nuevo pedido"
+        >
+          <ShoppingCart className="w-5 h-5" />
+          <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-1.5 bg-gray-900 text-white text-xs rounded pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
+            Nuevo Pedido
+          </div>
+        </button>
       </div>
 
       {/* Stats */}
