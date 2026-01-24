@@ -14,7 +14,7 @@ import {
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Plus, Dumbbell, Waves, Sparkles, Video, Coffee, UtensilsCrossed, LayoutGrid, Clock, Users } from "lucide-react"
+import { Plus, Dumbbell, Waves, Sparkles, Video, Coffee, UtensilsCrossed, LayoutGrid, Clock, Users, Building2, Calendar as CalendarIcon } from "lucide-react"
 
 import React from "react"
 
@@ -200,33 +200,54 @@ export default function FacilitiesPage() {
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h1 className="text-3xl font-bold text-foreground mb-1">Gestión de Facilities</h1>
-          <p className="text-muted-foreground">Administra los servicios y espacios del hotel</p>
+          <h1 className="text-3xl font-bold text-foreground mb-1">Gestión de Amenities</h1>
+          <p className="text-muted-foreground">Administra los amenities y espacios del hotel</p>
         </div>
         <div className="flex gap-2">
-          <Button variant={viewMode === "list" ? "default" : "outline"} onClick={() => setViewMode("list")} size="sm">
-            <LayoutGrid className="w-4 h-4 mr-2" />
-            Lista
-          </Button>
-          <Button
-            variant={viewMode === "timeline" ? "default" : "outline"}
-            onClick={() => setViewMode("timeline")}
-            size="sm"
-          >
-            <Clock className="w-4 h-4 mr-2" />
-            Timeline
-          </Button>
+          {/* View Mode Toggle */}
+          <div className="inline-flex h-10 items-center rounded-lg bg-gray-100 p-1 border border-gray-200">
+            <button
+              onClick={() => setViewMode("list")}
+              className={`px-5 py-2 rounded-md font-medium text-sm transition-all ${
+                viewMode === "list"
+                  ? "text-white shadow-md"
+                  : "text-gray-700 hover:text-gray-900"
+              }`}
+              style={viewMode === "list" ? { backgroundColor: "#394a63" } : {}}
+            >
+              Lista
+            </button>
+            <button
+              onClick={() => setViewMode("timeline")}
+              className={`px-5 py-2 rounded-md font-medium text-sm transition-all ${
+                viewMode === "timeline"
+                  ? "text-white shadow-md"
+                  : "text-gray-700 hover:text-gray-900"
+              }`}
+              style={viewMode === "timeline" ? { backgroundColor: "#394a63" } : {}}
+            >
+              Timeline
+            </button>
+          </div>
           <Dialog open={addFacilityOpen} onOpenChange={setAddFacilityOpen}>
             <DialogTrigger asChild>
-              <Button>
-                <Plus className="w-4 h-4 mr-2" />
-                Agregar Facility
-              </Button>
+              <button 
+                className="relative group w-10 h-10 rounded-full bg-primary hover:bg-primary/90 text-white flex items-center justify-center transition-all shadow-md hover:shadow-lg"
+                title="Agregar amenity"
+              >
+                <div className="relative">
+                  <Building2 className="w-5 h-5" />
+                  <span className="absolute -top-1 -right-1 bg-primary text-white text-xs font-bold w-4 h-4 rounded-full flex items-center justify-center" style={{fontSize: '10px'}}>+</span>
+                </div>
+                <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-1.5 bg-gray-900 text-white text-xs rounded pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
+                  Agregar Amenity
+                </div>
+              </button>
             </DialogTrigger>
             <DialogContent>
               <DialogHeader>
-                <DialogTitle>Agregar Nueva Facility</DialogTitle>
-                <DialogDescription>Configure un nuevo servicio o espacio para el hotel</DialogDescription>
+                <DialogTitle>Agregar Nuevo Amenity</DialogTitle>
+                <DialogDescription>Configure un nuevo amenity o espacio para el hotel</DialogDescription>
               </DialogHeader>
               <form onSubmit={handleAddFacility} className="space-y-4">
                 <div>
@@ -270,10 +291,18 @@ export default function FacilitiesPage() {
           </Dialog>
           <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
             <DialogTrigger asChild>
-              <Button>
-                <Plus className="w-4 h-4 mr-2" />
-                Nueva Reserva
-              </Button>
+              <button 
+                className="relative group w-10 h-10 rounded-full bg-primary hover:bg-primary/90 text-white flex items-center justify-center transition-all shadow-md hover:shadow-lg"
+                title="Agregar reserva"
+              >
+                <div className="relative">
+                  <CalendarIcon className="w-5 h-5" />
+                  <span className="absolute -top-1 -right-1 bg-primary text-white text-xs font-bold w-4 h-4 rounded-full flex items-center justify-center" style={{fontSize: '10px'}}>+</span>
+                </div>
+                <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-1.5 bg-gray-900 text-white text-xs rounded pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
+                  Nueva Reserva
+                </div>
+              </button>
             </DialogTrigger>
             <DialogContent>
               <DialogHeader>

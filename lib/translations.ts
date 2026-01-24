@@ -37,6 +37,7 @@ export const translations = {
       spaces: "Espacios",
       rooms: "Habitaciones",
       spaceDesign: "Diseño de Espacios",
+      amenities: "Amenities",
       services: "Servicios",
       facilities: "Instalaciones",
       staff: "Staff",

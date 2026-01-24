@@ -1,5 +1,7 @@
 "use client"
 
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
 import { useState } from "react"
 import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
@@ -30,6 +32,7 @@ export default function TicketsPage() {
       createdAt: "2024-01-13 14:30",
       description: "El aire acondicionado de la habitación no enciende",
       assignedTo: null as string | null,
+      scheduledTime: null as string | null,
     },
     {
       id: "T-002",
@@ -43,6 +46,7 @@ export default function TicketsPage() {
       createdAt: "2024-01-13 12:15",
       description: "Solicité ensalada César pero recibí una ensalada mixta",
       assignedTo: "Juan López - Cocina",
+      scheduledTime: null as string | null,
     },
     {
       id: "T-003",
@@ -56,6 +60,7 @@ export default function TicketsPage() {
       createdAt: "2024-01-13 10:00",
       description: "Faltan toallas en el baño después de la limpieza",
       assignedTo: "María Rodríguez - Limpieza",
+      scheduledTime: null as string | null,
     },
     {
       id: "T-004",
@@ -75,20 +80,30 @@ export default function TicketsPage() {
   const [selectedTicketId, setSelectedTicketId] = useState<string | null>(null)
   const [showAssignDialog, setShowAssignDialog] = useState(false)
   const [showCompleteDialog, setShowCompleteDialog] = useState(false)
+  const [scheduledTime, setScheduledTime] = useState<string | null>(null)
+  const [selectedStaffForSchedule, setSelectedStaffForSchedule] = useState<{ name: string; department: string } | null>(null)
+  const [selectedTime, setSelectedTime] = useState<string | null>(null)
+
+  const availableHours = ["08:00", "09:00", "10:00", "11:00", "12:00", "13:00", "14:00", "15:00", "16:00", "17:00", "18:00", "19:00", "20:00"]
 
   const staffMembers = [
-    { id: "1", name: "Juan López", department: "Cocina" },
-    { id: "2", name: "María Rodríguez", department: "Limpieza" },
-    { id: "3", name: "Carlos Sánchez", department: "Seguridad" },
-    { id: "4", name: "Ana García", department: "Recepción" },
-    { id: "5", name: "Roberto Martínez", department: "Mantenimiento" },
-    { id: "6", name: "Patricia López", department: "Servicio de Piso" },
-    { id: "7", name: "Diego Fernández", department: "Mantenimiento" },
-    { id: "8", name: "Laura González", department: "Limpieza" },
+    { id: "1", name: "Juan López", department: "Cocina", availableHours: ["08:00", "09:00", "10:00", "11:00", "12:00", "18:00", "19:00", "20:00"] },
+    { id: "2", name: "María Rodríguez", department: "Limpieza", availableHours: ["08:00", "09:00", "10:00", "13:00", "14:00", "15:00", "16:00"] },
+    { id: "3", name: "Carlos Sánchez", department: "Seguridad", availableHours: ["08:00", "11:00", "12:00", "13:00", "16:00", "17:00", "18:00", "19:00", "20:00"] },
+    { id: "4", name: "Ana García", department: "Recepción", availableHours: ["08:00", "09:00", "10:00", "11:00", "12:00", "13:00", "14:00", "15:00", "16:00", "17:00"] },
+    { id: "5", name: "Roberto Martínez", department: "Mantenimiento", availableHours: ["09:00", "10:00", "11:00", "14:00", "15:00", "16:00", "17:00", "18:00"] },
+    { id: "6", name: "Patricia López", department: "Servicio de Piso", availableHours: ["08:00", "09:00", "10:00", "11:00", "12:00", "13:00", "14:00"] },
+    { id: "7", name: "Diego Fernández", department: "Mantenimiento", availableHours: ["13:00", "14:00", "15:00", "16:00", "17:00", "18:00", "19:00"] },
+    { id: "8", name: "Laura González", department: "Limpieza", availableHours: ["09:00", "10:00", "11:00", "12:00", "13:00", "14:00", "15:00", "16:00", "17:00"] },
   ]
 
+  const getAvailableStaffForTime = (time: string | null) => {
+    if (!time) return []
+    return staffMembers.filter((staff) => staff.availableHours.includes(time))
+  }
+
   const handleAssignTicket = (staffName: string, staffDepartment: string) => {
-    if (!selectedTicketId) return
+    if (!selectedTicketId || !selectedTime) return
 
     setTickets((prevTickets) =>
       prevTickets.map((ticket) =>
@@ -96,6 +111,7 @@ export default function TicketsPage() {
           ? {
               ...ticket,
               assignedTo: `${staffName} - ${staffDepartment}`,
+              scheduledTime: selectedTime,
               status: ticket.status === "pending" ? "in-progress" : ticket.status,
             }
           : ticket,
@@ -103,6 +119,8 @@ export default function TicketsPage() {
     )
     setShowAssignDialog(false)
     setSelectedTicketId(null)
+    setSelectedTime(null)
+    setSelectedStaffForSchedule(null)
   }
 
   const handleCompleteTicket = () => {
@@ -149,73 +167,45 @@ export default function TicketsPage() {
       {/* Stats as Filters */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <Card
-          className={`p-4 cursor-pointer transition-all hover:shadow-md ${
+          className={`p-4 bg-gradient-to-br from-blue-50 to-white text-center cursor-pointer transition-all ${
             filter === "all" ? "ring-2 ring-primary" : ""
           }`}
           onClick={() => setFilter("all")}
         >
-          <div className="flex items-center gap-3">
-            <div className="p-2 bg-blue-500/10 rounded-lg">
-              <AlertCircle className="w-5 h-5 text-blue-600" />
-            </div>
-            <div>
-              <p className="text-sm text-muted-foreground">Todos</p>
-              <p className="text-2xl font-bold">{tickets.length}</p>
-            </div>
-          </div>
+          <p className="text-4xl font-bold text-blue-600 mb-1">{tickets.length}</p>
+          <p className="text-xs text-muted-foreground font-medium">Todos</p>
         </Card>
         <Card
-          className={`p-4 cursor-pointer transition-all hover:shadow-md ${
+          className={`p-4 bg-gradient-to-br from-yellow-50 to-white text-center cursor-pointer transition-all ${
             filter === "pending" ? "ring-2 ring-primary" : ""
           }`}
           onClick={() => setFilter("pending")}
         >
-          <div className="flex items-center gap-3">
-            <div className="p-2 bg-yellow-500/10 rounded-lg">
-              <Clock className="w-5 h-5 text-yellow-600" />
-            </div>
-            <div>
-              <p className="text-sm text-muted-foreground">Pendientes</p>
-              <p className="text-2xl font-bold">{tickets.filter((t) => t.status === "pending").length}</p>
-            </div>
-          </div>
+          <p className="text-4xl font-bold text-yellow-600 mb-1">{tickets.filter((t) => t.status === "pending").length}</p>
+          <p className="text-xs text-muted-foreground font-medium">Pendientes</p>
         </Card>
         <Card
-          className={`p-4 cursor-pointer transition-all hover:shadow-md ${
+          className={`p-4 bg-gradient-to-br from-blue-100 to-white text-center cursor-pointer transition-all ${
             filter === "in-progress" ? "ring-2 ring-primary" : ""
           }`}
           onClick={() => setFilter("in-progress")}
         >
-          <div className="flex items-center gap-3">
-            <div className="p-2 bg-blue-500/10 rounded-lg">
-              <AlertCircle className="w-5 h-5 text-blue-600" />
-            </div>
-            <div>
-              <p className="text-sm text-muted-foreground">En Proceso</p>
-              <p className="text-2xl font-bold">{tickets.filter((t) => t.status === "in-progress").length}</p>
-            </div>
-          </div>
+          <p className="text-4xl font-bold text-blue-700 mb-1">{tickets.filter((t) => t.status === "in-progress").length}</p>
+          <p className="text-xs text-muted-foreground font-medium">En Proceso</p>
         </Card>
         <Card
-          className={`p-4 cursor-pointer transition-all hover:shadow-md ${
+          className={`p-4 bg-gradient-to-br from-green-50 to-white text-center cursor-pointer transition-all ${
             filter === "resolved" ? "ring-2 ring-primary" : ""
           }`}
           onClick={() => setFilter("resolved")}
         >
-          <div className="flex items-center gap-3">
-            <div className="p-2 bg-green-500/10 rounded-lg">
-              <CheckCircle2 className="w-5 h-5 text-green-600" />
-            </div>
-            <div>
-              <p className="text-sm text-muted-foreground">Resueltos</p>
-              <p className="text-2xl font-bold">{tickets.filter((t) => t.status === "resolved").length}</p>
-            </div>
-          </div>
+          <p className="text-4xl font-bold text-green-600 mb-1">{tickets.filter((t) => t.status === "resolved").length}</p>
+          <p className="text-xs text-muted-foreground font-medium">Resueltos</p>
         </Card>
       </div>
 
       {/* Tickets Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {filteredTickets.map((ticket) => {
           const statusBadge = getStatusBadge(ticket.status)
           const priorityBadge = getPriorityBadge(ticket.priority)
@@ -257,10 +247,15 @@ export default function TicketsPage() {
                 </div>
                 <div className="flex items-start gap-2 pt-2 border-t border-border">
                   <User className="w-4 h-4 text-primary flex-shrink-0 mt-0.5" />
-                  <div>
+                  <div className="flex-1">
                     <span className="text-muted-foreground">Asignado a:</span>
                     {ticket.assignedTo ? (
-                      <p className="font-semibold text-primary">{ticket.assignedTo}</p>
+                      <div>
+                        <p className="font-semibold text-primary">{ticket.assignedTo}</p>
+                        {ticket.scheduledTime && (
+                          <p className="text-xs text-muted-foreground mt-1">Programado: {ticket.scheduledTime}</p>
+                        )}
+                      </div>
                     ) : (
                       <p className="font-semibold text-muted-foreground italic">Sin asignar</p>
                     )}
@@ -281,28 +276,69 @@ export default function TicketsPage() {
                         Asignar
                       </Button>
                     </DialogTrigger>
-                    <DialogContent className="max-w-md">
+                    <DialogContent className="max-w-2xl">
                       <DialogHeader>
                         <DialogTitle>Asignar Ticket</DialogTitle>
                         <DialogDescription>
-                          Selecciona el personal al que deseas asignar este ticket
+                          {!selectedTime 
+                            ? "Selecciona el horario para la tarea" 
+                            : `Selecciona el empleado para las ${selectedTime}`}
                         </DialogDescription>
                       </DialogHeader>
-                      <ScrollArea className="h-80 w-full rounded-md border p-4">
-                        <div className="space-y-2">
-                          {staffMembers.map((staff) => (
+                      
+                      {!selectedTime ? (
+                        // Step 1: Select Time - Grid of hours
+                        <div className="grid grid-cols-4 gap-2">
+                          {availableHours.map((hour) => (
                             <Button
-                              key={staff.id}
-                              variant="outline"
-                              className="w-full justify-start h-auto py-3 flex-col items-start bg-transparent"
-                              onClick={() => handleAssignTicket(staff.name, staff.department)}
+                              key={hour}
+                              variant={selectedTime === hour ? "default" : "outline"}
+                              className="h-12 text-sm"
+                              onClick={() => setSelectedTime(hour)}
                             >
-                              <span className="font-semibold">{staff.name}</span>
-                              <span className="text-xs text-muted-foreground">{staff.department}</span>
+                              {hour}
                             </Button>
                           ))}
                         </div>
-                      </ScrollArea>
+                      ) : (
+                        // Step 2: Select Staff - Show only available for selected time
+                        <div className="space-y-3">
+                          {getAvailableStaffForTime(selectedTime).length > 0 ? (
+                            <>
+                              <div className="space-y-2">
+                                {getAvailableStaffForTime(selectedTime).map((staff) => (
+                                  <Button
+                                    key={staff.id}
+                                    variant="outline"
+                                    className="w-full justify-start h-auto py-3 flex-col items-start bg-transparent hover:bg-muted"
+                                    onClick={() => handleAssignTicket(staff.name, staff.department)}
+                                  >
+                                    <span className="font-semibold">{staff.name}</span>
+                                    <span className="text-xs text-muted-foreground">{staff.department}</span>
+                                  </Button>
+                                ))}
+                              </div>
+                              <Button
+                                variant="outline"
+                                className="w-full bg-transparent"
+                                onClick={() => setSelectedTime(null)}
+                              >
+                                Cambiar Horario
+                              </Button>
+                            </>
+                          ) : (
+                            <div className="text-center py-8">
+                              <p className="text-muted-foreground mb-4">No hay empleados disponibles para las {selectedTime}</p>
+                              <Button
+                                variant="outline"
+                                onClick={() => setSelectedTime(null)}
+                              >
+                                Seleccionar otro horario
+                              </Button>
+                            </div>
+                          )}
+                        </div>
+                      )}
                     </DialogContent>
                   </Dialog>
                 )}

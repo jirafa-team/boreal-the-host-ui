@@ -223,22 +223,31 @@ export default function RoomsManagement() {
               <p className="text-sm text-muted-foreground">{t("admin.manageYourRooms")}</p>
             </div>
             <div className="flex gap-2">
-              <Button
-                variant={layoutMode === "grid" ? "default" : "outline"}
-                size="sm"
+            {/* View Mode Toggle */}
+            <div className="inline-flex h-10 items-center rounded-lg bg-gray-100 p-1 border border-gray-200">
+              <button
                 onClick={() => setLayoutMode("grid")}
+                className={`px-5 py-2 rounded-md font-medium text-sm transition-all ${
+                  layoutMode === "grid"
+                    ? "text-white shadow-md"
+                    : "text-gray-700 hover:text-gray-900"
+                }`}
+                style={layoutMode === "grid" ? { backgroundColor: "#394a63" } : {}}
               >
-                <LayoutGrid className="w-4 h-4 mr-2" />
-                {t("admin.gridView")}
-              </Button>
-              <Button
-                variant={layoutMode === "kanban" ? "default" : "outline"}
-                size="sm"
+                Grid
+              </button>
+              <button
                 onClick={() => setLayoutMode("kanban")}
+                className={`px-5 py-2 rounded-md font-medium text-sm transition-all ${
+                  layoutMode === "kanban"
+                    ? "text-white shadow-md"
+                    : "text-gray-700 hover:text-gray-900"
+                }`}
+                style={layoutMode === "kanban" ? { backgroundColor: "#394a63" } : {}}
               >
-                <Calendar className="w-4 h-4 mr-2" />
-                {t("admin.timelineView")}
-              </Button>
+                Timeline
+              </button>
+            </div>
             </div>
           </div>
         </div>

@@ -3,7 +3,7 @@
 import { useParams, useRouter } from 'next/navigation'
 import { useSearchParams } from 'next/navigation'
 import { Suspense } from 'react'
-import { ArrowLeft, Calendar, Clock, MapPin, Users, Edit, Trash2, Mail, Search, Plus, X } from 'lucide-react'
+import { ArrowLeft, Calendar, Clock, MapPin, Users, Edit, Trash2, Mail, Search, Plus, X, UserPlus, MailPlus } from 'lucide-react'
 import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
@@ -293,18 +293,25 @@ export default function EventDetailPage() {
                     onChange={(e) => setSearchQuery(e.target.value)}
                   />
                 </div>
-                <Button
-                  size="sm"
-                  className="gap-2 bg-blue-600 hover:bg-blue-700 text-white"
+                <button
+                  className="relative group w-10 h-10 rounded-full bg-primary hover:bg-primary/90 text-white flex items-center justify-center transition-all shadow-md hover:shadow-lg"
+                  title="Agregar cliente"
                   onClick={() => setAddGuestDialogOpen(true)}
                 >
-                  <Plus className="w-4 h-4" />
-                  Agregar Cliente
-                </Button>
-                <Button variant="outline" size="sm" className="gap-2 bg-transparent">
-                  <Mail className="w-4 h-4" />
-                  Email a Todos
-                </Button>
+                  <UserPlus className="w-5 h-5" />
+                  <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-1.5 bg-gray-900 text-white text-xs rounded pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
+                    Agregar Cliente
+                  </div>
+                </button>
+                <button
+                  className="relative group w-10 h-10 rounded-full bg-primary hover:bg-primary/90 text-white flex items-center justify-center transition-all shadow-md hover:shadow-lg"
+                  title="Enviar email"
+                >
+                  <MailPlus className="w-5 h-5" />
+                  <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-1.5 bg-gray-900 text-white text-xs rounded pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
+                    Email a Todos
+                  </div>
+                </button>
               </div>
             </div>
 
@@ -329,10 +336,10 @@ export default function EventDetailPage() {
                       key={attendee.id}
                       className={`p-2 hover:shadow-md transition-all border flex flex-col relative h-full`}
                     >
-                      <div className="flex items-start justify-between mb-1.5">
-                        <Avatar className="h-8 w-8">
-                          <AvatarImage src={attendee.avatar || "/placeholder.svg"} />
-                          <AvatarFallback className="bg-gray-200 font-semibold text-xs">
+                      <div className="flex items-start justify-between gap-1">
+                        <Avatar className="h-10 w-10 flex-shrink-0">
+                          <AvatarImage src={attendee.avatar || "/placeholder.svg"} alt={attendee.name} />
+                          <AvatarFallback className="bg-blue-600 text-white font-bold text-sm">
                             {attendee.name
                               .split(" ")
                               .map((n) => n[0])
@@ -340,16 +347,18 @@ export default function EventDetailPage() {
                           </AvatarFallback>
                         </Avatar>
                         {attendee.vip && (
-                          <Badge className="bg-amber-500 text-white text-xs font-bold px-1 h-5">
+                          <Badge className="bg-amber-500 text-white text-xs font-bold px-1 h-5 flex-shrink-0">
                             VIP
                           </Badge>
                         )}
                       </div>
 
-                      <p className="font-semibold text-xs text-foreground line-clamp-1 leading-tight">{attendee.name}</p>
-                      <p className="text-xs text-muted-foreground line-clamp-1 leading-tight mb-1.5">{attendee.email}</p>
+                      <div className="mt-1 min-h-0 flex-1">
+                        <p className="font-semibold text-xs text-foreground line-clamp-1 leading-none">{attendee.name}</p>
+                        <p className="text-xs text-muted-foreground line-clamp-1 leading-none">{attendee.email}</p>
+                      </div>
 
-                      <Badge className={`${config.bg} ${config.text} text-xs font-medium text-center mb-2`}>
+                      <Badge className={`${config.bg} ${config.text} text-xs font-medium text-center mt-1`}>
                         {config.label}
                       </Badge>
 

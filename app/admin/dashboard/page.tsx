@@ -4,13 +4,14 @@ import { useState } from "react"
 import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { ChevronLeft, ChevronRight, Search, Hotel, Users, Building2, Clock, AlertCircle, CheckCircle2, Dumbbell, Waves, Sparkles } from "lucide-react"
+import { ChevronLeft, ChevronRight, Search, Hotel, Users, Building2, Clock, AlertCircle, CheckCircle2, Dumbbell, Waves, Sparkles, Video, Coffee, UtensilsCrossed } from "lucide-react"
 import { useLanguage } from "@/lib/i18n-context"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 
 type RoomStatus = "available" | "occupied" | "maintenance" | "reserved"
+type FacilityStatus = "available" | "booked"
 
 type Room = {
   id: string
@@ -23,18 +24,24 @@ type Room = {
   checkOut?: string
 }
 
-type FacilityStatus = "available" | "booked"
-
 type Facility = {
   id: string
   name: string
   type: string
-  status: FacilityStatus
   capacity: number
-  nextBooking?: {
-    clientName: string
-    time: string
-  }
+  icon: typeof Dumbbell
+  color: string
+  startTime: string
+  endTime: string
+}
+
+type Booking = {
+  facilityId: string
+  clientName: string
+  clientRoom: string
+  time: string
+  duration: number
+  status: "confirmed" | "pending"
 }
 
 type StaffStatus = "available" | "busy" | "off"
@@ -120,17 +127,101 @@ const getTasksForTimeSlot = (staffName: string, timeSlot: string) => {
   ].filter(task => task.requestedTime === timeSlot && task.assignedTo === staffName)
 }
 
+const isBookingStart = (facilityId: string, facilityBookings: Booking[], time: string) => {
+  const booking = facilityBookings.find((b) => b.facilityId === facilityId && b.time === time)
+  return booking
+}
+
+const getBookingForSlot = (facilityId: string, facilityBookings: Booking[], time: string) => {
+  return facilityBookings.find((booking) => {
+    const bookingStartHour = Number.parseInt(booking.time.split(":")[0])
+    const bookingStartMinute = Number.parseInt(booking.time.split(":")[1] || "0")
+    const bookingDurationHours = booking.duration / 60
+    const slotHour = Number.parseInt(time.split(":")[0])
+
+    const slotInHours = slotHour
+    const bookingStartInHours = bookingStartHour + bookingStartMinute / 60
+    const bookingEndInHours = bookingStartInHours + bookingDurationHours
+
+    return booking.facilityId === facilityId && slotInHours >= bookingStartInHours && slotInHours < bookingEndInHours
+  })
+}
+
+const getBookingsAtSlot = (facilityId: string, facilityBookings: Booking[], timeSlot: string): Booking[] => {
+  return facilityBookings.filter((b) => {
+    if (b.facilityId !== facilityId) return false
+    const bookingStart = parseInt(b.time.split(":")[0])
+    const bookingEnd = bookingStart + b.duration / 60
+    const slotTime = parseInt(timeSlot.split(":")[0])
+    return slotTime >= bookingStart && slotTime < bookingEnd
+  })
+}
+
+const getOccupancyPercentage = (facilityId: string, facilityBookings: Booking[], facilityList: Facility[], timeSlot: string): number => {
+  const facility = facilityList.find((f) => f.id === facilityId)
+  if (!facility) return 0
+  const slotBookings = getBookingsAtSlot(facilityId, facilityBookings, timeSlot)
+  return Math.round((slotBookings.length / facility.capacity) * 100)
+}
+
+const isMultiPartyFacility = (facilityType: string): boolean => {
+  return ["fitness", "recreation", "wellness", "dining"].includes(facilityType)
+}
+
+const handleShowBookingsDetail = (slotBookings: Booking[]) => {
+  // Implementation for showing bookings detail
+  console.log("Bookings detail:", slotBookings)
+}
+
 export default function DashboardControl() {
   const { t } = useLanguage()
-  const [activeTab, setActiveTab] = useState<"rooms" | "staff" | "facilities" | "both">("both")
+  const [activeTab, setActiveTab] = useState<"rooms" | "staff" | "facilities">("rooms")
   const [timelineMode, setTimelineMode] = useState<"week" | "month">("week")
   const [currentDate, setCurrentDate] = useState(new Date())
   const [searchTerm, setSearchTerm] = useState("")
   const [searchName, setSearchName] = useState("")
   const [filterDepartment, setFilterDepartment] = useState("all")
   const [expandedSections, setExpandedSections] = useState(new Set<string>())
+  const [selectedSlotBookings, setSelectedSlotBookings] = useState<Booking[]>([])
+  const [bookingsDetailOpen, setBookingsDetailOpen] = useState(false)
 
-  // Mock data - Staff
+  const mockFacilities: Facility[] = [
+    { id: "1", name: "Gimnasio", type: "fitness", capacity: 15, icon: Dumbbell, color: "bg-orange-500", startTime: "06:00", endTime: "22:00" },
+    { id: "2", name: "Piscina", type: "recreation", capacity: 30, icon: Waves, color: "bg-blue-500", startTime: "08:00", endTime: "20:00" },
+    { id: "3", name: "Spa", type: "wellness", capacity: 8, icon: Sparkles, color: "bg-purple-500", startTime: "09:00", endTime: "21:00" },
+    { id: "4", name: "Sala de Conferencias A", type: "business", capacity: 50, icon: Video, color: "bg-teal-500", startTime: "07:00", endTime: "23:00" },
+    { id: "5", name: "Sala de Conferencias B", type: "business", capacity: 25, icon: Video, color: "bg-cyan-500", startTime: "07:00", endTime: "23:00" },
+    { id: "6", name: "Cafetería", type: "dining", capacity: 40, icon: Coffee, color: "bg-amber-500", startTime: "06:30", endTime: "23:00" },
+    { id: "7", name: "Restaurante Premium", type: "dining", capacity: 60, icon: UtensilsCrossed, color: "bg-rose-500", startTime: "12:00", endTime: "23:30" },
+  ]
+
+  const mockBookings: Booking[] = [
+    { facilityId: "1", clientName: "Juan Pérez", clientRoom: "301", time: "08:00", duration: 60, status: "confirmed" },
+    { facilityId: "1", clientName: "María García", clientRoom: "205", time: "10:00", duration: 60, status: "confirmed" },
+    { facilityId: "2", clientName: "Carlos López", clientRoom: "412", time: "09:00", duration: 120, status: "confirmed" },
+    { facilityId: "2", clientName: "Ana Martínez", clientRoom: "308", time: "14:00", duration: 60, status: "pending" },
+    { facilityId: "3", clientName: "Laura Sánchez", clientRoom: "501", time: "11:00", duration: 60, status: "confirmed" },
+    {
+      facilityId: "4",
+      clientName: "Empresa Tech Corp",
+      clientRoom: "N/A",
+      time: "09:00",
+      duration: 180,
+      status: "confirmed",
+    },
+  ]
+
+  const [bookings, setBookings] = useState<Booking[]>(mockBookings)
+
+  const timeSlots = Array.from({ length: 17 }, (_, i) => {
+    const hour = i + 7
+    return `${hour.toString().padStart(2, "0")}:00`
+  })
+
+  const handleShowBookingsDetail = (bookingsList: Booking[]) => {
+    setSelectedSlotBookings(bookingsList)
+    setBookingsDetailOpen(true)
+  }
   const staffMembers: StaffMember[] = [
     {
       id: 1,
@@ -278,13 +369,6 @@ export default function DashboardControl() {
     { id: "12", number: "304", type: "Doble", floor: 3, status: "available" },
   ]
 
-  // Mock data - Facilities
-  const facilities: Facility[] = [
-    { id: "1", name: "Piscina", type: "recreation", status: "available", capacity: 100 },
-    { id: "2", name: "Gimnasio", type: "fitness", status: "booked", capacity: 50, nextBooking: { clientName: "Carlos López", time: "14:00" } },
-    { id: "3", name: "Restaurante", type: "business", status: "available", capacity: 200 },
-  ]
-
   const filteredRooms = rooms.filter(
     (room) =>
       room.number.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -386,121 +470,120 @@ export default function DashboardControl() {
 
   const dateColumns = generateDateColumns()
 
+  const facilities: Facility[] = mockFacilities
+  const facilityList: Facility[] = mockFacilities // Declare facilityList variable
+
   return (
     <div>
       {/* Header */}
       <header className="bg-card border-b border-border sticky top-0 z-10">
         <div className="px-8 py-4">
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between mb-4">
             <div>
-              <h1 className="text-2xl font-bold text-foreground">{t("admin.roomsTimeline")}</h1>
-              <p className="text-sm text-muted-foreground">{t("admin.viewRealTimeStatus")}</p>
+              <h1 className="text-2xl font-bold text-foreground">
+                {activeTab === "rooms" && t("admin.roomsTimeline")}
+                {activeTab === "staff" && "Estado de Personal"}
+                {activeTab === "facilities" && "Timeline de Amenities"}
+              </h1>
+              <p className="text-sm text-muted-foreground">
+                {activeTab === "rooms" && t("admin.viewRealTimeStatus")}
+                {activeTab === "staff" && "Gestiona y visualiza el estado del personal en tiempo real"}
+                {activeTab === "facilities" && "Visualiza la disponibilidad y ocupación de los amenities"}
+              </p>
             </div>
-            <div className="flex items-center gap-4">
-              <div className="flex gap-2">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => navigateDate("prev")}
-                >
-                  <ChevronLeft className="w-4 h-4" />
-                </Button>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => setCurrentDate(new Date())}
-                >
-                  Hoy
-                </Button>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => navigateDate("next")}
-                >
-                  <ChevronRight className="w-4 h-4" />
-                </Button>
-              </div>
-            </div>
+          </div>
+          {/* View Tabs */}
+          <div className="flex gap-2 flex-wrap">
+            <button
+              onClick={() => setActiveTab("rooms")}
+              className={`group relative overflow-hidden rounded-lg px-5 py-2 text-white transition-all duration-300 text-xs font-medium ${
+                activeTab === "rooms"
+                  ? "bg-gradient-to-br from-purple-600 to-purple-700 shadow-lg scale-105 ring-2 ring-white ring-opacity-50"
+                  : "bg-gradient-to-br from-purple-600 to-purple-700 opacity-60 hover:opacity-75 shadow-sm hover:shadow-md hover:scale-105"
+              }`}
+            >
+              <div className="absolute top-0 right-0 w-12 h-12 bg-white opacity-10 rounded-full -mr-6 -mt-6"></div>
+              <Hotel className="w-4 h-4 inline mr-2 relative z-10" />
+              <span className="relative z-10">Habitaciones</span>
+            </button>
+            <button
+              onClick={() => setActiveTab("staff")}
+              className={`group relative overflow-hidden rounded-lg px-5 py-2 text-white transition-all duration-300 text-xs font-medium ${
+                activeTab === "staff"
+                  ? "bg-gradient-to-br from-lime-600 to-lime-700 shadow-lg scale-105 ring-2 ring-white ring-opacity-50"
+                  : "bg-gradient-to-br from-lime-600 to-lime-700 opacity-60 hover:opacity-75 shadow-sm hover:shadow-md hover:scale-105"
+              }`}
+            >
+              <div className="absolute top-0 right-0 w-12 h-12 bg-white opacity-10 rounded-full -mr-6 -mt-6"></div>
+              <Users className="w-4 h-4 inline mr-2 relative z-10" />
+              <span className="relative z-10">Personal</span>
+            </button>
+            <button
+              onClick={() => setActiveTab("facilities")}
+              className={`group relative overflow-hidden rounded-lg px-5 py-2 text-white transition-all duration-300 text-xs font-medium ${
+                activeTab === "facilities"
+                  ? "bg-gradient-to-br from-orange-600 to-orange-700 shadow-lg scale-105 ring-2 ring-white ring-opacity-50"
+                  : "bg-gradient-to-br from-orange-600 to-orange-700 opacity-60 hover:opacity-75 shadow-sm hover:shadow-md hover:scale-105"
+              }`}
+            >
+              <div className="absolute top-0 right-0 w-12 h-12 bg-white opacity-10 rounded-full -mr-6 -mt-6"></div>
+              <Building2 className="w-4 h-4 inline mr-2 relative z-10" />
+              <span className="relative z-10">Amenities</span>
+            </button>
           </div>
         </div>
       </header>
 
-      <div className="p-8">
-        {/* View Tabs */}
-        <div className="flex gap-2 mb-8 flex-wrap">
-          <Button
-            variant={activeTab === "both" ? "default" : "outline"}
-            onClick={() => setActiveTab("both")}
-            className="gap-2"
-          >
-            <Hotel className="w-4 h-4" />
-            Todas
-          </Button>
-          <Button
-            variant={activeTab === "rooms" ? "default" : "outline"}
-            onClick={() => setActiveTab("rooms")}
-            className="gap-2"
-          >
-            <Hotel className="w-4 h-4" />
-            Habitaciones
-          </Button>
-          <Button
-            variant={activeTab === "staff" ? "default" : "outline"}
-            onClick={() => setActiveTab("staff")}
-            className="gap-2"
-          >
-            <Users className="w-4 h-4" />
-            Personal
-          </Button>
-          <Button
-            variant={activeTab === "facilities" ? "default" : "outline"}
-            onClick={() => setActiveTab("facilities")}
-            className="gap-2"
-          >
-            <Building2 className="w-4 h-4" />
-            Instalaciones
-          </Button>
-        </div>
+      {filteredRooms.length === 0 && activeTab === "rooms" && (
+        <Card className="p-12 text-center m-8 mt-6">
+          <Search className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
+          <p className="text-sm text-muted-foreground">{t("admin.noRoomsFound")}</p>
+        </Card>
+      )}
 
-        {/* Rooms Section */}
-        {(activeTab === "rooms" || activeTab === "both") && (
-          <div className={activeTab === "both" ? "mb-8" : ""}>
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-xl font-bold text-foreground">{t("admin.roomsTimeline")}</h2>
-              <div className="flex gap-2">
-                <Button
-                  variant={timelineMode === "week" ? "default" : "outline"}
-                  size="sm"
-                  onClick={() => setTimelineMode("week")}
-                >
-                  {t("admin.weekView")}
-                </Button>
-                <Button
-                  variant={timelineMode === "month" ? "default" : "outline"}
-                  size="sm"
-                  onClick={() => setTimelineMode("month")}
-                >
-                  {t("admin.monthView")}
-                </Button>
-              </div>
-            </div>
-
-            {/* Search */}
-            <Card className="p-6 mb-6">
-              <div className="flex gap-4 items-center">
-                <div className="relative flex-1 max-w-md w-full">
+      {/* Rooms Timeline Section */}
+      {activeTab === "rooms" && (
+        <div className="px-8 py-6">
+          <Card className="p-6 overflow-x-auto">
+            {/* Filters and View Toggle */}
+            <div className="flex items-end justify-between gap-4 mb-6 pb-6 border-b border-border">
+              <div className="flex-1 max-w-xs">
+                <label className="text-sm font-medium text-foreground block mb-2">Buscar habitación</label>
+                <div className="relative">
                   <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                   <Input
-                    placeholder={t("admin.searchRoomsPlaceholder")}
+                    placeholder="Ej: 101, 205..."
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
                     className="pl-10"
                   />
                 </div>
               </div>
-            </Card>
+              
+              <div className="flex items-center gap-3">
+                <span className={`text-sm font-medium ${timelineMode === "week" ? "text-foreground" : "text-muted-foreground"}`}>
+                  Semana
+                </span>
+                <button
+                  onClick={() => setTimelineMode(timelineMode === "week" ? "month" : "week")}
+                  className={`relative inline-flex h-8 w-14 items-center rounded-full transition-colors ${
+                    timelineMode === "month"
+                      ? "bg-lime-600"
+                      : "bg-gray-300"
+                  }`}
+                >
+                  <span
+                    className={`inline-block h-6 w-6 transform rounded-full bg-white transition-transform ${
+                      timelineMode === "month" ? "translate-x-7" : "translate-x-1"
+                    }`}
+                  />
+                </button>
+                <span className={`text-sm font-medium ${timelineMode === "month" ? "text-foreground" : "text-muted-foreground"}`}>
+                  Mes
+                </span>
+              </div>
+            </div>
 
-            {/* Timeline Table */}
             <div className="min-w-max">
               {/* Timeline Header */}
               <div className="flex border-b border-border mb-4">
@@ -575,7 +658,7 @@ export default function DashboardControl() {
             </div>
 
             {/* Legend */}
-            <div className="flex items-center gap-6 mt-6 mb-6 border-t border-border">
+            <div className="flex items-center gap-6 mt-6 pt-6 border-t border-border">
               <div className="flex items-center gap-2">
                 <div className="w-4 h-4 rounded bg-green-100 border border-green-200" />
                 <span className="text-xs text-muted-foreground">{t("admin.legendAvailable")}</span>
@@ -593,236 +676,350 @@ export default function DashboardControl() {
                 <span className="text-xs text-muted-foreground">{t("admin.legendMaintenance")}</span>
               </div>
             </div>
-          </div>
-        )}
-
-        {filteredRooms.length === 0 && activeTab !== "staff" && (
-          <Card className="p-12 text-center">
-            <Search className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
-            <p className="text-muted-foreground">{t("admin.noRoomsFound")}</p>
           </Card>
-        )}
+        </div>
+      )}
+      {(activeTab === "staff") && (
+        <div className="px-8 py-6">
+          <Card className="p-6">
+            {/* Filters */}
+            <Card className="p-4 mb-4">
+              <div className="flex gap-4 items-end">
+                <div className="flex-1">
+                  <Label htmlFor="search-name" className="text-sm font-medium">Buscar por nombre</Label>
+                  <Input
+                    id="search-name"
+                    placeholder="Ej: María, Roberto..."
+                    value={searchName}
+                    onChange={(e) => setSearchName(e.target.value)}
+                    className="mt-2"
+                  />
+                </div>
+                <div className="w-48">
+                  <Label htmlFor="filter-dept" className="text-sm font-medium">Filtrar por departamento</Label>
+                  <Select value={filterDepartment} onValueChange={setFilterDepartment}>
+                    <SelectTrigger id="filter-dept" className="mt-2">
+                      <SelectValue placeholder="Todos los departamentos" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">Todos los departamentos</SelectItem>
+                      <SelectItem value="Limpieza">Limpieza</SelectItem>
+                      <SelectItem value="Mantenimiento">Mantenimiento</SelectItem>
+                      <SelectItem value="Seguridad">Seguridad</SelectItem>
+                      <SelectItem value="Recepción">Recepción</SelectItem>
+                      <SelectItem value="Servicio">Servicio</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+            </Card>
 
-        {/* Staff Kanban Section */}
-        {(activeTab === "staff" || activeTab === "both") && (
-          <div className={activeTab === "both" ? "mt-8 pt-8 border-t border-border" : ""}>
-            <h2 className="text-xl font-bold text-foreground mb-4">{t("admin.staffStatus")}</h2>
-            
-            <Card className="p-6">
-              {/* Filters */}
-              <Card className="p-4 mb-4">
-                <div className="flex gap-4 items-end">
-                  <div className="flex-1">
-                    <Label htmlFor="search-name" className="text-sm font-medium">Buscar por nombre</Label>
-                    <Input
-                      id="search-name"
-                      placeholder="Ej: María, Roberto..."
-                      value={searchName}
-                      onChange={(e) => setSearchName(e.target.value)}
-                      className="mt-2"
-                    />
+            <div className="overflow-x-auto">
+              <div className="min-w-max">
+                {/* Header Row with Time Slots */}
+                <div className="flex gap-2 mb-4 sticky left-0">
+                  {/* Staff Column Header */}
+                  <div className="w-48 flex-shrink-0">
+                    <div className="h-16 flex items-center justify-center bg-muted rounded-lg border border-border">
+                      <span className="text-sm font-semibold text-muted-foreground">Personal</span>
+                    </div>
                   </div>
-                  <div className="w-48">
-                    <Label htmlFor="filter-dept" className="text-sm font-medium">Filtrar por departamento</Label>
-                    <Select value={filterDepartment} onValueChange={setFilterDepartment}>
-                      <SelectTrigger id="filter-dept" className="mt-2">
-                        <SelectValue placeholder="Todos los departamentos" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="all">Todos los departamentos</SelectItem>
-                        <SelectItem value="Limpieza">Limpieza</SelectItem>
-                        <SelectItem value="Mantenimiento">Mantenimiento</SelectItem>
-                        <SelectItem value="Seguridad">Seguridad</SelectItem>
-                        <SelectItem value="Recepción">Recepción</SelectItem>
-                        <SelectItem value="Servicio">Servicio</SelectItem>
-                      </SelectContent>
-                    </Select>
+
+                  {/* Time Slot Headers */}
+                  <div className="flex gap-2">
+                    {timeSlots.map((timeSlot) => (
+                      <div key={timeSlot} className="w-32 flex-shrink-0">
+                        <div className="h-16 flex flex-col items-center justify-center bg-gradient-to-br from-primary/5 to-primary/10 rounded-lg border border-primary/20">
+                          <Clock className="w-4 h-4 text-primary mb-1" />
+                          <span className="text-xs font-medium text-foreground">{timeSlot}</span>
+                        </div>
+                      </div>
+                    ))}
                   </div>
                 </div>
-              </Card>
 
-              <div className="overflow-x-auto">
-                <div className="min-w-max">
-                  {/* Header Row with Time Slots */}
-                  <div className="flex gap-2 mb-4 sticky left-0">
-                    {/* Staff Column Header */}
-                    <div className="w-48 flex-shrink-0">
-                      <div className="h-16 flex items-center justify-center bg-muted rounded-lg border border-border">
-                        <span className="text-sm font-semibold text-muted-foreground">Personal</span>
-                      </div>
-                    </div>
-
-                    {/* Time Slot Headers */}
-                    <div className="flex gap-2">
-                      {timeSlots.map((timeSlot) => (
-                        <div key={timeSlot} className="w-32 flex-shrink-0">
-                          <div className="h-16 flex flex-col items-center justify-center bg-gradient-to-br from-primary/5 to-primary/10 rounded-lg border border-primary/20">
-                            <Clock className="w-4 h-4 text-primary mb-1" />
-                            <span className="text-xs font-medium text-foreground">{timeSlot}</span>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-
-                  {/* Staff Rows */}
-                  <div className="space-y-2">
-                    {staffMembers
-                      .filter((s) => s.status !== "off")
-                      .filter((s) =>
-                        s.name.toLowerCase().includes(searchName.toLowerCase())
-                      )
-                      .filter((s) =>
-                        filterDepartment === "all" || s.department === filterDepartment
-                      )
-                      .map((member) => (
-                        <div key={member.id} className="flex gap-2">
-                          {/* Staff Info (Fixed Column) */}
-                          <div className="w-48 flex-shrink-0 sticky left-0 bg-background">
-                            <Card className="p-3 bg-gradient-to-br from-primary/5 to-primary/10 border-primary/20 h-full">
-                              <div className="flex items-center gap-3">
-                                <div className="w-10 h-10 bg-gradient-to-br from-primary to-primary/80 rounded-full flex items-center justify-center text-white font-bold text-sm shadow-md">
-                                  {member.avatar}
-                                </div>
-                                <div className="flex-1 min-w-0">
-                                  <h3 className="font-semibold text-foreground text-sm truncate">{member.name}</h3>
-                                  <div className="flex items-center gap-2 mt-1">
-                                    <Badge className={getStatusColor(member.status) + " text-white text-xs py-0"}>
-                                      {getStatusText(member.status)}
-                                    </Badge>
-                                    <span className="text-xs text-muted-foreground">
-                                      {member.tasksToday}/{member.maxCapacity}
-                                    </span>
-                                  </div>
+                {/* Staff Rows */}
+                <div className="space-y-2">
+                  {staffMembers
+                    .filter((s) => s.status !== "off")
+                    .filter((s) =>
+                      s.name.toLowerCase().includes(searchName.toLowerCase())
+                    )
+                    .filter((s) =>
+                      filterDepartment === "all" || s.department === filterDepartment
+                    )
+                    .map((member) => (
+                      <div key={member.id} className="flex gap-2">
+                        {/* Staff Info (Fixed Column) */}
+                        <div className="w-48 flex-shrink-0 sticky left-0 bg-background">
+                          <Card className="p-3 bg-gradient-to-br from-primary/5 to-primary/10 border-primary/20 h-full">
+                            <div className="flex items-center gap-3">
+                              <div className="w-10 h-10 bg-gradient-to-br from-primary to-primary/80 rounded-full flex items-center justify-center text-white font-bold text-sm shadow-md">
+                                {member.avatar}
+                              </div>
+                              <div className="flex-1 min-w-0">
+                                <h3 className="font-semibold text-foreground text-sm truncate">{member.name}</h3>
+                                <div className="flex items-center gap-2 mt-1">
+                                  <Badge className={getStatusColor(member.status) + " text-white text-xs py-0"}>
+                                    {getStatusText(member.status)}
+                                  </Badge>
+                                  <span className="text-xs text-muted-foreground">
+                                    {member.tasksToday}/{member.maxCapacity}
+                                  </span>
                                 </div>
                               </div>
-                            </Card>
-                          </div>
+                            </div>
+                          </Card>
+                        </div>
 
-                          {/* Time Slots for this Staff Member */}
-                          <div className="flex gap-2">
-                            {timeSlots.map((timeSlot) => {
-                              const tasksInSlot = getTasksForTimeSlot(member.name, timeSlot)
-                              const hasTask = tasksInSlot.length > 0
+                        {/* Time Slots for this Staff Member */}
+                        <div className="flex gap-2">
+                          {timeSlots.map((timeSlot) => {
+                            const tasksInSlot = getTasksForTimeSlot(member.name, timeSlot)
+                            const hasTask = tasksInSlot.length > 0
 
-                              return (
-                                <div key={timeSlot} className="w-32 flex-shrink-0">
-                                  {hasTask ? (
-                                    <div className="space-y-2">
-                                      {tasksInSlot.map((task) => (
-                                        <Card
-                                          key={task.id}
-                                          className="p-2 bg-gradient-to-r from-primary/10 to-primary/5 border-primary/30 hover:shadow-lg transition-all cursor-pointer h-full"
-                                        >
-                                          <div className="flex flex-col gap-1">
-                                            <div className="flex items-center justify-between">
-                                              <span className="font-semibold text-foreground text-xs">{task.roomNumber}</span>
-                                              {task.priority === "urgent" && (
-                                                <Badge variant="destructive" className="text-[10px] px-1 py-0">
-                                                  !
-                                                </Badge>
-                                              )}
-                                            </div>
-                                            <p className="text-[10px] text-muted-foreground truncate">{task.guestName}</p>
-                                            <Badge className={getRequestStatusColor(task.status) + " text-[10px] px-1 py-0"}>
-                                              {getRequestStatusText(task.status)}
-                                            </Badge>
+                            return (
+                              <div key={timeSlot} className="w-32 flex-shrink-0">
+                                {hasTask ? (
+                                  <div className="space-y-2">
+                                    {tasksInSlot.map((task) => (
+                                      <Card
+                                        key={task.id}
+                                        className="p-2 bg-gradient-to-r from-primary/10 to-primary/5 border-primary/30 hover:shadow-lg transition-all cursor-pointer h-full"
+                                      >
+                                        <div className="flex flex-col gap-1">
+                                          <div className="flex items-center justify-between">
+                                            <span className="font-semibold text-foreground text-xs">{task.roomNumber}</span>
+                                            {task.priority === "urgent" && (
+                                              <Badge variant="destructive" className="text-[10px] px-1 py-0">
+                                                !
+                                              </Badge>
+                                            )}
                                           </div>
-                                        </Card>
-                                      ))}
+                                          <p className="text-[10px] text-muted-foreground truncate">{task.guestName}</p>
+                                          <Badge className={getRequestStatusColor(task.status) + " text-[10px] px-1 py-0"}>
+                                            {getRequestStatusText(task.status)}
+                                          </Badge>
+                                        </div>
+                                      </Card>
+                                    ))}
+                                  </div>
+                                ) : (
+                                  <div className="h-full min-h-[80px] bg-muted/30 rounded-lg border border-dashed border-border flex items-center justify-center">
+                                    <span className="text-xs text-muted-foreground/50">Libre</span>
+                                  </div>
+                                )}
+                              </div>
+                            )
+                          })}
+                        </div>
+                      </div>
+                    ))}
+                </div>
+              </div>
+            </div>
+          </Card>
+        </div>
+      )}
+
+      {/* Facilities Timeline Section */}
+      {(activeTab === "facilities") && (
+        <div className="px-8 py-6">
+          <div className="bg-card rounded-lg border border-border overflow-hidden">
+            <div className="overflow-x-auto">
+              <div style={{ width: "fit-content", minWidth: "100%" }}>
+                {/* Header con horas */}
+                <div className="flex border-b border-border bg-muted/50 sticky top-0 z-10">
+                  <div className="w-64 p-4 font-semibold border-r border-border bg-muted/50 shrink-0">Facility</div>
+                  {timeSlots.map((slot) => (
+                    <div key={slot} className="w-32 p-3 text-center text-sm font-medium border-r border-border shrink-0">
+                      {slot}
+                    </div>
+                  ))}
+                </div>
+
+                {/* Filas de facilities */}
+                {facilities.map((facility, idx) => {
+                  const Icon = facility.icon
+                  return (
+                    <div key={facility.id} className={`flex ${idx % 2 === 0 ? "bg-background" : "bg-muted/30"}`}>
+                      {/* Info de facility */}
+                      <div className="w-64 p-4 border-r border-border flex items-center gap-3 shrink-0 group relative">
+                        <div className={`${facility.color} p-2 rounded-lg shrink-0`}>
+                          <Icon className="w-5 h-5 text-white" />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="font-semibold text-sm truncate">{facility.name}</p>
+                          <p className="text-xs text-muted-foreground capitalize">{facility.type}</p>
+                          <p className="text-xs text-muted-foreground mt-0.5">Cap. {facility.capacity}</p>
+                          <p className="text-xs text-muted-foreground mt-0.5">{facility.startTime} - {facility.endTime}</p>
+                        </div>
+                      </div>
+
+                      <div className="flex">
+                        {timeSlots.map((slot) => {
+                          const bookingAtStart = isBookingStart(facility.id, bookings, slot)
+                          const booking = getBookingForSlot(facility.id, bookings, slot)
+                          const slotBookings = getBookingsAtSlot(facility.id, bookings, slot)
+                          const occupancy = getOccupancyPercentage(facility.id, bookings, facilities, slot)
+
+                          // Si hay una reserva que empieza en este slot
+                          if (bookingAtStart) {
+                            const durationHours = bookingAtStart.duration / 60
+                            const widthInColumns = durationHours
+
+                            return (
+                              <div
+                                key={slot}
+                                className="relative border-r border-border group shrink-0"
+                                style={{ width: `${widthInColumns * 128}px` }}
+                              >
+                                <div
+                                  className={`absolute inset-2 rounded-lg ${
+                                    bookingAtStart.status === "confirmed"
+                                      ? "bg-gradient-to-br from-green-500/30 to-green-600/20 border-2 border-green-500"
+                                      : "bg-gradient-to-br from-amber-500/30 to-amber-600/20 border-2 border-amber-500"
+                                  } p-3 flex flex-col justify-center hover:shadow-lg transition-all cursor-pointer hover:scale-[1.02] min-h-[72px]`}
+                                  onClick={() => slotBookings.length > 0 && handleShowBookingsDetail(slotBookings)}
+                                >
+                                  {/* Multi-party facilities show only capacity info */}
+                                  {isMultiPartyFacility(facility.type) ? (
+                                    <div className="flex flex-col items-center justify-center gap-2">
+                                      <p className="text-lg font-bold text-foreground">
+                                        {slotBookings.length}/{facility.capacity}
+                                      </p>
+                                      <p className="text-[10px] text-muted-foreground">
+                                        Ocupación: {occupancy}%
+                                      </p>
                                     </div>
                                   ) : (
-                                    <div className="h-full min-h-[80px] bg-muted/30 rounded-lg border border-dashed border-border flex items-center justify-center">
-                                      <span className="text-xs text-muted-foreground/50">Libre</span>
+                                    <>
+                                      <p className="text-sm font-bold truncate text-foreground">
+                                        {slotBookings.length > 1 ? `${slotBookings.length} participantes` : bookingAtStart.clientName}
+                                      </p>
+                                      <p className="text-[10px] text-muted-foreground truncate">
+                                        {slotBookings.length > 1 ? `Ocupación: ${occupancy}%` : `Hab. ${bookingAtStart.clientRoom}`}
+                                      </p>
+                                      <div className="text-[10px] text-muted-foreground font-medium mt-0.5 flex items-center gap-2">
+                                        <span>{bookingAtStart.duration / 60}h</span>
+                                        {slotBookings.length > 0 && (
+                                          <span className="text-xs px-1.5 py-0.5 rounded bg-primary/20 text-primary">
+                                            {slotBookings.length}/{facility.capacity}
+                                          </span>
+                                        )}
+                                      </div>
+                                    </>
+                                  )}
+                                  
+                                  {/* Barra de ocupación */}
+                                  {slotBookings.length > 0 && (
+                                    <div className="mt-2 w-full bg-black/10 rounded-full h-1.5">
+                                      <div
+                                        className={`h-1.5 rounded-full transition-all ${
+                                          occupancy > 80
+                                            ? "bg-red-500"
+                                            : occupancy > 50
+                                              ? "bg-amber-500"
+                                              : "bg-green-500"
+                                        }`}
+                                        style={{ width: `${occupancy}%` }}
+                                      />
                                     </div>
                                   )}
                                 </div>
+
+                                {/* Tooltip mejorado */}
+                                <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 hidden group-hover:block z-20">
+                                  <div className="bg-popover border border-border rounded-lg shadow-xl p-4 min-w-[280px]">
+                                    <p className="font-bold text-sm mb-3">Detalles del horario {slot}</p>
+                                    {slotBookings.length > 0 ? (
+                                      <div className="space-y-2">
+                                        <p className="text-xs text-muted-foreground">
+                                          <span className="font-medium">Ocupación:</span> {slotBookings.length}/{facility.capacity} ({occupancy}%)
+                                        </p>
+                                        {slotBookings.length <= 3 ? (
+                                          <div className="space-y-2">
+                                            {slotBookings.map((b, idx) => (
+                                              <div key={idx} className="text-xs text-muted-foreground border-t border-border pt-2">
+                                                <p className="font-medium text-foreground">{b.clientName}</p>
+                                                <p>Hab. {b.clientRoom}</p>
+                                              </div>
+                                            ))}
+                                          </div>
+                                        ) : (
+                                          <Button
+                                            onClick={() => handleShowBookingsDetail(slotBookings)}
+                                            className="mt-2 text-xs text-primary hover:underline font-medium"
+                                          >
+                                            Ver los {slotBookings.length} participantes →
+                                          </Button>
+                                        )}
+                                      </div>
+                                    ) : (
+                                      <p className="text-xs text-muted-foreground">Sin reservas</p>
+                                    )}
+                                  </div>
+                                </div>
+                              </div>
+                            )
+                          }
+                          // Si hay una reserva que cubre este slot pero no empieza aquí, mostrar barra de ocupación
+                          else if (booking) {
+                            const slotBookingsAtTime = getBookingsAtSlot(facility.id, bookings, slot)
+                            const occupancyAtTime = getOccupancyPercentage(facility.id, bookings, facilities, slot)
+                            
+                            if (slotBookingsAtTime.length > 0) {
+                              return (
+                                <div
+                                  key={slot}
+                                  className="w-32 border-r border-border p-2 shrink-0 min-h-[88px] flex items-center justify-center cursor-pointer hover:bg-primary/5 transition-colors"
+                                  onClick={() => handleShowBookingsDetail(slotBookingsAtTime)}
+                                >
+                                  <div className="w-full space-y-2">
+                                    <p className="text-xs font-medium text-foreground text-center">
+                                      {slotBookingsAtTime.length}/{facility.capacity}
+                                    </p>
+                                    <div className="w-full bg-black/10 rounded-full h-2">
+                                      <div
+                                        className={`h-2 rounded-full transition-all ${
+                                          occupancyAtTime > 80
+                                            ? "bg-red-500"
+                                            : occupancyAtTime > 50
+                                              ? "bg-amber-500"
+                                              : "bg-green-500"
+                                        }`}
+                                        style={{ width: `${occupancyAtTime}%` }}
+                                      />
+                                    </div>
+                                  </div>
+                                </div>
                               )
-                            })}
-                          </div>
-                        </div>
-                      ))}
-                  </div>
-                </div>
-              </div>
-            </Card>
-          </div>
-        )}
-
-        {/* Facilities Timeline Section */}
-        {(activeTab === "facilities" || activeTab === "both") && (
-          <div className={activeTab === "both" ? "mt-8 pt-8 border-t border-border" : ""}>
-            <h2 className="text-xl font-bold text-foreground mb-4">Timeline de Instalaciones</h2>
-            
-            <Card className="p-6 overflow-x-auto">
-              <div className="min-w-max">
-                {/* Header con horas */}
-                <div className="flex border-b border-border bg-muted/50 mb-4 sticky left-0">
-                  <div className="w-48 p-4 font-semibold border-r border-border bg-muted/50 shrink-0">Instalación</div>
-                  <div className="flex gap-1">
-                    {Array.from({ length: 17 }, (_, i) => {
-                      const hour = i + 7
-                      const time = `${hour.toString().padStart(2, "0")}:00`
-                      return (
-                        <div key={time} className="w-20 p-3 text-center text-xs font-medium border-r border-border shrink-0">
-                          {time}
-                        </div>
-                      )
-                    })}
-                  </div>
-                </div>
-
-                {/* Filas de instalaciones */}
-                {facilities.map((facility, idx) => (
-                  <div key={facility.id} className={`flex border-b border-border last:border-b-0 ${idx % 2 === 0 ? "bg-background" : "bg-muted/30"}`}>
-                    {/* Info de instalación */}
-                    <div className="w-48 p-4 border-r border-border flex items-center gap-3 shrink-0">
-                      <div className={`p-2 rounded-lg shrink-0 ${
-                        facility.type === "fitness" ? "bg-orange-500" :
-                        facility.type === "recreation" ? "bg-blue-500" :
-                        facility.type === "wellness" ? "bg-purple-500" :
-                        "bg-teal-500"
-                      }`}>
-                        {facility.type === "fitness" && <Dumbbell className="w-5 h-5 text-white" />}
-                        {facility.type === "recreation" && <Waves className="w-5 h-5 text-white" />}
-                        {facility.type === "wellness" && <Sparkles className="w-5 h-5 text-white" />}
-                        {facility.type === "business" && <Building2 className="w-5 h-5 text-white" />}
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="font-semibold text-sm truncate">{facility.name}</p>
-                        <div className="flex items-center gap-2 mt-1">
-                          <span className="text-xs text-muted-foreground capitalize">{facility.type}</span>
-                          <Badge variant="outline" className="text-xs">Cap. {facility.capacity}</Badge>
-                        </div>
+                            }
+                            return null
+                          }
+                          // Slot libre
+                          else {
+                            return (
+                              <div
+                                key={slot}
+                                className="w-32 border-r border-border p-2 shrink-0 min-h-[88px] flex items-center"
+                              >
+                                <div className="w-full border-2 border-dashed border-muted-foreground/20 rounded-md h-16 flex items-center justify-center hover:border-primary/30 hover:bg-primary/5 transition-colors cursor-pointer">
+                                  <span className="text-xs text-muted-foreground/50 font-medium">Libre</span>
+                                </div>
+                              </div>
+                            )
+                          }
+                        })}
                       </div>
                     </div>
-
-                    {/* Time slots */}
-                    <div className="flex gap-1">
-                      {Array.from({ length: 17 }, (_, i) => {
-                        const hour = i + 7
-                        const time = `${hour.toString().padStart(2, "0")}:00`
-                        return (
-                          <div
-                            key={time}
-                            className={`w-20 p-3 flex items-center justify-center text-xs font-medium border-r border-border shrink-0 ${
-                              facility.status === "booked"
-                                ? "bg-green-100 border-green-200 text-green-700"
-                                : "bg-gray-50 text-gray-400"
-                            }`}
-                          >
-                            {facility.status === "booked" ? "Ocupada" : "-"}
-                          </div>
-                        )
-                      })}
-                    </div>
-                  </div>
-                ))}
+                  )
+                })}
               </div>
-            </Card>
+            </div>
           </div>
-        )}
-      </div>
+        </div>
+      )}
     </div>
   )
 }
