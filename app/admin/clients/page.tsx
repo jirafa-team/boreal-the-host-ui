@@ -18,6 +18,7 @@ import {
   XCircle,
   ChevronDown,
   ChevronRight,
+  UserPlus,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -279,10 +280,15 @@ export default function ClientsPage() {
           <h1 className="text-3xl font-bold text-foreground">{t("admin.clientManagement")}</h1>
           <p className="text-muted-foreground mt-1">{t("admin.administerHotelGuests")}</p>
         </div>
-        <Button>
-          <UserCircle className="w-4 h-4 mr-2" />
-          {t("admin.newClient")}
-        </Button>
+        <button 
+          className="relative group w-10 h-10 rounded-full bg-primary hover:bg-primary/90 text-white flex items-center justify-center transition-all shadow-md hover:shadow-lg"
+          title="Agregar cliente"
+        >
+          <UserPlus className="w-5 h-5" />
+          <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-1.5 bg-gray-900 text-white text-xs rounded pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
+            Agregar Cliente
+          </div>
+        </button>
       </div>
 
       {/* Stats */}
