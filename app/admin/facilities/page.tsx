@@ -251,16 +251,15 @@ export default function FacilitiesPage() {
               </DialogHeader>
               <form onSubmit={handleAddFacility} className="space-y-4">
                 <div className="relative">
-                  <Input id="name" name="name" placeholder="Nombre" className="peer pt-6 pb-2" required />
-                  <Label htmlFor="name" className="absolute left-3 top-1.5 text-xs text-muted-foreground transition-all peer-placeholder-shown:top-3.5 peer-placeholder-shown:text-sm peer-focus:top-1.5 peer-focus:text-xs peer-focus:text-primary pointer-events-none">
+                  <Input id="name" name="name" className="peer pt-6 pb-2" required />
+                  <Label htmlFor="name" className="absolute left-3 top-2.5 text-sm text-muted-foreground transition-all peer-focus:top-1.5 peer-focus:text-xs peer-focus:text-primary pointer-events-none peer-not-placeholder-shown:top-1.5 peer-not-placeholder-shown:text-xs">
                     Nombre
                   </Label>
                 </div>
-                <div>
-                  <Label htmlFor="type" className="text-xs text-muted-foreground">Tipo</Label>
+                <div className="relative">
                   <Select name="type" required>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Seleccionar tipo" />
+                    <SelectTrigger className="peer pt-6 pb-2 relative">
+                      <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
                       <SelectItem value="fitness">Fitness</SelectItem>
@@ -270,10 +269,13 @@ export default function FacilitiesPage() {
                       <SelectItem value="dining">Gastronomía</SelectItem>
                     </SelectContent>
                   </Select>
+                  <Label className="absolute left-3 top-2.5 text-sm text-muted-foreground transition-all pointer-events-none text-primary">
+                    Tipo
+                  </Label>
                 </div>
                 <div className="relative">
-                  <Input id="capacity" name="capacity" type="number" placeholder="Capacidad" className="peer pt-6 pb-2" required />
-                  <Label htmlFor="capacity" className="absolute left-3 top-1.5 text-xs text-muted-foreground transition-all peer-placeholder-shown:top-3.5 peer-placeholder-shown:text-sm peer-focus:top-1.5 peer-focus:text-xs peer-focus:text-primary pointer-events-none">
+                  <Input id="capacity" name="capacity" type="number" className="peer pt-6 pb-2" required />
+                  <Label htmlFor="capacity" className="absolute left-3 top-2.5 text-sm text-muted-foreground transition-all peer-focus:top-1.5 peer-focus:text-xs peer-focus:text-primary pointer-events-none peer-not-placeholder-shown:top-1.5 peer-not-placeholder-shown:text-xs">
                     Capacidad
                   </Label>
                 </div>
