@@ -250,12 +250,14 @@ export default function FacilitiesPage() {
                 <DialogDescription>Configure un nuevo amenity o espacio para el hotel</DialogDescription>
               </DialogHeader>
               <form onSubmit={handleAddFacility} className="space-y-4">
-                <div>
-                  <Label htmlFor="name">Nombre</Label>
-                  <Input id="name" name="name" placeholder="Ej: Gimnasio" required />
+                <div className="relative">
+                  <Input id="name" name="name" placeholder="Nombre" className="peer pt-6 pb-2" required />
+                  <Label htmlFor="name" className="absolute left-3 top-1.5 text-xs text-muted-foreground transition-all peer-placeholder-shown:top-3.5 peer-placeholder-shown:text-sm peer-focus:top-1.5 peer-focus:text-xs peer-focus:text-primary pointer-events-none">
+                    Nombre
+                  </Label>
                 </div>
                 <div>
-                  <Label htmlFor="type">Tipo</Label>
+                  <Label htmlFor="type" className="text-xs text-muted-foreground">Tipo</Label>
                   <Select name="type" required>
                     <SelectTrigger>
                       <SelectValue placeholder="Seleccionar tipo" />
@@ -269,18 +271,24 @@ export default function FacilitiesPage() {
                     </SelectContent>
                   </Select>
                 </div>
-                <div>
-                  <Label htmlFor="capacity">Capacidad</Label>
-                  <Input id="capacity" name="capacity" type="number" placeholder="15" required />
+                <div className="relative">
+                  <Input id="capacity" name="capacity" type="number" placeholder="Capacidad" className="peer pt-6 pb-2" required />
+                  <Label htmlFor="capacity" className="absolute left-3 top-1.5 text-xs text-muted-foreground transition-all peer-placeholder-shown:top-3.5 peer-placeholder-shown:text-sm peer-focus:top-1.5 peer-focus:text-xs peer-focus:text-primary pointer-events-none">
+                    Capacidad
+                  </Label>
                 </div>
                 <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <Label htmlFor="startTime">Hora de Apertura</Label>
-                    <Input id="startTime" name="startTime" type="time" required />
+                  <div className="relative">
+                    <Input id="startTime" name="startTime" type="time" className="peer pt-6 pb-2" required />
+                    <Label htmlFor="startTime" className="absolute left-3 top-1.5 text-xs text-muted-foreground transition-all peer-focus:top-1.5 peer-focus:text-xs peer-focus:text-primary pointer-events-none">
+                      Apertura
+                    </Label>
                   </div>
-                  <div>
-                    <Label htmlFor="endTime">Hora de Cierre</Label>
-                    <Input id="endTime" name="endTime" type="time" required />
+                  <div className="relative">
+                    <Input id="endTime" name="endTime" type="time" className="peer pt-6 pb-2" required />
+                    <Label htmlFor="endTime" className="absolute left-3 top-1.5 text-xs text-muted-foreground transition-all peer-focus:top-1.5 peer-focus:text-xs peer-focus:text-primary pointer-events-none">
+                      Cierre
+                    </Label>
                   </div>
                 </div>
                 <Button type="submit" className="w-full">
