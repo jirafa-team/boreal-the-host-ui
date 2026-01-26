@@ -18,6 +18,7 @@ import {
   Ticket,
   ShoppingBag,
   UserCog,
+  Settings,
   ArrowRight,
 } from "lucide-react"
 
@@ -31,6 +32,7 @@ const colorClasses = {
   "from-green-600 to-green-700": "bg-gradient-to-br from-green-600 to-green-700",
   "from-yellow-600 to-yellow-700": "bg-gradient-to-br from-yellow-600 to-yellow-700",
   "from-slate-600 to-slate-700": "bg-gradient-to-br from-slate-600 to-slate-700",
+  "from-teal-600 to-teal-700": "bg-gradient-to-br from-teal-600 to-teal-700",
 }
 
 const customColors = {
@@ -54,6 +56,7 @@ export default function AdminHomePage() {
     "from-green-600 to-green-700": "linear-gradient(135deg, rgb(22, 163, 74), rgb(20, 124, 61))",
     "from-yellow-600 to-yellow-700": "linear-gradient(135deg, rgb(202, 138, 4), rgb(161, 98, 7))",
     "from-slate-600 to-slate-700": "linear-gradient(135deg, rgb(71, 85, 105), rgb(51, 65, 85))",
+    "from-teal-600 to-teal-700": "linear-gradient(135deg, rgb(13, 148, 136), rgb(5, 122, 119))",
   }
 
   const solidColors: { [key: string]: string } = {
@@ -104,6 +107,7 @@ export default function AdminHomePage() {
       title: t("admin.management"),
       items: [
         { href: "/admin/users", label: "Usuarios", icon: UserCog, color: "from-slate-600 to-slate-700" },
+        { href: "/admin/settings", label: "Configuración", icon: Settings, color: "from-teal-600 to-teal-700" },
       ],
       columns: 2,
     },
