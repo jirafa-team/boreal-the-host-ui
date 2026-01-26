@@ -151,7 +151,7 @@ export default function SelectEstablishmentPage() {
                         <span className="text-xs text-white/80">Ocupación</span>
                         <span className="text-xs font-semibold text-white">{establishment.occupancy}%</span>
                       </div>
-                      <div className="w-full h-2 bg-white/20 rounded-full overflow-hidden">
+                      <div className="w-full h-1 bg-white/20 rounded-full overflow-hidden">
                         <div
                           className="h-full bg-white rounded-full transition-all duration-300"
                           style={{ width: `${establishment.occupancy}%` }}
