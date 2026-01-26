@@ -35,6 +35,10 @@ export default function AdminHomePage() {
     "from-green-600 to-green-700": "bg-gradient-to-br from-green-600 to-green-700",
     "from-yellow-600 to-yellow-700": "bg-gradient-to-br from-yellow-600 to-yellow-700",
     "from-slate-600 to-slate-700": "bg-gradient-to-br from-slate-600 to-slate-700",
+    "pedidos-custom": "bg-[#008db1]",
+    "clientes-custom": "bg-[#7c1df9]",
+    "notificaciones-custom": "bg-[#dd6d00]",
+    "recomendaciones-custom": "bg-[#5ba000]",
   }
 
   const menuSections = [
@@ -61,16 +65,16 @@ export default function AdminHomePage() {
         { href: "/admin/housekeeping", label: t("admin.housekeeping"), icon: Sparkles, color: "from-pink-600 to-pink-700" },
         { href: "/admin/events", label: t("admin.events"), icon: Calendar, color: "from-red-600 to-red-700" },
         { href: "/admin/tickets", label: t("admin.tickets"), icon: Ticket, color: "from-yellow-600 to-yellow-700" },
-        { href: "/admin/pedidos", label: t("admin.orders"), icon: ShoppingBag, color: "from-cyan-600 to-cyan-700" },
+        { href: "/admin/pedidos", label: t("admin.orders"), icon: ShoppingBag, color: "pedidos-custom" },
       ],
       columns: 2,
     },
     {
       title: t("admin.communication"),
       items: [
-        { href: "/admin/clients", label: t("admin.clients"), icon: Users, color: "from-violet-600 to-violet-700" },
-        { href: "/admin/notifications", label: t("admin.notifications"), icon: Bell, color: "from-amber-600 to-amber-700" },
-        { href: "/admin/recommendations", label: t("admin.recommendations"), icon: Compass, color: "from-lime-600 to-lime-700" },
+        { href: "/admin/clients", label: t("admin.clients"), icon: Users, color: "clientes-custom" },
+        { href: "/admin/notifications", label: t("admin.notifications"), icon: Bell, color: "notificaciones-custom" },
+        { href: "/admin/recommendations", label: t("admin.recommendations"), icon: Compass, color: "recomendaciones-custom" },
       ],
       columns: 3,
     },
