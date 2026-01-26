@@ -40,10 +40,10 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   const hideSidebar = pathname === '/admin/select-establishment'
 
   const languages = [
-    { code: "es", name: "Español", flag: "🇪🇸" },
-    { code: "en", name: "English", flag: "🇬🇧" },
-    { code: "pt", name: "Português", flag: "🇵🇹" },
-    { code: "fr", name: "Français", flag: "🇫🇷" },
+    { code: "es", name: "Español", label: "ES" },
+    { code: "en", name: "English", label: "EN" },
+    { code: "pt", name: "Português", label: "PT" },
+    { code: "fr", name: "Français", label: "FR" },
   ]
 
   const navSections = [
@@ -213,17 +213,17 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             <div className="p-2 border-t border-white/10">
               <div className="flex items-center gap-2">
                 <Globe className="w-4 h-4 text-white/70 shrink-0" />
-                <div className="inline-flex w-24 h-7 items-center rounded-md bg-white/10 border border-white/20 overflow-hidden">
+                <div className="inline-flex w-full h-7 items-center rounded-md bg-white/10 border border-white/20 overflow-hidden">
                   {languages.map((lang) => (
                     <button
                       key={lang.code}
                       onClick={() => setLanguage(lang.code)}
-                      className={`flex-1 h-full px-3 font-medium text-xs transition-all ${
+                      className={`flex-1 h-full font-medium text-xs transition-all ${
                         language === lang.code ? "text-white shadow-md" : "text-white/60 hover:text-white/80"
                       }`}
                       style={language === lang.code ? { backgroundColor: "#0891B2" } : {}}
                     >
-                      {lang.flag}
+                      {lang.label}
                     </button>
                   ))}
                 </div>
