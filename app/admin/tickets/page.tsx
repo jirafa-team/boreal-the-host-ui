@@ -6,7 +6,7 @@ import { useState } from "react"
 import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { Clock, AlertCircle, CheckCircle2, User, MapPin, Calendar, TicketPlus } from "lucide-react"
+import { Clock, AlertCircle, CheckCircle2, User, MapPin, Calendar, TicketPlus, CheckCircle } from "lucide-react"
 import {
   Dialog,
   DialogContent,
@@ -422,6 +422,20 @@ export default function TicketsPage() {
                       )}
                     </DialogContent>
                   </Dialog>
+                )}
+                {ticket.status !== "pending" && ticket.status !== "resolved" && (
+                  <Button
+                    size="sm"
+                    className="flex-1 text-white hover:opacity-90 border-0"
+                    style={{ backgroundColor: "#235E20" }}
+                    onClick={() => {
+                      setSelectedTicketId(ticket.id)
+                      handleCompleteTicket()
+                    }}
+                  >
+                    <CheckCircle className="w-4 h-4 mr-1" />
+                    Completar
+                  </Button>
                 )}
                 {ticket.status === "resolved" && (
                   <Button size="sm" variant="outline" disabled className="flex-1 bg-transparent">
