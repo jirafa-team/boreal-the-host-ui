@@ -36,6 +36,7 @@ export default function SelectEstablishmentPage() {
       vacancies: 8,
       image: 'https://hebbkx1anhila5yf.public.blob.vercel-storage.com/image-ZLayOs5KXWob6A0IspenQ4rnkxAIam.png',
       color: cardColors[0],
+      occupancy: 75,
     },
     {
       id: 2,
@@ -44,6 +45,7 @@ export default function SelectEstablishmentPage() {
       vacancies: 12,
       image: 'https://hebbkx1anhila5yf.public.blob.vercel-storage.com/image-mrtDKpDEpjY5hMBVvi8vNx4TOTH4y7.png',
       color: cardColors[1],
+      occupancy: 60,
     },
     {
       id: 3,
@@ -52,6 +54,7 @@ export default function SelectEstablishmentPage() {
       vacancies: 5,
       image: 'https://hebbkx1anhila5yf.public.blob.vercel-storage.com/image-9bjUummRceyN2U8e69b3oeZ3nvuEwB.png',
       color: cardColors[2],
+      occupancy: 71,
     },
     {
       id: 4,
@@ -60,6 +63,7 @@ export default function SelectEstablishmentPage() {
       vacancies: 15,
       image: 'https://hebbkx1anhila5yf.public.blob.vercel-storage.com/image-G11mqeawI8yeHZ2P6eu1GGRh3obJWg.png',
       color: cardColors[3],
+      occupancy: 67,
     },
   ]
 
@@ -138,6 +142,20 @@ export default function SelectEstablishmentPage() {
                       <div className="flex items-center gap-2">
                         <Building2 className="w-4 h-4" />
                         <span>{establishment.vacancies} plazas</span>
+                      </div>
+                    </div>
+
+                    {/* Occupancy Bar */}
+                    <div className="mb-4">
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="text-xs text-white/80">Ocupación</span>
+                        <span className="text-xs font-semibold text-white">{establishment.occupancy}%</span>
+                      </div>
+                      <div className="w-full h-2 bg-white/20 rounded-full overflow-hidden">
+                        <div
+                          className="h-full bg-white rounded-full transition-all duration-300"
+                          style={{ width: `${establishment.occupancy}%` }}
+                        ></div>
                       </div>
                     </div>
                   </div>
