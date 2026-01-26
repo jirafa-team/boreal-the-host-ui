@@ -34,7 +34,7 @@ export default function SelectEstablishmentPage() {
       name: 'Hotel Central',
       members: 24,
       vacancies: 8,
-      image: '/images/hotel-room-balcony-with-city-view-and-comfortable.jpg',
+      image: 'https://hebbkx1anhila5yf.public.blob.vercel-storage.com/image-ZLayOs5KXWob6A0IspenQ4rnkxAIam.png',
       color: cardColors[0],
     },
     {
@@ -42,7 +42,7 @@ export default function SelectEstablishmentPage() {
       name: 'Resort Playa',
       members: 18,
       vacancies: 12,
-      image: '/images/luxury-deluxe-hotel-room-with-king-bed-and-modern.jpg',
+      image: 'https://hebbkx1anhila5yf.public.blob.vercel-storage.com/image-mrtDKpDEpjY5hMBVvi8vNx4TOTH4y7.png',
       color: cardColors[1],
     },
     {
@@ -50,7 +50,7 @@ export default function SelectEstablishmentPage() {
       name: 'Boutique Hotel',
       members: 12,
       vacancies: 5,
-      image: '/images/hotel-interior-map-modern.jpg',
+      image: 'https://hebbkx1anhila5yf.public.blob.vercel-storage.com/image-9bjUummRceyN2U8e69b3oeZ3nvuEwB.png',
       color: cardColors[2],
     },
     {
@@ -58,7 +58,7 @@ export default function SelectEstablishmentPage() {
       name: 'Hotel Executive',
       members: 31,
       vacancies: 15,
-      image: '/images/conference-room.jpg',
+      image: 'https://hebbkx1anhila5yf.public.blob.vercel-storage.com/image-G11mqeawI8yeHZ2P6eu1GGRh3obJWg.png',
       color: cardColors[3],
     },
   ]
