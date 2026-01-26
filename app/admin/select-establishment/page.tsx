@@ -2,7 +2,7 @@
 
 import { useRouter } from 'next/navigation'
 import { useLanguage } from '@/lib/i18n-context'
-import { Users, ArrowRight, Search } from 'lucide-react'
+import { Users, ArrowRight, Search, Building2 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { useState } from 'react'
 
@@ -33,6 +33,7 @@ export default function SelectEstablishmentPage() {
       id: 1,
       name: 'Hotel Central',
       members: 24,
+      vacancies: 8,
       image: '/images/hotel-room-balcony-with-city-view-and-comfortable.jpg',
       color: cardColors[0],
     },
@@ -40,6 +41,7 @@ export default function SelectEstablishmentPage() {
       id: 2,
       name: 'Resort Playa',
       members: 18,
+      vacancies: 12,
       image: '/images/luxury-deluxe-hotel-room-with-king-bed-and-modern.jpg',
       color: cardColors[1],
     },
@@ -47,6 +49,7 @@ export default function SelectEstablishmentPage() {
       id: 3,
       name: 'Boutique Hotel',
       members: 12,
+      vacancies: 5,
       image: '/images/hotel-interior-map-modern.jpg',
       color: cardColors[2],
     },
@@ -54,6 +57,7 @@ export default function SelectEstablishmentPage() {
       id: 4,
       name: 'Hotel Executive',
       members: 31,
+      vacancies: 15,
       image: '/images/conference-room.jpg',
       color: cardColors[3],
     },
@@ -122,18 +126,26 @@ export default function SelectEstablishmentPage() {
 
                   {/* Content */}
                   <div className="relative">
-                    <h3 className="text-base font-bold text-white mb-2">
+                    <h3 className="text-base font-bold text-white mb-3">
                       {establishment.name}
                     </h3>
-                    <div className="flex items-center gap-1 text-white/90 text-xs">
-                      <Users className="w-4 h-4" />
-                      <span>{establishment.members} {t('common.members') || 'miembros'}</span>
+                    
+                    {/* Members and Vacancies Info */}
+                    <div className="flex items-center justify-between text-xs text-white/90 mb-4 pb-4 border-b border-white/20">
+                      <div className="flex items-center gap-2">
+                        <Users className="w-4 h-4" />
+                        <span>{establishment.members} miembros</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Building2 className="w-4 h-4" />
+                        <span>{establishment.vacancies} plazas</span>
+                      </div>
                     </div>
                   </div>
 
                   {/* Action Button integrated in color section */}
-                  <div className="flex items-center justify-between text-xs font-semibold text-white/90 group-hover:text-white transition-colors pt-4 mt-4 border-t border-white/20">
-                    <span>{t('common.access') || 'Acceder'}</span>
+                  <div className="flex items-center justify-between text-xs font-semibold text-white/90 group-hover:text-white transition-colors pt-2">
+                    <span>Acceder</span>
                     <ArrowRight className="w-3 h-3 group-hover:translate-x-0.5 transition-transform duration-300" />
                   </div>
                 </div>
