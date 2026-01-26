@@ -1,109 +1,115 @@
 'use client'
 
+import React from 'react'
+
 export function BorealSpinner() {
   return (
     <div className="flex items-center justify-center">
+      <style>{`
+        @keyframes fillCyan1 {
+          0% { clip-path: polygon(50% 50%, 50% 50%, 50% 50%, 50% 50%); }
+          100% { clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%); }
+        }
+        
+        @keyframes fillBlue {
+          0% { clip-path: polygon(50% 50%, 50% 50%, 50% 50%, 50% 50%); }
+          100% { clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%); }
+        }
+        
+        @keyframes fillTeal {
+          0% { clip-path: polygon(50% 50%, 50% 50%, 50% 50%, 50% 50%); }
+          100% { clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%); }
+        }
+        
+        @keyframes fillCyan2 {
+          0% { clip-path: polygon(50% 50%, 50% 50%, 50% 50%, 50% 50%); }
+          100% { clip-path: polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%); }
+        }
+        
+        .section-top {
+          animation: fillCyan1 1.2s ease-in-out 0s infinite;
+        }
+        
+        .section-right {
+          animation: fillBlue 1.2s ease-in-out 0.4s infinite;
+        }
+        
+        .section-bottom {
+          animation: fillTeal 1.2s ease-in-out 0.8s infinite;
+        }
+        
+        .section-left {
+          animation: fillCyan2 1.2s ease-in-out 1.2s infinite;
+        }
+      `}</style>
+      
       <svg
-        width="120"
-        height="120"
+        width="100"
+        height="100"
         viewBox="0 0 200 200"
         xmlns="http://www.w3.org/2000/svg"
+        preserveAspectRatio="xMidYMid meet"
       >
         <defs>
-          <style>{`
-            @keyframes reveal {
-              0% {
-                opacity: 0;
-                transform: scale(0.8);
-              }
-              100% {
-                opacity: 1;
-                transform: scale(1);
-              }
-            }
-            
-            .section-top-right {
-              animation: reveal 0.6s ease-out forwards;
-              animation-delay: 0s;
-              transform-origin: 100px 100px;
-            }
-            
-            .section-bottom-right {
-              animation: reveal 0.6s ease-out forwards;
-              animation-delay: 0.3s;
-              transform-origin: 100px 100px;
-            }
-            
-            .section-bottom-left {
-              animation: reveal 0.6s ease-out forwards;
-              animation-delay: 0.6s;
-              transform-origin: 100px 100px;
-            }
-            
-            .section-top-left {
-              animation: reveal 0.6s ease-out forwards;
-              animation-delay: 0.9s;
-              transform-origin: 100px 100px;
-            }
-            
-            .center-circle {
-              animation: reveal 0.6s ease-out forwards;
-              animation-delay: 1.2s;
-            }
-          `}</style>
-          
-          {/* Gradientes para cada sección */}
-          <linearGradient id="gradientTopRight" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stopColor="#2E3B91" />
-            <stop offset="100%" stopColor="#5B4BA3" />
+          {/* Top - Cyan a Blue */}
+          <linearGradient id="gradTop" x1="50%" y1="0%" x2="50%" y2="50%">
+            <stop offset="0%" stopColor="#06B6D4" />
+            <stop offset="100%" stopColor="#3B82F6" />
           </linearGradient>
           
-          <linearGradient id="gradientBottomRight" x1="0%" y1="100%" x2="100%" y2="0%">
-            <stop offset="0%" stopColor="#0D7C7C" />
-            <stop offset="100%" stopColor="#2E5C6E" />
+          {/* Right - Blue a Purple */}
+          <linearGradient id="gradRight" x1="50%" y1="50%" x2="100%" y2="50%">
+            <stop offset="0%" stopColor="#3B82F6" />
+            <stop offset="100%" stopColor="#7C3AED" />
           </linearGradient>
           
-          <linearGradient id="gradientBottomLeft" x1="100%" y1="100%" x2="0%" y2="0%">
-            <stop offset="0%" stopColor="#00D9FF" />
-            <stop offset="100%" stopColor="#00B8A3" />
+          {/* Bottom - Teal */}
+          <linearGradient id="gradBottom" x1="50%" y1="50%" x2="50%" y2="100%">
+            <stop offset="0%" stopColor="#0D9488" />
+            <stop offset="100%" stopColor="#06B6D4" />
           </linearGradient>
           
-          <linearGradient id="gradientTopLeft" x1="100%" y1="0%" x2="0%" y2="100%">
-            <stop offset="0%" stopColor="#00A8CC" />
-            <stop offset="100%" stopColor="#00D9FF" />
+          {/* Left - Cyan a Teal */}
+          <linearGradient id="gradLeft" x1="50%" y1="50%" x2="0%" y2="50%">
+            <stop offset="0%" stopColor="#06B6D4" />
+            <stop offset="100%" stopColor="#0D9488" />
           </linearGradient>
         </defs>
 
-        {/* Sección Superior Derecha - Púrpura */}
-        <path
-          className="section-top-right"
-          d="M 100 100 Q 130 70 150 20 Q 180 50 160 100 Z"
-          fill="url(#gradientTopRight)"
-        />
+        {/* Top petal - Cyan to Blue */}
+        <g className="section-top">
+          <path
+            d="M 100 20 C 120 40 130 60 100 100 C 70 60 80 40 100 20 Z"
+            fill="url(#gradTop)"
+          />
+        </g>
 
-        {/* Sección Inferior Derecha - Teal Oscuro */}
-        <path
-          className="section-bottom-right"
-          d="M 100 100 Q 160 100 180 150 Q 130 130 100 160 Z"
-          fill="url(#gradientBottomRight)"
-        />
+        {/* Right petal - Blue to Purple */}
+        <g className="section-right">
+          <path
+            d="M 180 100 C 160 80 140 90 100 100 C 140 110 160 120 180 100 Z"
+            fill="url(#gradRight)"
+          />
+        </g>
 
-        {/* Sección Inferior Izquierda - Cyan */}
-        <path
-          className="section-bottom-left"
-          d="M 100 100 Q 100 160 50 180 Q 70 130 100 100 Z"
-          fill="url(#gradientBottomLeft)"
-        />
+        {/* Bottom petal - Teal */}
+        <g className="section-bottom">
+          <path
+            d="M 100 180 C 80 160 70 140 100 100 C 130 140 120 160 100 180 Z"
+            fill="url(#gradBottom)"
+          />
+        </g>
 
-        {/* Sección Superior Izquierda - Cyan Claro */}
-        <path
-          className="section-top-left"
-          d="M 100 100 Q 50 100 20 50 Q 70 70 100 100 Z"
-          fill="url(#gradientTopLeft)"
-        />
+        {/* Left petal - Cyan to Teal */}
+        <g className="section-left">
+          <path
+            d="M 20 100 C 40 120 60 110 100 100 C 60 90 40 80 20 100 Z"
+            fill="url(#gradLeft)"
+          />
+        </g>
 
         {/* Centro blanco */}
-        <circle cx="100" cy="100" r="18" fill="white" className="center-circle" />
+        <circle cx="100" cy="100" r="14" fill="white" />
       </svg>
     </div>
   )
