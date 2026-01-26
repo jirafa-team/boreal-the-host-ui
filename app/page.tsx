@@ -50,7 +50,7 @@ export default function HomePage() {
       setTimeout(() => router.push("/system/organizations"), 800)
     } else if (adminUser === "admin" && adminPassword === "1234") {
       setIsLoading(true)
-      setTimeout(() => router.push("/admin/home"), 800)
+      setTimeout(() => router.push("/admin/select-establishment"), 800)
     } else if (adminUser === "staff" && adminPassword === "1234") {
       setIsLoading(true)
       setTimeout(() => router.push("/staff/tasks"), 800)
