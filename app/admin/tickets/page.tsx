@@ -353,7 +353,8 @@ export default function TicketsPage() {
                     <DialogTrigger asChild>
                       <Button
                         size="sm"
-                        className="flex-1 bg-blue-600 hover:bg-blue-700 text-white"
+                        variant="outline"
+                        className="flex-1 text-primary hover:text-primary hover:bg-primary/10 bg-transparent"
                         onClick={() => setSelectedTicketId(ticket.id)}
                       >
                         Asignar
