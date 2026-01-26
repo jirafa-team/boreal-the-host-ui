@@ -27,10 +27,14 @@ export default function LoginLoading() {
           <p className="text-muted-foreground">Estamos preparando tu experiencia...</p>
         </div>
 
-        {/* Progress Bar */}
+        {/* Progress Bar with Percentage */}
         <div className="w-64 mx-auto">
+          <div className="flex items-center justify-between mb-2">
+            <span className="text-sm font-medium text-muted-foreground">Cargando...</span>
+            <span className="text-sm font-semibold text-primary">15%</span>
+          </div>
           <div className="h-2 bg-muted rounded-full overflow-hidden">
-            <div className="h-full bg-gradient-to-r from-primary to-primary/50 animate-[loading_1.5s_ease-in-out_infinite]"></div>
+            <div className="h-full bg-gradient-to-r from-primary to-primary/50 rounded-full transition-all duration-500" style={{ width: '15%' }}></div>
           </div>
         </div>
 
@@ -41,20 +45,6 @@ export default function LoginLoading() {
           <div className="w-2 h-2 bg-primary rounded-full animate-bounce"></div>
         </div>
       </div>
-
-      <style jsx>{`
-        @keyframes loading {
-          0% {
-            transform: translateX(-100%);
-          }
-          50% {
-            transform: translateX(100%);
-          }
-          100% {
-            transform: translateX(-100%);
-          }
-        }
-      `}</style>
     </div>
   )
 }
