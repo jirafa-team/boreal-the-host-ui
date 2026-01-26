@@ -161,7 +161,7 @@ export default function SelectEstablishmentPage() {
                   </div>
 
                   {/* Circular Action Button */}
-                  <div className="flex justify-end">
+                  <div className="flex justify-start">
                     <button className="w-8 h-8 rounded-full bg-white/20 hover:bg-white/30 flex items-center justify-center transition-all group/btn hover:scale-110">
                       <ArrowRight className="w-4 h-4 text-white group-hover/btn:translate-x-0.5 transition-transform duration-300" />
                     </button>
