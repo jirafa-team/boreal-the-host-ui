@@ -4,85 +4,106 @@ export function BorealSpinner() {
   return (
     <div className="flex items-center justify-center">
       <svg
-        width="80"
-        height="80"
+        width="120"
+        height="120"
         viewBox="0 0 200 200"
-        className="animate-spin"
-        style={{
-          animationDuration: '3s',
-        }}
+        xmlns="http://www.w3.org/2000/svg"
       >
         <defs>
-          <linearGradient id="gradientCyan" x1="0%" y1="0%" x2="100%" y2="100%">
+          <style>{`
+            @keyframes reveal {
+              0% {
+                opacity: 0;
+                transform: scale(0.8);
+              }
+              100% {
+                opacity: 1;
+                transform: scale(1);
+              }
+            }
+            
+            .section-top-right {
+              animation: reveal 0.6s ease-out forwards;
+              animation-delay: 0s;
+              transform-origin: 100px 100px;
+            }
+            
+            .section-bottom-right {
+              animation: reveal 0.6s ease-out forwards;
+              animation-delay: 0.3s;
+              transform-origin: 100px 100px;
+            }
+            
+            .section-bottom-left {
+              animation: reveal 0.6s ease-out forwards;
+              animation-delay: 0.6s;
+              transform-origin: 100px 100px;
+            }
+            
+            .section-top-left {
+              animation: reveal 0.6s ease-out forwards;
+              animation-delay: 0.9s;
+              transform-origin: 100px 100px;
+            }
+            
+            .center-circle {
+              animation: reveal 0.6s ease-out forwards;
+              animation-delay: 1.2s;
+            }
+          `}</style>
+          
+          {/* Gradientes para cada sección */}
+          <linearGradient id="gradientTopRight" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stopColor="#2E3B91" />
+            <stop offset="100%" stopColor="#5B4BA3" />
+          </linearGradient>
+          
+          <linearGradient id="gradientBottomRight" x1="0%" y1="100%" x2="100%" y2="0%">
+            <stop offset="0%" stopColor="#0D7C7C" />
+            <stop offset="100%" stopColor="#2E5C6E" />
+          </linearGradient>
+          
+          <linearGradient id="gradientBottomLeft" x1="100%" y1="100%" x2="0%" y2="0%">
             <stop offset="0%" stopColor="#00D9FF" />
             <stop offset="100%" stopColor="#00B8A3" />
           </linearGradient>
-          <linearGradient id="gradientPurple" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stopColor="#5B4BA3" />
-            <stop offset="100%" stopColor="#2E3B91" />
+          
+          <linearGradient id="gradientTopLeft" x1="100%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" stopColor="#00A8CC" />
+            <stop offset="100%" stopColor="#00D9FF" />
           </linearGradient>
-          <style>{`
-            @keyframes drawStroke {
-              0% {
-                stroke-dashoffset: 1000;
-              }
-              100% {
-                stroke-dashoffset: 0;
-              }
-            }
-            
-            .boreal-stroke-top-right {
-              stroke-dasharray: 300;
-              animation: drawStroke 2s ease-in-out infinite;
-            }
-            
-            .boreal-stroke-bottom-right {
-              stroke-dasharray: 300;
-              animation: drawStroke 2s ease-in-out infinite 0.15s;
-            }
-            
-            .boreal-stroke-bottom-left {
-              stroke-dasharray: 300;
-              animation: drawStroke 2s ease-in-out infinite 0.3s;
-            }
-            
-            .boreal-stroke-top-left {
-              stroke-dasharray: 300;
-              animation: drawStroke 2s ease-in-out infinite 0.45s;
-            }
-          `}</style>
         </defs>
 
-        {/* Top Right Punta - Gradiente Púrpura */}
+        {/* Sección Superior Derecha - Púrpura */}
         <path
-          d="M 100 100 Q 140 60 160 20 Q 140 80 100 100"
-          fill="url(#gradientPurple)"
-          className="boreal-stroke-top-right"
+          className="section-top-right"
+          d="M 100 100 Q 130 70 150 20 Q 180 50 160 100 Z"
+          fill="url(#gradientTopRight)"
         />
 
-        {/* Bottom Right Punta - Gradiente Púrpura a Teal */}
+        {/* Sección Inferior Derecha - Teal Oscuro */}
         <path
-          d="M 100 100 Q 140 140 160 180 Q 140 120 100 100"
-          fill="url(#gradientCyan)"
-          className="boreal-stroke-bottom-right"
+          className="section-bottom-right"
+          d="M 100 100 Q 160 100 180 150 Q 130 130 100 160 Z"
+          fill="url(#gradientBottomRight)"
         />
 
-        {/* Bottom Left Punta - Gradiente Cyan */}
+        {/* Sección Inferior Izquierda - Cyan */}
         <path
-          d="M 100 100 Q 60 140 40 180 Q 60 120 100 100"
-          fill="url(#gradientCyan)"
-          className="boreal-stroke-bottom-left"
+          className="section-bottom-left"
+          d="M 100 100 Q 100 160 50 180 Q 70 130 100 100 Z"
+          fill="url(#gradientBottomLeft)"
         />
 
-        {/* Top Left Punta - Gradiente Púrpura */}
+        {/* Sección Superior Izquierda - Cyan Claro */}
         <path
-          d="M 100 100 Q 60 60 40 20 Q 60 80 100 100"
-          fill="url(#gradientPurple)"
-          className="boreal-stroke-top-left"
+          className="section-top-left"
+          d="M 100 100 Q 50 100 20 50 Q 70 70 100 100 Z"
+          fill="url(#gradientTopLeft)"
         />
 
         {/* Centro blanco */}
-        <circle cx="100" cy="100" r="15" fill="white" />
+        <circle cx="100" cy="100" r="18" fill="white" className="center-circle" />
       </svg>
     </div>
   )
