@@ -47,10 +47,10 @@ export default function SelectEstablishmentPage() {
       <div className="max-w-7xl mx-auto mb-12">
         <div className="mb-8">
           <h1 className="text-4xl font-bold text-gray-900 mb-2">
-            {t('admin.selectEstablishment') || 'Seleccionar Establecimiento'}
+            Seleccionar Hospedaje
           </h1>
           <p className="text-gray-600 text-lg">
-            {t('admin.selectEstablishmentDesc') || 'Elige el establecimiento donde deseas trabajar'}
+            Elige un establecimiento para continuar
           </p>
         </div>
 
