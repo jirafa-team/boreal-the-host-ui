@@ -40,7 +40,7 @@
   --chart-4: oklch(0.7 0.1 140);
   --chart-5: oklch(0.75 0.08 40);
 
-  --radius: 0.5rem;
+  --radius: 0.625rem; /* Updated from diff */
 
   /* Sidebar */
   --sidebar: oklch(0.99 0 0);
@@ -137,7 +137,7 @@
     @apply bg-background text-foreground;
   }
 
-  /* Slide animations */
+  /* Existing animations - not overwritten as diff only had base styles for body/glob */
   @keyframes slide-in-from-left {
     from {
       transform: translateX(-100%);
@@ -186,7 +186,6 @@
     }
   }
 
-  /* Blob animation */
   @keyframes blob {
     0% {
       transform: translate(0px, 0px) scale(1);

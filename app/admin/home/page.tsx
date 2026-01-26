@@ -1,5 +1,7 @@
 "use client"
 
+import React from "react"
+
 import { useRouter } from "next/navigation"
 import { useLanguage } from "@/lib/i18n-context"
 import {
@@ -22,6 +24,18 @@ import {
 export default function AdminHomePage() {
   const router = useRouter()
   const { t } = useLanguage()
+
+  const colorClasses: { [key: string]: string } = {
+    "from-purple-600 to-purple-700": "bg-gradient-to-br from-purple-600 to-purple-700",
+    "from-indigo-600 to-indigo-700": "bg-gradient-to-br from-indigo-600 to-indigo-700",
+    "from-orange-600 to-orange-700": "bg-gradient-to-br from-orange-600 to-orange-700",
+    "from-pink-600 to-pink-700": "bg-gradient-to-br from-pink-600 to-pink-700",
+    "from-red-600 to-red-700": "bg-gradient-to-br from-red-600 to-red-700",
+    "from-blue-600 to-blue-700": "bg-gradient-to-br from-blue-600 to-blue-700",
+    "from-green-600 to-green-700": "bg-gradient-to-br from-green-600 to-green-700",
+    "from-yellow-600 to-yellow-700": "bg-gradient-to-br from-yellow-600 to-yellow-700",
+    "from-slate-600 to-slate-700": "bg-gradient-to-br from-slate-600 to-slate-700",
+  }
 
   const menuSections = [
     {
@@ -85,7 +99,7 @@ export default function AdminHomePage() {
                     <button
                       key={item.href}
                       onClick={() => router.push(item.href)}
-                      className={`group relative overflow-hidden rounded-lg p-2 text-white shadow-md hover:shadow-lg transition-all duration-300 hover:scale-105 bg-gradient-to-br ${item.color}`}
+                      className={`group relative overflow-hidden rounded-lg p-2 text-white shadow-md hover:shadow-lg transition-all duration-300 hover:scale-105 ${colorClasses[item.color] || "bg-gradient-to-br from-gray-600 to-gray-700"}`}
                     >
                       {/* Background pattern */}
                       <div className="absolute inset-0 opacity-10">
