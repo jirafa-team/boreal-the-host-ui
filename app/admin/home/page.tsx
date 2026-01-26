@@ -109,7 +109,7 @@ export default function AdminHomePage() {
                         className={`group relative overflow-hidden rounded-lg p-3 text-white shadow-md hover:shadow-lg transition-all duration-300 hover:scale-105 ${colorClasses[item.color] || "bg-gradient-to-br from-gray-600 to-gray-700"}`}
                       >
                         <div className="absolute inset-0 opacity-10">
-                          <div className="absolute top-0 right-0 w-10 h-10 bg-white rounded-full -mr-3 -mt-3"></div>
+                          <div className="absolute top-0 right-0 w-15 h-15 bg-white rounded-full -mr-4 -mt-4"></div>
                         </div>
                         <div className="relative flex flex-col items-start h-full">
                           <div className="mb-2">
@@ -142,7 +142,7 @@ export default function AdminHomePage() {
                         className={`group relative overflow-hidden rounded-lg p-3 text-white shadow-md hover:shadow-lg transition-all duration-300 hover:scale-105 ${colorClasses[item.color] || "bg-gradient-to-br from-gray-600 to-gray-700"}`}
                       >
                         <div className="absolute inset-0 opacity-10">
-                          <div className="absolute top-0 right-0 w-10 h-10 bg-white rounded-full -mr-3 -mt-3"></div>
+                          <div className="absolute top-0 right-0 w-15 h-15 bg-white rounded-full -mr-4 -mt-4"></div>
                         </div>
                         <div className="relative flex flex-col items-start h-full">
                           <div className="mb-2">
@@ -165,7 +165,7 @@ export default function AdminHomePage() {
             {menuSections.slice(4, 5).map((section) => (
               <div key={section.title}>
                 <h2 className="text-base font-semibold text-gray-900 mb-3">{section.title}</h2>
-                <div className={`grid gap-3 grid-cols-4`}>
+                <div className={`grid gap-3 grid-cols-1`}>
                   {section.items.map((item) => {
                     const Icon = item.icon
                     return (
@@ -175,7 +175,7 @@ export default function AdminHomePage() {
                         className={`group relative overflow-hidden rounded-lg p-3 text-white shadow-md hover:shadow-lg transition-all duration-300 hover:scale-105 ${colorClasses[item.color] || "bg-gradient-to-br from-gray-600 to-gray-700"}`}
                       >
                         <div className="absolute inset-0 opacity-10">
-                          <div className="absolute top-0 right-0 w-10 h-10 bg-white rounded-full -mr-3 -mt-3"></div>
+                          <div className="absolute top-0 right-0 w-15 h-15 bg-white rounded-full -mr-4 -mt-4"></div>
                         </div>
                         <div className="relative flex flex-col items-start h-full">
                           <div className="mb-2">
@@ -211,7 +211,7 @@ export default function AdminHomePage() {
                         className={`group relative overflow-hidden rounded-lg p-3 text-white shadow-md hover:shadow-lg transition-all duration-300 hover:scale-105 ${colorClasses[item.color] || "bg-gradient-to-br from-gray-600 to-gray-700"}`}
                       >
                         <div className="absolute inset-0 opacity-10">
-                          <div className="absolute top-0 right-0 w-10 h-10 bg-white rounded-full -mr-3 -mt-3"></div>
+                          <div className="absolute top-0 right-0 w-15 h-15 bg-white rounded-full -mr-4 -mt-4"></div>
                         </div>
                         <div className="relative flex flex-col items-start h-full">
                           <div className="mb-2">
@@ -244,7 +244,7 @@ export default function AdminHomePage() {
                         className={`group relative overflow-hidden rounded-lg p-3 text-white shadow-md hover:shadow-lg transition-all duration-300 hover:scale-105 ${colorClasses[item.color] || "bg-gradient-to-br from-gray-600 to-gray-700"}`}
                       >
                         <div className="absolute inset-0 opacity-10">
-                          <div className="absolute top-0 right-0 w-10 h-10 bg-white rounded-full -mr-3 -mt-3"></div>
+                          <div className="absolute top-0 right-0 w-15 h-15 bg-white rounded-full -mr-4 -mt-4"></div>
                         </div>
                         <div className="relative flex flex-col items-start h-full">
                           <div className="mb-2">
