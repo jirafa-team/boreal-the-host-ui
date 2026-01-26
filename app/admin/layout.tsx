@@ -24,6 +24,7 @@ import {
   Plus,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import { Switch } from "@/components/ui/switch"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { useLanguage } from "@/lib/i18n-context"
@@ -198,22 +199,17 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
         {sidebarOpen && (
           <div className="p-2 border-t border-white/10">
-            <Select value={language} onValueChange={(value) => setLanguage(value as any)}>
-              <SelectTrigger className="bg-white/10 text-white border-white/20 hover:bg-white/20">
-                <Globe className="w-4 h-4 mr-2" />
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                {languages.map((lang) => (
-                  <SelectItem key={lang.code} value={lang.code}>
-                    <span className="flex items-center gap-2">
-                      <span>{lang.flag}</span>
-                      <span>{lang.name}</span>
-                    </span>
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <div className="flex items-center justify-between px-3 py-2 rounded-lg">
+              <div className="flex items-center gap-2">
+                <Globe className="w-4 h-4 text-white/70" />
+                <span className="text-xs font-medium text-white/70">{language === "es" ? "ES" : "EN"}</span>
+              </div>
+              <Switch
+                checked={language === "en"}
+                onCheckedChange={(checked) => setLanguage(checked ? "en" : "es")}
+                className="data-[state=checked]:bg-primary"
+              />
+            </div>
           </div>
         )}
       </aside>
