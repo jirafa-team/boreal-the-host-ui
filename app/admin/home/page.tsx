@@ -21,24 +21,46 @@ import {
   ArrowRight,
 } from "lucide-react"
 
+const colorClasses = {
+  "from-purple-600 to-purple-700": "bg-gradient-to-br from-purple-600 to-purple-700",
+  "from-indigo-600 to-indigo-700": "bg-gradient-to-br from-indigo-600 to-indigo-700",
+  "from-orange-600 to-orange-700": "bg-gradient-to-br from-orange-600 to-orange-700",
+  "from-pink-600 to-pink-700": "bg-gradient-to-br from-pink-600 to-pink-700",
+  "from-red-600 to-red-700": "bg-gradient-to-br from-red-600 to-red-700",
+  "from-blue-600 to-blue-700": "bg-gradient-to-br from-blue-600 to-blue-700",
+  "from-green-600 to-green-700": "bg-gradient-to-br from-green-600 to-green-700",
+  "from-yellow-600 to-yellow-700": "bg-gradient-to-br from-yellow-600 to-yellow-700",
+  "from-slate-600 to-slate-700": "bg-gradient-to-br from-slate-600 to-slate-700",
+}
+
+const customColors = {
+  "pedidos-custom": "#008db1",
+  "clientes-custom": "#7c1df9",
+  "notificaciones-custom": "#dd6d00",
+  "recomendaciones-custom": "#5ba000",
+}
+
 export default function AdminHomePage() {
   const router = useRouter()
   const { t } = useLanguage()
 
-  const colorClasses: { [key: string]: string } = {
-    "from-purple-600 to-purple-700": "bg-gradient-to-br from-purple-600 to-purple-700",
-    "from-indigo-600 to-indigo-700": "bg-gradient-to-br from-indigo-600 to-indigo-700",
-    "from-orange-600 to-orange-700": "bg-gradient-to-br from-orange-600 to-orange-700",
-    "from-pink-600 to-pink-700": "bg-gradient-to-br from-pink-600 to-pink-700",
-    "from-red-600 to-red-700": "bg-gradient-to-br from-red-600 to-red-700",
-    "from-blue-600 to-blue-700": "bg-gradient-to-br from-blue-600 to-blue-700",
-    "from-green-600 to-green-700": "bg-gradient-to-br from-green-600 to-green-700",
-    "from-yellow-600 to-yellow-700": "bg-gradient-to-br from-yellow-600 to-yellow-700",
-    "from-slate-600 to-slate-700": "bg-gradient-to-br from-slate-600 to-slate-700",
-    "pedidos-custom": "bg-[#008db1]",
-    "clientes-custom": "bg-[#7c1df9]",
-    "notificaciones-custom": "bg-[#dd6d00]",
-    "recomendaciones-custom": "bg-[#5ba000]",
+  const gradientColors: { [key: string]: string } = {
+    "from-purple-600 to-purple-700": "linear-gradient(135deg, rgb(147, 51, 234), rgb(126, 34, 206))",
+    "from-indigo-600 to-indigo-700": "linear-gradient(135deg, rgb(79, 70, 229), rgb(67, 56, 202))",
+    "from-orange-600 to-orange-700": "linear-gradient(135deg, rgb(234, 88, 12), rgb(194, 65, 12))",
+    "from-pink-600 to-pink-700": "linear-gradient(135deg, rgb(236, 72, 153), rgb(219, 39, 119))",
+    "from-red-600 to-red-700": "linear-gradient(135deg, rgb(220, 38, 38), rgb(185, 28, 28))",
+    "from-blue-600 to-blue-700": "linear-gradient(135deg, rgb(37, 99, 235), rgb(29, 78, 216))",
+    "from-green-600 to-green-700": "linear-gradient(135deg, rgb(22, 163, 74), rgb(20, 124, 61))",
+    "from-yellow-600 to-yellow-700": "linear-gradient(135deg, rgb(202, 138, 4), rgb(161, 98, 7))",
+    "from-slate-600 to-slate-700": "linear-gradient(135deg, rgb(71, 85, 105), rgb(51, 65, 85))",
+  }
+
+  const solidColors: { [key: string]: string } = {
+    "pedidos-custom": "#008db1",
+    "clientes-custom": "#7c1df9",
+    "notificaciones-custom": "#dd6d00",
+    "recomendaciones-custom": "#5ba000",
   }
 
   const menuSections = [
@@ -110,10 +132,13 @@ export default function AdminHomePage() {
                       <button
                         key={item.href}
                         onClick={() => router.push(item.href)}
-                        className={`group relative overflow-hidden rounded-lg p-3 text-white shadow-md hover:shadow-lg transition-all duration-300 hover:scale-105 ${colorClasses[item.color] || "bg-gradient-to-br from-gray-600 to-gray-700"}`}
+                        className="group relative overflow-hidden rounded-lg p-3 text-white shadow-md hover:shadow-lg transition-all duration-300 hover:scale-105"
+                        style={{
+                          background: solidColors[item.color] || gradientColors[item.color] || "linear-gradient(135deg, rgb(71, 85, 105), rgb(51, 65, 85))"
+                        }}
                       >
                         <div className="absolute inset-0 opacity-10">
-                          <div className="absolute top-0 right-0 w-15 h-15 bg-white rounded-full -mr-4 -mt-4"></div>
+                          <div className="absolute top-0 right-0 w-12 h-12 bg-white rounded-full -mr-4 -mt-4"></div>
                         </div>
                         <div className="relative flex flex-col items-start h-full">
                           <div className="mb-2">
@@ -136,17 +161,20 @@ export default function AdminHomePage() {
             {menuSections.slice(2, 3).map((section) => (
               <div key={section.title}>
                 <h2 className="text-base font-semibold text-gray-900 mb-3">{section.title}</h2>
-                <div className={`grid gap-3 grid-cols-2`}>
+                <div className="grid gap-3 grid-cols-2">
                   {section.items.map((item) => {
                     const Icon = item.icon
                     return (
                       <button
                         key={item.href}
                         onClick={() => router.push(item.href)}
-                        className={`group relative overflow-hidden rounded-lg p-3 text-white shadow-md hover:shadow-lg transition-all duration-300 hover:scale-105 ${colorClasses[item.color] || "bg-gradient-to-br from-gray-600 to-gray-700"}`}
+                        className="group relative overflow-hidden rounded-lg p-3 text-white shadow-md hover:shadow-lg transition-all duration-300 hover:scale-105"
+                        style={{
+                          background: solidColors[item.color] || gradientColors[item.color] || "linear-gradient(135deg, rgb(71, 85, 105), rgb(51, 65, 85))"
+                        }}
                       >
                         <div className="absolute inset-0 opacity-10">
-                          <div className="absolute top-0 right-0 w-15 h-15 bg-white rounded-full -mr-4 -mt-4"></div>
+                          <div className="absolute top-0 right-0 w-12 h-12 bg-white rounded-full -mr-4 -mt-4"></div>
                         </div>
                         <div className="relative flex flex-col items-start h-full">
                           <div className="mb-2">
@@ -169,17 +197,20 @@ export default function AdminHomePage() {
             {menuSections.slice(4, 5).map((section) => (
               <div key={section.title}>
                 <h2 className="text-base font-semibold text-gray-900 mb-3">{section.title}</h2>
-                <div className={`grid gap-3 grid-cols-1`}>
+                <div className="grid gap-3 grid-cols-1">
                   {section.items.map((item) => {
                     const Icon = item.icon
                     return (
                       <button
                         key={item.href}
                         onClick={() => router.push(item.href)}
-                        className={`group relative overflow-hidden rounded-lg p-3 text-white shadow-md hover:shadow-lg transition-all duration-300 hover:scale-105 ${colorClasses[item.color] || "bg-gradient-to-br from-gray-600 to-gray-700"}`}
+                        className="group relative overflow-hidden rounded-lg p-3 text-white shadow-md hover:shadow-lg transition-all duration-300 hover:scale-105"
+                        style={{
+                          background: solidColors[item.color] || gradientColors[item.color] || "linear-gradient(135deg, rgb(71, 85, 105), rgb(51, 65, 85))"
+                        }}
                       >
                         <div className="absolute inset-0 opacity-10">
-                          <div className="absolute top-0 right-0 w-15 h-15 bg-white rounded-full -mr-4 -mt-4"></div>
+                          <div className="absolute top-0 right-0 w-12 h-12 bg-white rounded-full -mr-4 -mt-4"></div>
                         </div>
                         <div className="relative flex flex-col items-start h-full">
                           <div className="mb-2">
@@ -205,17 +236,20 @@ export default function AdminHomePage() {
             {menuSections.slice(1, 2).map((section) => (
               <div key={section.title}>
                 <h2 className="text-base font-semibold text-gray-900 mb-3">{section.title}</h2>
-                <div className={`grid gap-3 grid-cols-2`}>
+                <div className="grid gap-3 grid-cols-2">
                   {section.items.map((item) => {
                     const Icon = item.icon
                     return (
                       <button
                         key={item.href}
                         onClick={() => router.push(item.href)}
-                        className={`group relative overflow-hidden rounded-lg p-3 text-white shadow-md hover:shadow-lg transition-all duration-300 hover:scale-105 ${colorClasses[item.color] || "bg-gradient-to-br from-gray-600 to-gray-700"}`}
+                        className="group relative overflow-hidden rounded-lg p-3 text-white shadow-md hover:shadow-lg transition-all duration-300 hover:scale-105"
+                        style={{
+                          background: solidColors[item.color] || gradientColors[item.color] || "linear-gradient(135deg, rgb(71, 85, 105), rgb(51, 65, 85))"
+                        }}
                       >
                         <div className="absolute inset-0 opacity-10">
-                          <div className="absolute top-0 right-0 w-15 h-15 bg-white rounded-full -mr-4 -mt-4"></div>
+                          <div className="absolute top-0 right-0 w-12 h-12 bg-white rounded-full -mr-4 -mt-4"></div>
                         </div>
                         <div className="relative flex flex-col items-start h-full">
                           <div className="mb-2">
@@ -238,17 +272,20 @@ export default function AdminHomePage() {
             {menuSections.slice(3, 4).map((section) => (
               <div key={section.title}>
                 <h2 className="text-base font-semibold text-gray-900 mb-3">{section.title}</h2>
-                <div className={`grid gap-3 grid-cols-2`}>
+                <div className="grid gap-3 grid-cols-2">
                   {section.items.map((item) => {
                     const Icon = item.icon
                     return (
                       <button
                         key={item.href}
                         onClick={() => router.push(item.href)}
-                        className={`group relative overflow-hidden rounded-lg p-3 text-white shadow-md hover:shadow-lg transition-all duration-300 hover:scale-105 ${colorClasses[item.color] || "bg-gradient-to-br from-gray-600 to-gray-700"}`}
+                        className="group relative overflow-hidden rounded-lg p-3 text-white shadow-md hover:shadow-lg transition-all duration-300 hover:scale-105"
+                        style={{
+                          background: solidColors[item.color] || gradientColors[item.color] || "linear-gradient(135deg, rgb(71, 85, 105), rgb(51, 65, 85))"
+                        }}
                       >
                         <div className="absolute inset-0 opacity-10">
-                          <div className="absolute top-0 right-0 w-15 h-15 bg-white rounded-full -mr-4 -mt-4"></div>
+                          <div className="absolute top-0 right-0 w-12 h-12 bg-white rounded-full -mr-4 -mt-4"></div>
                         </div>
                         <div className="relative flex flex-col items-start h-full">
                           <div className="mb-2">
