@@ -160,10 +160,11 @@ export default function SelectEstablishmentPage() {
                     </div>
                   </div>
 
-                  {/* Action Button integrated in color section */}
-                  <div className="flex items-center justify-between text-xs font-semibold text-white/90 group-hover:text-white transition-colors pt-2">
-                    <span>Acceder</span>
-                    <ArrowRight className="w-3 h-3 group-hover:translate-x-0.5 transition-transform duration-300" />
+                  {/* Circular Action Button */}
+                  <div className="flex justify-end">
+                    <button className="w-8 h-8 rounded-full bg-white/20 hover:bg-white/30 flex items-center justify-center transition-all group/btn hover:scale-110">
+                      <ArrowRight className="w-4 h-4 text-white group-hover/btn:translate-x-0.5 transition-transform duration-300" />
+                    </button>
                   </div>
                 </div>
               </button>
