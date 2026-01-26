@@ -36,12 +36,12 @@ export default function AdminHomePage() {
       items: [
         { href: "/admin/rooms", label: t("admin.rooms"), icon: Hotel, color: "from-purple-600 to-purple-700" },
         { href: "/admin/space-builder", label: t("admin.spaceDesign"), icon: LayoutGrid, color: "from-indigo-600 to-indigo-700" },
+        { href: "/admin/facilities", label: t("admin.facilities"), icon: Building2, color: "from-orange-600 to-orange-700" },
       ],
     },
     {
       title: t("admin.services"),
       items: [
-        { href: "/admin/facilities", label: t("admin.facilities"), icon: Building2, color: "from-orange-600 to-orange-700" },
         { href: "/admin/staff", label: t("admin.staff"), icon: Users, color: "from-pink-600 to-pink-700" },
         { href: "/admin/events", label: t("admin.events"), icon: Calendar, color: "from-red-600 to-red-700" },
         { href: "/admin/tickets", label: t("admin.tickets"), icon: Ticket, color: "from-yellow-600 to-yellow-700" },
