@@ -395,6 +395,84 @@ export default function TicketsPage() {
                     </DialogContent>
                   </Dialog>
                 )}
+                {ticket.assignedTo && ticket.status !== "resolved" && (
+                  <Dialog open={showAssignDialog && selectedTicketId === ticket.id} onOpenChange={setShowAssignDialog}>
+                    <DialogTrigger asChild>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        className="flex-1 bg-transparent"
+                        onClick={() => setSelectedTicketId(ticket.id)}
+                      >
+                        Reasignar
+                      </Button>
+                    </DialogTrigger>
+                    <DialogContent className="max-w-2xl">
+                      <DialogHeader>
+                        <DialogTitle>Reasignar Ticket</DialogTitle>
+                        <DialogDescription>
+                          {!selectedTime 
+                            ? "Selecciona el horario para la tarea" 
+                            : `Selecciona el empleado para las ${selectedTime}`}
+                        </DialogDescription>
+                      </DialogHeader>
+                      
+                      {!selectedTime ? (
+                        // Step 1: Select Time - Grid of hours
+                        <div className="grid grid-cols-4 gap-2">
+                          {availableHours.map((hour) => (
+                            <Button
+                              key={hour}
+                              variant={selectedTime === hour ? "default" : "outline"}
+                              className="h-12 text-sm"
+                              onClick={() => setSelectedTime(hour)}
+                            >
+                              {hour}
+                            </Button>
+                          ))}
+                        </div>
+                      ) : (
+                        // Step 2: Select Staff - Show only available for selected time
+                        <div className="space-y-3">
+                          {getAvailableStaffForTime(selectedTime).length > 0 ? (
+                            <>
+                              <div className="space-y-2">
+                                {getAvailableStaffForTime(selectedTime).map((staff) => (
+                                  <Button
+                                    key={staff.id}
+                                    variant="outline"
+                                    className="w-full justify-start h-auto py-3 flex-col items-start bg-transparent hover:bg-muted"
+                                    onClick={() => handleAssignTicket(staff.name, staff.department)}
+                                  >
+                                    <span className="font-semibold">{staff.name}</span>
+                                    <span className="text-xs text-muted-foreground">{staff.department}</span>
+                                  </Button>
+                                ))}
+                              </div>
+                              <Button
+                                variant="outline"
+                                className="w-full bg-transparent"
+                                onClick={() => setSelectedTime(null)}
+                              >
+                                Cambiar Horario
+                              </Button>
+                            </>
+                          ) : (
+                            <div className="text-center py-8">
+                              <p className="text-muted-foreground mb-4">No hay empleados disponibles para las {selectedTime}</p>
+                              <Button
+                                variant="outline"
+                                onClick={() => setSelectedTime(null)}
+                              >
+                                Seleccionar otro horario
+                              </Button>
+                            </div>
+                          )}
+                        </div>
+                      )}
+                    </DialogContent>
+                  </Dialog>
+                )}
                 {ticket.status === "resolved" && (
                   <Button size="sm" variant="outline" disabled className="flex-1 bg-transparent">
                     Completado
