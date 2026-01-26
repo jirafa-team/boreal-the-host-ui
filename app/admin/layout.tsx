@@ -22,6 +22,7 @@ import {
   Globe,
   ChevronDown,
   Plus,
+  Settings,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Switch } from "@/components/ui/switch"
@@ -89,7 +90,8 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       id: "management",
       title: t("admin.management"),
       items: [
-        { href: "/admin/users", label: t("admin.users"), icon: UserCog },
+        { href: "/admin/users", label: "Usuarios", icon: UserCog },
+        { href: "/admin/settings", label: "Configuración", icon: Settings },
       ],
     },
   ]
