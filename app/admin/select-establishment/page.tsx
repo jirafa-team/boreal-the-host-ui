@@ -11,6 +11,14 @@ export default function SelectEstablishmentPage() {
   const { t } = useLanguage()
   const [searchTerm, setSearchTerm] = useState('')
 
+  // Colores personalizados para cada establecimiento (degradados similares a las cards del home)
+  const cardColors = [
+    'linear-gradient(135deg, rgb(37, 99, 235), rgb(29, 78, 216))', // Azul
+    'linear-gradient(135deg, rgb(34, 197, 94), rgb(22, 163, 74))', // Verde
+    'linear-gradient(135deg, rgb(168, 85, 247), rgb(147, 51, 234))', // Púrpura
+    'linear-gradient(135deg, rgb(239, 68, 68), rgb(220, 38, 38))', // Rojo
+  ]
+
   // Mock data - en un proyecto real, esto vendría de una API
   const establishments = [
     {
@@ -18,24 +26,28 @@ export default function SelectEstablishmentPage() {
       name: 'Hotel Central',
       members: 24,
       image: '/images/hotel-room-balcony-with-city-view-and-comfortable.jpg',
+      color: cardColors[0],
     },
     {
       id: 2,
       name: 'Resort Playa',
       members: 18,
       image: '/images/luxury-deluxe-hotel-room-with-king-bed-and-modern.jpg',
+      color: cardColors[1],
     },
     {
       id: 3,
       name: 'Boutique Hotel',
       members: 12,
       image: '/images/hotel-interior-map-modern.jpg',
+      color: cardColors[2],
     },
     {
       id: 4,
       name: 'Hotel Executive',
       members: 31,
       image: '/images/conference-room.jpg',
+      color: cardColors[3],
     },
   ]
 
@@ -80,46 +92,44 @@ export default function SelectEstablishmentPage() {
               <button
                 key={establishment.id}
                 onClick={() => handleSelectEstablishment(establishment.id)}
-                className="group relative overflow-hidden rounded-2xl bg-white shadow-md hover:shadow-2xl transition-all duration-300 hover:-translate-y-2"
+                className="group relative overflow-hidden rounded-lg bg-white shadow-md hover:shadow-lg transition-all duration-300 hover:scale-105 flex flex-col"
               >
                 {/* Image Container */}
-                <div className="relative h-48 overflow-hidden bg-gradient-to-br from-cyan-400 to-blue-500">
+                <div className="relative h-40 overflow-hidden bg-gray-200">
                   <img
                     src={establishment.image || "/placeholder.svg"}
                     alt={establishment.name}
                     className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
                   />
-                  <div className="absolute inset-0 bg-black/20 group-hover:bg-black/10 transition-colors duration-300" />
+                  <div className="absolute inset-0 bg-black/10 group-hover:bg-black/5 transition-colors duration-300" />
                 </div>
 
-                {/* Content */}
-                <div className="p-6 space-y-4">
-                  {/* Name */}
-                  <div>
-                    <h3 className="text-lg font-bold text-gray-900 group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-cyan-600 group-hover:to-blue-600 transition-all duration-300">
+                {/* Name Section with Color Background */}
+                <div className="relative p-4 flex-1" style={{ background: establishment.color }}>
+                  {/* Decorative Circle */}
+                  <div className="absolute inset-0 opacity-10">
+                    <div className="absolute top-0 right-0 w-20 h-20 bg-white rounded-full -mr-8 -mt-8"></div>
+                  </div>
+
+                  {/* Content */}
+                  <div className="relative">
+                    <h3 className="text-base font-bold text-white mb-2">
                       {establishment.name}
                     </h3>
-                  </div>
-
-                  {/* Members Count */}
-                  <div className="flex items-center gap-2 text-gray-600">
-                    <Users className="w-5 h-5 text-cyan-500" />
-                    <span className="text-sm font-medium">
-                      {establishment.members} {t('common.members') || 'miembros'}
-                    </span>
-                  </div>
-
-                  {/* Action Button */}
-                  <div className="pt-2 border-t border-gray-100">
-                    <div className="flex items-center justify-between text-sm font-semibold text-gray-700 group-hover:text-cyan-600 transition-colors duration-300">
-                      <span>{t('common.access') || 'Acceder'}</span>
-                      <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform duration-300" />
+                    <div className="flex items-center gap-1 text-white/90 text-xs">
+                      <Users className="w-4 h-4" />
+                      <span>{establishment.members} {t('common.members') || 'miembros'}</span>
                     </div>
                   </div>
                 </div>
 
-                {/* Hover Gradient Border */}
-                <div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-cyan-500 to-blue-500 opacity-0 group-hover:opacity-10 transition-opacity duration-300 pointer-events-none" />
+                {/* Action Footer */}
+                <div className="px-4 py-3 bg-gray-50 border-t border-gray-100 group-hover:bg-gray-100 transition-colors duration-300">
+                  <div className="flex items-center justify-between text-xs font-semibold text-gray-700 group-hover:text-gray-900 transition-colors">
+                    <span>{t('common.access') || 'Acceder'}</span>
+                    <ArrowRight className="w-3 h-3 group-hover:translate-x-0.5 transition-transform duration-300" />
+                  </div>
+                </div>
               </button>
             ))}
           </div>
