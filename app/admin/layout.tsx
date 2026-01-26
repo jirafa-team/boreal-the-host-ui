@@ -199,7 +199,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
         {sidebarOpen && (
           <div className="p-2 border-t border-white/10">
-            <div className="inline-flex w-full h-8 items-center rounded-md bg-white/10 p-1 border border-white/20">
+            <div className="inline-flex w-24 h-8 items-center rounded-md bg-white/10 p-1 border border-white/20">
               <button
                 onClick={() => setLanguage("es")}
                 className={`flex-1 px-3 py-1 rounded-sm font-medium text-xs transition-all ${
@@ -207,7 +207,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                     ? "text-white shadow-md"
                     : "text-white/60 hover:text-white/80"
                 }`}
-                style={language === "es" ? { backgroundColor: "#235E20" } : {}}
+                style={language === "es" ? { backgroundColor: "#0891B2" } : {}}
               >
                 ES
               </button>
@@ -218,7 +218,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                     ? "text-white shadow-md"
                     : "text-white/60 hover:text-white/80"
                 }`}
-                style={language === "en" ? { backgroundColor: "#235E20" } : {}}
+                style={language === "en" ? { backgroundColor: "#0891B2" } : {}}
               >
                 EN
               </button>
