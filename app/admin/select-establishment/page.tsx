@@ -16,7 +16,15 @@ export default function SelectEstablishmentPage() {
     'linear-gradient(135deg, rgb(37, 99, 235), rgb(29, 78, 216))', // Azul
     'linear-gradient(135deg, rgb(34, 197, 94), rgb(22, 163, 74))', // Verde
     'linear-gradient(135deg, rgb(168, 85, 247), rgb(147, 51, 234))', // Púrpura
-    'linear-gradient(135deg, rgb(239, 68, 68), rgb(220, 38, 38))', // Rojo
+    '#e07204', // Naranja
+  ]
+
+  // Colores sólidos para los bordes (para las tarjetas con gradientes)
+  const borderColors = [
+    'rgb(29, 78, 216)',
+    'rgb(22, 163, 74)',
+    'rgb(147, 51, 234)',
+    '#e07204',
   ]
 
   // Mock data - en un proyecto real, esto vendría de una API
@@ -88,11 +96,12 @@ export default function SelectEstablishmentPage() {
       <div className="max-w-7xl mx-auto">
         {filteredEstablishments.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {filteredEstablishments.map((establishment) => (
+            {filteredEstablishments.map((establishment, index) => (
               <button
                 key={establishment.id}
                 onClick={() => handleSelectEstablishment(establishment.id)}
                 className="group relative overflow-hidden rounded-lg bg-white shadow-md hover:shadow-lg transition-all duration-300 hover:scale-105 flex flex-col"
+                style={{ border: `2px solid ${borderColors[index]}` }}
               >
                 {/* Image Container */}
                 <div className="relative h-40 overflow-hidden bg-gray-200">
@@ -104,8 +113,8 @@ export default function SelectEstablishmentPage() {
                   <div className="absolute inset-0 bg-black/10 group-hover:bg-black/5 transition-colors duration-300" />
                 </div>
 
-                {/* Name Section with Color Background */}
-                <div className="relative p-4 flex-1" style={{ background: establishment.color }}>
+                {/* Name Section with Color Background - Extends to bottom */}
+                <div className="relative p-4 flex-1 flex flex-col justify-between" style={{ background: establishment.color }}>
                   {/* Decorative Circle */}
                   <div className="absolute inset-0 opacity-10">
                     <div className="absolute top-0 right-0 w-20 h-20 bg-white rounded-full -mr-8 -mt-8"></div>
@@ -121,11 +130,9 @@ export default function SelectEstablishmentPage() {
                       <span>{establishment.members} {t('common.members') || 'miembros'}</span>
                     </div>
                   </div>
-                </div>
 
-                {/* Action Footer */}
-                <div className="px-4 py-3 bg-gray-50 border-t border-gray-100 group-hover:bg-gray-100 transition-colors duration-300">
-                  <div className="flex items-center justify-between text-xs font-semibold text-gray-700 group-hover:text-gray-900 transition-colors">
+                  {/* Action Button integrated in color section */}
+                  <div className="flex items-center justify-between text-xs font-semibold text-white/90 group-hover:text-white transition-colors pt-4 mt-4 border-t border-white/20">
                     <span>{t('common.access') || 'Acceder'}</span>
                     <ArrowRight className="w-3 h-3 group-hover:translate-x-0.5 transition-transform duration-300" />
                   </div>
