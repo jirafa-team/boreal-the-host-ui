@@ -105,7 +105,6 @@ export default function SelectEstablishmentPage() {
                 key={establishment.id}
                 onClick={() => handleSelectEstablishment(establishment.id)}
                 className="group relative overflow-hidden rounded-lg bg-white shadow-md hover:shadow-lg transition-all duration-300 hover:scale-105 flex flex-col"
-                style={{ border: `2px solid ${borderColors[index]}` }}
               >
                 {/* Image Container */}
                 <div className="relative h-40 overflow-hidden bg-gray-200">
