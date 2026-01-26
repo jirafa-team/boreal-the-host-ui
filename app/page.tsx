@@ -1,7 +1,6 @@
 "use client"
 
 import type React from "react"
-
 import { useState } from "react"
 import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
@@ -10,7 +9,7 @@ import { User, Shield, X, Globe } from "lucide-react"
 import Image from "next/image"
 import { useLanguage } from "@/lib/i18n-context"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { BorealSpinner } from "@/components/boreal-spinner"
+import { BorealLoadingBar } from "@/components/boreal-loading-bar"
 
 export default function HomePage() {
   const [reservationCode, setReservationCode] = useState("")
@@ -98,9 +97,8 @@ export default function HomePage() {
       {/* Content */}
       <div className="relative z-10 max-w-md w-full">
         {isLoading ? (
-          <div className="bg-white/95 backdrop-blur-lg rounded-3xl shadow-2xl p-8 flex flex-col items-center justify-center min-h-96 space-y-6">
-            <BorealSpinner />
-            <p className="text-gray-600 font-medium">{t("login.loading") || "Cargando..."}</p>
+          <div className="bg-white/95 backdrop-blur-lg rounded-3xl shadow-2xl p-12 flex flex-col items-center justify-center min-h-96">
+            <BorealLoadingBar />
           </div>
         ) : showAdminLogin ? (
           <div className="bg-white/95 backdrop-blur-lg rounded-3xl shadow-2xl p-8 space-y-6">
