@@ -21,7 +21,7 @@ export function BorealLoadingBar() {
     <div className="flex flex-col items-center justify-center gap-12 w-full max-w-md">
       {/* Boreal Logo - Static */}
       <img
-        src="/images/boreal-20-20logos-20fondo-20transparente.png"
+        src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/Boreal%20-%20Logos%20Fondo%20transparente-ubZrjxMOj3R7xPHOr0FFzrtTXekF0J.png"
         alt="Boreal Logo"
         className="w-48 h-48 object-contain"
       />
