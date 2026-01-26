@@ -23,57 +23,14 @@ export function BorealLoadingBar() {
     <div className="flex flex-col items-center justify-center gap-10 w-full">
       {/* Logo Boreal */}
       <div className="relative w-40 h-40">
-        <svg
-          viewBox="0 0 200 200"
-          className="w-full h-full drop-shadow-2xl"
+        <img
+          src="/images/boreal-20-20logos-20fondo-20transparente.png"
+          alt="Boreal Logo"
+          className="w-full h-full object-contain drop-shadow-2xl"
           style={{
             filter: 'drop-shadow(0 10px 30px rgba(29, 217, 191, 0.2))',
           }}
-        >
-          {/* Top left petal - Cyan */}
-          <path
-            d="M 100 100 Q 60 60 40 50 Q 30 100 40 150 Q 60 60 100 100"
-            fill="url(#gradientTopLeft)"
-          />
-          {/* Top right petal - Purple */}
-          <path
-            d="M 100 100 Q 140 60 160 50 Q 170 100 160 150 Q 140 60 100 100"
-            fill="url(#gradientTopRight)"
-          />
-          {/* Bottom left petal - Teal */}
-          <path
-            d="M 100 100 Q 60 140 40 150 Q 30 100 40 50 Q 60 140 100 100"
-            fill="url(#gradientBottomLeft)"
-          />
-          {/* Bottom right petal - Dark Blue */}
-          <path
-            d="M 100 100 Q 140 140 160 150 Q 170 100 160 50 Q 140 140 100 100"
-            fill="url(#gradientBottomRight)"
-          />
-
-          {/* Gradients */}
-          <defs>
-            <linearGradient id="gradientTopLeft" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stopColor="#06B6D4" />
-              <stop offset="100%" stopColor="#0D7A77" />
-            </linearGradient>
-            <linearGradient id="gradientTopRight" x1="100%" y1="0%" x2="0%" y2="100%">
-              <stop offset="0%" stopColor="#6366F1" />
-              <stop offset="100%" stopColor="#4F46E5" />
-            </linearGradient>
-            <linearGradient id="gradientBottomLeft" x1="0%" y1="100%" x2="100%" y2="0%">
-              <stop offset="0%" stopColor="#0D7A77" />
-              <stop offset="100%" stopColor="#06B6D4" />
-            </linearGradient>
-            <linearGradient id="gradientBottomRight" x1="100%" y1="100%" x2="0%" y2="0%">
-              <stop offset="0%" stopColor="#1E3A8A" />
-              <stop offset="100%" stopColor="#4F46E5" />
-            </linearGradient>
-          </defs>
-
-          {/* Center highlight */}
-          <circle cx="100" cy="100" r="8" fill="white" opacity="0.8" />
-        </svg>
+        />
       </div>
 
       {/* Progress Bar Container */}
