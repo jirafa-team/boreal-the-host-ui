@@ -8,36 +8,31 @@ export function BorealLoadingBar() {
   useEffect(() => {
     const interval = setInterval(() => {
       setProgress((prev) => {
-        if (prev >= 90) {
-          return prev
-        }
-        const increment = Math.random() * 8 + 2
-        return Math.min(prev + increment, 90)
+        if (prev >= 100) return 100
+        const increment = Math.random() * 4 + 1
+        return Math.min(prev + increment, 100)
       })
-    }, 600)
+    }, 1000)
 
     return () => clearInterval(interval)
   }, [])
 
   return (
-    <div className="flex flex-col items-center justify-center gap-12 w-full">
+    <div className="flex flex-col items-center justify-center gap-12 w-full max-w-md">
       {/* Boreal Logo - Static */}
-      <div className="w-48 h-48 flex items-center justify-center">
-        <img
-          src="/images/boreal-20-20logos-20fondo-20transparente.png"
-          alt="Boreal Logo"
-          className="w-full h-full object-contain"
-          crossOrigin="anonymous"
-        />
-      </div>
+      <img
+        src="/images/boreal-20-20logos-20fondo-20transparente.png"
+        alt="Boreal Logo"
+        className="w-48 h-48 object-contain"
+      />
 
       {/* Progress Bar Container */}
       <div className="w-full max-w-sm space-y-4">
         {/* Animated Progress Bar with Boreal Gradient */}
-        <div className="relative w-full h-3 bg-gradient-to-r from-gray-200/40 via-gray-200/20 to-gray-200/10 rounded-full overflow-hidden shadow-inner">
+        <div className="relative w-full h-3 bg-gray-200 rounded-full overflow-hidden shadow-inner">
           {/* Animated progress fill with Boreal colors */}
           <div
-            className="h-full rounded-full transition-all duration-300 ease-out"
+            className="h-full rounded-full transition-all duration-500 ease-out"
             style={{
               width: `${progress}%`,
               background:
