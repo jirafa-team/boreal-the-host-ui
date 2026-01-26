@@ -77,14 +77,14 @@ export default function AdminHomePage() {
       items: [
         { href: "/admin/rooms", label: t("admin.rooms"), icon: Hotel, color: "from-purple-600 to-purple-700" },
         { href: "/admin/space-builder", label: t("admin.spaceDesign"), icon: LayoutGrid, color: "from-indigo-600 to-indigo-700" },
-        { href: "/admin/facilities", label: t("admin.facilities"), icon: Building2, color: "from-orange-600 to-orange-700" },
+        { href: "/admin/facilities", label: "Amenities", icon: Building2, color: "from-orange-600 to-orange-700" },
       ],
       columns: 2,
     },
     {
       title: t("admin.services"),
       items: [
-        { href: "/admin/housekeeping", label: t("admin.housekeeping"), icon: Sparkles, color: "from-pink-600 to-pink-700" },
+        { href: "/admin/housekeeping", label: "Personal", icon: Sparkles, color: "from-pink-600 to-pink-700" },
         { href: "/admin/events", label: t("admin.events"), icon: Calendar, color: "from-red-600 to-red-700" },
         { href: "/admin/tickets", label: t("admin.tickets"), icon: Ticket, color: "from-yellow-600 to-yellow-700" },
         { href: "/admin/pedidos", label: t("admin.orders"), icon: ShoppingBag, color: "pedidos-custom" },
@@ -103,7 +103,7 @@ export default function AdminHomePage() {
     {
       title: t("admin.management"),
       items: [
-        { href: "/admin/users", label: t("admin.users"), icon: UserCog, color: "from-slate-600 to-slate-700" },
+        { href: "/admin/users", label: "Usuarios", icon: UserCog, color: "from-slate-600 to-slate-700" },
       ],
       columns: 2,
     },
