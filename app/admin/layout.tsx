@@ -199,15 +199,29 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
         {sidebarOpen && (
           <div className="p-2 border-t border-white/10">
-            <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-white/5 hover:bg-white/10 cursor-pointer transition-colors"
-              onClick={() => setLanguage(language === "es" ? "en" : "es")}
-            >
-              <Globe className="w-4 h-4 text-white/70 shrink-0" />
-              <div className="flex gap-1 text-xs font-semibold">
-                <span className={language === "es" ? "text-primary" : "text-white/50"}>ES</span>
-                <span className="text-white/30">/</span>
-                <span className={language === "en" ? "text-primary" : "text-white/50"}>EN</span>
-              </div>
+            <div className="inline-flex w-full h-8 items-center rounded-md bg-white/10 p-1 border border-white/20">
+              <button
+                onClick={() => setLanguage("es")}
+                className={`flex-1 px-3 py-1 rounded-sm font-medium text-xs transition-all ${
+                  language === "es"
+                    ? "text-white shadow-md"
+                    : "text-white/60 hover:text-white/80"
+                }`}
+                style={language === "es" ? { backgroundColor: "#235E20" } : {}}
+              >
+                ES
+              </button>
+              <button
+                onClick={() => setLanguage("en")}
+                className={`flex-1 px-3 py-1 rounded-sm font-medium text-xs transition-all ${
+                  language === "en"
+                    ? "text-white shadow-md"
+                    : "text-white/60 hover:text-white/80"
+                }`}
+                style={language === "en" ? { backgroundColor: "#235E20" } : {}}
+              >
+                EN
+              </button>
             </div>
           </div>
         )}
