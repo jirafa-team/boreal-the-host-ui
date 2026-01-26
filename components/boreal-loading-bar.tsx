@@ -8,13 +8,13 @@ export function BorealLoadingBar() {
   useEffect(() => {
     const interval = setInterval(() => {
       setProgress((prev) => {
-        if (prev >= 95) {
+        if (prev >= 90) {
           return prev
         }
-        const increment = Math.random() * 15 + 3
-        return Math.min(prev + increment, 95)
+        const increment = Math.random() * 8 + 2
+        return Math.min(prev + increment, 90)
       })
-    }, 400)
+    }, 600)
 
     return () => clearInterval(interval)
   }, [])
@@ -24,7 +24,7 @@ export function BorealLoadingBar() {
       {/* Boreal Logo - Static */}
       <div className="w-48 h-48 flex items-center justify-center">
         <img
-          src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/Boreal%20-%20Logos%20Fondo%20transparente-ubZrjxMOj3R7xPHOr0FFzrtTXekF0J.png"
+          src="/images/boreal-20-20logos-20fondo-20transparente.png"
           alt="Boreal Logo"
           className="w-full h-full object-contain"
           crossOrigin="anonymous"
