@@ -125,7 +125,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                 <>
                   <button
                     onClick={() => toggleSection(section.id)}
-                    className="w-full px-3 mb-2 text-xs font-semibold text-white/70 uppercase tracking-wider hover:text-white/90 flex items-center justify-between transition-colors"
+                    className="w-full px-3 mb-2 text-[10px] font-semibold text-white/70 uppercase tracking-wider hover:text-white/90 flex items-center justify-between transition-colors"
                   >
                     <span>{section.title}</span>
                     <ChevronDown
@@ -143,7 +143,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                           <Link
                             key={item.href}
                             href={item.href}
-                            className={`flex items-center gap-3 px-3 py-2 rounded-lg transition-colors ${
+                            className={`flex items-center gap-3 px-3 py-1.5 text-xs rounded-lg transition-colors ${
                               isActive ? "bg-white/20 text-white font-medium" : "text-white/90 hover:bg-white/10"
                             }`}
                           >
@@ -182,14 +182,14 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         <div className="p-2 border-t border-white/10 space-y-2">
           <Link
             href="/admin/select-establishment"
-            className="flex items-center gap-3 px-3 py-2 rounded-lg transition-colors text-white/90 hover:bg-white/10"
+            className="flex items-center gap-3 px-3 py-1.5 text-xs rounded-lg transition-colors text-white/90 hover:bg-white/10"
           >
             <Plus className="w-5 h-5 shrink-0" />
             {sidebarOpen && <span>Hospedajes</span>}
           </Link>
           <Link
             href="/"
-            className="flex items-center gap-3 px-3 py-2 rounded-lg transition-colors text-white/90 hover:bg-white/10"
+            className="flex items-center gap-3 px-3 py-1.5 text-xs rounded-lg transition-colors text-white/90 hover:bg-white/10"
           >
             <LogOut className="w-5 h-5 shrink-0" />
             {sidebarOpen && <span>{t("admin.logout")}</span>}
