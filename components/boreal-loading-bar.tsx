@@ -27,18 +27,18 @@ export function BorealLoadingBar() {
       />
 
       {/* Progress Bar Container */}
-      <div className="w-full max-w-sm space-y-4">
+      <div className="w-full max-w-sm space-y-3">
         {/* Animated Progress Bar with Boreal Gradient */}
-        <div className="relative w-full h-3 bg-gray-200 rounded-full overflow-hidden shadow-inner">
+        <div className="relative w-full h-1.5 bg-gray-200 rounded-full overflow-hidden shadow-sm">
           {/* Animated progress fill with Boreal colors */}
           <div
-            className="h-full rounded-full transition-all duration-500 ease-out"
+            className="h-full rounded-full transition-all duration-300 ease-out"
             style={{
               width: `${progress}%`,
               background:
                 'linear-gradient(90deg, #06B6D4 0%, #1DD9BF 25%, #6366F1 50%, #4F46E5 75%, #0D7A77 100%)',
               boxShadow:
-                '0 0 15px rgba(6, 182, 212, 0.7), 0 0 25px rgba(99, 102, 241, 0.5), inset 0 1px 2px rgba(255, 255, 255, 0.4)',
+                '0 0 12px rgba(6, 182, 212, 0.8), 0 0 20px rgba(99, 102, 241, 0.6)',
             }}
           />
         </div>
