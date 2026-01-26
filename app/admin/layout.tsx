@@ -180,48 +180,29 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           ))}
         </nav>
 
-        <div className="p-2 border-t border-white/10 space-y-2">
-          {sidebarOpen ? (
-            <>
-              <Link
-                href="/admin/select-establishment"
-                className="flex items-center gap-3 px-3 py-1.5 text-xs rounded-lg transition-colors text-white/90 hover:bg-white/10"
-              >
-                <Plus className="w-5 h-5 shrink-0" />
-                <span>Hospedajes</span>
-              </Link>
-              <Link
-                href="/"
-                className="flex items-center gap-3 px-3 py-1.5 text-xs rounded-lg transition-colors text-white/90 hover:bg-white/10"
-              >
-                <LogOut className="w-5 h-5 shrink-0" />
-                <span>{t("admin.logout")}</span>
-              </Link>
-            </>
-          ) : (
-            <div className="flex items-center justify-center gap-2">
-              <Link
-                href="/admin/select-establishment"
-                className="relative group w-10 h-10 rounded-full bg-white/20 hover:bg-white/30 text-white flex items-center justify-center transition-all"
-                title="Hospedajes"
-              >
-                <Plus className="w-5 h-5" />
-                <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-1.5 bg-gray-900 text-white text-xs rounded pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
-                  Hospedajes
-                </div>
-              </Link>
-              <Link
-                href="/"
-                className="relative group w-10 h-10 rounded-full bg-white/20 hover:bg-white/30 text-white flex items-center justify-center transition-all"
-                title="Cerrar sesión"
-              >
-                <LogOut className="w-5 h-5" />
-                <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-1.5 bg-gray-900 text-white text-xs rounded pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
-                  Cerrar sesión
-                </div>
-              </Link>
-            </div>
-          )}
+        <div className="p-2 border-t border-white/10">
+          <div className="flex items-center justify-center gap-2">
+            <Link
+              href="/admin/select-establishment"
+              className="relative group w-10 h-10 rounded-full bg-white/20 hover:bg-white/30 text-white flex items-center justify-center transition-all"
+              title="Hospedajes"
+            >
+              <Hotel className="w-5 h-5" />
+              <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-1.5 bg-gray-900 text-white text-xs rounded pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
+                Hospedajes
+              </div>
+            </Link>
+            <Link
+              href="/"
+              className="relative group w-10 h-10 rounded-full bg-white/20 hover:bg-white/30 text-white flex items-center justify-center transition-all"
+              title="Cerrar sesión"
+            >
+              <LogOut className="w-5 h-5" />
+              <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-1.5 bg-gray-900 text-white text-xs rounded pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
+                Cerrar sesión
+              </div>
+            </Link>
+          </div>
         </div>
 
         {sidebarOpen && (
