@@ -199,29 +199,32 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
         {sidebarOpen && (
           <div className="p-2 border-t border-white/10">
-            <div className="inline-flex w-24 h-8 items-center rounded-md bg-white/10 p-1 border border-white/20">
-              <button
-                onClick={() => setLanguage("es")}
-                className={`flex-1 px-3 py-1 rounded-sm font-medium text-xs transition-all ${
-                  language === "es"
-                    ? "text-white shadow-md"
-                    : "text-white/60 hover:text-white/80"
-                }`}
-                style={language === "es" ? { backgroundColor: "#0891B2" } : {}}
-              >
-                ES
-              </button>
-              <button
-                onClick={() => setLanguage("en")}
-                className={`flex-1 px-3 py-1 rounded-sm font-medium text-xs transition-all ${
-                  language === "en"
-                    ? "text-white shadow-md"
-                    : "text-white/60 hover:text-white/80"
-                }`}
-                style={language === "en" ? { backgroundColor: "#0891B2" } : {}}
-              >
-                EN
-              </button>
+            <div className="flex items-center gap-2">
+              <Globe className="w-4 h-4 text-white/70 shrink-0" />
+              <div className="inline-flex w-24 h-7 items-center rounded-md bg-white/10 border border-white/20 overflow-hidden">
+                <button
+                  onClick={() => setLanguage("es")}
+                  className={`flex-1 h-full px-3 font-medium text-xs transition-all ${
+                    language === "es"
+                      ? "text-white shadow-md"
+                      : "text-white/60 hover:text-white/80"
+                  }`}
+                  style={language === "es" ? { backgroundColor: "#0891B2" } : {}}
+                >
+                  ES
+                </button>
+                <button
+                  onClick={() => setLanguage("en")}
+                  className={`flex-1 h-full px-3 font-medium text-xs transition-all ${
+                    language === "en"
+                      ? "text-white shadow-md"
+                      : "text-white/60 hover:text-white/80"
+                  }`}
+                  style={language === "en" ? { backgroundColor: "#0891B2" } : {}}
+                >
+                  EN
+                </button>
+              </div>
             </div>
           </div>
         )}
