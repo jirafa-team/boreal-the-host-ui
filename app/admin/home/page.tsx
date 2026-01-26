@@ -99,26 +99,26 @@ export default function AdminHomePage() {
             {menuSections.slice(0, 1).map((section) => (
               <div key={section.title}>
                 <h2 className="text-base font-semibold text-gray-900 mb-3">{section.title}</h2>
-                <div className={`grid gap-2 grid-cols-4`}>
+                <div className={`grid gap-3 grid-cols-4`}>
                   {section.items.map((item) => {
                     const Icon = item.icon
                     return (
                       <button
                         key={item.href}
                         onClick={() => router.push(item.href)}
-                        className={`group relative overflow-hidden rounded-lg p-2 text-white shadow-md hover:shadow-lg transition-all duration-300 hover:scale-105 ${colorClasses[item.color] || "bg-gradient-to-br from-gray-600 to-gray-700"}`}
+                        className={`group relative overflow-hidden rounded-lg p-3 text-white shadow-md hover:shadow-lg transition-all duration-300 hover:scale-105 ${colorClasses[item.color] || "bg-gradient-to-br from-gray-600 to-gray-700"}`}
                       >
                         <div className="absolute inset-0 opacity-10">
-                          <div className="absolute top-0 right-0 w-8 h-8 bg-white rounded-full -mr-2 -mt-2"></div>
+                          <div className="absolute top-0 right-0 w-10 h-10 bg-white rounded-full -mr-3 -mt-3"></div>
                         </div>
                         <div className="relative flex flex-col items-start h-full">
-                          <div className="mb-1">
-                            <Icon className="w-4 h-4" />
+                          <div className="mb-2">
+                            <Icon className="w-5 h-5" />
                           </div>
-                          <h3 className="text-xs font-semibold mb-1 text-left line-clamp-2">{item.label}</h3>
-                          <div className="mt-auto flex items-center gap-0.5 text-[10px] opacity-90">
+                          <h3 className="text-sm font-semibold mb-2 text-left line-clamp-2">{item.label}</h3>
+                          <div className="mt-auto flex items-center gap-1 text-xs opacity-90">
                             <span>Acceder</span>
-                            <ArrowRight className="w-2 h-2 group-hover:translate-x-0.5 transition-transform" />
+                            <ArrowRight className="w-3 h-3 group-hover:translate-x-0.5 transition-transform" />
                           </div>
                         </div>
                       </button>
@@ -132,26 +132,26 @@ export default function AdminHomePage() {
             {menuSections.slice(2, 3).map((section) => (
               <div key={section.title}>
                 <h2 className="text-base font-semibold text-gray-900 mb-3">{section.title}</h2>
-                <div className={`grid gap-2 grid-cols-4`}>
+                <div className={`grid gap-3 grid-cols-2`}>
                   {section.items.map((item) => {
                     const Icon = item.icon
                     return (
                       <button
                         key={item.href}
                         onClick={() => router.push(item.href)}
-                        className={`group relative overflow-hidden rounded-lg p-2 text-white shadow-md hover:shadow-lg transition-all duration-300 hover:scale-105 ${colorClasses[item.color] || "bg-gradient-to-br from-gray-600 to-gray-700"}`}
+                        className={`group relative overflow-hidden rounded-lg p-3 text-white shadow-md hover:shadow-lg transition-all duration-300 hover:scale-105 ${colorClasses[item.color] || "bg-gradient-to-br from-gray-600 to-gray-700"}`}
                       >
                         <div className="absolute inset-0 opacity-10">
-                          <div className="absolute top-0 right-0 w-8 h-8 bg-white rounded-full -mr-2 -mt-2"></div>
+                          <div className="absolute top-0 right-0 w-10 h-10 bg-white rounded-full -mr-3 -mt-3"></div>
                         </div>
                         <div className="relative flex flex-col items-start h-full">
-                          <div className="mb-1">
-                            <Icon className="w-4 h-4" />
+                          <div className="mb-2">
+                            <Icon className="w-5 h-5" />
                           </div>
-                          <h3 className="text-xs font-semibold mb-1 text-left line-clamp-2">{item.label}</h3>
-                          <div className="mt-auto flex items-center gap-0.5 text-[10px] opacity-90">
+                          <h3 className="text-sm font-semibold mb-2 text-left line-clamp-2">{item.label}</h3>
+                          <div className="mt-auto flex items-center gap-1 text-xs opacity-90">
                             <span>Acceder</span>
-                            <ArrowRight className="w-2 h-2 group-hover:translate-x-0.5 transition-transform" />
+                            <ArrowRight className="w-3 h-3 group-hover:translate-x-0.5 transition-transform" />
                           </div>
                         </div>
                       </button>
@@ -165,26 +165,26 @@ export default function AdminHomePage() {
             {menuSections.slice(4, 5).map((section) => (
               <div key={section.title}>
                 <h2 className="text-base font-semibold text-gray-900 mb-3">{section.title}</h2>
-                <div className={`grid gap-2 grid-cols-4`}>
+                <div className={`grid gap-3 grid-cols-4`}>
                   {section.items.map((item) => {
                     const Icon = item.icon
                     return (
                       <button
                         key={item.href}
                         onClick={() => router.push(item.href)}
-                        className={`group relative overflow-hidden rounded-lg p-2 text-white shadow-md hover:shadow-lg transition-all duration-300 hover:scale-105 ${colorClasses[item.color] || "bg-gradient-to-br from-gray-600 to-gray-700"}`}
+                        className={`group relative overflow-hidden rounded-lg p-3 text-white shadow-md hover:shadow-lg transition-all duration-300 hover:scale-105 ${colorClasses[item.color] || "bg-gradient-to-br from-gray-600 to-gray-700"}`}
                       >
                         <div className="absolute inset-0 opacity-10">
-                          <div className="absolute top-0 right-0 w-8 h-8 bg-white rounded-full -mr-2 -mt-2"></div>
+                          <div className="absolute top-0 right-0 w-10 h-10 bg-white rounded-full -mr-3 -mt-3"></div>
                         </div>
                         <div className="relative flex flex-col items-start h-full">
-                          <div className="mb-1">
-                            <Icon className="w-4 h-4" />
+                          <div className="mb-2">
+                            <Icon className="w-5 h-5" />
                           </div>
-                          <h3 className="text-xs font-semibold mb-1 text-left line-clamp-2">{item.label}</h3>
-                          <div className="mt-auto flex items-center gap-0.5 text-[10px] opacity-90">
+                          <h3 className="text-sm font-semibold mb-2 text-left line-clamp-2">{item.label}</h3>
+                          <div className="mt-auto flex items-center gap-1 text-xs opacity-90">
                             <span>Acceder</span>
-                            <ArrowRight className="w-2 h-2 group-hover:translate-x-0.5 transition-transform" />
+                            <ArrowRight className="w-3 h-3 group-hover:translate-x-0.5 transition-transform" />
                           </div>
                         </div>
                       </button>
@@ -201,26 +201,26 @@ export default function AdminHomePage() {
             {menuSections.slice(1, 2).map((section) => (
               <div key={section.title}>
                 <h2 className="text-base font-semibold text-gray-900 mb-3">{section.title}</h2>
-                <div className={`grid gap-2 grid-cols-4`}>
+                <div className={`grid gap-3 grid-cols-4`}>
                   {section.items.map((item) => {
                     const Icon = item.icon
                     return (
                       <button
                         key={item.href}
                         onClick={() => router.push(item.href)}
-                        className={`group relative overflow-hidden rounded-lg p-2 text-white shadow-md hover:shadow-lg transition-all duration-300 hover:scale-105 ${colorClasses[item.color] || "bg-gradient-to-br from-gray-600 to-gray-700"}`}
+                        className={`group relative overflow-hidden rounded-lg p-3 text-white shadow-md hover:shadow-lg transition-all duration-300 hover:scale-105 ${colorClasses[item.color] || "bg-gradient-to-br from-gray-600 to-gray-700"}`}
                       >
                         <div className="absolute inset-0 opacity-10">
-                          <div className="absolute top-0 right-0 w-8 h-8 bg-white rounded-full -mr-2 -mt-2"></div>
+                          <div className="absolute top-0 right-0 w-10 h-10 bg-white rounded-full -mr-3 -mt-3"></div>
                         </div>
                         <div className="relative flex flex-col items-start h-full">
-                          <div className="mb-1">
-                            <Icon className="w-4 h-4" />
+                          <div className="mb-2">
+                            <Icon className="w-5 h-5" />
                           </div>
-                          <h3 className="text-xs font-semibold mb-1 text-left line-clamp-2">{item.label}</h3>
-                          <div className="mt-auto flex items-center gap-0.5 text-[10px] opacity-90">
+                          <h3 className="text-sm font-semibold mb-2 text-left line-clamp-2">{item.label}</h3>
+                          <div className="mt-auto flex items-center gap-1 text-xs opacity-90">
                             <span>Acceder</span>
-                            <ArrowRight className="w-2 h-2 group-hover:translate-x-0.5 transition-transform" />
+                            <ArrowRight className="w-3 h-3 group-hover:translate-x-0.5 transition-transform" />
                           </div>
                         </div>
                       </button>
@@ -234,26 +234,26 @@ export default function AdminHomePage() {
             {menuSections.slice(3, 4).map((section) => (
               <div key={section.title}>
                 <h2 className="text-base font-semibold text-gray-900 mb-3">{section.title}</h2>
-                <div className={`grid gap-2 grid-cols-4`}>
+                <div className={`grid gap-3 grid-cols-4`}>
                   {section.items.map((item) => {
                     const Icon = item.icon
                     return (
                       <button
                         key={item.href}
                         onClick={() => router.push(item.href)}
-                        className={`group relative overflow-hidden rounded-lg p-2 text-white shadow-md hover:shadow-lg transition-all duration-300 hover:scale-105 ${colorClasses[item.color] || "bg-gradient-to-br from-gray-600 to-gray-700"}`}
+                        className={`group relative overflow-hidden rounded-lg p-3 text-white shadow-md hover:shadow-lg transition-all duration-300 hover:scale-105 ${colorClasses[item.color] || "bg-gradient-to-br from-gray-600 to-gray-700"}`}
                       >
                         <div className="absolute inset-0 opacity-10">
-                          <div className="absolute top-0 right-0 w-8 h-8 bg-white rounded-full -mr-2 -mt-2"></div>
+                          <div className="absolute top-0 right-0 w-10 h-10 bg-white rounded-full -mr-3 -mt-3"></div>
                         </div>
                         <div className="relative flex flex-col items-start h-full">
-                          <div className="mb-1">
-                            <Icon className="w-4 h-4" />
+                          <div className="mb-2">
+                            <Icon className="w-5 h-5" />
                           </div>
-                          <h3 className="text-xs font-semibold mb-1 text-left line-clamp-2">{item.label}</h3>
-                          <div className="mt-auto flex items-center gap-0.5 text-[10px] opacity-90">
+                          <h3 className="text-sm font-semibold mb-2 text-left line-clamp-2">{item.label}</h3>
+                          <div className="mt-auto flex items-center gap-1 text-xs opacity-90">
                             <span>Acceder</span>
-                            <ArrowRight className="w-2 h-2 group-hover:translate-x-0.5 transition-transform" />
+                            <ArrowRight className="w-3 h-3 group-hover:translate-x-0.5 transition-transform" />
                           </div>
                         </div>
                       </button>
