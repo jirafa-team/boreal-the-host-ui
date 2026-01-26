@@ -21,6 +21,7 @@ import {
   Home,
   Globe,
   ChevronDown,
+  Plus,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import Link from "next/link"
@@ -178,7 +179,14 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           ))}
         </nav>
 
-        <div className="p-2 border-t border-white/10">
+        <div className="p-2 border-t border-white/10 space-y-2">
+          <Link
+            href="/admin/select-establishment"
+            className="flex items-center gap-3 px-3 py-2 rounded-lg transition-colors text-white/90 hover:bg-white/10"
+          >
+            <Plus className="w-5 h-5 shrink-0" />
+            {sidebarOpen && <span>Hospedajes</span>}
+          </Link>
           <Link
             href="/"
             className="flex items-center gap-3 px-3 py-2 rounded-lg transition-colors text-white/90 hover:bg-white/10"
