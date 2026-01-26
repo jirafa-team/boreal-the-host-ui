@@ -10,6 +10,7 @@ import { User, Shield, X, Globe } from "lucide-react"
 import Image from "next/image"
 import { useLanguage } from "@/lib/i18n-context"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { BorealSpinner } from "@/components/boreal-spinner"
 
 export default function HomePage() {
   const [reservationCode, setReservationCode] = useState("")
@@ -17,6 +18,7 @@ export default function HomePage() {
   const [showAdminLogin, setShowAdminLogin] = useState(false)
   const [adminUser, setAdminUser] = useState("")
   const [adminPassword, setAdminPassword] = useState("")
+  const [isLoading, setIsLoading] = useState(false)
   const router = useRouter()
 
   const { language, setLanguage, t } = useLanguage()
@@ -29,24 +31,30 @@ export default function HomePage() {
       return
     }
 
-    if (reservationCode === "1") {
-      router.push("/client/checkin")
-    } else if (reservationCode === "2") {
-      router.push("/client/quick-checkin")
-    } else if (reservationCode === "3") {
-      router.push("/client/quick-checkin?type=future")
-    }
+    setIsLoading(true)
+    setTimeout(() => {
+      if (reservationCode === "1") {
+        router.push("/client/checkin")
+      } else if (reservationCode === "2") {
+        router.push("/client/quick-checkin")
+      } else if (reservationCode === "3") {
+        router.push("/client/quick-checkin?type=future")
+      }
+    }, 800)
   }
 
   const handleAdminLogin = (e: React.FormEvent) => {
     e.preventDefault()
 
     if (adminUser === "system" && adminPassword === "1234") {
-      router.push("/system/organizations")
+      setIsLoading(true)
+      setTimeout(() => router.push("/system/organizations"), 800)
     } else if (adminUser === "admin" && adminPassword === "1234") {
-      router.push("/admin/home")
+      setIsLoading(true)
+      setTimeout(() => router.push("/admin/home"), 800)
     } else if (adminUser === "staff" && adminPassword === "1234") {
-      router.push("/staff/tasks")
+      setIsLoading(true)
+      setTimeout(() => router.push("/staff/tasks"), 800)
     } else {
       alert(t("login.invalidCredentials"))
       setAdminPassword("")
@@ -89,7 +97,12 @@ export default function HomePage() {
 
       {/* Content */}
       <div className="relative z-10 max-w-md w-full">
-        {showAdminLogin ? (
+        {isLoading ? (
+          <div className="bg-white/95 backdrop-blur-lg rounded-3xl shadow-2xl p-8 flex flex-col items-center justify-center min-h-96 space-y-6">
+            <BorealSpinner />
+            <p className="text-gray-600 font-medium">{t("login.loading") || "Cargando..."}</p>
+          </div>
+        ) : showAdminLogin ? (
           <div className="bg-white/95 backdrop-blur-lg rounded-3xl shadow-2xl p-8 space-y-6">
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-2xl font-bold text-gray-800">{t("login.adminAccess")}</h2>
