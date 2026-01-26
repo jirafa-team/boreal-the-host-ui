@@ -2,7 +2,7 @@
 
 import { useRouter } from 'next/navigation'
 import { useLanguage } from '@/lib/i18n-context'
-import { Users, ArrowRight, Search, Building2 } from 'lucide-react'
+import { Users, ArrowRight, Search, Building2, Home } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { useState } from 'react'
 
@@ -10,6 +10,7 @@ export default function SelectEstablishmentPage() {
   const router = useRouter()
   const { t } = useLanguage()
   const [searchTerm, setSearchTerm] = useState('')
+  const [clickedId, setClickedId] = useState<number | null>(null)
 
   // Colores personalizados para cada establecimiento (degradados similares a las cards del home)
   const cardColors = [
@@ -73,7 +74,10 @@ export default function SelectEstablishmentPage() {
   )
 
   const handleSelectEstablishment = (establishmentId: number) => {
-    router.push('/admin/home')
+    setClickedId(establishmentId)
+    setTimeout(() => {
+      router.push('/admin/home')
+    }, 600)
   }
 
   return (
@@ -161,9 +165,19 @@ export default function SelectEstablishmentPage() {
                   </div>
 
                   {/* Circular Action Button */}
-                  <div className="flex justify-start">
-                    <button className="w-8 h-8 rounded-full bg-white/20 hover:bg-white/30 flex items-center justify-center transition-all group/btn hover:scale-110">
-                      <ArrowRight className="w-4 h-4 text-white group-hover/btn:translate-x-0.5 transition-transform duration-300" />
+                  <div className={`flex transition-all duration-500 ${clickedId === establishment.id ? 'justify-end' : 'justify-start'}`}>
+                    <button 
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        handleSelectEstablishment(establishment.id)
+                      }}
+                      className={`w-8 h-8 rounded-full bg-white/20 hover:bg-white/30 flex items-center justify-center transition-all group/btn hover:scale-110 ${clickedId === establishment.id ? 'rotate-180' : ''}`}
+                    >
+                      {clickedId === establishment.id ? (
+                        <Home className="w-4 h-4 text-white transition-all duration-500" />
+                      ) : (
+                        <ArrowRight className="w-4 h-4 text-white group-hover/btn:translate-x-0.5 transition-transform duration-300" />
+                      )}
                     </button>
                   </div>
                 </div>
