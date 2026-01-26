@@ -92,42 +92,177 @@ export default function AdminHomePage() {
           <p className="text-gray-600 mt-1">{t("admin.selectFeature") || "Selecciona una opción para comenzar"}</p>
         </div>
 
-        {/* Menu Sections - Full Width Grid */}
-        <div className="w-full">
-          {menuSections.map((section) => (
-            <div key={section.title} className="mb-8">
-              <h2 className="text-base font-semibold text-gray-900 mb-3">{section.title}</h2>
-              <div className={`grid gap-2 ${section.columns === 2 ? "grid-cols-4" : section.columns === 3 ? "grid-cols-4" : "grid-cols-4"}`}>
-                {section.items.map((item) => {
-                  const Icon = item.icon
-                  return (
-                    <button
-                      key={item.href}
-                      onClick={() => router.push(item.href)}
-                      className={`group relative overflow-hidden rounded-lg p-2 text-white shadow-md hover:shadow-lg transition-all duration-300 hover:scale-105 ${colorClasses[item.color] || "bg-gradient-to-br from-gray-600 to-gray-700"}`}
-                    >
-                      {/* Background pattern */}
-                      <div className="absolute inset-0 opacity-10">
-                        <div className="absolute top-0 right-0 w-8 h-8 bg-white rounded-full -mr-2 -mt-2"></div>
-                      </div>
-
-                      {/* Content */}
-                      <div className="relative flex flex-col items-start h-full">
-                        <div className="mb-1">
-                          <Icon className="w-4 h-4" />
+        {/* Menu Sections - Two Column Layout */}
+        <div className="w-full grid grid-cols-2 gap-8">
+          {/* Left Column: General, Servicios, Gestión */}
+          <div className="space-y-8">
+            {menuSections.slice(0, 1).map((section) => (
+              <div key={section.title}>
+                <h2 className="text-base font-semibold text-gray-900 mb-3">{section.title}</h2>
+                <div className={`grid gap-2 grid-cols-4`}>
+                  {section.items.map((item) => {
+                    const Icon = item.icon
+                    return (
+                      <button
+                        key={item.href}
+                        onClick={() => router.push(item.href)}
+                        className={`group relative overflow-hidden rounded-lg p-2 text-white shadow-md hover:shadow-lg transition-all duration-300 hover:scale-105 ${colorClasses[item.color] || "bg-gradient-to-br from-gray-600 to-gray-700"}`}
+                      >
+                        <div className="absolute inset-0 opacity-10">
+                          <div className="absolute top-0 right-0 w-8 h-8 bg-white rounded-full -mr-2 -mt-2"></div>
                         </div>
-                        <h3 className="text-xs font-semibold mb-1 text-left line-clamp-2">{item.label}</h3>
-                        <div className="mt-auto flex items-center gap-0.5 text-[10px] opacity-90">
-                          <span>Acceder</span>
-                          <ArrowRight className="w-2 h-2 group-hover:translate-x-0.5 transition-transform" />
+                        <div className="relative flex flex-col items-start h-full">
+                          <div className="mb-1">
+                            <Icon className="w-4 h-4" />
+                          </div>
+                          <h3 className="text-xs font-semibold mb-1 text-left line-clamp-2">{item.label}</h3>
+                          <div className="mt-auto flex items-center gap-0.5 text-[10px] opacity-90">
+                            <span>Acceder</span>
+                            <ArrowRight className="w-2 h-2 group-hover:translate-x-0.5 transition-transform" />
+                          </div>
                         </div>
-                      </div>
-                    </button>
-                  )
-                })}
+                      </button>
+                    )
+                  })}
+                </div>
               </div>
-            </div>
-          ))}
+            ))}
+
+            {/* Servicios Section */}
+            {menuSections.slice(2, 3).map((section) => (
+              <div key={section.title}>
+                <h2 className="text-base font-semibold text-gray-900 mb-3">{section.title}</h2>
+                <div className={`grid gap-2 grid-cols-4`}>
+                  {section.items.map((item) => {
+                    const Icon = item.icon
+                    return (
+                      <button
+                        key={item.href}
+                        onClick={() => router.push(item.href)}
+                        className={`group relative overflow-hidden rounded-lg p-2 text-white shadow-md hover:shadow-lg transition-all duration-300 hover:scale-105 ${colorClasses[item.color] || "bg-gradient-to-br from-gray-600 to-gray-700"}`}
+                      >
+                        <div className="absolute inset-0 opacity-10">
+                          <div className="absolute top-0 right-0 w-8 h-8 bg-white rounded-full -mr-2 -mt-2"></div>
+                        </div>
+                        <div className="relative flex flex-col items-start h-full">
+                          <div className="mb-1">
+                            <Icon className="w-4 h-4" />
+                          </div>
+                          <h3 className="text-xs font-semibold mb-1 text-left line-clamp-2">{item.label}</h3>
+                          <div className="mt-auto flex items-center gap-0.5 text-[10px] opacity-90">
+                            <span>Acceder</span>
+                            <ArrowRight className="w-2 h-2 group-hover:translate-x-0.5 transition-transform" />
+                          </div>
+                        </div>
+                      </button>
+                    )
+                  })}
+                </div>
+              </div>
+            ))}
+
+            {/* Gestión Section */}
+            {menuSections.slice(4, 5).map((section) => (
+              <div key={section.title}>
+                <h2 className="text-base font-semibold text-gray-900 mb-3">{section.title}</h2>
+                <div className={`grid gap-2 grid-cols-4`}>
+                  {section.items.map((item) => {
+                    const Icon = item.icon
+                    return (
+                      <button
+                        key={item.href}
+                        onClick={() => router.push(item.href)}
+                        className={`group relative overflow-hidden rounded-lg p-2 text-white shadow-md hover:shadow-lg transition-all duration-300 hover:scale-105 ${colorClasses[item.color] || "bg-gradient-to-br from-gray-600 to-gray-700"}`}
+                      >
+                        <div className="absolute inset-0 opacity-10">
+                          <div className="absolute top-0 right-0 w-8 h-8 bg-white rounded-full -mr-2 -mt-2"></div>
+                        </div>
+                        <div className="relative flex flex-col items-start h-full">
+                          <div className="mb-1">
+                            <Icon className="w-4 h-4" />
+                          </div>
+                          <h3 className="text-xs font-semibold mb-1 text-left line-clamp-2">{item.label}</h3>
+                          <div className="mt-auto flex items-center gap-0.5 text-[10px] opacity-90">
+                            <span>Acceder</span>
+                            <ArrowRight className="w-2 h-2 group-hover:translate-x-0.5 transition-transform" />
+                          </div>
+                        </div>
+                      </button>
+                    )
+                  })}
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Right Column: Espacios, Comunicación */}
+          <div className="space-y-8">
+            {/* Espacios Section */}
+            {menuSections.slice(1, 2).map((section) => (
+              <div key={section.title}>
+                <h2 className="text-base font-semibold text-gray-900 mb-3">{section.title}</h2>
+                <div className={`grid gap-2 grid-cols-4`}>
+                  {section.items.map((item) => {
+                    const Icon = item.icon
+                    return (
+                      <button
+                        key={item.href}
+                        onClick={() => router.push(item.href)}
+                        className={`group relative overflow-hidden rounded-lg p-2 text-white shadow-md hover:shadow-lg transition-all duration-300 hover:scale-105 ${colorClasses[item.color] || "bg-gradient-to-br from-gray-600 to-gray-700"}`}
+                      >
+                        <div className="absolute inset-0 opacity-10">
+                          <div className="absolute top-0 right-0 w-8 h-8 bg-white rounded-full -mr-2 -mt-2"></div>
+                        </div>
+                        <div className="relative flex flex-col items-start h-full">
+                          <div className="mb-1">
+                            <Icon className="w-4 h-4" />
+                          </div>
+                          <h3 className="text-xs font-semibold mb-1 text-left line-clamp-2">{item.label}</h3>
+                          <div className="mt-auto flex items-center gap-0.5 text-[10px] opacity-90">
+                            <span>Acceder</span>
+                            <ArrowRight className="w-2 h-2 group-hover:translate-x-0.5 transition-transform" />
+                          </div>
+                        </div>
+                      </button>
+                    )
+                  })}
+                </div>
+              </div>
+            ))}
+
+            {/* Comunicación Section */}
+            {menuSections.slice(3, 4).map((section) => (
+              <div key={section.title}>
+                <h2 className="text-base font-semibold text-gray-900 mb-3">{section.title}</h2>
+                <div className={`grid gap-2 grid-cols-4`}>
+                  {section.items.map((item) => {
+                    const Icon = item.icon
+                    return (
+                      <button
+                        key={item.href}
+                        onClick={() => router.push(item.href)}
+                        className={`group relative overflow-hidden rounded-lg p-2 text-white shadow-md hover:shadow-lg transition-all duration-300 hover:scale-105 ${colorClasses[item.color] || "bg-gradient-to-br from-gray-600 to-gray-700"}`}
+                      >
+                        <div className="absolute inset-0 opacity-10">
+                          <div className="absolute top-0 right-0 w-8 h-8 bg-white rounded-full -mr-2 -mt-2"></div>
+                        </div>
+                        <div className="relative flex flex-col items-start h-full">
+                          <div className="mb-1">
+                            <Icon className="w-4 h-4" />
+                          </div>
+                          <h3 className="text-xs font-semibold mb-1 text-left line-clamp-2">{item.label}</h3>
+                          <div className="mt-auto flex items-center gap-0.5 text-[10px] opacity-90">
+                            <span>Acceder</span>
+                            <ArrowRight className="w-2 h-2 group-hover:translate-x-0.5 transition-transform" />
+                          </div>
+                        </div>
+                      </button>
+                    )
+                  })}
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
       </div>
     </div>
