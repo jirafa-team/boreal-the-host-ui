@@ -73,34 +73,34 @@ export default function AdminHomePage() {
           <p className="text-gray-600 mt-1">{t("admin.selectFeature") || "Selecciona una opción para comenzar"}</p>
         </div>
 
-        {/* Menu Sections - Flex Layout */}
-        <div className="flex flex-wrap gap-8">
+        {/* Menu Sections - Full Width Grid */}
+        <div className="w-full">
           {menuSections.map((section) => (
-            <div key={section.title} className="flex-1 min-w-[500px]">
-              <h2 className="text-lg font-semibold text-gray-900 mb-4">{section.title}</h2>
-              <div className="grid grid-cols-2 gap-3">
+            <div key={section.title} className="mb-8">
+              <h2 className="text-base font-semibold text-gray-900 mb-3">{section.title}</h2>
+              <div className="grid grid-cols-9 gap-2">
                 {section.items.map((item) => {
                   const Icon = item.icon
                   return (
                     <button
                       key={item.href}
                       onClick={() => router.push(item.href)}
-                      className={`group relative overflow-hidden rounded-lg p-4 text-white shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 bg-gradient-to-br ${item.color}`}
+                      className={`group relative overflow-hidden rounded-lg p-2 text-white shadow-md hover:shadow-lg transition-all duration-300 hover:scale-105 bg-gradient-to-br ${item.color}`}
                     >
                       {/* Background pattern */}
                       <div className="absolute inset-0 opacity-10">
-                        <div className="absolute top-0 right-0 w-20 h-20 bg-white rounded-full -mr-6 -mt-6"></div>
+                        <div className="absolute top-0 right-0 w-12 h-12 bg-white rounded-full -mr-4 -mt-4"></div>
                       </div>
 
                       {/* Content */}
                       <div className="relative flex flex-col items-start h-full">
-                        <div className="mb-2">
-                          <Icon className="w-6 h-6" />
+                        <div className="mb-1">
+                          <Icon className="w-4 h-4" />
                         </div>
-                        <h3 className="text-sm font-semibold mb-2 text-left line-clamp-2">{item.label}</h3>
-                        <div className="mt-auto flex items-center gap-1 text-xs opacity-90">
+                        <h3 className="text-xs font-semibold mb-1 text-left line-clamp-2">{item.label}</h3>
+                        <div className="mt-auto flex items-center gap-0.5 text-[10px] opacity-90">
                           <span>Acceder</span>
-                          <ArrowRight className="w-3 h-3 group-hover:translate-x-1 transition-transform" />
+                          <ArrowRight className="w-2 h-2 group-hover:translate-x-0.5 transition-transform" />
                         </div>
                       </div>
                     </button>
