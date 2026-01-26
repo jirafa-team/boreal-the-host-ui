@@ -138,7 +138,7 @@ export default function AdminHomePage() {
                         }}
                       >
                         <div className="absolute inset-0 opacity-10">
-                          <div className="absolute top-0 right-0 w-12 h-12 bg-white rounded-full -mr-4 -mt-4"></div>
+                          <div className="absolute top-0 right-0 w-20 h-20 bg-white rounded-full -mr-8 -mt-8"></div>
                         </div>
                         <div className="relative flex flex-col items-start h-full">
                           <div className="mb-2">
@@ -174,7 +174,7 @@ export default function AdminHomePage() {
                         }}
                       >
                         <div className="absolute inset-0 opacity-10">
-                          <div className="absolute top-0 right-0 w-12 h-12 bg-white rounded-full -mr-4 -mt-4"></div>
+                          <div className="absolute top-0 right-0 w-20 h-20 bg-white rounded-full -mr-8 -mt-8"></div>
                         </div>
                         <div className="relative flex flex-col items-start h-full">
                           <div className="mb-2">
@@ -210,7 +210,7 @@ export default function AdminHomePage() {
                         }}
                       >
                         <div className="absolute inset-0 opacity-10">
-                          <div className="absolute top-0 right-0 w-12 h-12 bg-white rounded-full -mr-4 -mt-4"></div>
+                          <div className="absolute top-0 right-0 w-20 h-20 bg-white rounded-full -mr-8 -mt-8"></div>
                         </div>
                         <div className="relative flex flex-col items-start h-full">
                           <div className="mb-2">
@@ -249,7 +249,7 @@ export default function AdminHomePage() {
                         }}
                       >
                         <div className="absolute inset-0 opacity-10">
-                          <div className="absolute top-0 right-0 w-12 h-12 bg-white rounded-full -mr-4 -mt-4"></div>
+                          <div className="absolute top-0 right-0 w-20 h-20 bg-white rounded-full -mr-8 -mt-8"></div>
                         </div>
                         <div className="relative flex flex-col items-start h-full">
                           <div className="mb-2">
@@ -285,7 +285,7 @@ export default function AdminHomePage() {
                         }}
                       >
                         <div className="absolute inset-0 opacity-10">
-                          <div className="absolute top-0 right-0 w-12 h-12 bg-white rounded-full -mr-4 -mt-4"></div>
+                          <div className="absolute top-0 right-0 w-20 h-20 bg-white rounded-full -mr-8 -mt-8"></div>
                         </div>
                         <div className="relative flex flex-col items-start h-full">
                           <div className="mb-2">
