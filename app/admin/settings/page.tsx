@@ -154,13 +154,16 @@ export default function SettingsPage() {
                         active: true
                       }])
                     }}
-                    className="flex items-center justify-center w-12 h-12 rounded-full bg-gradient-to-br from-purple-600 to-purple-700 text-white shadow-md hover:shadow-lg transition-all duration-300 hover:scale-110 group"
-                    title="Agregar departamento"
+                    className="flex items-center justify-center w-12 h-12 rounded-full bg-gradient-to-br from-purple-600 to-purple-700 text-white shadow-md hover:shadow-lg transition-all duration-300 hover:scale-110 group relative"
+                    title="Añadir Departamento"
                   >
                     <div className="relative flex items-center justify-center">
-                      <Hotel className="w-5 h-5 absolute" />
-                      <span className="text-xl font-bold ml-3">+</span>
+                      <Hotel className="w-5 h-5" />
+                      <span className="absolute text-lg font-bold -bottom-1 -right-0.5 text-white drop-shadow-lg">+</span>
                     </div>
+                    <span className="absolute bottom-full mb-2 px-2 py-1 bg-gray-900 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap">
+                      Añadir Departamento
+                    </span>
                   </button>
                 </div>
                 
