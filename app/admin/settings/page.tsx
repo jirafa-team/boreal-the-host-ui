@@ -34,6 +34,7 @@ export default function SettingsPage() {
   const [newDeptName, setNewDeptName] = useState('')
   const [editingId, setEditingId] = useState<number | null>(null)
   const [editingName, setEditingName] = useState('')
+  const [deletingId, setDeletingId] = useState<number | null>(null)
   const [departments, setDepartments] = useState([
     { id: 1, name: 'Limpieza', description: 'Departamento de limpieza y mantenimiento de espacios', status: 'Activo', active: true },
     { id: 2, name: 'Mantenimiento', description: 'Departamento de reparación y mantenimiento técnico', status: 'Activo', active: true },
@@ -50,6 +51,11 @@ export default function SettingsPage() {
 
   const deleteDepartment = (id: number) => {
     setDepartments(departments.filter(dept => dept.id !== id))
+    setDeletingId(null)
+  }
+
+  const handleDeleteClick = (id: number) => {
+    setDeletingId(id)
   }
 
   const handleSaveNewDepartment = () => {
@@ -290,13 +296,6 @@ export default function SettingsPage() {
                             </div>
                           </div>
                           <div className="flex items-center gap-3">
-                            {/* Edit Button */}
-                            <button
-                              onClick={() => handleEditStart(department.id, department.name)}
-                              className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
-                            >
-                              <Edit2 className="w-5 h-5" />
-                            </button>
                             {/* Toggle Switch */}
                             <button
                               onClick={() => toggleDepartment(department.id)}
@@ -310,9 +309,16 @@ export default function SettingsPage() {
                                 }`}
                               />
                             </button>
+                            {/* Edit Button */}
+                            <button
+                              onClick={() => handleEditStart(department.id, department.name)}
+                              className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                            >
+                              <Edit2 className="w-5 h-5" />
+                            </button>
                             {/* Delete Button */}
                             <button
-                              onClick={() => deleteDepartment(department.id)}
+                              onClick={() => handleDeleteClick(department.id)}
                               className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
                             >
                               <Trash2 className="w-5 h-5" />
@@ -333,6 +339,53 @@ export default function SettingsPage() {
             )}
           </div>
         </div>
+
+        {/* Delete Confirmation Modal */}
+        {deletingId !== null && (
+          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+            <div className="bg-white rounded-lg shadow-lg p-6 max-w-sm mx-4">
+              <h3 className="text-xl font-bold text-gray-900 mb-2">Confirmar eliminación</h3>
+              <p className="text-gray-600 mb-4">
+                ¿Está seguro de que desea eliminar el siguiente departamento?
+              </p>
+              
+              {deletingId && departments.find(d => d.id === deletingId) && (
+                <div className="bg-gray-50 rounded-lg p-4 mb-6">
+                  <div className="space-y-2">
+                    <p className="text-sm text-gray-600">
+                      <span className="font-semibold">Nombre:</span> {departments.find(d => d.id === deletingId)?.name}
+                    </p>
+                    <p className="text-sm text-gray-600">
+                      <span className="font-semibold">Estado:</span> 
+                      <span className={`ml-2 px-2 py-0.5 text-xs font-medium rounded-full ${
+                        departments.find(d => d.id === deletingId)?.active
+                          ? 'bg-green-100 text-green-800'
+                          : 'bg-gray-100 text-gray-800'
+                      }`}>
+                        {departments.find(d => d.id === deletingId)?.status}
+                      </span>
+                    </p>
+                  </div>
+                </div>
+              )}
+
+              <div className="flex gap-3 justify-end">
+                <button
+                  onClick={() => setDeletingId(null)}
+                  className="px-4 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 transition-colors font-medium"
+                >
+                  Cancelar
+                </button>
+                <button
+                  onClick={() => deletingId && deleteDepartment(deletingId)}
+                  className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors font-medium"
+                >
+                  Eliminar
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   )
