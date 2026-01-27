@@ -226,7 +226,7 @@ export default function EventsManagement() {
     <div className="p-8">
       {/* Sticky Navigation Bar with rounded borders */}
       <div className="sticky top-4 z-40">
-        <div className="bg-white rounded-lg shadow-lg border border-gray-200 mx-4">
+        <div className="bg-white rounded-lg shadow-lg border border-gray-200 mx-3.5">
           <div className="px-8 py-4">
             <div className="flex items-center justify-between">
               <div>
