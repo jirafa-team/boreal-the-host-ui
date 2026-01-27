@@ -123,6 +123,19 @@ export default function SettingsPage() {
   const [editingEventSpaceName, setEditingEventSpaceName] = useState('')
   const [deletingEventSpaceId, setDeletingEventSpaceId] = useState<number | null>(null)
 
+  const [recommendationCategories, setRecommendationCategories] = useState([
+    { id: 1, name: 'Cultura', description: 'Actividades culturales', status: 'Activo', active: true },
+    { id: 2, name: 'Gastronomía', description: 'Experiencias gastronómicas', status: 'Activo', active: true },
+    { id: 3, name: 'Naturaleza', description: 'Actividades en la naturaleza', status: 'Activo', active: true },
+    { id: 4, name: 'Entretenimiento', description: 'Entretenimiento y diversión', status: 'Activo', active: true },
+  ])
+
+  const [isCreatingRecommendation, setIsCreatingRecommendation] = useState(false)
+  const [newRecommendationName, setNewRecommendationName] = useState('')
+  const [editingRecommendationId, setEditingRecommendationId] = useState<number | null>(null)
+  const [editingRecommendationName, setEditingRecommendationName] = useState('')
+  const [deletingRecommendationId, setDeletingRecommendationId] = useState<number | null>(null)
+
   const toggleDepartment = (id: number) => {
     setDepartments(departments.map(dept =>
       dept.id === id ? { ...dept, active: !dept.active, status: !dept.active ? 'Activo' : 'Inactivo' } : dept
@@ -473,6 +486,56 @@ export default function SettingsPage() {
     setEditingEventSpaceName('')
   }
 
+  const toggleRecommendation = (id: number) => {
+    setRecommendationCategories(recommendationCategories.map(rec =>
+      rec.id === id ? { ...rec, active: !rec.active, status: !rec.active ? 'Activo' : 'Inactivo' } : rec
+    ))
+  }
+
+  const deleteRecommendation = (id: number) => {
+    setRecommendationCategories(recommendationCategories.filter(rec => rec.id !== id))
+    setDeletingRecommendationId(null)
+  }
+
+  const handleDeleteRecommendationClick = (id: number) => {
+    setDeletingRecommendationId(id)
+  }
+
+  const handleSaveNewRecommendation = () => {
+    if (newRecommendationName.trim()) {
+      const newId = Math.max(...recommendationCategories.map(r => r.id), 0) + 1
+      setRecommendationCategories([{
+        id: newId,
+        name: newRecommendationName,
+        description: 'Descripción de la nueva categoría',
+        status: 'Activo',
+        active: true
+      }, ...recommendationCategories])
+      setNewRecommendationName('')
+      setIsCreatingRecommendation(false)
+    }
+  }
+
+  const handleEditRecommendationStart = (id: number, name: string) => {
+    setEditingRecommendationId(id)
+    setEditingRecommendationName(name)
+  }
+
+  const handleSaveRecommendationEdit = () => {
+    if (editingRecommendationName.trim() && editingRecommendationId !== null) {
+      setRecommendationCategories(recommendationCategories.map(rec =>
+        rec.id === editingRecommendationId ? { ...rec, name: editingRecommendationName } : rec
+      ))
+      setEditingRecommendationId(null)
+      setEditingRecommendationName('')
+    }
+  }
+
+  const handleCancelRecommendationEdit = () => {
+    setEditingRecommendationId(null)
+    setEditingRecommendationName('')
+  }
+
   const filteredDepartments = departments.filter(dept => {
     const matchesSearch = dept.name.toLowerCase().includes(searchTerm.toLowerCase())
     const matchesStatus = searchStatus === 'all' || (searchStatus === 'activo' ? dept.active : !dept.active)
@@ -512,6 +575,12 @@ export default function SettingsPage() {
   const filteredEventSpaces = eventSpaces.filter(eventSpace => {
     const matchesSearch = eventSpace.name.toLowerCase().includes(searchTerm.toLowerCase())
     const matchesStatus = searchStatus === 'all' || (searchStatus === 'activo' ? eventSpace.active : !eventSpace.active)
+    return matchesSearch && matchesStatus
+  })
+
+  const filteredRecommendations = recommendationCategories.filter(rec => {
+    const matchesSearch = rec.name.toLowerCase().includes(searchTerm.toLowerCase())
+    const matchesStatus = searchStatus === 'all' || (searchStatus === 'activo' ? rec.active : !rec.active)
     return matchesSearch && matchesStatus
   })
 
@@ -748,7 +817,7 @@ export default function SettingsPage() {
               </div>
             )}
 
-            {selectedCard !== 'Departamentos' && selectedCard !== 'Amenities' && selectedCard !== 'Habitaciones' && selectedCard !== 'Personal' && selectedCard !== 'Eventos' && (
+            {selectedCard !== 'Departamentos' && selectedCard !== 'Amenities' && selectedCard !== 'Habitaciones' && selectedCard !== 'Personal' && selectedCard !== 'Eventos' && selectedCard !== 'Recomendaciones' && (
               <div className="bg-white rounded-lg shadow-sm p-6 flex items-center justify-center h-64">
                 <p className="text-gray-400">Selecciona una opción para ver su configuración</p>
               </div>
@@ -1938,6 +2007,204 @@ export default function SettingsPage() {
                     </button>
                     <button
                       onClick={() => deletingEventSpaceId && deleteEventSpace(deletingEventSpaceId)}
+                      className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors font-medium"
+                    >
+                      Eliminar
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {selectedCard === 'Recomendaciones' && (
+              <div className="bg-white rounded-lg shadow-sm p-6">
+                <div className="flex items-center justify-between mb-6">
+                  <h2 className="text-2xl font-bold text-gray-900">{selectedCard}</h2>
+                  <button
+                    onClick={() => {
+                      setIsCreatingRecommendation(true)
+                      setNewRecommendationName('')
+                    }}
+                    className="flex items-center justify-center w-12 h-12 rounded-full text-white shadow-md hover:shadow-lg transition-all duration-300 hover:scale-110 group relative"
+                    style={{ background: 'linear-gradient(135deg, #5ba000, #4a8500)' }}
+                    title="Añadir Categoría"
+                  >
+                    <div className="relative flex items-center justify-center">
+                      <Compass className="w-5 h-5" />
+                      <span className="absolute text-lg font-bold -bottom-1 -right-0.5 text-white drop-shadow-lg">+</span>
+                    </div>
+                    <span className="absolute bottom-full mb-2 px-2 py-1 bg-gray-900 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap">
+                      Añadir Categoría
+                    </span>
+                  </button>
+                </div>
+
+                {/* Search Section */}
+                <div className="mb-6 flex gap-3">
+                  <input
+                    type="text"
+                    placeholder="Buscar por nombre..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+                  />
+                  <select
+                    value={searchStatus}
+                    onChange={(e) => setSearchStatus(e.target.value)}
+                    className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+                  >
+                    <option value="all">Todos los estados</option>
+                    <option value="activo">Activo</option>
+                    <option value="inactivo">Inactivo</option>
+                  </select>
+                </div>
+
+                <div className="space-y-3">
+                  {isCreatingRecommendation && (
+                    <div className="flex items-center gap-4 p-4 border-2 rounded-lg" style={{ borderColor: '#5ba000', backgroundColor: '#e8f5e0' }}>
+                      <input
+                        type="text"
+                        placeholder="Nombre de la categoría..."
+                        value={newRecommendationName}
+                        onChange={(e) => setNewRecommendationName(e.target.value)}
+                        onKeyPress={(e) => e.key === 'Enter' && handleSaveNewRecommendation()}
+                        className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2"
+                        style={{ focusColor: '#5ba000' }}
+                        autoFocus
+                      />
+                      <button
+                        onClick={handleSaveNewRecommendation}
+                        className="px-4 py-2 text-white rounded-lg hover:opacity-90 transition-colors font-medium"
+                        style={{ backgroundColor: '#5ba000' }}
+                      >
+                        Guardar
+                      </button>
+                      <button
+                        onClick={() => {
+                          setIsCreatingRecommendation(false)
+                          setNewRecommendationName('')
+                        }}
+                        className="px-4 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 transition-colors font-medium"
+                      >
+                        Cancelar
+                      </button>
+                    </div>
+                  )}
+                  {filteredRecommendations.map((recommendation) => (
+                    <div key={recommendation.id}>
+                      {editingRecommendationId === recommendation.id ? (
+                        <div className="flex items-center gap-4 p-4 border-2 rounded-lg" style={{ borderColor: '#5ba000', backgroundColor: '#e8f5e0' }}>
+                          <input
+                            type="text"
+                            value={editingRecommendationName}
+                            onChange={(e) => setEditingRecommendationName(e.target.value)}
+                            onKeyPress={(e) => e.key === 'Enter' && handleSaveRecommendationEdit()}
+                            className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2"
+                            autoFocus
+                          />
+                          <button
+                            onClick={handleSaveRecommendationEdit}
+                            className="px-4 py-2 text-white rounded-lg hover:opacity-90 transition-colors font-medium"
+                            style={{ backgroundColor: '#5ba000' }}
+                          >
+                            Guardar
+                          </button>
+                          <button
+                            onClick={handleCancelRecommendationEdit}
+                            className="px-4 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 transition-colors font-medium"
+                          >
+                            Cancelar
+                          </button>
+                        </div>
+                      ) : (
+                        <div className="flex items-center gap-4 p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
+                          <div className="flex-1">
+                            <div className="flex items-center gap-2 mb-2">
+                              <h3 className="text-lg font-semibold text-gray-900">{recommendation.name}</h3>
+                              <span className={`px-2 py-1 text-xs font-medium rounded-full ${
+                                recommendation.active
+                                  ? 'bg-green-100 text-green-800'
+                                  : 'bg-gray-100 text-gray-800'
+                              }`}>
+                                {recommendation.status}
+                              </span>
+                            </div>
+                          </div>
+                          <div className="flex items-center gap-3">
+                            {/* Toggle Switch */}
+                            <button
+                              onClick={() => toggleRecommendation(recommendation.id)}
+                              className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+                                recommendation.active ? 'bg-green-500' : 'bg-gray-300'
+                              }`}
+                            >
+                              <span
+                                className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                                  recommendation.active ? 'translate-x-6' : 'translate-x-1'
+                                }`}
+                              />
+                            </button>
+                            {/* Edit Button */}
+                            <button
+                              onClick={() => handleEditRecommendationStart(recommendation.id, recommendation.name)}
+                              className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                            >
+                              <Edit2 className="w-5 h-5" />
+                            </button>
+                            {/* Delete Button */}
+                            <button
+                              onClick={() => handleDeleteRecommendationClick(recommendation.id)}
+                              className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                            >
+                              <Trash2 className="w-5 h-5" />
+                            </button>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Delete Confirmation Modal for Recommendations */}
+            {deletingRecommendationId !== null && (
+              <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+                <div className="bg-white rounded-lg shadow-lg p-6 max-w-sm mx-4">
+                  <h3 className="text-xl font-bold text-gray-900 mb-2">Confirmar eliminación</h3>
+                  <p className="text-gray-600 mb-4">
+                    ¿Está seguro de que desea eliminar la siguiente categoría?
+                  </p>
+                  
+                  {deletingRecommendationId && recommendationCategories.find(r => r.id === deletingRecommendationId) && (
+                    <div className="bg-gray-50 rounded-lg p-4 mb-6">
+                      <div className="space-y-2">
+                        <p className="text-sm text-gray-600">
+                          <span className="font-semibold">Nombre:</span> {recommendationCategories.find(r => r.id === deletingRecommendationId)?.name}
+                        </p>
+                        <p className="text-sm text-gray-600">
+                          <span className="font-semibold">Estado:</span> 
+                          <span className={`ml-2 px-2 py-0.5 text-xs font-medium rounded-full ${
+                            recommendationCategories.find(r => r.id === deletingRecommendationId)?.active
+                              ? 'bg-green-100 text-green-800'
+                              : 'bg-gray-100 text-gray-800'
+                          }`}>
+                            {recommendationCategories.find(r => r.id === deletingRecommendationId)?.status}
+                          </span>
+                        </p>
+                      </div>
+                    </div>
+                  )}
+
+                  <div className="flex gap-3 justify-end">
+                    <button
+                      onClick={() => setDeletingRecommendationId(null)}
+                      className="px-4 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 transition-colors font-medium"
+                    >
+                      Cancelar
+                    </button>
+                    <button
+                      onClick={() => deletingRecommendationId && deleteRecommendation(deletingRecommendationId)}
                       className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors font-medium"
                     >
                       Eliminar
