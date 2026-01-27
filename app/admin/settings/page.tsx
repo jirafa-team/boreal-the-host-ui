@@ -11,6 +11,7 @@ import {
   Compass,
   ArrowRight,
 } from 'lucide-react'
+import { useState } from 'react'
 
 const gradientColors: { [key: string]: string } = {
   'from-purple-600 to-purple-700': 'linear-gradient(135deg, rgb(147, 51, 234), rgb(126, 34, 206))',
@@ -24,6 +25,7 @@ const gradientColors: { [key: string]: string } = {
 export default function SettingsPage() {
   const router = useRouter()
   const { t } = useLanguage()
+  const [selectedCard, setSelectedCard] = useState('Departamentos')
 
   const settingsCards = [
     {
@@ -72,11 +74,16 @@ export default function SettingsPage() {
           <div className="space-y-3">
             {settingsCards.map((card) => {
               const Icon = card.icon
+              const isSelected = selectedCard === card.label
               return (
                 <button
                   key={card.label}
-                  onClick={() => router.push('#')}
-                  className="group relative overflow-hidden rounded-lg p-3 text-white shadow-md hover:shadow-lg transition-all duration-300 hover:scale-105 w-full text-left h-16 flex items-center justify-start"
+                  onClick={() => setSelectedCard(card.label)}
+                  className={`group relative overflow-hidden rounded-lg p-3 text-white shadow-md hover:shadow-lg transition-all duration-300 w-full text-left h-16 flex items-center justify-start ${
+                    isSelected
+                      ? 'scale-110 hover:scale-110'
+                      : 'opacity-50 hover:scale-105 hover:opacity-75'
+                  }`}
                   style={{
                     background: gradientColors[card.color],
                   }}
