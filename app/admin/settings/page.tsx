@@ -27,6 +27,8 @@ export default function SettingsPage() {
   const router = useRouter()
   const { t } = useLanguage()
   const [selectedCard, setSelectedCard] = useState('Departamentos')
+  const [searchTerm, setSearchTerm] = useState('')
+  const [searchStatus, setSearchStatus] = useState('all')
   const [departments, setDepartments] = useState([
     { id: 1, name: 'Limpieza', description: 'Departamento de limpieza y mantenimiento de espacios', status: 'Activo', active: true },
     { id: 2, name: 'Mantenimiento', description: 'Departamento de reparación y mantenimiento técnico', status: 'Activo', active: true },
@@ -44,6 +46,12 @@ export default function SettingsPage() {
   const deleteDepartment = (id: number) => {
     setDepartments(departments.filter(dept => dept.id !== id))
   }
+
+  const filteredDepartments = departments.filter(dept => {
+    const matchesSearch = dept.name.toLowerCase().includes(searchTerm.toLowerCase())
+    const matchesStatus = searchStatus === 'all' || (searchStatus === 'activo' ? dept.active : !dept.active)
+    return matchesSearch && matchesStatus
+  })
 
   const settingsCards = [
     {
@@ -96,7 +104,7 @@ export default function SettingsPage() {
         </div>
 
         {/* Main Layout: Left Sidebar + Right Content */}
-        <div className="flex gap-8">
+        <div className="flex gap-24">
           {/* Left Column: Settings Cards */}
           <div className="max-w-[240px]">
             <div className="space-y-3">
@@ -134,8 +142,29 @@ export default function SettingsPage() {
             {selectedCard === 'Departamentos' && (
               <div className="bg-white rounded-lg shadow-sm p-6">
                 <h2 className="text-2xl font-bold text-gray-900 mb-6">{selectedCard}</h2>
+                
+                {/* Search Section */}
+                <div className="mb-6 flex gap-3">
+                  <input
+                    type="text"
+                    placeholder="Buscar por nombre..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+                  <select
+                    value={searchStatus}
+                    onChange={(e) => setSearchStatus(e.target.value)}
+                    className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  >
+                    <option value="all">Todos los estados</option>
+                    <option value="activo">Activo</option>
+                    <option value="inactivo">Inactivo</option>
+                  </select>
+                </div>
+
                 <div className="space-y-3">
-                  {departments.map((department) => (
+                  {filteredDepartments.map((department) => (
                     <div
                       key={department.id}
                       className="flex items-center gap-4 p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
