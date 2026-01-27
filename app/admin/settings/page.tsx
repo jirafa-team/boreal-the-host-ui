@@ -1,190 +1,106 @@
 'use client'
 
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import { Switch } from '@/components/ui/switch'
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select'
-import { Bell, Lock, Palette, Globe, Database, Shield, Mail, Clock } from 'lucide-react'
+import { useRouter } from 'next/navigation'
 import { useLanguage } from '@/lib/i18n-context'
-import { useState } from 'react'
+import {
+  Hotel,
+  Building2,
+  Users,
+  Sparkles,
+  Calendar,
+  Compass,
+  ArrowRight,
+} from 'lucide-react'
+
+const gradientColors: { [key: string]: string } = {
+  'from-purple-600 to-purple-700': 'linear-gradient(135deg, rgb(147, 51, 234), rgb(126, 34, 206))',
+  'from-indigo-600 to-indigo-700': 'linear-gradient(135deg, rgb(79, 70, 229), rgb(67, 56, 202))',
+  'from-orange-600 to-orange-700': 'linear-gradient(135deg, rgb(234, 88, 12), rgb(194, 65, 12))',
+  'from-pink-600 to-pink-700': 'linear-gradient(135deg, rgb(236, 72, 153), rgb(219, 39, 119))',
+  'from-red-600 to-red-700': 'linear-gradient(135deg, rgb(220, 38, 38), rgb(185, 28, 28))',
+  'from-yellow-600 to-yellow-700': 'linear-gradient(135deg, rgb(202, 138, 4), rgb(161, 98, 7))',
+}
 
 export default function SettingsPage() {
-  const { t, language, setLanguage } = useLanguage()
-  const [settings, setSettings] = useState({
-    systemName: 'Sistema de Hospedaje',
-    timezone: 'UTC-5',
-    theme: 'light',
-    notifications: true,
-    emailAlerts: true,
-    maintenanceMode: false,
-    dataBackup: true,
-  })
+  const router = useRouter()
+  const { t } = useLanguage()
 
-  const handleSettingChange = (key: string, value: any) => {
-    setSettings((prev) => ({
-      ...prev,
-      [key]: value,
-    }))
-  }
-
-  const handleSaveSettings = () => {
-    // Aquí iría la lógica para guardar la configuración
-    console.log('Settings saved:', settings)
-  }
-
-  const settingsSections = [
+  const settingsCards = [
     {
-      title: 'Sistema',
-      icon: Database,
-      settings: [
-        {
-          label: 'Nombre del Sistema',
-          key: 'systemName',
-          type: 'input',
-          value: settings.systemName,
-        },
-        {
-          label: 'Zona Horaria',
-          key: 'timezone',
-          type: 'select',
-          value: settings.timezone,
-          options: ['UTC-5', 'UTC-4', 'UTC-3', 'UTC-2', 'UTC', 'UTC+1', 'UTC+2'],
-        },
-      ],
+      label: 'Departamentos',
+      icon: Hotel,
+      color: 'from-purple-600 to-purple-700',
     },
     {
-      title: 'Interfaz',
-      icon: Palette,
-      settings: [
-        {
-          label: 'Tema',
-          key: 'theme',
-          type: 'select',
-          value: settings.theme,
-          options: ['light', 'dark', 'auto'],
-        },
-      ],
+      label: 'Amenities',
+      icon: Building2,
+      color: 'from-orange-600 to-orange-700',
     },
     {
-      title: 'Notificaciones',
-      icon: Bell,
-      settings: [
-        {
-          label: 'Habilitar notificaciones',
-          key: 'notifications',
-          type: 'toggle',
-          value: settings.notifications,
-        },
-        {
-          label: 'Alertas por email',
-          key: 'emailAlerts',
-          type: 'toggle',
-          value: settings.emailAlerts,
-        },
-      ],
+      label: 'Habitaciones',
+      icon: Hotel,
+      color: 'from-indigo-600 to-indigo-700',
     },
     {
-      title: 'Seguridad y Mantenimiento',
-      icon: Shield,
-      settings: [
-        {
-          label: 'Modo de mantenimiento',
-          key: 'maintenanceMode',
-          type: 'toggle',
-          value: settings.maintenanceMode,
-        },
-        {
-          label: 'Copias de seguridad automáticas',
-          key: 'dataBackup',
-          type: 'toggle',
-          value: settings.dataBackup,
-        },
-      ],
+      label: 'Personal',
+      icon: Sparkles,
+      color: 'from-pink-600 to-pink-700',
+    },
+    {
+      label: 'Eventos',
+      icon: Calendar,
+      color: 'from-red-600 to-red-700',
+    },
+    {
+      label: 'Recomendaciones',
+      icon: Compass,
+      color: 'from-yellow-600 to-yellow-700',
     },
   ]
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 p-8">
-      {/* Header */}
-      <div className="max-w-7xl mx-auto mb-8">
-        <h1 className="text-4xl font-bold text-gray-900 mb-2">Configuración</h1>
-        <p className="text-gray-600 text-lg">Personaliza valores del sistema</p>
-      </div>
+    <div className="flex-1 overflow-auto bg-gray-50">
+      <div className="max-w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Header */}
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold text-gray-900">Configuración</h1>
+          <p className="text-gray-600 mt-1">Personaliza valores del sistema</p>
+        </div>
 
-      {/* Settings Sections */}
-      <div className="max-w-7xl mx-auto space-y-6">
-        {settingsSections.map((section) => {
-          const IconComponent = section.icon
-          return (
-            <Card key={section.title} className="border-0 shadow-sm hover:shadow-md transition-shadow">
-              <CardHeader className="pb-4">
-                <div className="flex items-center gap-3">
-                  <div className="p-2 bg-gradient-to-br from-cyan-500 to-blue-500 rounded-lg">
-                    <IconComponent className="w-5 h-5 text-white" />
+        {/* Left Column: Settings Cards */}
+        <div className="w-full max-w-sm">
+          <div className="space-y-3">
+            {settingsCards.map((card) => {
+              const Icon = card.icon
+              return (
+                <button
+                  key={card.label}
+                  onClick={() => router.push('#')}
+                  className="group relative overflow-hidden rounded-lg p-3 text-white shadow-md hover:shadow-lg transition-all duration-300 hover:scale-105 w-full text-left"
+                  style={{
+                    background: gradientColors[card.color],
+                  }}
+                >
+                  <div className="absolute inset-0 opacity-10">
+                    <div className="absolute top-0 right-0 w-20 h-20 bg-white rounded-full -mr-8 -mt-8"></div>
                   </div>
-                  <CardTitle className="text-xl">{section.title}</CardTitle>
-                </div>
-              </CardHeader>
-              <CardContent className="space-y-6">
-                {section.settings.map((setting) => (
-                  <div key={setting.key} className="flex items-center justify-between py-3 border-b border-gray-100 last:border-b-0 last:pb-0">
-                    <Label className="text-base font-medium text-gray-700 cursor-pointer">
-                      {setting.label}
-                    </Label>
-                    <div className="flex-shrink-0">
-                      {setting.type === 'input' && (
-                        <Input
-                          type="text"
-                          value={setting.value}
-                          onChange={(e) => handleSettingChange(setting.key, e.target.value)}
-                          className="w-64"
-                        />
-                      )}
-                      {setting.type === 'select' && (
-                        <Select value={setting.value} onValueChange={(value) => handleSettingChange(setting.key, value)}>
-                          <SelectTrigger className="w-48">
-                            <SelectValue />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {setting.options?.map((option) => (
-                              <SelectItem key={option} value={option}>
-                                {option}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                      )}
-                      {setting.type === 'toggle' && (
-                        <Switch
-                          checked={setting.value}
-                          onCheckedChange={(checked) => handleSettingChange(setting.key, checked)}
-                        />
-                      )}
+                  <div className="relative flex flex-col items-start h-full">
+                    <div className="mb-2">
+                      <Icon className="w-5 h-5" />
+                    </div>
+                    <div className="flex-1 flex flex-col justify-between w-full">
+                      <p className="text-sm font-medium">{card.label}</p>
+                      <div className="flex items-center justify-between mt-2 text-xs text-white/80">
+                        <span className="text-white/60">Configurar</span>
+                        <ArrowRight className="w-3 h-3 group-hover:translate-x-0.5 transition-transform" />
+                      </div>
                     </div>
                   </div>
-                ))}
-              </CardContent>
-            </Card>
-          )
-        })}
-      </div>
-
-      {/* Action Buttons */}
-      <div className="max-w-7xl mx-auto mt-8 flex gap-3 justify-end">
-        <Button variant="outline" className="px-6 bg-transparent">
-          Cancelar
-        </Button>
-        <Button onClick={handleSaveSettings} className="px-6 bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600 text-white">
-          Guardar Cambios
-        </Button>
+                </button>
+              )
+            })}
+          </div>
+        </div>
       </div>
     </div>
   )
