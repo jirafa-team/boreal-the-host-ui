@@ -599,7 +599,7 @@ export default function StaffManagement() {
               <Dialog>
                 <DialogTrigger asChild>
                   <button 
-                    className="flex items-center justify-center w-10 h-10 rounded-full bg-gradient-to-br from-pink-600 to-pink-700 text-white shadow-md hover:shadow-lg transition-all duration-300 hover:scale-110 group relative"
+                    className="flex items-center justify-center w-10 h-10 rounded-full bg-gradient-to-br from-primary to-primary/80 text-white shadow-md hover:shadow-lg transition-all duration-300 hover:scale-110 group relative"
                     title="Agregar personal"
                   >
                     <UserPlus className="w-5 h-5" />
