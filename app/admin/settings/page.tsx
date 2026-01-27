@@ -68,7 +68,7 @@ export default function SettingsPage() {
         </div>
 
         {/* Left Column: Settings Cards */}
-        <div className="w-full max-w-sm">
+        <div className="max-w-xs">
           <div className="space-y-3">
             {settingsCards.map((card) => {
               const Icon = card.icon
@@ -76,7 +76,7 @@ export default function SettingsPage() {
                 <button
                   key={card.label}
                   onClick={() => router.push('#')}
-                  className="group relative overflow-hidden rounded-lg p-2 text-white shadow-md hover:shadow-lg transition-all duration-300 hover:scale-105 w-full text-left"
+                  className="group relative overflow-hidden rounded-lg p-4 text-white shadow-md hover:shadow-lg transition-all duration-300 hover:scale-105 w-full text-left h-24 flex items-center justify-start"
                   style={{
                     background: gradientColors[card.color],
                   }}
@@ -84,9 +84,9 @@ export default function SettingsPage() {
                   <div className="absolute inset-0 opacity-10">
                     <div className="absolute top-0 right-0 w-20 h-20 bg-white rounded-full -mr-8 -mt-8"></div>
                   </div>
-                  <div className="relative flex items-center gap-2">
-                    <Icon className="w-5 h-5 flex-shrink-0" />
-                    <p className="text-sm font-medium">{card.label}</p>
+                  <div className="relative flex items-center gap-3">
+                    <Icon className="w-6 h-6 flex-shrink-0" />
+                    <p className="text-base font-medium">{card.label}</p>
                   </div>
                 </button>
               )
