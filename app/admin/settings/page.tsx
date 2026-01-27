@@ -10,6 +10,7 @@ import {
   Calendar,
   Compass,
   ArrowRight,
+  Trash2,
 } from 'lucide-react'
 import { useState } from 'react'
 
@@ -26,14 +27,23 @@ export default function SettingsPage() {
   const router = useRouter()
   const { t } = useLanguage()
   const [selectedCard, setSelectedCard] = useState('Departamentos')
+  const [departments, setDepartments] = useState([
+    { id: 1, name: 'Limpieza', description: 'Departamento de limpieza y mantenimiento de espacios', status: 'Activo', active: true },
+    { id: 2, name: 'Mantenimiento', description: 'Departamento de reparación y mantenimiento técnico', status: 'Activo', active: true },
+    { id: 3, name: 'Seguridad', description: 'Departamento de seguridad y vigilancia', status: 'Inactivo', active: false },
+    { id: 4, name: 'Recepción', description: 'Departamento de recepción y administración', status: 'Activo', active: true },
+    { id: 5, name: 'Servicio', description: 'Departamento de servicios al huésped', status: 'Activo', active: true },
+  ])
 
-  const departmentsData = [
-    { id: 1, name: 'Limpieza', description: 'Departamento de limpieza y mantenimiento de espacios' },
-    { id: 2, name: 'Mantenimiento', description: 'Departamento de reparación y mantenimiento técnico' },
-    { id: 3, name: 'Seguridad', description: 'Departamento de seguridad y vigilancia' },
-    { id: 4, name: 'Recepción', description: 'Departamento de recepción y administración' },
-    { id: 5, name: 'Servicio', description: 'Departamento de servicios al huésped' },
-  ]
+  const toggleDepartment = (id: number) => {
+    setDepartments(departments.map(dept =>
+      dept.id === id ? { ...dept, active: !dept.active, status: !dept.active ? 'Activo' : 'Inactivo' } : dept
+    ))
+  }
+
+  const deleteDepartment = (id: number) => {
+    setDepartments(departments.filter(dept => dept.id !== id))
+  }
 
   const settingsCards = [
     {
@@ -66,6 +76,14 @@ export default function SettingsPage() {
       icon: Compass,
       color: 'from-yellow-600 to-yellow-700',
     },
+  ]
+
+  const departmentsData = [
+    { id: 1, name: 'Limpieza', description: 'Departamento de limpieza y mantenimiento de espacios', status: 'Activo', active: true },
+    { id: 2, name: 'Mantenimiento', description: 'Departamento de reparación y mantenimiento técnico', status: 'Activo', active: true },
+    { id: 3, name: 'Seguridad', description: 'Departamento de seguridad y vigilancia', status: 'Inactivo', active: false },
+    { id: 4, name: 'Recepción', description: 'Departamento de recepción y administración', status: 'Activo', active: true },
+    { id: 5, name: 'Servicio', description: 'Departamento de servicios al huésped', status: 'Activo', active: true },
   ]
 
   return (
@@ -117,17 +135,44 @@ export default function SettingsPage() {
               <div className="bg-white rounded-lg shadow-sm p-6">
                 <h2 className="text-2xl font-bold text-gray-900 mb-6">{selectedCard}</h2>
                 <div className="space-y-3">
-                  {departmentsData.map((department) => (
+                  {departments.map((department) => (
                     <div
                       key={department.id}
-                      className="flex items-start p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors cursor-pointer"
+                      className="flex items-center gap-4 p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
                     >
                       <div className="flex-1">
-                        <h3 className="text-lg font-semibold text-gray-900">{department.name}</h3>
-                        <p className="text-sm text-gray-500 mt-1">{department.description}</p>
+                        <div className="flex items-center gap-2 mb-2">
+                          <h3 className="text-lg font-semibold text-gray-900">{department.name}</h3>
+                          <span className={`px-2 py-1 text-xs font-medium rounded-full ${
+                            department.active
+                              ? 'bg-green-100 text-green-800'
+                              : 'bg-gray-100 text-gray-800'
+                          }`}>
+                            {department.status}
+                          </span>
+                        </div>
                       </div>
-                      <div className="flex-shrink-0 ml-4">
-                        <ArrowRight className="w-5 h-5 text-gray-400" />
+                      <div className="flex items-center gap-3">
+                        {/* Toggle Switch */}
+                        <button
+                          onClick={() => toggleDepartment(department.id)}
+                          className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+                            department.active ? 'bg-green-500' : 'bg-gray-300'
+                          }`}
+                        >
+                          <span
+                            className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                              department.active ? 'translate-x-6' : 'translate-x-1'
+                            }`}
+                          />
+                        </button>
+                        {/* Delete Button */}
+                        <button
+                          onClick={() => deleteDepartment(department.id)}
+                          className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                        >
+                          <Trash2 className="w-5 h-5" />
+                        </button>
                       </div>
                     </div>
                   ))}
