@@ -141,7 +141,28 @@ export default function SettingsPage() {
           <div className="flex-1">
             {selectedCard === 'Departamentos' && (
               <div className="bg-white rounded-lg shadow-sm p-6">
-                <h2 className="text-2xl font-bold text-gray-900 mb-6">{selectedCard}</h2>
+                <div className="flex items-center justify-between mb-6">
+                  <h2 className="text-2xl font-bold text-gray-900">{selectedCard}</h2>
+                  <button
+                    onClick={() => {
+                      const newId = Math.max(...departments.map(d => d.id), 0) + 1
+                      setDepartments([...departments, {
+                        id: newId,
+                        name: `Nuevo Departamento ${newId}`,
+                        description: 'Descripción del nuevo departamento',
+                        status: 'Activo',
+                        active: true
+                      }])
+                    }}
+                    className="flex items-center justify-center w-12 h-12 rounded-full bg-gradient-to-br from-purple-600 to-purple-700 text-white shadow-md hover:shadow-lg transition-all duration-300 hover:scale-110 group"
+                    title="Agregar departamento"
+                  >
+                    <div className="relative flex items-center justify-center">
+                      <Hotel className="w-5 h-5 absolute" />
+                      <span className="text-xl font-bold ml-3">+</span>
+                    </div>
+                  </button>
+                </div>
                 
                 {/* Search Section */}
                 <div className="mb-6 flex gap-3">
