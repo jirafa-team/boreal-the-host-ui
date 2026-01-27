@@ -87,7 +87,7 @@ export default function AdminHomePage() {
     {
       title: t("admin.services"),
       items: [
-        { href: "/admin/housekeeping", label: "Personal", icon: Sparkles, color: "from-pink-600 to-pink-700" },
+        { href: "/admin/staff", label: "Personal", icon: Sparkles, color: "from-pink-600 to-pink-700" },
         { href: "/admin/events", label: t("admin.events"), icon: Calendar, color: "from-red-600 to-red-700" },
         { href: "/admin/tickets", label: t("admin.tickets"), icon: Ticket, color: "from-yellow-600 to-yellow-700" },
         { href: "/admin/pedidos", label: t("admin.orders"), icon: ShoppingBag, color: "pedidos-custom" },
