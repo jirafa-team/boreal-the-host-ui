@@ -945,19 +945,19 @@ export default function SettingsPage() {
 
                 <div className="space-y-3">
                   {isCreatingShift && (
-                    <div className="flex items-center gap-4 p-4 border-2 border-indigo-500 rounded-lg bg-indigo-50">
+                    <div className="flex items-center gap-4 p-4 border-2 border-pink-500 rounded-lg bg-pink-50">
                       <input
                         type="text"
                         placeholder="Nombre del turno..."
                         value={newShiftName}
                         onChange={(e) => setNewShiftName(e.target.value)}
                         onKeyPress={(e) => e.key === 'Enter' && handleSaveNewShift()}
-                        className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                        className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-500"
                         autoFocus
                       />
                       <button
                         onClick={handleSaveNewShift}
-                        className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors font-medium"
+                        className="px-4 py-2 bg-pink-600 text-white rounded-lg hover:bg-pink-700 transition-colors font-medium"
                       >
                         Guardar
                       </button>
@@ -975,18 +975,18 @@ export default function SettingsPage() {
                   {filteredShifts.map((shift) => (
                     <div key={shift.id}>
                       {editingShiftId === shift.id ? (
-                        <div className="flex items-center gap-4 p-4 border-2 border-indigo-500 rounded-lg bg-indigo-50">
+                        <div className="flex items-center gap-4 p-4 border-2 border-pink-500 rounded-lg bg-pink-50">
                           <input
                             type="text"
                             value={editingShiftName}
                             onChange={(e) => setEditingShiftName(e.target.value)}
                             onKeyPress={(e) => e.key === 'Enter' && handleSaveShiftEdit()}
-                            className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                            className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-pink-500"
                             autoFocus
                           />
                           <button
                             onClick={handleSaveShiftEdit}
-                            className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors font-medium"
+                            className="px-4 py-2 bg-pink-600 text-white rounded-lg hover:bg-pink-700 transition-colors font-medium"
                           >
                             Guardar
                           </button>
