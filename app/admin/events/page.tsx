@@ -234,19 +234,6 @@ export default function EventsManagement() {
                 <p className="text-sm text-muted-foreground">Gestiona y organiza todos los eventos del hotel</p>
               </div>
               <div className="flex gap-4 items-center ml-auto">
-                {/* Search and Filters */}
-                <div className="flex gap-2 items-center">
-                  <div className="relative">
-                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-                    <Input
-                      placeholder="Buscar eventos..."
-                      value={searchQuery}
-                      onChange={(e) => setSearchQuery(e.target.value)}
-                      className="pl-10 w-48"
-                    />
-                  </div>
-                </div>
-
                 {/* Create Event Button */}
                 <Dialog open={createDialogOpen} onOpenChange={setCreateDialogOpen}>
                   <DialogTrigger asChild>
