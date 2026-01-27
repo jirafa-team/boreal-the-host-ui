@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { ChevronLeft, ChevronRight, Search, LayoutGrid, Calendar } from "lucide-react"
+import { ChevronLeft, ChevronRight, Search, LayoutGrid, Calendar, Plus } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -29,9 +29,11 @@ export default function RoomsManagement() {
   const [timelineMode, setTimelineMode] = useState<"week" | "month">("week")
   const [currentDate, setCurrentDate] = useState(new Date())
   const [searchTerm, setSearchTerm] = useState("")
+  const [showCreateModal, setShowCreateModal] = useState(false)
+  const [newRoom, setNewRoom] = useState({ number: "", type: "Individual", floor: 1 })
   const { t } = useLanguage()
 
-  const rooms: Room[] = [
+  const [rooms, setRooms] = useState<Room[]>([
     { id: "1", number: "101", type: "Individual", floor: 1, status: "available" },
     {
       id: "2",
@@ -89,7 +91,22 @@ export default function RoomsManagement() {
     },
     { id: "11", number: "303", type: "Individual", floor: 3, status: "available" },
     { id: "12", number: "304", type: "Doble", floor: 3, status: "available" },
-  ]
+  ])
+
+  const handleCreateRoom = () => {
+    if (newRoom.number.trim()) {
+      const newId = (Math.max(...rooms.map(r => parseInt(r.id) || 0), 0) + 1).toString()
+      setRooms([...rooms, {
+        id: newId,
+        number: newRoom.number,
+        type: newRoom.type,
+        floor: newRoom.floor,
+        status: "available"
+      }]);
+      setNewRoom({ number: "", type: "Individual", floor: 1 });
+      setShowCreateModal(false);
+    }
+  }
 
   const filteredRooms = rooms.filter(
     (room) =>
@@ -222,32 +239,44 @@ export default function RoomsManagement() {
               <h1 className="text-2xl font-bold text-foreground">{t("admin.roomsTitle")}</h1>
               <p className="text-sm text-muted-foreground">{t("admin.manageYourRooms")}</p>
             </div>
-            <div className="flex gap-2">
-            {/* View Mode Toggle */}
-            <div className="inline-flex h-10 items-center rounded-lg bg-gray-100 p-1 border border-gray-200">
+            <div className="flex gap-4 items-center">
               <button
-                onClick={() => setLayoutMode("grid")}
-                className={`px-5 py-2 rounded-md font-medium text-sm transition-all ${
-                  layoutMode === "grid"
-                    ? "text-white shadow-md"
-                    : "text-gray-700 hover:text-gray-900"
-                }`}
-                style={layoutMode === "grid" ? { backgroundColor: "#394a63" } : {}}
+                onClick={() => setShowCreateModal(true)}
+                className="flex items-center justify-center w-12 h-12 rounded-full bg-gradient-to-br from-indigo-600 to-indigo-700 text-white shadow-md hover:shadow-lg transition-all duration-300 hover:scale-110 group relative"
+                title="Crear habitación"
               >
-                Grid
+                <Plus className="w-6 h-6" />
+                <span className="absolute bottom-full mb-2 px-2 py-1 bg-gray-900 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap">
+                  Crear habitación
+                </span>
               </button>
-              <button
-                onClick={() => setLayoutMode("kanban")}
-                className={`px-5 py-2 rounded-md font-medium text-sm transition-all ${
-                  layoutMode === "kanban"
-                    ? "text-white shadow-md"
-                    : "text-gray-700 hover:text-gray-900"
-                }`}
-                style={layoutMode === "kanban" ? { backgroundColor: "#394a63" } : {}}
-              >
-                Timeline
-              </button>
-            </div>
+              <div className="flex gap-2">
+                {/* View Mode Toggle */}
+                <div className="inline-flex h-10 items-center rounded-lg bg-gray-100 p-1 border border-gray-200">
+                  <button
+                    onClick={() => setLayoutMode("grid")}
+                    className={`px-5 py-2 rounded-md font-medium text-sm transition-all ${
+                      layoutMode === "grid"
+                        ? "text-white shadow-md"
+                        : "text-gray-700 hover:text-gray-900"
+                    }`}
+                    style={layoutMode === "grid" ? { backgroundColor: "#394a63" } : {}}
+                  >
+                    Grid
+                  </button>
+                  <button
+                    onClick={() => setLayoutMode("kanban")}
+                    className={`px-5 py-2 rounded-md font-medium text-sm transition-all ${
+                      layoutMode === "kanban"
+                        ? "text-white shadow-md"
+                        : "text-gray-700 hover:text-gray-900"
+                    }`}
+                    style={layoutMode === "kanban" ? { backgroundColor: "#394a63" } : {}}
+                  >
+                    Timeline
+                  </button>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -473,6 +502,73 @@ export default function RoomsManagement() {
           </Card>
         )}
       </div>
+
+      {/* Create Room Modal */}
+      {showCreateModal && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg shadow-lg p-6 max-w-md w-full mx-4">
+            <h3 className="text-xl font-bold text-gray-900 mb-4">Crear Nueva Habitación</h3>
+            
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Número de Habitación</label>
+                <Input
+                  type="text"
+                  placeholder="Ej: 105"
+                  value={newRoom.number}
+                  onChange={(e) => setNewRoom({ ...newRoom, number: e.target.value })}
+                  className="w-full"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Tipo de Habitación</label>
+                <select
+                  value={newRoom.type}
+                  onChange={(e) => setNewRoom({ ...newRoom, type: e.target.value })}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                >
+                  <option>Individual</option>
+                  <option>Doble</option>
+                  <option>Suite</option>
+                  <option>Deluxe</option>
+                  <option>Presidencial</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Piso</label>
+                <select
+                  value={newRoom.floor}
+                  onChange={(e) => setNewRoom({ ...newRoom, floor: parseInt(e.target.value) })}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                >
+                  <option value={1}>Piso 1</option>
+                  <option value={2}>Piso 2</option>
+                  <option value={3}>Piso 3</option>
+                  <option value={4}>Piso 4</option>
+                  <option value={5}>Piso 5</option>
+                </select>
+              </div>
+            </div>
+
+            <div className="flex gap-3 justify-end mt-6">
+              <button
+                onClick={() => setShowCreateModal(false)}
+                className="px-4 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 transition-colors font-medium"
+              >
+                Cancelar
+              </button>
+              <button
+                onClick={handleCreateRoom}
+                className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors font-medium"
+              >
+                Crear Habitación
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </>
   )
 }
