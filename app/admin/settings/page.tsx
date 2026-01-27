@@ -76,7 +76,7 @@ export default function SettingsPage() {
                 <button
                   key={card.label}
                   onClick={() => router.push('#')}
-                  className="group relative overflow-hidden rounded-lg p-3 text-white shadow-md hover:shadow-lg transition-all duration-300 hover:scale-105 w-full text-left"
+                  className="group relative overflow-hidden rounded-lg p-2 text-white shadow-md hover:shadow-lg transition-all duration-300 hover:scale-105 w-full text-left"
                   style={{
                     background: gradientColors[card.color],
                   }}
@@ -84,17 +84,9 @@ export default function SettingsPage() {
                   <div className="absolute inset-0 opacity-10">
                     <div className="absolute top-0 right-0 w-20 h-20 bg-white rounded-full -mr-8 -mt-8"></div>
                   </div>
-                  <div className="relative flex flex-col items-start h-full">
-                    <div className="mb-2">
-                      <Icon className="w-5 h-5" />
-                    </div>
-                    <div className="flex-1 flex flex-col justify-between w-full">
-                      <p className="text-sm font-medium">{card.label}</p>
-                      <div className="flex items-center justify-between mt-2 text-xs text-white/80">
-                        <span className="text-white/60">Configurar</span>
-                        <ArrowRight className="w-3 h-3 group-hover:translate-x-0.5 transition-transform" />
-                      </div>
-                    </div>
+                  <div className="relative flex items-center gap-2">
+                    <Icon className="w-5 h-5 flex-shrink-0" />
+                    <p className="text-sm font-medium">{card.label}</p>
                   </div>
                 </button>
               )
