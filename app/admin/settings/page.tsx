@@ -771,7 +771,7 @@ export default function SettingsPage() {
                       setIsCreatingShift(true)
                       setNewShiftName('')
                     }}
-                    className="flex items-center justify-center w-12 h-12 rounded-full bg-gradient-to-br from-primary to-primary/80 text-white shadow-md hover:shadow-lg transition-all duration-300 hover:scale-110 group relative"
+                    className="flex items-center justify-center w-12 h-12 rounded-full bg-gradient-to-br from-pink-600 to-pink-700 text-white shadow-md hover:shadow-lg transition-all duration-300 hover:scale-110 group relative"
                     title="Añadir Turno"
                   >
                     <div className="relative flex items-center justify-center">
