@@ -1058,7 +1058,7 @@ export default function SettingsPage() {
                       onClick={() => setEventosTab('tipos')}
                       className={`px-4 py-2 rounded-lg font-medium text-sm transition-all ${
                         eventosTab === 'tipos'
-                          ? 'bg-indigo-600 text-white shadow-md'
+                          ? 'bg-red-600 text-white shadow-md'
                           : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                       }`}
                     >
@@ -1068,7 +1068,7 @@ export default function SettingsPage() {
                       onClick={() => setEventosTab('espacios')}
                       className={`px-4 py-2 rounded-lg font-medium text-sm transition-all ${
                         eventosTab === 'espacios'
-                          ? 'bg-indigo-600 text-white shadow-md'
+                          ? 'bg-red-600 text-white shadow-md'
                           : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                       }`}
                     >
@@ -1085,7 +1085,7 @@ export default function SettingsPage() {
                         setNewEventSpaceName('')
                       }
                     }}
-                    className="flex items-center justify-center w-12 h-12 rounded-full bg-gradient-to-br from-indigo-600 to-indigo-700 text-white shadow-md hover:shadow-lg transition-all duration-300 hover:scale-110 group relative"
+                    className="flex items-center justify-center w-12 h-12 rounded-full bg-gradient-to-br from-red-600 to-red-700 text-white shadow-md hover:shadow-lg transition-all duration-300 hover:scale-110 group relative"
                     title="Añadir"
                   >
                     <div className="relative flex items-center justify-center">
@@ -1122,19 +1122,19 @@ export default function SettingsPage() {
                 {eventosTab === 'tipos' && (
                   <div className="space-y-3">
                     {isCreatingEventType && (
-                      <div className="flex items-center gap-4 p-4 border-2 border-indigo-500 rounded-lg bg-indigo-50">
+                      <div className="flex items-center gap-4 p-4 border-2 border-red-500 rounded-lg bg-red-50">
                         <input
                           type="text"
                           placeholder="Nombre del tipo de evento..."
                           value={newEventTypeName}
                           onChange={(e) => setNewEventTypeName(e.target.value)}
                           onKeyPress={(e) => e.key === 'Enter' && handleSaveNewEventType()}
-                          className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                          className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
                           autoFocus
                         />
                         <button
                           onClick={handleSaveNewEventType}
-                          className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors font-medium"
+                          className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors font-medium"
                         >
                           Guardar
                         </button>
@@ -1152,18 +1152,18 @@ export default function SettingsPage() {
                     {filteredEventTypes.map((eventType) => (
                       <div key={eventType.id}>
                         {editingEventTypeId === eventType.id ? (
-                          <div className="flex items-center gap-4 p-4 border-2 border-indigo-500 rounded-lg bg-indigo-50">
+                          <div className="flex items-center gap-4 p-4 border-2 border-red-500 rounded-lg bg-red-50">
                             <input
                               type="text"
                               value={editingEventTypeName}
                               onChange={(e) => setEditingEventTypeName(e.target.value)}
                               onKeyPress={(e) => e.key === 'Enter' && handleSaveEventTypeEdit()}
-                              className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                              className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
                               autoFocus
                             />
                             <button
                               onClick={handleSaveEventTypeEdit}
-                              className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors font-medium"
+                              className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors font-medium"
                             >
                               Guardar
                             </button>
@@ -1228,19 +1228,19 @@ export default function SettingsPage() {
                 {eventosTab === 'espacios' && (
                   <div className="space-y-3">
                     {isCreatingEventSpace && (
-                      <div className="flex items-center gap-4 p-4 border-2 border-indigo-500 rounded-lg bg-indigo-50">
+                      <div className="flex items-center gap-4 p-4 border-2 border-red-500 rounded-lg bg-red-50">
                         <input
                           type="text"
                           placeholder="Nombre del espacio..."
                           value={newEventSpaceName}
                           onChange={(e) => setNewEventSpaceName(e.target.value)}
                           onKeyPress={(e) => e.key === 'Enter' && handleSaveNewEventSpace()}
-                          className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                          className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
                           autoFocus
                         />
                         <button
                           onClick={handleSaveNewEventSpace}
-                          className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors font-medium"
+                          className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors font-medium"
                         >
                           Guardar
                         </button>
@@ -1258,18 +1258,18 @@ export default function SettingsPage() {
                     {filteredEventSpaces.map((eventSpace) => (
                       <div key={eventSpace.id}>
                         {editingEventSpaceId === eventSpace.id ? (
-                          <div className="flex items-center gap-4 p-4 border-2 border-indigo-500 rounded-lg bg-indigo-50">
+                          <div className="flex items-center gap-4 p-4 border-2 border-red-500 rounded-lg bg-red-50">
                             <input
                               type="text"
                               value={editingEventSpaceName}
                               onChange={(e) => setEditingEventSpaceName(e.target.value)}
                               onKeyPress={(e) => e.key === 'Enter' && handleSaveEventSpaceEdit()}
-                              className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                              className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
                               autoFocus
                             />
                             <button
                               onClick={handleSaveEventSpaceEdit}
-                              className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors font-medium"
+                              className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors font-medium"
                             >
                               Guardar
                             </button>
