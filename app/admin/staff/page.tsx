@@ -561,99 +561,101 @@ export default function StaffManagement() {
 
   return (
     <>
-      {/* Fixed Header Section */}
-      <div className="sticky top-0 z-40 bg-white border-b border-gray-200">
-        <div className="px-8 py-4">
-          <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-2xl font-bold text-foreground">{t("admin.staffTitle")}</h1>
-              <p className="text-sm text-muted-foreground">{t("admin.manageYour")} {t("admin.staffMembers")}</p>
-            </div>
-            <div className="flex gap-4 items-center ml-auto">
-              {/* View Mode Toggle */}
-              <div className="inline-flex h-10 items-center rounded-lg bg-gray-100 p-1 border border-gray-200">
-                <button
-                  onClick={() => setViewMode("overview")}
-                  className={`px-5 py-2 rounded-md font-medium text-sm transition-all ${
-                    viewMode === "overview"
-                      ? "text-white shadow-md"
-                      : "text-gray-700 hover:text-gray-900"
-                  }`}
-                  style={viewMode === "overview" ? { backgroundColor: "#394a63" } : {}}
-                >
-                  General
-                </button>
-                <button
-                  onClick={() => setViewMode("kanban")}
-                  className={`px-5 py-2 rounded-md font-medium text-sm transition-all ${
-                    viewMode === "kanban"
-                      ? "text-white shadow-md"
-                      : "text-gray-700 hover:text-gray-900"
-                  }`}
-                  style={viewMode === "kanban" ? { backgroundColor: "#394a63" } : {}}
-                >
-                  Kanban
-                </button>
+      {/* Sticky Navigation Bar with rounded borders and transparency */}
+      <div className="sticky top-4 z-40 mx-4">
+        <div className="bg-white rounded-lg shadow-lg backdrop-blur-sm border border-gray-200" style={{ backgroundColor: 'rgba(255, 255, 255, 0.5)' }}>
+          <div className="px-8 py-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <h1 className="text-2xl font-bold text-foreground">{t("admin.staffTitle")}</h1>
+                <p className="text-sm text-muted-foreground">{t("admin.manageYour")} {t("admin.staffMembers")}</p>
               </div>
-              
-              <Dialog>
-                <DialogTrigger asChild>
-                  <button 
-                    className="flex items-center justify-center w-10 h-10 rounded-full bg-gradient-to-br from-primary to-primary/80 text-white shadow-md hover:shadow-lg transition-all duration-300 hover:scale-110 group relative"
-                    title="Agregar personal"
+              <div className="flex gap-4 items-center ml-auto">
+                {/* View Mode Toggle */}
+                <div className="inline-flex h-10 items-center rounded-lg bg-gray-100 p-1 border border-gray-200">
+                  <button
+                    onClick={() => setViewMode("overview")}
+                    className={`px-5 py-2 rounded-md font-medium text-sm transition-all ${
+                      viewMode === "overview"
+                        ? "text-white shadow-md"
+                        : "text-gray-700 hover:text-gray-900"
+                    }`}
+                    style={viewMode === "overview" ? { backgroundColor: "#394a63" } : {}}
                   >
-                    <UserPlus className="w-5 h-5" />
-                    <span className="absolute top-full mt-2 px-2 py-1 bg-gray-900 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap">
-                      Agregar personal
-                    </span>
+                    General
                   </button>
-                </DialogTrigger>
-                <DialogContent>
-                  <DialogHeader>
-                    <DialogTitle>Añadir Nuevo Personal</DialogTitle>
-                    <DialogDescription>Registra un nuevo miembro del equipo de staff</DialogDescription>
-                  </DialogHeader>
-                  <div className="space-y-4 py-4">
-                    <div>
-                      <Label htmlFor="name">Nombre Completo</Label>
-                      <Input id="name" placeholder="Ej: María González" />
+                  <button
+                    onClick={() => setViewMode("kanban")}
+                    className={`px-5 py-2 rounded-md font-medium text-sm transition-all ${
+                      viewMode === "kanban"
+                        ? "text-white shadow-md"
+                        : "text-gray-700 hover:text-gray-900"
+                    }`}
+                    style={viewMode === "kanban" ? { backgroundColor: "#394a63" } : {}}
+                  >
+                    Kanban
+                  </button>
+                </div>
+                
+                <Dialog>
+                  <DialogTrigger asChild>
+                    <button 
+                      className="flex items-center justify-center w-10 h-10 rounded-full bg-gradient-to-br from-primary to-primary/80 text-white shadow-md hover:shadow-lg transition-all duration-300 hover:scale-110 group relative"
+                      title="Agregar personal"
+                    >
+                      <UserPlus className="w-5 h-5" />
+                      <span className="absolute top-full mt-2 px-2 py-1 bg-gray-900 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap">
+                        Agregar personal
+                      </span>
+                    </button>
+                  </DialogTrigger>
+                  <DialogContent>
+                    <DialogHeader>
+                      <DialogTitle>Añadir Nuevo Personal</DialogTitle>
+                      <DialogDescription>Registra un nuevo miembro del equipo de staff</DialogDescription>
+                    </DialogHeader>
+                    <div className="space-y-4 py-4">
+                      <div>
+                        <Label htmlFor="name">Nombre Completo</Label>
+                        <Input id="name" placeholder="Ej: María González" />
+                      </div>
+                      <div>
+                        <Label htmlFor="department">Departamento</Label>
+                        <Select>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Seleccionar departamento" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="Limpieza">Limpieza</SelectItem>
+                            <SelectItem value="Mantenimiento">Mantenimiento</SelectItem>
+                            <SelectItem value="Seguridad">Seguridad</SelectItem>
+                            <SelectItem value="Recepción">Recepción</SelectItem>
+                            <SelectItem value="Servicio">Servicio</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <div>
+                        <Label htmlFor="shift">Turno</Label>
+                        <Select>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Seleccionar turno" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="morning">Mañana (7:00 AM - 3:00 PM)</SelectItem>
+                            <SelectItem value="afternoon">Tarde (11:00 AM - 7:00 PM)</SelectItem>
+                            <SelectItem value="evening">Noche (3:00 PM - 11:00 PM)</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <div>
+                        <Label htmlFor="capacity">Capacidad Diaria (tareas)</Label>
+                        <Input id="capacity" type="number" placeholder="8" defaultValue="8" />
+                      </div>
                     </div>
-                    <div>
-                      <Label htmlFor="department">Departamento</Label>
-                      <Select>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Seleccionar departamento" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="Limpieza">Limpieza</SelectItem>
-                          <SelectItem value="Mantenimiento">Mantenimiento</SelectItem>
-                          <SelectItem value="Seguridad">Seguridad</SelectItem>
-                          <SelectItem value="Recepción">Recepción</SelectItem>
-                          <SelectItem value="Servicio">Servicio</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    <div>
-                      <Label htmlFor="shift">Turno</Label>
-                      <Select>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Seleccionar turno" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="morning">Mañana (7:00 AM - 3:00 PM)</SelectItem>
-                          <SelectItem value="afternoon">Tarde (11:00 AM - 7:00 PM)</SelectItem>
-                          <SelectItem value="evening">Noche (3:00 PM - 11:00 PM)</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    <div>
-                      <Label htmlFor="capacity">Capacidad Diaria (tareas)</Label>
-                      <Input id="capacity" type="number" placeholder="8" defaultValue="8" />
-                    </div>
-                  </div>
-                  <Button className="w-full">Registrar Personal</Button>
-                </DialogContent>
-              </Dialog>
+                    <Button className="w-full">Registrar Personal</Button>
+                  </DialogContent>
+                </Dialog>
+              </div>
             </div>
           </div>
         </div>
