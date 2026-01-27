@@ -29,6 +29,8 @@ export default function SettingsPage() {
   const [selectedCard, setSelectedCard] = useState('Departamentos')
   const [searchTerm, setSearchTerm] = useState('')
   const [searchStatus, setSearchStatus] = useState('all')
+  const [isCreating, setIsCreating] = useState(false)
+  const [newDeptName, setNewDeptName] = useState('')
   const [departments, setDepartments] = useState([
     { id: 1, name: 'Limpieza', description: 'Departamento de limpieza y mantenimiento de espacios', status: 'Activo', active: true },
     { id: 2, name: 'Mantenimiento', description: 'Departamento de reparación y mantenimiento técnico', status: 'Activo', active: true },
@@ -45,6 +47,21 @@ export default function SettingsPage() {
 
   const deleteDepartment = (id: number) => {
     setDepartments(departments.filter(dept => dept.id !== id))
+  }
+
+  const handleSaveNewDepartment = () => {
+    if (newDeptName.trim()) {
+      const newId = Math.max(...departments.map(d => d.id), 0) + 1
+      setDepartments([{
+        id: newId,
+        name: newDeptName,
+        description: 'Descripción del nuevo departamento',
+        status: 'Activo',
+        active: true
+      }, ...departments])
+      setNewDeptName('')
+      setIsCreating(false)
+    }
   }
 
   const filteredDepartments = departments.filter(dept => {
@@ -145,14 +162,8 @@ export default function SettingsPage() {
                   <h2 className="text-2xl font-bold text-gray-900">{selectedCard}</h2>
                   <button
                     onClick={() => {
-                      const newId = Math.max(...departments.map(d => d.id), 0) + 1
-                      setDepartments([...departments, {
-                        id: newId,
-                        name: `Nuevo Departamento ${newId}`,
-                        description: 'Descripción del nuevo departamento',
-                        status: 'Activo',
-                        active: true
-                      }])
+                      setIsCreating(true)
+                      setNewDeptName('')
                     }}
                     className="flex items-center justify-center w-12 h-12 rounded-full bg-gradient-to-br from-purple-600 to-purple-700 text-white shadow-md hover:shadow-lg transition-all duration-300 hover:scale-110 group relative"
                     title="Añadir Departamento"
@@ -188,6 +199,34 @@ export default function SettingsPage() {
                 </div>
 
                 <div className="space-y-3">
+                  {isCreating && (
+                    <div className="flex items-center gap-4 p-4 border-2 border-purple-500 rounded-lg bg-purple-50">
+                      <input
+                        type="text"
+                        placeholder="Nombre del departamento..."
+                        value={newDeptName}
+                        onChange={(e) => setNewDeptName(e.target.value)}
+                        onKeyPress={(e) => e.key === 'Enter' && handleSaveNewDepartment()}
+                        className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500"
+                        autoFocus
+                      />
+                      <button
+                        onClick={handleSaveNewDepartment}
+                        className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors font-medium"
+                      >
+                        Guardar
+                      </button>
+                      <button
+                        onClick={() => {
+                          setIsCreating(false)
+                          setNewDeptName('')
+                        }}
+                        className="px-4 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 transition-colors font-medium"
+                      >
+                        Cancelar
+                      </button>
+                    </div>
+                  )}
                   {filteredDepartments.map((department) => (
                     <div
                       key={department.id}
