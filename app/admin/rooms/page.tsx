@@ -240,32 +240,30 @@ export default function RoomsManagement() {
               <p className="text-sm text-muted-foreground">{t("admin.manageYourRooms")}</p>
             </div>
             <div className="flex gap-4 items-center">
-              <div className="flex gap-2">
-                {/* View Mode Toggle */}
-                <div className="inline-flex h-10 items-center rounded-lg bg-gray-100 p-1 border border-gray-200">
-                  <button
-                    onClick={() => setLayoutMode("grid")}
-                    className={`px-5 py-2 rounded-md font-medium text-sm transition-all ${
-                      layoutMode === "grid"
-                        ? "text-white shadow-md"
-                        : "text-gray-700 hover:text-gray-900"
-                    }`}
-                    style={layoutMode === "grid" ? { backgroundColor: "#394a63" } : {}}
-                  >
-                    Grid
-                  </button>
-                  <button
-                    onClick={() => setLayoutMode("kanban")}
-                    className={`px-5 py-2 rounded-md font-medium text-sm transition-all ${
-                      layoutMode === "kanban"
-                        ? "text-white shadow-md"
-                        : "text-gray-700 hover:text-gray-900"
-                    }`}
-                    style={layoutMode === "kanban" ? { backgroundColor: "#394a63" } : {}}
-                  >
-                    Timeline
-                  </button>
-                </div>
+              {/* View Mode Toggle */}
+              <div className="inline-flex h-10 items-center rounded-lg bg-gray-100 p-1 border border-gray-200">
+                <button
+                  onClick={() => setLayoutMode("grid")}
+                  className={`px-5 py-2 rounded-md font-medium text-sm transition-all ${
+                    layoutMode === "grid"
+                      ? "text-white shadow-md"
+                      : "text-gray-700 hover:text-gray-900"
+                  }`}
+                  style={layoutMode === "grid" ? { backgroundColor: "#394a63" } : {}}
+                >
+                  Grid
+                </button>
+                <button
+                  onClick={() => setLayoutMode("kanban")}
+                  className={`px-5 py-2 rounded-md font-medium text-sm transition-all ${
+                    layoutMode === "kanban"
+                      ? "text-white shadow-md"
+                      : "text-gray-700 hover:text-gray-900"
+                  }`}
+                  style={layoutMode === "kanban" ? { backgroundColor: "#394a63" } : {}}
+                >
+                  Timeline
+                </button>
               </div>
               <button
                 onClick={() => setShowCreateModal(true)}
@@ -276,7 +274,7 @@ export default function RoomsManagement() {
                   <LayoutGrid className="w-5 h-5" />
                   <span className="absolute text-base font-bold -bottom-0.5 -right-0.5 text-white drop-shadow-lg">+</span>
                 </div>
-                <span className="absolute bottom-full mb-2 px-2 py-1 bg-gray-900 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap">
+                <span className="absolute top-full mt-2 px-2 py-1 bg-gray-900 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap">
                   Crear habitación
                 </span>
               </button>
