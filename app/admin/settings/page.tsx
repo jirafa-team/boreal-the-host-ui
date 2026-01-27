@@ -2025,8 +2025,7 @@ export default function SettingsPage() {
                       setIsCreatingRecommendation(true)
                       setNewRecommendationName('')
                     }}
-                    className="flex items-center justify-center w-12 h-12 rounded-full text-white shadow-md hover:shadow-lg transition-all duration-300 hover:scale-110 group relative"
-                    style={{ background: 'linear-gradient(135deg, #5ba000, #4a8500)' }}
+                    className="flex items-center justify-center w-12 h-12 rounded-full bg-gradient-to-br from-green-600 to-green-700 text-white shadow-md hover:shadow-lg transition-all duration-300 hover:scale-110 group relative"
                     title="Añadir Categoría"
                   >
                     <div className="relative flex items-center justify-center">
@@ -2061,21 +2060,19 @@ export default function SettingsPage() {
 
                 <div className="space-y-3">
                   {isCreatingRecommendation && (
-                    <div className="flex items-center gap-4 p-4 border-2 rounded-lg" style={{ borderColor: '#5ba000', backgroundColor: '#e8f5e0' }}>
+                    <div className="flex items-center gap-4 p-4 border-2 border-green-500 rounded-lg bg-green-50">
                       <input
                         type="text"
                         placeholder="Nombre de la categoría..."
                         value={newRecommendationName}
                         onChange={(e) => setNewRecommendationName(e.target.value)}
                         onKeyPress={(e) => e.key === 'Enter' && handleSaveNewRecommendation()}
-                        className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2"
-                        style={{ focusColor: '#5ba000' }}
+                        className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
                         autoFocus
                       />
                       <button
                         onClick={handleSaveNewRecommendation}
-                        className="px-4 py-2 text-white rounded-lg hover:opacity-90 transition-colors font-medium"
-                        style={{ backgroundColor: '#5ba000' }}
+                        className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-medium"
                       >
                         Guardar
                       </button>
@@ -2093,19 +2090,18 @@ export default function SettingsPage() {
                   {filteredRecommendations.map((recommendation) => (
                     <div key={recommendation.id}>
                       {editingRecommendationId === recommendation.id ? (
-                        <div className="flex items-center gap-4 p-4 border-2 rounded-lg" style={{ borderColor: '#5ba000', backgroundColor: '#e8f5e0' }}>
+                        <div className="flex items-center gap-4 p-4 border-2 border-green-500 rounded-lg bg-green-50">
                           <input
                             type="text"
                             value={editingRecommendationName}
                             onChange={(e) => setEditingRecommendationName(e.target.value)}
                             onKeyPress={(e) => e.key === 'Enter' && handleSaveRecommendationEdit()}
-                            className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2"
+                            className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
                             autoFocus
                           />
                           <button
                             onClick={handleSaveRecommendationEdit}
-                            className="px-4 py-2 text-white rounded-lg hover:opacity-90 transition-colors font-medium"
-                            style={{ backgroundColor: '#5ba000' }}
+                            className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-medium"
                           >
                             Guardar
                           </button>
