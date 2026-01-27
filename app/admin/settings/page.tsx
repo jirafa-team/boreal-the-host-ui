@@ -23,6 +23,7 @@ const gradientColors: { [key: string]: string } = {
   'from-pink-600 to-pink-700': 'linear-gradient(135deg, rgb(236, 72, 153), rgb(219, 39, 119))',
   'from-red-600 to-red-700': 'linear-gradient(135deg, rgb(220, 38, 38), rgb(185, 28, 28))',
   'from-yellow-600 to-yellow-700': 'linear-gradient(135deg, rgb(202, 138, 4), rgb(161, 98, 7))',
+  'from-green-600 to-green-700': 'linear-gradient(135deg, #5b9f00, #4a7f00)',
 }
 
 export default function SettingsPage() {
