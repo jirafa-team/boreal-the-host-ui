@@ -240,16 +240,6 @@ export default function RoomsManagement() {
               <p className="text-sm text-muted-foreground">{t("admin.manageYourRooms")}</p>
             </div>
             <div className="flex gap-4 items-center">
-              <button
-                onClick={() => setShowCreateModal(true)}
-                className="flex items-center justify-center w-12 h-12 rounded-full bg-gradient-to-br from-indigo-600 to-indigo-700 text-white shadow-md hover:shadow-lg transition-all duration-300 hover:scale-110 group relative"
-                title="Crear habitación"
-              >
-                <Plus className="w-6 h-6" />
-                <span className="absolute bottom-full mb-2 px-2 py-1 bg-gray-900 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap">
-                  Crear habitación
-                </span>
-              </button>
               <div className="flex gap-2">
                 {/* View Mode Toggle */}
                 <div className="inline-flex h-10 items-center rounded-lg bg-gray-100 p-1 border border-gray-200">
@@ -277,6 +267,19 @@ export default function RoomsManagement() {
                   </button>
                 </div>
               </div>
+              <button
+                onClick={() => setShowCreateModal(true)}
+                className="flex items-center justify-center w-10 h-10 rounded-full bg-gradient-to-br from-indigo-600 to-indigo-700 text-white shadow-md hover:shadow-lg transition-all duration-300 hover:scale-110 group relative"
+                title="Crear habitación"
+              >
+                <div className="relative flex items-center justify-center">
+                  <LayoutGrid className="w-5 h-5" />
+                  <span className="absolute text-base font-bold -bottom-0.5 -right-0.5 text-white drop-shadow-lg">+</span>
+                </div>
+                <span className="absolute bottom-full mb-2 px-2 py-1 bg-gray-900 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap">
+                  Crear habitación
+                </span>
+              </button>
             </div>
           </div>
         </div>
