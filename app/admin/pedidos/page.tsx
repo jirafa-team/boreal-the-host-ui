@@ -269,22 +269,6 @@ export default function PedidosPage() {
         </div>
       </div>
 
-        {/* View Mode Switcher */}
-        <div className="flex gap-2">
-          <Button variant={filter === "all" ? "default" : "outline"} onClick={() => setFilter("all")}>
-            Todos
-          </Button>
-          <Button variant={filter === "pending" ? "default" : "outline"} onClick={() => setFilter("pending")}>
-            Pendientes
-          </Button>
-          <Button variant={filter === "preparing" ? "default" : "outline"} onClick={() => setFilter("preparing")}>
-            En Preparación
-          </Button>
-          <Button variant={filter === "delivered" ? "default" : "outline"} onClick={() => setFilter("delivered")}>
-            Entregados
-          </Button>
-        </div>
-
         {/* Orders View - Kanban or List */}
         {viewMode === "kanban" ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -370,7 +354,7 @@ export default function PedidosPage() {
                         </Button>
                       )}
                       {order.status === "preparing" && (
-                        <Button size="sm" variant="default" className="flex-1">
+                        <Button size="sm" className="flex-1 text-white hover:opacity-90 border-0" style={{ backgroundColor: "#235E20" }}>
                           Marcar Entregado
                         </Button>
                       )}
