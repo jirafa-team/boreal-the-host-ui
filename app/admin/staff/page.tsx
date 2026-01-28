@@ -667,7 +667,7 @@ export default function StaffManagement() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
           {[
             { dept: "Limpieza", icon: Broom, color: "from-green-400 to-green-600", iconBg: "bg-green-600", textColor: "text-white" },
-            { dept: "Mantenimiento", icon: Wrench, color: "from-teal-500 to-blue-600", iconBg: "bg-teal-600", textColor: "text-white" },
+            { dept: "Mantenimiento", icon: Wrench, color: "from-yellow-500 to-yellow-600", iconBg: "bg-yellow-600", textColor: "text-white" },
             { dept: "Seguridad", icon: Shield, color: "from-blue-500 to-blue-700", iconBg: "bg-blue-700", textColor: "text-white" },
             { dept: "Recepción", icon: ReceiptText, color: "from-indigo-500 to-indigo-700", iconBg: "bg-indigo-700", textColor: "text-white" },
             { dept: "Servicio", icon: UtensilsCrossed, color: "from-violet-500 to-violet-700", iconBg: "bg-violet-700", textColor: "text-white" },
