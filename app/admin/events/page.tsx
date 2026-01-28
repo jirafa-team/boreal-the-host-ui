@@ -429,89 +429,149 @@ export default function EventsManagement() {
             </div>
           </Card>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filteredEvents.map((event) => {
-              const occupancyPercent = Math.round((event.registered / event.capacity) * 100)
-              const isNearCapacity = occupancyPercent >= 80
+          {viewMode === "list" && (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {filteredEvents.map((event) => {
+                const occupancyPercent = Math.round((event.registered / event.capacity) * 100)
+                const isNearCapacity = occupancyPercent >= 80
 
-              return (
-                <Card key={event.id} className="p-6 hover:shadow-lg transition-shadow flex flex-col overflow-hidden">
-                  {/* Chips de ubicación y fecha/hora en la parte superior */}
-                  <div className="flex gap-2 mb-4 flex-wrap">
-                    <Badge className="bg-violet-800 hover:bg-violet-900 text-white text-xs gap-1.5 flex items-center font-bold">
-                      <MapPin className="w-3.5 h-3.5" />
-                      {event.location}
-                    </Badge>
-                    <Badge className="bg-sky-100 hover:bg-sky-200 text-black text-xs font-bold gap-1.5 flex items-center">
-                      <Calendar className="w-3.5 h-3.5" />
-                      {new Date(event.date).toLocaleDateString("es-ES", {
-                        month: "short",
-                        day: "numeric",
-                      })}
-                      <span className="text-black/70">•</span>
-                      <Clock className="w-3.5 h-3.5" />
-                      {event.time}
-                    </Badge>
-                  </div>
-
-                  {/* Header con nombre y descripción */}
-                  <div className="mb-4">
-                    <h3 className="text-xl font-bold text-foreground">{event.name}</h3>
-                    <p className="text-sm text-muted-foreground mt-1 line-clamp-2">{event.description}</p>
-                  </div>
-
-                  {/* Ocupación */}
-                  <div className="space-y-2 mb-4 flex-grow">
-                    <div className="flex items-center justify-between text-sm">
-                      <span className="text-muted-foreground">Ocupación</span>
-                      <span className={`font-semibold ${isNearCapacity ? "text-orange-600" : "text-foreground"}`}>
-                        {event.registered}/{event.capacity} ({occupancyPercent}%)
-                      </span>
+                return (
+                  <Card key={event.id} className="p-6 hover:shadow-lg transition-shadow flex flex-col overflow-hidden">
+                    {/* Chips de ubicación y fecha/hora en la parte superior */}
+                    <div className="flex gap-2 mb-4 flex-wrap">
+                      <Badge className="bg-violet-800 hover:bg-violet-900 text-white text-xs gap-1.5 flex items-center font-bold">
+                        <MapPin className="w-3.5 h-3.5" />
+                        {event.location}
+                      </Badge>
+                      <Badge className="bg-sky-100 hover:bg-sky-200 text-black text-xs font-bold gap-1.5 flex items-center">
+                        <Calendar className="w-3.5 h-3.5" />
+                        {new Date(event.date).toLocaleDateString("es-ES", {
+                          month: "short",
+                          day: "numeric",
+                        })}
+                        <span className="text-black/70">•</span>
+                        <Clock className="w-3.5 h-3.5" />
+                        {event.time}
+                      </Badge>
                     </div>
-                    <div className="w-full h-1 bg-muted rounded-full overflow-hidden">
-                      <div
-                        className={`h-full transition-all ${isNearCapacity ? "bg-orange-500" : "bg-primary"}`}
-                        style={{ width: `${occupancyPercent}%` }}
-                      />
-                    </div>
-                  </div>
 
-                  {/* Botones de acción */}
-                  <div className="flex gap-2 mt-auto items-center justify-between">
-                    <button
-                      className="w-10 h-10 rounded-full bg-red-100 hover:bg-red-200 text-red-600 flex items-center justify-center transition-colors"
-                      title="Eliminar evento"
-                      onClick={() => {
-                        // TODO: Implementar lógica de eliminación
-                        console.log("Eliminar evento:", event.id)
-                      }}
-                    >
-                      <Trash2 className="w-5 h-5" />
-                    </button>
-                    <div className="flex gap-2">
+                    {/* Header con nombre y descripción */}
+                    <div className="mb-4">
+                      <h3 className="text-xl font-bold text-foreground">{event.name}</h3>
+                      <p className="text-sm text-muted-foreground mt-1 line-clamp-2">{event.description}</p>
+                    </div>
+
+                    {/* Ocupación */}
+                    <div className="space-y-2 mb-4 flex-grow">
+                      <div className="flex items-center justify-between text-sm">
+                        <span className="text-muted-foreground">Ocupación</span>
+                        <span className={`font-semibold ${isNearCapacity ? "text-orange-600" : "text-foreground"}`}>
+                          {event.registered}/{event.capacity} ({occupancyPercent}%)
+                        </span>
+                      </div>
+                      <div className="w-full h-1 bg-muted rounded-full overflow-hidden">
+                        <div
+                          className={`h-full transition-all ${isNearCapacity ? "bg-orange-500" : "bg-primary"}`}
+                          style={{ width: `${occupancyPercent}%` }}
+                        />
+                      </div>
+                    </div>
+
+                    {/* Botones de acción */}
+                    <div className="flex gap-2 mt-auto items-center justify-between">
                       <button
-                        className="w-10 h-10 rounded-full bg-blue-600 hover:bg-blue-700 text-white flex items-center justify-center transition-colors"
-                        onClick={() => router.push(`/admin/events/${event.id}`)}
-                        title="Ver detalles"
-                      >
-                        <Eye className="w-5 h-5" />
-                      </button>
-                      <button
-                        className="w-10 h-10 rounded-full bg-emerald-600 hover:bg-emerald-700 text-white flex items-center justify-center transition-colors"
+                        className="w-10 h-10 rounded-full bg-red-100 hover:bg-red-200 text-red-600 flex items-center justify-center transition-colors"
+                        title="Eliminar evento"
                         onClick={() => {
-                          setSelectedEventForPeople(event)
-                          setAddPeopleDialogOpen(true)
+                          // TODO: Implementar lógica de eliminación
+                          console.log("Eliminar evento:", event.id)
                         }}
-                        title="Agregar personas"
                       >
-                        <Users className="w-5 h-5" />
+                        <Trash2 className="w-5 h-5" />
                       </button>
+                      <div className="flex gap-2">
+                        <button
+                          className="w-10 h-10 rounded-full bg-blue-600 hover:bg-blue-700 text-white flex items-center justify-center transition-colors"
+                          onClick={() => router.push(`/admin/events/${event.id}`)}
+                          title="Ver detalles"
+                        >
+                          <Eye className="w-5 h-5" />
+                        </button>
+                        <button
+                          className="w-10 h-10 rounded-full bg-emerald-600 hover:bg-emerald-700 text-white flex items-center justify-center transition-colors"
+                          onClick={() => {
+                            setSelectedEventForPeople(event)
+                            setAddPeopleDialogOpen(true)
+                          }}
+                          title="Agregar personas"
+                        >
+                          <Users className="w-5 h-5" />
+                        </button>
+                      </div>
                     </div>
-                  </div>
-                </Card>
-              )
-            })}
-          </div>
+                  </Card>
+                )
+              })}
+            </div>
+          )}
+
+          {viewMode === "calendar" && (
+            <div className="bg-white rounded-lg border border-gray-200 p-6">
+              <div className="space-y-4">
+                {/* Calendar Grid Header */}
+                <div className="grid grid-cols-7 gap-2 mb-4">
+                  {["Dom", "Lun", "Mar", "Mié", "Jue", "Vie", "Sáb"].map((day) => (
+                    <div key={day} className="text-center font-bold text-sm text-muted-foreground py-2">
+                      {day}
+                    </div>
+                  ))}
+                </div>
+
+                {/* Calendar Days */}
+                <div className="grid grid-cols-7 gap-2">
+                  {Array.from({ length: 35 }).map((_, index) => {
+                    const date = new Date(2024, 10, 1)
+                    date.setDate(date.getDate() - date.getDay() + index)
+                    const dateStr = date.toISOString().split("T")[0]
+                    const dayEvents = filteredEvents.filter((e) => e.date === dateStr)
+                    const isCurrentMonth = date.getMonth() === 10
+
+                    return (
+                      <div
+                        key={index}
+                        className={`min-h-24 p-2 rounded-lg border ${
+                          isCurrentMonth
+                            ? "bg-white border-gray-200 hover:border-gray-300"
+                            : "bg-gray-50 border-gray-100"
+                        }`}
+                      >
+                        <div className={`text-sm font-semibold mb-1 ${isCurrentMonth ? "text-foreground" : "text-muted-foreground"}`}>
+                          {date.getDate()}
+                        </div>
+                        <div className="space-y-1">
+                          {dayEvents.slice(0, 2).map((event) => (
+                            <div
+                              key={event.id}
+                              className="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded cursor-pointer hover:bg-blue-200 truncate"
+                              onClick={() => router.push(`/admin/events/${event.id}`)}
+                              title={event.name}
+                            >
+                              {event.name}
+                            </div>
+                          ))}
+                          {dayEvents.length > 2 && (
+                            <div className="text-xs text-muted-foreground px-2">
+                              +{dayEvents.length - 2} más
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    )
+                  })}
+                </div>
+              </div>
+            </div>
+          )}
 
           {filteredEvents.length === 0 && (
             <Card className="p-12 text-center">
