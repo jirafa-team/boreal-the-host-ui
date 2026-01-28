@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { ChevronLeft, ChevronRight, Search, LayoutGrid, Calendar, Plus } from "lucide-react"
+import { ChevronLeft, ChevronRight, Search, LayoutGrid, Calendar, Plus, User } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -472,18 +472,21 @@ export default function RoomsManagement() {
 
                 <div className="space-y-2">
                   <div className="pt-2 border-t border-border">
-                    <p className="text-xs text-muted-foreground mb-1">{t("admin.roomGuestLabel")}</p>
-                    <button 
-                      onClick={() => {
-                        console.log("[v0] Guest clicked:", room.guest)
-                        // TODO: Add guest detail modal or navigation here
-                      }}
-                      className="text-sm font-medium text-foreground hover:text-primary hover:underline cursor-pointer transition-colors"
-                    >
-                      {room.guest}
-                    </button>
+                    <div className="flex items-center gap-2">
+                      <User className="w-4 h-4 text-muted-foreground" />
+                      <button 
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          // TODO: Add guest detail modal or navigation here
+                        }}
+                        className="text-sm font-medium text-foreground hover:text-primary hover:underline cursor-pointer transition-colors"
+                      >
+                        {room.guest}
+                      </button>
+                    </div>
                     {room.checkIn && room.checkOut && (
                       <div className="flex items-center gap-2 mt-2 text-xs text-muted-foreground">
+                        <Calendar className="w-3.5 h-3.5" />
                         <span>{new Date(room.checkIn).toLocaleDateString("es-ES")}</span>
                         <span>→</span>
                         <span>{new Date(room.checkOut).toLocaleDateString("es-ES")}</span>
