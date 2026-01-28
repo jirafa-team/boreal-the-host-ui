@@ -473,7 +473,18 @@ export default function RoomsManagement() {
                 <div className="space-y-2">
                   <div className="pt-2 border-t border-border">
                     <div className="flex items-center gap-2">
-                      <User className="w-4 h-4 text-muted-foreground" />
+                      <User 
+                        className="w-4 h-4" 
+                        style={{ 
+                          color: room.status === "available" 
+                            ? "#235E20" 
+                            : room.status === "occupied" 
+                              ? "#AA2C2C" 
+                              : room.status === "reserved" 
+                                ? "#1E3A8A" 
+                                : "#B45309" 
+                        }} 
+                      />
                       <button 
                         onClick={(e) => {
                           e.stopPropagation()
@@ -485,11 +496,22 @@ export default function RoomsManagement() {
                       </button>
                     </div>
                     {room.checkIn && room.checkOut && (
-                      <div className="flex items-center gap-2 mt-2 text-xs text-muted-foreground">
-                        <Calendar className="w-3.5 h-3.5" />
-                        <span>{new Date(room.checkIn).toLocaleDateString("es-ES")}</span>
-                        <span>→</span>
-                        <span>{new Date(room.checkOut).toLocaleDateString("es-ES")}</span>
+                      <div className="flex items-center gap-2 mt-2 text-xs">
+                        <Calendar 
+                          className="w-3.5 h-3.5" 
+                          style={{ 
+                            color: room.status === "available" 
+                              ? "#235E20" 
+                              : room.status === "occupied" 
+                                ? "#AA2C2C" 
+                                : room.status === "reserved" 
+                                  ? "#1E3A8A" 
+                                  : "#B45309" 
+                          }} 
+                        />
+                        <span className="text-muted-foreground">{new Date(room.checkIn).toLocaleDateString("es-ES")}</span>
+                        <span className="text-muted-foreground">→</span>
+                        <span className="text-muted-foreground">{new Date(room.checkOut).toLocaleDateString("es-ES")}</span>
                       </div>
                     )}
                   </div>
