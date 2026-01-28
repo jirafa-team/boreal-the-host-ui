@@ -438,7 +438,7 @@ export default function EventsManagement() {
                 <Card key={event.id} className="p-6 hover:shadow-lg transition-shadow flex flex-col overflow-hidden">
                   {/* Chips de ubicación y fecha/hora en la parte superior */}
                   <div className="flex gap-2 mb-4 flex-wrap">
-                    <Badge className="bg-violet-600 hover:bg-violet-700 text-white text-xs gap-1.5 flex items-center font-bold">
+                    <Badge className="bg-violet-800 hover:bg-violet-900 text-white text-xs gap-1.5 flex items-center font-bold">
                       <MapPin className="w-3.5 h-3.5" />
                       {event.location}
                     </Badge>
@@ -479,7 +479,7 @@ export default function EventsManagement() {
                   {/* Botones de acción */}
                   <div className="flex gap-2 mt-auto items-center justify-between">
                     <button
-                      className="w-10 h-10 rounded-full border-2 border-red-600 hover:bg-red-50 text-red-600 flex items-center justify-center transition-colors"
+                      className="w-10 h-10 rounded-full bg-red-100 hover:bg-red-200 text-red-600 flex items-center justify-center transition-colors"
                       title="Eliminar evento"
                       onClick={() => {
                         // TODO: Implementar lógica de eliminación
