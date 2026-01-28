@@ -669,7 +669,7 @@ export default function StaffManagement() {
             { dept: "Limpieza", icon: Broom, color: "from-green-400 to-green-600", iconBg: "bg-green-600", textColor: "text-white" },
             { dept: "Mantenimiento", icon: Wrench, color: "from-yellow-500 to-yellow-600", iconBg: "bg-yellow-600", textColor: "text-white" },
             { dept: "Seguridad", icon: Shield, color: "from-red-600 to-red-700", iconBg: "bg-red-700", textColor: "text-white" },
-            { dept: "Recepción", icon: ReceiptText, color: "from-indigo-500 to-indigo-700", iconBg: "bg-indigo-700", textColor: "text-white" },
+            { dept: "Recepción", icon: ReceiptText, color: "from-pink-600 to-pink-700", iconBg: "bg-pink-700", textColor: "text-white" },
             { dept: "Servicio", icon: UtensilsCrossed, color: "from-violet-500 to-violet-700", iconBg: "bg-violet-700", textColor: "text-white" },
           ].map((deptInfo) => {
             const deptStaff = staff.filter((s) => s.department === deptInfo.dept)
