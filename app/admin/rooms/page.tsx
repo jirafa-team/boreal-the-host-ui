@@ -317,7 +317,13 @@ export default function RoomsManagement() {
             <Card 
               onClick={() => setStatusFilter("available")}
               className={`p-4 bg-gradient-to-br to-white text-center cursor-pointer transition-all ${statusFilter === "available" ? 'ring-2 shadow-lg' : 'hover:shadow-md'}`}
-              style={{ backgroundImage: statusFilter === "available" ? "linear-gradient(135deg, rgba(35, 94, 32, 0.3), rgba(35, 94, 32, 0.1))" : "linear-gradient(135deg, rgba(35, 94, 32, 0.1), white)", ringColor: "#235E20" }}
+              style={{ 
+                backgroundImage: statusFilter === "available" ? "linear-gradient(135deg, rgba(35, 94, 32, 0.3), rgba(35, 94, 32, 0.1))" : "linear-gradient(135deg, rgba(35, 94, 32, 0.1), white)",
+                outlineWidth: statusFilter === "available" ? "2px" : "0px",
+                outlineStyle: statusFilter === "available" ? "solid" : "none",
+                outlineColor: "#235E20",
+                borderRadius: "inherit"
+              }}
             >
               <p className="text-6xl font-bold mb-1" style={{ color: "#235E20" }}>{stats.available}</p>
               <p className="text-xs text-muted-foreground font-medium">{t("admin.availableRooms")}</p>
@@ -325,7 +331,13 @@ export default function RoomsManagement() {
             <Card 
               onClick={() => setStatusFilter("occupied")}
               className={`p-4 bg-gradient-to-br to-white text-center cursor-pointer transition-all ${statusFilter === "occupied" ? 'ring-2 shadow-lg' : 'hover:shadow-md'}`}
-              style={{ backgroundImage: statusFilter === "occupied" ? "linear-gradient(135deg, rgba(170, 44, 44, 0.3), rgba(170, 44, 44, 0.1))" : "linear-gradient(135deg, rgba(170, 44, 44, 0.1), white)", ringColor: "#AA2C2C" }}
+              style={{ 
+                backgroundImage: statusFilter === "occupied" ? "linear-gradient(135deg, rgba(170, 44, 44, 0.3), rgba(170, 44, 44, 0.1))" : "linear-gradient(135deg, rgba(170, 44, 44, 0.1), white)",
+                outlineWidth: statusFilter === "occupied" ? "2px" : "0px",
+                outlineStyle: statusFilter === "occupied" ? "solid" : "none",
+                outlineColor: "#AA2C2C",
+                borderRadius: "inherit"
+              }}
             >
               <p className="text-6xl font-bold mb-1" style={{ color: "#AA2C2C" }}>{stats.occupied}</p>
               <p className="text-xs text-muted-foreground font-medium">{t("admin.occupiedRooms")}</p>
