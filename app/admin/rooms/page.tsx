@@ -306,23 +306,23 @@ export default function RoomsManagement() {
         {layoutMode === "grid" && (
           <div className="grid grid-cols-2 md:grid-cols-5 gap-3 mb-6">
             <Card className="p-4 bg-gradient-to-br from-blue-50 to-white text-center">
-              <p className="text-5xl font-bold text-blue-600 mb-1">{stats.total}</p>
+              <p className="text-6xl font-bold text-blue-600 mb-1">{stats.total}</p>
               <p className="text-xs text-muted-foreground font-medium">{t("admin.totalRooms")}</p>
             </Card>
             <Card className="p-4 bg-gradient-to-br to-white text-center" style={{ backgroundImage: "linear-gradient(135deg, rgba(35, 94, 32, 0.1), white)" }}>
-              <p className="text-5xl font-bold mb-1" style={{ color: "#235E20" }}>{stats.available}</p>
+              <p className="text-6xl font-bold mb-1" style={{ color: "#235E20" }}>{stats.available}</p>
               <p className="text-xs text-muted-foreground font-medium">{t("admin.availableRooms")}</p>
             </Card>
             <Card className="p-4 bg-gradient-to-br to-white text-center" style={{ backgroundImage: "linear-gradient(135deg, rgba(170, 44, 44, 0.1), white)" }}>
-              <p className="text-5xl font-bold mb-1" style={{ color: "#AA2C2C" }}>{stats.occupied}</p>
+              <p className="text-6xl font-bold mb-1" style={{ color: "#AA2C2C" }}>{stats.occupied}</p>
               <p className="text-xs text-muted-foreground font-medium">{t("admin.occupiedRooms")}</p>
             </Card>
             <Card className="p-4 bg-gradient-to-br from-blue-100 to-white text-center">
-              <p className="text-5xl font-bold text-blue-700 mb-1">{stats.reserved}</p>
+              <p className="text-6xl font-bold text-blue-700 mb-1">{stats.reserved}</p>
               <p className="text-xs text-muted-foreground font-medium">{t("admin.reservedRooms")}</p>
             </Card>
             <Card className="p-4 bg-gradient-to-br from-yellow-50 to-white text-center">
-              <p className="text-5xl font-bold text-yellow-600 mb-1">{stats.maintenance}</p>
+              <p className="text-6xl font-bold text-yellow-600 mb-1">{stats.maintenance}</p>
               <p className="text-xs text-muted-foreground font-medium">{t("admin.maintenanceRooms")}</p>
             </Card>
           </div>
