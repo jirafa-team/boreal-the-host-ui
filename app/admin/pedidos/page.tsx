@@ -4,12 +4,13 @@ import { useState } from "react"
 import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { Clock, CheckCircle2, User, MapPin, ChefHat, Utensils, AlertTriangle, AlertCircle, Grid3x3, Table, ShoppingCart } from "lucide-react"
+import { Clock, CheckCircle2, User, MapPin, ChefHat, Utensils, AlertTriangle, AlertCircle, Grid3x3, Table, ShoppingCart, ChevronLeft, ChevronRight } from "lucide-react"
 
 export default function PedidosPage() {
   const [filter, setFilter] = useState<"all" | "pending" | "preparing" | "delivered">("all")
   const [viewMode, setViewMode] = useState<"kanban" | "list">("kanban")
   const [showNewOrderModal, setShowNewOrderModal] = useState(false)
+  const [selectedDate, setSelectedDate] = useState(new Date(2024, 0, 13)) // 2024-01-13
 
   const orders = [
     {
@@ -87,6 +88,27 @@ export default function PedidosPage() {
 
   const filteredOrders = filter === "all" ? orders : orders.filter((o) => o.status === filter)
 
+  const handlePreviousDay = () => {
+    const newDate = new Date(selectedDate)
+    newDate.setDate(newDate.getDate() - 1)
+    setSelectedDate(newDate)
+  }
+
+  const handleNextDay = () => {
+    const newDate = new Date(selectedDate)
+    newDate.setDate(newDate.getDate() + 1)
+    setSelectedDate(newDate)
+  }
+
+  const handleToday = () => {
+    setSelectedDate(new Date(2024, 0, 13)) // Current date in the system
+  }
+
+  const formatDate = (date: Date) => {
+    const options: Intl.DateTimeFormatOptions = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }
+    return date.toLocaleDateString('es-ES', options)
+  }
+
   const getStatusBadge = (status: string) => {
     const statusConfig = {
       pending: { label: "Pendiente", badgeClass: "bg-gray-600 text-white", bgColor: "bg-yellow-50" },
@@ -129,6 +151,29 @@ export default function PedidosPage() {
               <p className="text-sm text-muted-foreground">Gestiona las órdenes de comida a las habitaciones</p>
             </div>
             <div className="flex gap-4 items-center ml-auto">
+              {/* Date Navigation */}
+              <div className="flex items-center gap-3 px-4 py-2 bg-gray-50 rounded-lg border border-gray-200">
+                <button
+                  onClick={handlePreviousDay}
+                  className="p-1 hover:bg-gray-200 rounded transition-colors"
+                  title="Día anterior"
+                >
+                  <ChevronLeft className="w-5 h-5 text-gray-600" />
+                </button>
+                <button
+                  onClick={handleToday}
+                  className="text-sm font-medium text-gray-700 hover:text-gray-900 transition-colors min-w-max"
+                >
+                  {formatDate(selectedDate)}
+                </button>
+                <button
+                  onClick={handleNextDay}
+                  className="p-1 hover:bg-gray-200 rounded transition-colors"
+                  title="Día siguiente"
+                >
+                  <ChevronRight className="w-5 h-5 text-gray-600" />
+                </button>
+              </div>
               {/* View Mode Toggle */}
               <div className="inline-flex h-10 items-center rounded-lg bg-gray-100 p-1 border border-gray-200">
                 <button
