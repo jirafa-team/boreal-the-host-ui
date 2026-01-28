@@ -403,7 +403,7 @@ export default function RoomsManagement() {
             <div 
               onClick={() => setStatusFilter("maintenance")}
               className={`p-4 relative rounded-3xl shadow-2xl text-center cursor-pointer transition-all overflow-hidden ${statusFilter === "maintenance" ? 'text-white' : 'bg-white/95 backdrop-blur-lg hover:shadow-lg'}`}
-              style={statusFilter === "maintenance" ? { backgroundColor: "#B45309" } : {}}
+              style={statusFilter === "maintenance" ? { backgroundColor: "#CA8A04" } : {}}
             >
               {statusFilter === "maintenance" && (
                 <div className="absolute -top-16 -right-16 w-28 h-28 rounded-full" style={{ backgroundColor: "rgba(255, 255, 255, 0.2)" }} />
