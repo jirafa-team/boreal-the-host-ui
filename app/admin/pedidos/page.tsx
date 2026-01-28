@@ -8,7 +8,7 @@ import { Clock, CheckCircle2, User, MapPin, ChefHat, Utensils, AlertTriangle, Al
 
 export default function PedidosPage() {
   const [filter, setFilter] = useState<"all" | "pending" | "preparing" | "delivered">("all")
-  const [viewMode, setViewMode] = useState<"cards" | "table">("cards")
+  const [viewMode, setViewMode] = useState<"kanban" | "list">("kanban")
   const [showNewOrderModal, setShowNewOrderModal] = useState(false)
 
   const orders = [
@@ -250,8 +250,8 @@ export default function PedidosPage() {
         </Button>
       </div>
 
-      {/* Orders View - Cards or Table */}
-      {viewMode === "cards" ? (
+      {/* Orders View - Kanban or List */}
+      {viewMode === "kanban" ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {filteredOrders.map((order) => {
             const statusBadge = getStatusBadge(order.status)
