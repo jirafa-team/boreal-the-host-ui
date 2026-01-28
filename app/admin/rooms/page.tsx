@@ -316,13 +316,11 @@ export default function RoomsManagement() {
             </Card>
             <Card 
               onClick={() => setStatusFilter("available")}
-              className={`p-4 bg-gradient-to-br to-white text-center cursor-pointer transition-all ${statusFilter === "available" ? 'ring-2 shadow-lg' : 'hover:shadow-md'}`}
+              className={`p-4 bg-gradient-to-br to-white text-center cursor-pointer transition-all ${statusFilter === "available" ? 'shadow-lg' : 'hover:shadow-md'}`}
               style={{ 
                 backgroundImage: statusFilter === "available" ? "linear-gradient(135deg, rgba(35, 94, 32, 0.3), rgba(35, 94, 32, 0.1))" : "linear-gradient(135deg, rgba(35, 94, 32, 0.1), white)",
-                outlineWidth: statusFilter === "available" ? "2px" : "0px",
-                outlineStyle: statusFilter === "available" ? "solid" : "none",
-                outlineColor: "#235E20",
-                borderRadius: "inherit"
+                border: statusFilter === "available" ? "2px solid #235E20" : "none",
+                boxShadow: statusFilter === "available" ? "0 0 0 3px rgba(35, 94, 32, 0.1), 0 10px 15px -3px rgba(0, 0, 0, 0.1)" : "none"
               }}
             >
               <p className="text-6xl font-bold mb-1" style={{ color: "#235E20" }}>{stats.available}</p>
@@ -330,13 +328,11 @@ export default function RoomsManagement() {
             </Card>
             <Card 
               onClick={() => setStatusFilter("occupied")}
-              className={`p-4 bg-gradient-to-br to-white text-center cursor-pointer transition-all ${statusFilter === "occupied" ? 'ring-2 shadow-lg' : 'hover:shadow-md'}`}
+              className={`p-4 bg-gradient-to-br to-white text-center cursor-pointer transition-all ${statusFilter === "occupied" ? 'shadow-lg' : 'hover:shadow-md'}`}
               style={{ 
                 backgroundImage: statusFilter === "occupied" ? "linear-gradient(135deg, rgba(170, 44, 44, 0.3), rgba(170, 44, 44, 0.1))" : "linear-gradient(135deg, rgba(170, 44, 44, 0.1), white)",
-                outlineWidth: statusFilter === "occupied" ? "2px" : "0px",
-                outlineStyle: statusFilter === "occupied" ? "solid" : "none",
-                outlineColor: "#AA2C2C",
-                borderRadius: "inherit"
+                border: statusFilter === "occupied" ? "2px solid #AA2C2C" : "none",
+                boxShadow: statusFilter === "occupied" ? "0 0 0 3px rgba(170, 44, 44, 0.1), 0 10px 15px -3px rgba(0, 0, 0, 0.1)" : "none"
               }}
             >
               <p className="text-6xl font-bold mb-1" style={{ color: "#AA2C2C" }}>{stats.occupied}</p>
