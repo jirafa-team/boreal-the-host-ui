@@ -511,7 +511,7 @@ export default function RoomsManagement() {
                     {room.checkIn && room.checkOut && (
                       <div className="flex items-center gap-2 mt-2 text-xs">
                         <div 
-                          className="w-5 h-5 rounded-full flex items-center justify-center"
+                          className="w-6 h-6 rounded-full flex items-center justify-center"
                           style={{ 
                             backgroundColor: room.status === "available" 
                               ? "rgba(35, 94, 32, 0.15)" 
@@ -523,7 +523,7 @@ export default function RoomsManagement() {
                           }}
                         >
                           <Calendar 
-                            className="w-3 h-3" 
+                            className="w-3.5 h-3.5" 
                             style={{ 
                               color: room.status === "available" 
                                 ? "#235E20" 
