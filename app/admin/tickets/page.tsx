@@ -479,6 +479,7 @@ export default function TicketsPage() {
           )
         })}
       </div>
+      </div>
     </div>
   )
 }
