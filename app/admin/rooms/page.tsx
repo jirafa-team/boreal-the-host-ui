@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { useLanguage } from "@/lib/i18n-context"
+import { useToast } from "@/hooks/use-toast"
 
 type RoomStatus = "available" | "occupied" | "maintenance" | "reserved"
 
@@ -24,6 +25,7 @@ type ViewMode = "day" | "week" | "month"
 type LayoutMode = "grid" | "kanban"
 
 export default function RoomsManagement() {
+  const { toast } = useToast()
   const [viewMode, setViewMode] = useState<ViewMode>("week")
   const [layoutMode, setLayoutMode] = useState<LayoutMode>("grid")
   const [timelineMode, setTimelineMode] = useState<"week" | "month">("week")
@@ -95,6 +97,17 @@ export default function RoomsManagement() {
 
   const handleCreateRoom = () => {
     if (newRoom.number.trim()) {
+      // Check if room number already exists
+      const roomExists = rooms.some(r => r.number.toLowerCase() === newRoom.number.toLowerCase())
+      if (roomExists) {
+        toast({
+          title: "Error",
+          description: `La habitación número ${newRoom.number} ya existe.`,
+          variant: "destructive"
+        })
+        return
+      }
+      
       const newId = (Math.max(...rooms.map(r => parseInt(r.id) || 0), 0) + 1).toString()
       setRooms([...rooms, {
         id: newId,
@@ -105,6 +118,10 @@ export default function RoomsManagement() {
       }]);
       setNewRoom({ number: "", type: "Individual", floor: 1 });
       setShowCreateModal(false);
+      toast({
+        title: "Éxito",
+        description: `Habitación ${newRoom.number} creada correctamente.`,
+      })
     }
   }
 
