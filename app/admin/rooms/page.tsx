@@ -309,12 +309,12 @@ export default function RoomsManagement() {
               <p className="text-5xl font-bold text-blue-600 mb-1">{stats.total}</p>
               <p className="text-xs text-muted-foreground font-medium">{t("admin.totalRooms")}</p>
             </Card>
-            <Card className="p-4 bg-gradient-to-br from-green-50 to-white text-center">
-              <p className="text-5xl font-bold text-green-600 mb-1">{stats.available}</p>
+            <Card className="p-4 bg-gradient-to-br to-white text-center" style={{ backgroundImage: "linear-gradient(135deg, rgba(35, 94, 32, 0.1), white)" }}>
+              <p className="text-5xl font-bold mb-1" style={{ color: "#235E20" }}>{stats.available}</p>
               <p className="text-xs text-muted-foreground font-medium">{t("admin.availableRooms")}</p>
             </Card>
-            <Card className="p-4 bg-gradient-to-br from-red-50 to-white text-center">
-              <p className="text-5xl font-bold text-red-600 mb-1">{stats.occupied}</p>
+            <Card className="p-4 bg-gradient-to-br to-white text-center" style={{ backgroundImage: "linear-gradient(135deg, rgba(170, 44, 44, 0.1), white)" }}>
+              <p className="text-5xl font-bold mb-1" style={{ color: "#AA2C2C" }}>{stats.occupied}</p>
               <p className="text-xs text-muted-foreground font-medium">{t("admin.occupiedRooms")}</p>
             </Card>
             <Card className="p-4 bg-gradient-to-br from-blue-100 to-white text-center">
@@ -359,13 +359,20 @@ export default function RoomsManagement() {
                   <div
                     className={`px-3 py-1.5 rounded-lg text-xs font-medium text-white shrink-0 ${
                       room.status === "available"
-                        ? "bg-green-600"
+                        ? "bg-blue-600"
                         : room.status === "occupied"
-                          ? "bg-red-600"
+                          ? "bg-blue-600"
                           : room.status === "reserved"
                             ? "bg-blue-600"
                             : "bg-yellow-600"
                     }`}
+                    style={
+                      room.status === "available"
+                        ? { backgroundColor: "#235E20" }
+                        : room.status === "occupied"
+                          ? { backgroundColor: "#AA2C2C" }
+                          : undefined
+                    }
                   >
                     {getStatusLabel(room.status)}
                   </div>
