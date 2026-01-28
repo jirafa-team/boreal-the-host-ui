@@ -312,7 +312,7 @@ export default function RoomsManagement() {
               style={statusFilter === null ? { backgroundColor: "#1E40AF" } : {}}
             >
               {statusFilter === null && (
-                <div className="absolute -top-16 -right-16 w-40 h-40 rounded-full" style={{ backgroundColor: "rgba(255, 255, 255, 0.2)" }} />
+                <div className="absolute -top-16 -right-16 w-28 h-28 rounded-full" style={{ backgroundColor: "rgba(255, 255, 255, 0.2)" }} />
               )}
               <div className="relative z-10">
                 <p className={`text-6xl font-bold mb-1 ${statusFilter === null ? 'text-white' : 'text-blue-600'}`}>{stats.total}</p>
@@ -325,7 +325,7 @@ export default function RoomsManagement() {
               style={statusFilter === "available" ? { backgroundColor: "#235E20" } : {}}
             >
               {statusFilter === "available" && (
-                <div className="absolute -top-16 -right-16 w-40 h-40 rounded-full" style={{ backgroundColor: "rgba(255, 255, 255, 0.2)" }} />
+                <div className="absolute -top-16 -right-16 w-28 h-28 rounded-full" style={{ backgroundColor: "rgba(255, 255, 255, 0.2)" }} />
               )}
               <div className="relative z-10">
                 <p className={`text-6xl font-bold mb-1 ${statusFilter === "available" ? 'text-white' : ''}`} style={statusFilter !== "available" ? { color: "#235E20" } : {}}>{stats.available}</p>
@@ -338,7 +338,7 @@ export default function RoomsManagement() {
               style={statusFilter === "occupied" ? { backgroundColor: "#AA2C2C" } : {}}
             >
               {statusFilter === "occupied" && (
-                <div className="absolute -top-16 -right-16 w-40 h-40 rounded-full" style={{ backgroundColor: "rgba(255, 255, 255, 0.2)" }} />
+                <div className="absolute -top-16 -right-16 w-28 h-28 rounded-full" style={{ backgroundColor: "rgba(255, 255, 255, 0.2)" }} />
               )}
               <div className="relative z-10">
                 <p className={`text-6xl font-bold mb-1 ${statusFilter === "occupied" ? 'text-white' : ''}`} style={statusFilter !== "occupied" ? { color: "#AA2C2C" } : {}}>{stats.occupied}</p>
@@ -351,7 +351,7 @@ export default function RoomsManagement() {
               style={statusFilter === "reserved" ? { backgroundColor: "#1E3A8A" } : {}}
             >
               {statusFilter === "reserved" && (
-                <div className="absolute -top-16 -right-16 w-40 h-40 rounded-full" style={{ backgroundColor: "rgba(255, 255, 255, 0.2)" }} />
+                <div className="absolute -top-16 -right-16 w-28 h-28 rounded-full" style={{ backgroundColor: "rgba(255, 255, 255, 0.2)" }} />
               )}
               <div className="relative z-10">
                 <p className={`text-6xl font-bold mb-1 ${statusFilter === "reserved" ? 'text-white' : 'text-blue-700'}`}>{stats.reserved}</p>
@@ -364,7 +364,7 @@ export default function RoomsManagement() {
               style={statusFilter === "maintenance" ? { backgroundColor: "#B45309" } : {}}
             >
               {statusFilter === "maintenance" && (
-                <div className="absolute -top-16 -right-16 w-40 h-40 rounded-full" style={{ backgroundColor: "rgba(255, 255, 255, 0.2)" }} />
+                <div className="absolute -top-16 -right-16 w-28 h-28 rounded-full" style={{ backgroundColor: "rgba(255, 255, 255, 0.2)" }} />
               )}
               <div className="relative z-10">
                 <p className={`text-6xl font-bold mb-1 ${statusFilter === "maintenance" ? 'text-white' : 'text-yellow-600'}`}>{stats.maintenance}</p>
