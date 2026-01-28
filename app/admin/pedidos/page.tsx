@@ -10,6 +10,9 @@ export default function PedidosPage() {
   const [filter, setFilter] = useState<"all" | "pending" | "preparing" | "delivered">("all")
   const [viewMode, setViewMode] = useState<"kanban" | "list">("kanban")
   const [showNewOrderModal, setShowNewOrderModal] = useState(false)
+  const [searchDate, setSearchDate] = useState("2024-01-13")
+  const [searchGuest, setSearchGuest] = useState("")
+  const [searchRoom, setSearchRoom] = useState("")
 
   const orders = [
     {
@@ -86,6 +89,14 @@ export default function PedidosPage() {
   ]
 
   const filteredOrders = filter === "all" ? orders : orders.filter((o) => o.status === filter)
+
+  const searchFilteredOrders = filteredOrders.filter((order) => {
+    const orderDate = order.orderedAt.split(" ")[0]
+    const dateMatch = !searchDate || orderDate === searchDate
+    const guestMatch = !searchGuest || order.guest.toLowerCase().includes(searchGuest.toLowerCase())
+    const roomMatch = !searchRoom || order.room.includes(searchRoom)
+    return dateMatch && guestMatch && roomMatch
+  })
 
   const getStatusBadge = (status: string) => {
     const statusConfig = {
@@ -269,6 +280,41 @@ export default function PedidosPage() {
         </div>
       </div>
 
+      {/* Search Section */}
+      <div className="mb-6 p-4 bg-white rounded-lg border border-gray-200 shadow-sm">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Fecha</label>
+            <input
+              type="date"
+              value={searchDate}
+              onChange={(e) => setSearchDate(e.target.value)}
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Huésped</label>
+            <input
+              type="text"
+              placeholder="Buscar por nombre..."
+              value={searchGuest}
+              onChange={(e) => setSearchGuest(e.target.value)}
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Nro Habitación</label>
+            <input
+              type="text"
+              placeholder="Ej: 204"
+              value={searchRoom}
+              onChange={(e) => setSearchRoom(e.target.value)}
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+          </div>
+        </div>
+      </div>
+
         {/* Orders View - Kanban or List */}
         {viewMode === "kanban" ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -380,7 +426,7 @@ export default function PedidosPage() {
                 </tr>
               </thead>
               <tbody className="divide-y">
-                {filteredOrders.map((order) => {
+            {searchFilteredOrders.map((order) => {
                   const statusBadge = getStatusBadge(order.status)
                   const delayIndicator = getDelayIndicator(order.delayStatus)
 
