@@ -108,10 +108,11 @@ export default function RoomsManagement() {
         return
       }
       
+      const roomNumber = newRoom.number
       const newId = (Math.max(...rooms.map(r => parseInt(r.id) || 0), 0) + 1).toString()
       setRooms([...rooms, {
         id: newId,
-        number: newRoom.number,
+        number: roomNumber,
         type: newRoom.type,
         floor: newRoom.floor,
         status: "available"
@@ -120,7 +121,7 @@ export default function RoomsManagement() {
       setShowCreateModal(false);
       toast({
         title: "Éxito",
-        description: `Habitación ${newRoom.number} creada correctamente.`,
+        description: `Habitación ${roomNumber} creada correctamente.`,
       })
     }
   }
