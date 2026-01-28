@@ -156,56 +156,54 @@ export default function TicketsPage() {
   }
 
   return (
-    <div className="p-8 space-y-6">
-      {/* Sticky Navigation Bar with rounded borders */}
-      <div className="sticky top-4 z-40 mx-4">
-        <div className="bg-white rounded-lg shadow-lg border border-gray-200">
-          <div className="px-8 py-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <h1 className="text-2xl font-bold text-foreground">Tickets de Soporte</h1>
-                <p className="text-sm text-muted-foreground">Gestiona los reportes y solicitudes de los huéspedes</p>
-              </div>
-              <div className="flex gap-4 items-center ml-auto">
-                <Dialog>
-                  <DialogTrigger asChild>
-                    <button 
-                      className="flex items-center justify-center w-10 h-10 rounded-full bg-gradient-to-br from-primary to-primary/80 text-white shadow-md hover:shadow-lg transition-all duration-300 hover:scale-110 group relative"
-                      title="Nuevo ticket"
-                    >
-                      <TicketPlus className="w-5 h-5" />
-                      <span className="absolute top-full mt-2 px-2 py-1 bg-gray-900 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap">
-                        Nuevo Ticket
-                      </span>
-                    </button>
-                  </DialogTrigger>
-                  <DialogContent>
-                    <DialogHeader>
-                      <DialogTitle>Crear Nuevo Ticket</DialogTitle>
-                      <DialogDescription>Registra un nuevo ticket de soporte</DialogDescription>
-                    </DialogHeader>
-                    <div className="space-y-4 py-4">
-                      <div>
-                        <Label htmlFor="ticket-title">Título</Label>
-                        <Input id="ticket-title" placeholder="Ej: Aire acondicionado no funciona" />
-                      </div>
-                      <div>
-                        <Label htmlFor="ticket-description">Descripción</Label>
-                        <Input id="ticket-description" placeholder="Describe el problema..." />
-                      </div>
-                      <div>
-                        <Label htmlFor="ticket-category">Categoría</Label>
-                        <Input id="ticket-category" placeholder="Ej: Mantenimiento" />
-                      </div>
-                    </div>
-                    <Button className="w-full">Crear Ticket</Button>
-                  </DialogContent>
-                </Dialog>
-              </div>
-            </div>
+    <div className="p-8">
+      {/* Header */}
+      <header className="bg-card border-b border-border sticky top-0 z-10 -mx-8 -mt-8 px-8 py-4 mb-8">
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-2xl font-bold text-foreground">Tickets de Soporte</h1>
+            <p className="text-sm text-muted-foreground">Gestiona los reportes y solicitudes de los huéspedes</p>
+          </div>
+          <div className="flex gap-4 items-center ml-auto">
+            <Dialog>
+              <DialogTrigger asChild>
+                <button 
+                  className="flex items-center justify-center w-10 h-10 rounded-full bg-gradient-to-br from-primary to-primary/80 text-white shadow-md hover:shadow-lg transition-all duration-300 hover:scale-110 group relative"
+                  title="Nuevo ticket"
+                >
+                  <TicketPlus className="w-5 h-5" />
+                  <span className="absolute top-full mt-2 px-2 py-1 bg-gray-900 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap">
+                    Nuevo Ticket
+                  </span>
+                </button>
+              </DialogTrigger>
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle>Crear Nuevo Ticket</DialogTitle>
+                  <DialogDescription>Registra un nuevo ticket de soporte</DialogDescription>
+                </DialogHeader>
+                <div className="space-y-4 py-4">
+                  <div>
+                    <Label htmlFor="ticket-title">Título</Label>
+                    <Input id="ticket-title" placeholder="Ej: Aire acondicionado no funciona" />
+                  </div>
+                  <div>
+                    <Label htmlFor="ticket-description">Descripción</Label>
+                    <Input id="ticket-description" placeholder="Describe el problema..." />
+                  </div>
+                  <div>
+                    <Label htmlFor="ticket-category">Categoría</Label>
+                    <Input id="ticket-category" placeholder="Ej: Mantenimiento" />
+                  </div>
+                </div>
+                <Button className="w-full">Crear Ticket</Button>
+              </DialogContent>
+            </Dialog>
           </div>
         </div>
-      </div>
+      </header>
+
+      <div className="space-y-6">
 
       {/* Stats as Filters */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
@@ -464,7 +462,7 @@ export default function TicketsPage() {
                     style={{ backgroundColor: "#235E20" }}
                     onClick={() => {
                       setSelectedTicketId(ticket.id)
-                      handleCompleteTicket()
+                      setShowCompleteDialog(true)
                     }}
                   >
                     <CheckCircle className="w-4 h-4 mr-1" />
