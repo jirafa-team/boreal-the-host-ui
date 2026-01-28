@@ -442,7 +442,7 @@ export default function EventsManagement() {
                       <MapPin className="w-3.5 h-3.5" />
                       {event.location}
                     </Badge>
-                    <Badge className="bg-sky-100 hover:bg-sky-200 text-black text-xs font-bold gap-1.5 flex items-center border-sky-200">
+                    <Badge className="bg-sky-100 hover:bg-sky-200 text-black text-xs font-bold gap-1.5 flex items-center">
                       <Calendar className="w-3.5 h-3.5" />
                       {new Date(event.date).toLocaleDateString("es-ES", {
                         month: "short",
@@ -477,44 +477,24 @@ export default function EventsManagement() {
                   </div>
 
                   {/* Botones de acción */}
-                  <div className="flex gap-2 mt-auto flex-col">
-                    <div className="flex gap-2">
-                      <Button
-                        size="sm"
-                        className="flex-1 gap-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg"
-                        onClick={() => router.push(`/admin/events/${event.id}`)}
-                      >
-                        <Eye className="w-4 h-4" />
-                        Ver Detalles
-                      </Button>
-                      <Button
-                        size="sm"
-                        className="flex-1 gap-2 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold rounded-lg"
-                        onClick={() => {
-                          setSelectedEventForPeople(event)
-                          setAddPeopleDialogOpen(true)
-                        }}
-                      >
-                        <Users className="w-4 h-4" />
-                        Agregar Personas
-                      </Button>
-                    </div>
-                    <div className="flex gap-2">
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        className="flex-1 gap-2 bg-transparent"
-                      >
-                        <Edit className="w-4 h-4" />
-                      </Button>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        className="flex-1 gap-2 text-destructive hover:text-destructive bg-transparent"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </Button>
-                    </div>
+                  <div className="flex gap-2 mt-auto items-center justify-end">
+                    <button
+                      className="w-10 h-10 rounded-full bg-blue-600 hover:bg-blue-700 text-white flex items-center justify-center transition-colors"
+                      onClick={() => router.push(`/admin/events/${event.id}`)}
+                      title="Ver detalles"
+                    >
+                      <Eye className="w-5 h-5" />
+                    </button>
+                    <button
+                      className="w-10 h-10 rounded-full bg-emerald-600 hover:bg-emerald-700 text-white flex items-center justify-center transition-colors"
+                      onClick={() => {
+                        setSelectedEventForPeople(event)
+                        setAddPeopleDialogOpen(true)
+                      }}
+                      title="Agregar personas"
+                    >
+                      <Users className="w-5 h-5" />
+                    </button>
                   </div>
                 </Card>
               )
