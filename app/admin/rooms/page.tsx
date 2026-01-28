@@ -473,18 +473,31 @@ export default function RoomsManagement() {
                 <div className="space-y-2">
                   <div className="pt-2 border-t border-border">
                     <div className="flex items-center gap-2">
-                      <User 
-                        className="w-4 h-4" 
+                      <div 
+                        className="w-6 h-6 rounded-full flex items-center justify-center"
                         style={{ 
-                          color: room.status === "available" 
-                            ? "#235E20" 
+                          backgroundColor: room.status === "available" 
+                            ? "rgba(35, 94, 32, 0.15)" 
                             : room.status === "occupied" 
-                              ? "#AA2C2C" 
+                              ? "rgba(170, 44, 44, 0.15)" 
                               : room.status === "reserved" 
-                                ? "#1E3A8A" 
-                                : "#B45309" 
-                        }} 
-                      />
+                                ? "rgba(30, 58, 138, 0.15)" 
+                                : "rgba(180, 83, 9, 0.15)" 
+                        }}
+                      >
+                        <User 
+                          className="w-3.5 h-3.5" 
+                          style={{ 
+                            color: room.status === "available" 
+                              ? "#235E20" 
+                              : room.status === "occupied" 
+                                ? "#AA2C2C" 
+                                : room.status === "reserved" 
+                                  ? "#1E3A8A" 
+                                  : "#B45309" 
+                          }} 
+                        />
+                      </div>
                       <button 
                         onClick={(e) => {
                           e.stopPropagation()
@@ -497,18 +510,31 @@ export default function RoomsManagement() {
                     </div>
                     {room.checkIn && room.checkOut && (
                       <div className="flex items-center gap-2 mt-2 text-xs">
-                        <Calendar 
-                          className="w-3.5 h-3.5" 
+                        <div 
+                          className="w-5 h-5 rounded-full flex items-center justify-center"
                           style={{ 
-                            color: room.status === "available" 
-                              ? "#235E20" 
+                            backgroundColor: room.status === "available" 
+                              ? "rgba(35, 94, 32, 0.15)" 
                               : room.status === "occupied" 
-                                ? "#AA2C2C" 
+                                ? "rgba(170, 44, 44, 0.15)" 
                                 : room.status === "reserved" 
-                                  ? "#1E3A8A" 
-                                  : "#B45309" 
-                          }} 
-                        />
+                                  ? "rgba(30, 58, 138, 0.15)" 
+                                  : "rgba(180, 83, 9, 0.15)" 
+                          }}
+                        >
+                          <Calendar 
+                            className="w-3 h-3" 
+                            style={{ 
+                              color: room.status === "available" 
+                                ? "#235E20" 
+                                : room.status === "occupied" 
+                                  ? "#AA2C2C" 
+                                  : room.status === "reserved" 
+                                    ? "#1E3A8A" 
+                                    : "#B45309" 
+                            }} 
+                          />
+                        </div>
                         <span className="text-muted-foreground">{new Date(room.checkIn).toLocaleDateString("es-ES")}</span>
                         <span className="text-muted-foreground">→</span>
                         <span className="text-muted-foreground">{new Date(room.checkOut).toLocaleDateString("es-ES")}</span>
