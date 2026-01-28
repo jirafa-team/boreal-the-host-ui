@@ -9,6 +9,7 @@ import { Clock, CheckCircle2, User, MapPin, ChefHat, Utensils, AlertTriangle, Al
 export default function PedidosPage() {
   const [filter, setFilter] = useState<"all" | "pending" | "preparing" | "delivered">("all")
   const [viewMode, setViewMode] = useState<"cards" | "table">("cards")
+  const [showNewOrderModal, setShowNewOrderModal] = useState(false)
 
   const orders = [
     {
@@ -118,22 +119,60 @@ export default function PedidosPage() {
   }
 
   return (
-    <div className="p-8 space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold">Pedidos de Room Service</h1>
-          <p className="text-muted-foreground">Gestiona las órdenes de comida a las habitaciones</p>
-        </div>
-        <button 
-          className="relative group w-10 h-10 rounded-full bg-primary hover:bg-primary/90 text-white flex items-center justify-center transition-all shadow-md hover:shadow-lg"
-          title="Nuevo pedido"
-        >
-          <ShoppingCart className="w-5 h-5" />
-          <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-1.5 bg-gray-900 text-white text-xs rounded pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
-            Nuevo Pedido
+    <>
+      {/* Header */}
+      <header className="bg-card border-b border-border sticky top-0 z-10">
+        <div className="px-8 py-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-2xl font-bold text-foreground">Pedidos de Room Service</h1>
+              <p className="text-sm text-muted-foreground">Gestiona las órdenes de comida a las habitaciones</p>
+            </div>
+            <div className="flex gap-4 items-center ml-auto">
+              {/* View Mode Toggle */}
+              <div className="inline-flex h-10 items-center rounded-lg bg-gray-100 p-1 border border-gray-200">
+                <button
+                  onClick={() => setViewMode("list")}
+                  className={`px-5 py-2 rounded-md font-medium text-sm transition-all ${
+                    viewMode === "list"
+                      ? "text-white shadow-md"
+                      : "text-gray-700 hover:text-gray-900"
+                  }`}
+                  style={viewMode === "list" ? { backgroundColor: "#394a63" } : {}}
+                >
+                  Lista
+                </button>
+                <button
+                  onClick={() => setViewMode("kanban")}
+                  className={`px-5 py-2 rounded-md font-medium text-sm transition-all ${
+                    viewMode === "kanban"
+                      ? "text-white shadow-md"
+                      : "text-gray-700 hover:text-gray-900"
+                  }`}
+                  style={viewMode === "kanban" ? { backgroundColor: "#394a63" } : {}}
+                >
+                  Kanban
+                </button>
+              </div>
+              <button 
+                onClick={() => setShowNewOrderModal(true)}
+                className="flex items-center justify-center w-10 h-10 rounded-full bg-gradient-to-br from-orange-600 to-orange-700 text-white shadow-md hover:shadow-lg transition-all duration-300 hover:scale-110 group relative"
+                title="Nuevo pedido"
+              >
+                <div className="relative flex items-center justify-center">
+                  <ShoppingCart className="w-5 h-5" />
+                  <span className="absolute text-base font-bold -bottom-0.5 -right-0.5 text-white drop-shadow-lg">+</span>
+                </div>
+                <span className="absolute top-full mt-2 px-2 py-1 bg-gray-900 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap">
+                  Nuevo Pedido
+                </span>
+              </button>
+            </div>
           </div>
-        </button>
-      </div>
+        </div>
+      </header>
+
+      <div className="p-8 space-y-6">
 
       {/* Stats */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
@@ -367,5 +406,6 @@ export default function PedidosPage() {
         </div>
       )}
     </div>
+    </>
   )
 }
