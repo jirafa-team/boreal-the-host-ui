@@ -307,51 +307,47 @@ export default function RoomsManagement() {
         {/* Stats Cards - Only show for Grid view */}
         {layoutMode === "grid" && (
           <div className="grid grid-cols-2 md:grid-cols-5 gap-3 mb-6">
-            <Card 
+            <div 
               onClick={() => setStatusFilter(null)}
-              className={`p-4 bg-gradient-to-br from-blue-50 to-white text-center cursor-pointer transition-all ${statusFilter === null ? 'ring-2 ring-blue-600 shadow-lg' : 'hover:shadow-md'}`}
+              className={`p-4 bg-white/95 backdrop-blur-lg rounded-3xl shadow-2xl text-center cursor-pointer transition-all ${statusFilter === null ? 'ring-2 ring-blue-600' : 'hover:shadow-lg'}`}
             >
               <p className="text-6xl font-bold text-blue-600 mb-1">{stats.total}</p>
               <p className="text-xs text-muted-foreground font-medium">{t("admin.totalRooms")}</p>
-            </Card>
-            <Card 
+            </div>
+            <div 
               onClick={() => setStatusFilter("available")}
-              className={`p-4 bg-gradient-to-br to-white text-center cursor-pointer transition-all ${statusFilter === "available" ? 'shadow-lg' : 'hover:shadow-md'}`}
+              className={`p-4 bg-white/95 backdrop-blur-lg rounded-3xl shadow-2xl text-center cursor-pointer transition-all ${statusFilter === "available" ? 'ring-2' : 'hover:shadow-lg'}`}
               style={{ 
-                backgroundImage: statusFilter === "available" ? "linear-gradient(135deg, rgba(35, 94, 32, 0.3), rgba(35, 94, 32, 0.1))" : "linear-gradient(135deg, rgba(35, 94, 32, 0.1), white)",
-                border: statusFilter === "available" ? "2px solid #235E20" : "none",
-                boxShadow: statusFilter === "available" ? "0 0 0 3px rgba(35, 94, 32, 0.1), 0 10px 15px -3px rgba(0, 0, 0, 0.1)" : "none"
+                ringColor: statusFilter === "available" ? "#235E20" : "transparent"
               }}
             >
               <p className="text-6xl font-bold mb-1" style={{ color: "#235E20" }}>{stats.available}</p>
               <p className="text-xs text-muted-foreground font-medium">{t("admin.availableRooms")}</p>
-            </Card>
-            <Card 
+            </div>
+            <div 
               onClick={() => setStatusFilter("occupied")}
-              className={`p-4 bg-gradient-to-br to-white text-center cursor-pointer transition-all ${statusFilter === "occupied" ? 'shadow-lg' : 'hover:shadow-md'}`}
+              className={`p-4 bg-white/95 backdrop-blur-lg rounded-3xl shadow-2xl text-center cursor-pointer transition-all ${statusFilter === "occupied" ? 'ring-2' : 'hover:shadow-lg'}`}
               style={{ 
-                backgroundImage: statusFilter === "occupied" ? "linear-gradient(135deg, rgba(170, 44, 44, 0.3), rgba(170, 44, 44, 0.1))" : "linear-gradient(135deg, rgba(170, 44, 44, 0.1), white)",
-                border: statusFilter === "occupied" ? "2px solid #AA2C2C" : "none",
-                boxShadow: statusFilter === "occupied" ? "0 0 0 3px rgba(170, 44, 44, 0.1), 0 10px 15px -3px rgba(0, 0, 0, 0.1)" : "none"
+                ringColor: statusFilter === "occupied" ? "#AA2C2C" : "transparent"
               }}
             >
               <p className="text-6xl font-bold mb-1" style={{ color: "#AA2C2C" }}>{stats.occupied}</p>
               <p className="text-xs text-muted-foreground font-medium">{t("admin.occupiedRooms")}</p>
-            </Card>
-            <Card 
+            </div>
+            <div 
               onClick={() => setStatusFilter("reserved")}
-              className={`p-4 bg-gradient-to-br from-blue-100 to-white text-center cursor-pointer transition-all ${statusFilter === "reserved" ? 'ring-2 ring-blue-700 shadow-lg' : 'hover:shadow-md'}`}
+              className={`p-4 bg-white/95 backdrop-blur-lg rounded-3xl shadow-2xl text-center cursor-pointer transition-all ${statusFilter === "reserved" ? 'ring-2 ring-blue-700' : 'hover:shadow-lg'}`}
             >
               <p className="text-6xl font-bold text-blue-700 mb-1">{stats.reserved}</p>
               <p className="text-xs text-muted-foreground font-medium">{t("admin.reservedRooms")}</p>
-            </Card>
-            <Card 
+            </div>
+            <div 
               onClick={() => setStatusFilter("maintenance")}
-              className={`p-4 bg-gradient-to-br from-yellow-50 to-white text-center cursor-pointer transition-all ${statusFilter === "maintenance" ? 'ring-2 ring-yellow-600 shadow-lg' : 'hover:shadow-md'}`}
+              className={`p-4 bg-white/95 backdrop-blur-lg rounded-3xl shadow-2xl text-center cursor-pointer transition-all ${statusFilter === "maintenance" ? 'ring-2 ring-yellow-600' : 'hover:shadow-lg'}`}
             >
               <p className="text-6xl font-bold text-yellow-600 mb-1">{stats.maintenance}</p>
               <p className="text-xs text-muted-foreground font-medium">{t("admin.maintenanceRooms")}</p>
-            </Card>
+            </div>
           </div>
         )}
 
