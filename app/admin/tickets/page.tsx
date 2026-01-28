@@ -206,43 +206,59 @@ export default function TicketsPage() {
       <div className="space-y-6">
 
       {/* Stats as Filters */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <Card
-          className={`p-4 bg-gradient-to-br from-blue-50 to-white text-center cursor-pointer transition-all ${
-            filter === "all" ? "ring-2 ring-primary" : ""
-          }`}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+        <div 
           onClick={() => setFilter("all")}
+          className={`p-4 relative rounded-3xl shadow-2xl text-center cursor-pointer transition-all overflow-hidden ${filter === "all" ? 'text-white' : 'bg-white/95 backdrop-blur-lg hover:shadow-lg'}`}
+          style={filter === "all" ? { backgroundColor: "#1E40AF" } : {}}
         >
-          <p className="text-4xl font-bold text-blue-600 mb-1">{tickets.length}</p>
-          <p className="text-xs text-muted-foreground font-medium">Todos</p>
-        </Card>
-        <Card
-          className={`p-4 bg-gradient-to-br from-yellow-50 to-white text-center cursor-pointer transition-all ${
-            filter === "pending" ? "ring-2 ring-primary" : ""
-          }`}
+          {filter === "all" && (
+            <div className="absolute -top-16 -right-16 w-28 h-28 rounded-full" style={{ backgroundColor: "rgba(255, 255, 255, 0.2)" }} />
+          )}
+          <div className="relative z-10">
+            <p className={`text-6xl font-bold mb-1 ${filter === "all" ? 'text-white' : 'text-blue-600'}`}>{tickets.length}</p>
+            <p className={`text-xs font-medium ${filter === "all" ? 'text-blue-100' : 'text-muted-foreground'}`}>Todos</p>
+          </div>
+        </div>
+        <div 
           onClick={() => setFilter("pending")}
+          className={`p-4 relative rounded-3xl shadow-2xl text-center cursor-pointer transition-all overflow-hidden ${filter === "pending" ? 'text-white' : 'bg-white/95 backdrop-blur-lg hover:shadow-lg'}`}
+          style={filter === "pending" ? { backgroundColor: "#CA8A04" } : {}}
         >
-          <p className="text-4xl font-bold text-yellow-600 mb-1">{tickets.filter((t) => t.status === "pending").length}</p>
-          <p className="text-xs text-muted-foreground font-medium">Pendientes</p>
-        </Card>
-        <Card
-          className={`p-4 bg-gradient-to-br from-blue-100 to-white text-center cursor-pointer transition-all ${
-            filter === "in-progress" ? "ring-2 ring-primary" : ""
-          }`}
+          {filter === "pending" && (
+            <div className="absolute -top-16 -right-16 w-28 h-28 rounded-full" style={{ backgroundColor: "rgba(255, 255, 255, 0.2)" }} />
+          )}
+          <div className="relative z-10">
+            <p className={`text-6xl font-bold mb-1 ${filter === "pending" ? 'text-white' : 'text-yellow-600'}`}>{tickets.filter((t) => t.status === "pending").length}</p>
+            <p className={`text-xs font-medium ${filter === "pending" ? 'text-yellow-100' : 'text-muted-foreground'}`}>Pendientes</p>
+          </div>
+        </div>
+        <div 
           onClick={() => setFilter("in-progress")}
+          className={`p-4 relative rounded-3xl shadow-2xl text-center cursor-pointer transition-all overflow-hidden ${filter === "in-progress" ? 'text-white' : 'bg-white/95 backdrop-blur-lg hover:shadow-lg'}`}
+          style={filter === "in-progress" ? { backgroundColor: "#1E3A8A" } : {}}
         >
-          <p className="text-4xl font-bold text-blue-700 mb-1">{tickets.filter((t) => t.status === "in-progress").length}</p>
-          <p className="text-xs text-muted-foreground font-medium">En Proceso</p>
-        </Card>
-        <Card
-          className={`p-4 bg-gradient-to-br from-green-50 to-white text-center cursor-pointer transition-all ${
-            filter === "resolved" ? "ring-2 ring-primary" : ""
-          }`}
+          {filter === "in-progress" && (
+            <div className="absolute -top-16 -right-16 w-28 h-28 rounded-full" style={{ backgroundColor: "rgba(255, 255, 255, 0.2)" }} />
+          )}
+          <div className="relative z-10">
+            <p className={`text-6xl font-bold mb-1 ${filter === "in-progress" ? 'text-white' : 'text-blue-700'}`}>{tickets.filter((t) => t.status === "in-progress").length}</p>
+            <p className={`text-xs font-medium ${filter === "in-progress" ? 'text-blue-100' : 'text-muted-foreground'}`}>En Proceso</p>
+          </div>
+        </div>
+        <div 
           onClick={() => setFilter("resolved")}
+          className={`p-4 relative rounded-3xl shadow-2xl text-center cursor-pointer transition-all overflow-hidden ${filter === "resolved" ? 'text-white' : 'bg-white/95 backdrop-blur-lg hover:shadow-lg'}`}
+          style={filter === "resolved" ? { backgroundColor: "#235E20" } : {}}
         >
-          <p className="text-4xl font-bold text-green-600 mb-1">{tickets.filter((t) => t.status === "resolved").length}</p>
-          <p className="text-xs text-muted-foreground font-medium">Resueltos</p>
-        </Card>
+          {filter === "resolved" && (
+            <div className="absolute -top-16 -right-16 w-28 h-28 rounded-full" style={{ backgroundColor: "rgba(255, 255, 255, 0.2)" }} />
+          )}
+          <div className="relative z-10">
+            <p className={`text-6xl font-bold mb-1 ${filter === "resolved" ? 'text-white' : ''}`} style={filter !== "resolved" ? { color: "#235E20" } : {}}>{tickets.filter((t) => t.status === "resolved").length}</p>
+            <p className={`text-xs font-medium ${filter === "resolved" ? 'text-green-100' : 'text-muted-foreground'}`}>Resueltos</p>
+          </div>
+        </div>
       </div>
 
       {/* Tickets Grid */}
