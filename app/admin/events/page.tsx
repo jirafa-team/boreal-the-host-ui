@@ -468,7 +468,7 @@ export default function EventsManagement() {
                         {event.registered}/{event.capacity} ({occupancyPercent}%)
                       </span>
                     </div>
-                    <div className="w-full h-2 bg-muted rounded-full overflow-hidden">
+                    <div className="w-full h-1 bg-muted rounded-full overflow-hidden">
                       <div
                         className={`h-full transition-all ${isNearCapacity ? "bg-orange-500" : "bg-primary"}`}
                         style={{ width: `${occupancyPercent}%` }}
@@ -477,24 +477,36 @@ export default function EventsManagement() {
                   </div>
 
                   {/* Botones de acción */}
-                  <div className="flex gap-2 mt-auto items-center justify-end">
+                  <div className="flex gap-2 mt-auto items-center justify-between">
                     <button
-                      className="w-10 h-10 rounded-full bg-blue-600 hover:bg-blue-700 text-white flex items-center justify-center transition-colors"
-                      onClick={() => router.push(`/admin/events/${event.id}`)}
-                      title="Ver detalles"
-                    >
-                      <Eye className="w-5 h-5" />
-                    </button>
-                    <button
-                      className="w-10 h-10 rounded-full bg-emerald-600 hover:bg-emerald-700 text-white flex items-center justify-center transition-colors"
+                      className="w-10 h-10 rounded-full bg-red-600 hover:bg-red-700 text-white flex items-center justify-center transition-colors"
+                      title="Eliminar evento"
                       onClick={() => {
-                        setSelectedEventForPeople(event)
-                        setAddPeopleDialogOpen(true)
+                        // TODO: Implementar lógica de eliminación
+                        console.log("Eliminar evento:", event.id)
                       }}
-                      title="Agregar personas"
                     >
-                      <Users className="w-5 h-5" />
+                      <Trash2 className="w-5 h-5" />
                     </button>
+                    <div className="flex gap-2">
+                      <button
+                        className="w-10 h-10 rounded-full bg-blue-600 hover:bg-blue-700 text-white flex items-center justify-center transition-colors"
+                        onClick={() => router.push(`/admin/events/${event.id}`)}
+                        title="Ver detalles"
+                      >
+                        <Eye className="w-5 h-5" />
+                      </button>
+                      <button
+                        className="w-10 h-10 rounded-full bg-emerald-600 hover:bg-emerald-700 text-white flex items-center justify-center transition-colors"
+                        onClick={() => {
+                          setSelectedEventForPeople(event)
+                          setAddPeopleDialogOpen(true)
+                        }}
+                        title="Agregar personas"
+                      >
+                        <Users className="w-5 h-5" />
+                      </button>
+                    </div>
                   </div>
                 </Card>
               )
