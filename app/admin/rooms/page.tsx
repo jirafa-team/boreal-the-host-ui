@@ -31,6 +31,7 @@ export default function RoomsManagement() {
   const [timelineMode, setTimelineMode] = useState<"week" | "month">("week")
   const [currentDate, setCurrentDate] = useState(new Date())
   const [searchTerm, setSearchTerm] = useState("")
+  const [statusFilter, setStatusFilter] = useState<RoomStatus | null>(null)
   const [showCreateModal, setShowCreateModal] = useState(false)
   const [newRoom, setNewRoom] = useState({ number: "", type: "Individual", floor: 1 })
   const { t } = useLanguage()
@@ -128,9 +129,10 @@ export default function RoomsManagement() {
 
   const filteredRooms = rooms.filter(
     (room) =>
-      room.number.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (statusFilter === null || room.status === statusFilter) &&
+      (room.number.toLowerCase().includes(searchTerm.toLowerCase()) ||
       room.type.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      room.guest?.toLowerCase().includes(searchTerm.toLowerCase()),
+      room.guest?.toLowerCase().includes(searchTerm.toLowerCase())),
   )
 
   const getStatusColor = (status: RoomStatus) => {
@@ -305,23 +307,40 @@ export default function RoomsManagement() {
         {/* Stats Cards - Only show for Grid view */}
         {layoutMode === "grid" && (
           <div className="grid grid-cols-2 md:grid-cols-5 gap-3 mb-6">
-            <Card className="p-4 bg-gradient-to-br from-blue-50 to-white text-center">
+            <Card 
+              onClick={() => setStatusFilter(null)}
+              className={`p-4 bg-gradient-to-br from-blue-50 to-white text-center cursor-pointer transition-all ${statusFilter === null ? 'ring-2 ring-blue-600 shadow-lg' : 'hover:shadow-md'}`}
+            >
               <p className="text-6xl font-bold text-blue-600 mb-1">{stats.total}</p>
               <p className="text-xs text-muted-foreground font-medium">{t("admin.totalRooms")}</p>
             </Card>
-            <Card className="p-4 bg-gradient-to-br to-white text-center" style={{ backgroundImage: "linear-gradient(135deg, rgba(35, 94, 32, 0.1), white)" }}>
+            <Card 
+              onClick={() => setStatusFilter("available")}
+              className={`p-4 bg-gradient-to-br to-white text-center cursor-pointer transition-all ${statusFilter === "available" ? 'ring-2 shadow-lg' : 'hover:shadow-md'}`}
+              style={{ backgroundImage: statusFilter === "available" ? "linear-gradient(135deg, rgba(35, 94, 32, 0.3), rgba(35, 94, 32, 0.1))" : "linear-gradient(135deg, rgba(35, 94, 32, 0.1), white)", ringColor: "#235E20" }}
+            >
               <p className="text-6xl font-bold mb-1" style={{ color: "#235E20" }}>{stats.available}</p>
               <p className="text-xs text-muted-foreground font-medium">{t("admin.availableRooms")}</p>
             </Card>
-            <Card className="p-4 bg-gradient-to-br to-white text-center" style={{ backgroundImage: "linear-gradient(135deg, rgba(170, 44, 44, 0.1), white)" }}>
+            <Card 
+              onClick={() => setStatusFilter("occupied")}
+              className={`p-4 bg-gradient-to-br to-white text-center cursor-pointer transition-all ${statusFilter === "occupied" ? 'ring-2 shadow-lg' : 'hover:shadow-md'}`}
+              style={{ backgroundImage: statusFilter === "occupied" ? "linear-gradient(135deg, rgba(170, 44, 44, 0.3), rgba(170, 44, 44, 0.1))" : "linear-gradient(135deg, rgba(170, 44, 44, 0.1), white)", ringColor: "#AA2C2C" }}
+            >
               <p className="text-6xl font-bold mb-1" style={{ color: "#AA2C2C" }}>{stats.occupied}</p>
               <p className="text-xs text-muted-foreground font-medium">{t("admin.occupiedRooms")}</p>
             </Card>
-            <Card className="p-4 bg-gradient-to-br from-blue-100 to-white text-center">
+            <Card 
+              onClick={() => setStatusFilter("reserved")}
+              className={`p-4 bg-gradient-to-br from-blue-100 to-white text-center cursor-pointer transition-all ${statusFilter === "reserved" ? 'ring-2 ring-blue-700 shadow-lg' : 'hover:shadow-md'}`}
+            >
               <p className="text-6xl font-bold text-blue-700 mb-1">{stats.reserved}</p>
               <p className="text-xs text-muted-foreground font-medium">{t("admin.reservedRooms")}</p>
             </Card>
-            <Card className="p-4 bg-gradient-to-br from-yellow-50 to-white text-center">
+            <Card 
+              onClick={() => setStatusFilter("maintenance")}
+              className={`p-4 bg-gradient-to-br from-yellow-50 to-white text-center cursor-pointer transition-all ${statusFilter === "maintenance" ? 'ring-2 ring-yellow-600 shadow-lg' : 'hover:shadow-md'}`}
+            >
               <p className="text-6xl font-bold text-yellow-600 mb-1">{stats.maintenance}</p>
               <p className="text-xs text-muted-foreground font-medium">{t("admin.maintenanceRooms")}</p>
             </Card>
