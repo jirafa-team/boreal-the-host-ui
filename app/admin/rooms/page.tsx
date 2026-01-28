@@ -33,6 +33,8 @@ export default function RoomsManagement() {
   const [searchTerm, setSearchTerm] = useState("")
   const [statusFilter, setStatusFilter] = useState<RoomStatus | null>(null)
   const [showCreateModal, setShowCreateModal] = useState(false)
+  const [showEditModal, setShowEditModal] = useState(false)
+  const [selectedRoom, setSelectedRoom] = useState<Room | null>(null)
   const [newRoom, setNewRoom] = useState({ number: "", type: "Individual", floor: 1 })
   const { t } = useLanguage()
 
@@ -123,6 +125,46 @@ export default function RoomsManagement() {
       toast({
         title: "Éxito",
         description: `Habitación ${roomNumber} creada correctamente.`,
+      })
+    }
+  }
+
+  const handleEditRoom = (room: Room) => {
+    setSelectedRoom({ ...room })
+    setShowEditModal(true)
+  }
+
+  const handleUpdateRoom = () => {
+    if (selectedRoom) {
+      // Check if room number already exists (excluding current room)
+      const roomExists = rooms.some(r => r.id !== selectedRoom.id && r.number.toLowerCase() === selectedRoom.number.toLowerCase())
+      if (roomExists) {
+        toast({
+          title: "Error",
+          description: `La habitación número ${selectedRoom.number} ya existe.`,
+          variant: "destructive"
+        })
+        return
+      }
+
+      setRooms(rooms.map(r => r.id === selectedRoom.id ? selectedRoom : r))
+      setShowEditModal(false)
+      setSelectedRoom(null)
+      toast({
+        title: "Éxito",
+        description: `Habitación ${selectedRoom.number} actualizada correctamente.`,
+      })
+    }
+  }
+
+  const handleDeleteRoom = () => {
+    if (selectedRoom) {
+      setRooms(rooms.filter(r => r.id !== selectedRoom.id))
+      setShowEditModal(false)
+      setSelectedRoom(null)
+      toast({
+        title: "Éxito",
+        description: "Habitación eliminada correctamente.",
       })
     }
   }
@@ -394,7 +436,11 @@ export default function RoomsManagement() {
           /* Rooms Grid */
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
             {filteredRooms.map((room) => (
-              <Card key={room.id} className="p-4 hover:shadow-lg transition-shadow cursor-pointer relative">
+              <Card 
+                key={room.id} 
+                className="p-4 hover:shadow-lg transition-shadow cursor-pointer relative"
+                onClick={() => handleEditRoom(room)}
+              >
                 <div className="flex items-start justify-between mb-3">
                   <div>
                     <h3 className="text-lg font-bold text-foreground">{t("admin.roomNumber")} {room.number}</h3>
@@ -636,6 +682,120 @@ export default function RoomsManagement() {
                 className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors font-medium"
               >
                 Crear Habitación
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Edit Room Modal */}
+      {showEditModal && selectedRoom && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
+          <div className="bg-white rounded-2xl shadow-2xl p-6 w-full max-w-md mx-4">
+            <h2 className="text-xl font-bold text-foreground mb-4">Editar Habitación {selectedRoom.number}</h2>
+            
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-foreground mb-1">Número de Habitación</label>
+                <Input
+                  value={selectedRoom.number}
+                  onChange={(e) => setSelectedRoom({ ...selectedRoom, number: e.target.value })}
+                  placeholder="Ej: 101"
+                />
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium text-foreground mb-1">Tipo</label>
+                <select
+                  value={selectedRoom.type}
+                  onChange={(e) => setSelectedRoom({ ...selectedRoom, type: e.target.value })}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                >
+                  <option value="Individual">Individual</option>
+                  <option value="Doble">Doble</option>
+                  <option value="Suite">Suite</option>
+                  <option value="Familiar">Familiar</option>
+                </select>
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium text-foreground mb-1">Piso</label>
+                <Input
+                  type="number"
+                  value={selectedRoom.floor}
+                  onChange={(e) => setSelectedRoom({ ...selectedRoom, floor: parseInt(e.target.value) || 1 })}
+                  min={1}
+                />
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium text-foreground mb-1">Estado</label>
+                <select
+                  value={selectedRoom.status}
+                  onChange={(e) => setSelectedRoom({ ...selectedRoom, status: e.target.value as RoomStatus })}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                >
+                  <option value="available">Disponible</option>
+                  <option value="occupied">Ocupada</option>
+                  <option value="reserved">Reservada</option>
+                  <option value="maintenance">Mantenimiento</option>
+                </select>
+              </div>
+
+              {(selectedRoom.status === "occupied" || selectedRoom.status === "reserved") && (
+                <>
+                  <div>
+                    <label className="block text-sm font-medium text-foreground mb-1">Huésped</label>
+                    <Input
+                      value={selectedRoom.guest || ""}
+                      onChange={(e) => setSelectedRoom({ ...selectedRoom, guest: e.target.value })}
+                      placeholder="Nombre del huésped"
+                    />
+                  </div>
+                  <div className="grid grid-cols-2 gap-3">
+                    <div>
+                      <label className="block text-sm font-medium text-foreground mb-1">Check-in</label>
+                      <Input
+                        type="date"
+                        value={selectedRoom.checkIn || ""}
+                        onChange={(e) => setSelectedRoom({ ...selectedRoom, checkIn: e.target.value })}
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-foreground mb-1">Check-out</label>
+                      <Input
+                        type="date"
+                        value={selectedRoom.checkOut || ""}
+                        onChange={(e) => setSelectedRoom({ ...selectedRoom, checkOut: e.target.value })}
+                      />
+                    </div>
+                  </div>
+                </>
+              )}
+            </div>
+            
+            <div className="flex gap-3 mt-6">
+              <button
+                onClick={handleDeleteRoom}
+                className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors font-medium"
+              >
+                Eliminar
+              </button>
+              <div className="flex-1" />
+              <button
+                onClick={() => {
+                  setShowEditModal(false)
+                  setSelectedRoom(null)
+                }}
+                className="px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition-colors font-medium"
+              >
+                Cancelar
+              </button>
+              <button
+                onClick={handleUpdateRoom}
+                className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors font-medium"
+              >
+                Guardar
               </button>
             </div>
           </div>
