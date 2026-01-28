@@ -4,13 +4,12 @@ import { useState } from "react"
 import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { Clock, CheckCircle2, User, MapPin, ChefHat, Utensils, AlertTriangle, AlertCircle, Grid3x3, Table, ShoppingCart, ChevronLeft, ChevronRight } from "lucide-react"
+import { Clock, CheckCircle2, User, MapPin, ChefHat, Utensils, AlertTriangle, AlertCircle, Grid3x3, Table, ShoppingCart } from "lucide-react"
 
 export default function PedidosPage() {
   const [filter, setFilter] = useState<"all" | "pending" | "preparing" | "delivered">("all")
   const [viewMode, setViewMode] = useState<"kanban" | "list">("kanban")
   const [showNewOrderModal, setShowNewOrderModal] = useState(false)
-  const [selectedDate, setSelectedDate] = useState(new Date(2024, 0, 13)) // 2024-01-13
 
   const orders = [
     {
@@ -88,27 +87,6 @@ export default function PedidosPage() {
 
   const filteredOrders = filter === "all" ? orders : orders.filter((o) => o.status === filter)
 
-  const handlePreviousDay = () => {
-    const newDate = new Date(selectedDate)
-    newDate.setDate(newDate.getDate() - 1)
-    setSelectedDate(newDate)
-  }
-
-  const handleNextDay = () => {
-    const newDate = new Date(selectedDate)
-    newDate.setDate(newDate.getDate() + 1)
-    setSelectedDate(newDate)
-  }
-
-  const handleToday = () => {
-    setSelectedDate(new Date(2024, 0, 13)) // Current date in the system
-  }
-
-  const formatDate = (date: Date) => {
-    const options: Intl.DateTimeFormatOptions = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }
-    return date.toLocaleDateString('es-ES', options)
-  }
-
   const getStatusBadge = (status: string) => {
     const statusConfig = {
       pending: { label: "Pendiente", badgeClass: "bg-gray-600 text-white", bgColor: "bg-yellow-50" },
@@ -151,29 +129,6 @@ export default function PedidosPage() {
               <p className="text-sm text-muted-foreground">Gestiona las órdenes de comida a las habitaciones</p>
             </div>
             <div className="flex gap-4 items-center ml-auto">
-              {/* Date Navigation */}
-              <div className="flex items-center gap-3 px-4 py-2 bg-gray-50 rounded-lg border border-gray-200">
-                <button
-                  onClick={handlePreviousDay}
-                  className="p-1 hover:bg-gray-200 rounded transition-colors"
-                  title="Día anterior"
-                >
-                  <ChevronLeft className="w-5 h-5 text-gray-600" />
-                </button>
-                <button
-                  onClick={handleToday}
-                  className="text-sm font-medium text-gray-700 hover:text-gray-900 transition-colors min-w-max"
-                >
-                  {formatDate(selectedDate)}
-                </button>
-                <button
-                  onClick={handleNextDay}
-                  className="p-1 hover:bg-gray-200 rounded transition-colors"
-                  title="Día siguiente"
-                >
-                  <ChevronRight className="w-5 h-5 text-gray-600" />
-                </button>
-              </div>
               {/* View Mode Toggle */}
               <div className="inline-flex h-10 items-center rounded-lg bg-gray-100 p-1 border border-gray-200">
                 <button
@@ -219,238 +174,254 @@ export default function PedidosPage() {
 
       <div className="p-8 space-y-6">
 
-      {/* Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <Card
-          className="p-4 cursor-pointer hover:shadow-lg transition-shadow"
-          onClick={() => setFilter("pending")}
-        >
-          <div className="flex items-center gap-3">
-            <div className="p-2 bg-yellow-500/10 rounded-lg">
-              <Clock className="w-5 h-5 text-yellow-600" />
+        {/* Stats */}
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+          <div
+            className="relative overflow-hidden rounded-lg p-4 text-white shadow-md hover:shadow-lg transition-all duration-300 hover:scale-105 cursor-pointer group"
+            style={{ background: "linear-gradient(135deg, rgb(236, 72, 153), rgb(219, 39, 119))" }}
+            onClick={() => setFilter("all")}
+          >
+            <div className="absolute inset-0 opacity-10">
+              <div className="absolute top-0 right-0 w-20 h-20 bg-white rounded-full -mr-8 -mt-8"></div>
             </div>
-            <div>
-              <p className="text-sm text-muted-foreground">Pendientes</p>
-              <p className="text-2xl font-bold">{orders.filter((o) => o.status === "pending").length}</p>
-            </div>
-          </div>
-        </Card>
-        <Card
-          className="p-4 cursor-pointer hover:shadow-lg transition-shadow"
-          onClick={() => setFilter("preparing")}
-        >
-          <div className="flex items-center gap-3">
-            <div className="p-2 bg-blue-500/10 rounded-lg">
-              <ChefHat className="w-5 h-5 text-blue-600" />
-            </div>
-            <div>
-              <p className="text-sm text-muted-foreground">En Preparación</p>
-              <p className="text-2xl font-bold">{orders.filter((o) => o.status === "preparing").length}</p>
+            <div className="relative flex items-center gap-3">
+              <div className="p-2 bg-white/20 rounded-lg">
+                <Clock className="w-5 h-5" />
+              </div>
+              <div>
+                <p className="text-sm opacity-90">Todos</p>
+                <p className="text-2xl font-bold">{orders.length}</p>
+              </div>
             </div>
           </div>
-        </Card>
-        <Card
-          className="p-4 cursor-pointer hover:shadow-lg transition-shadow"
-          onClick={() => setFilter("delivered")}
-        >
-          <div className="flex items-center gap-3">
-            <div className="p-2 bg-green-500/10 rounded-lg">
-              <CheckCircle2 className="w-5 h-5 text-green-600" />
+          <div
+            className="relative overflow-hidden rounded-lg p-4 text-white shadow-md hover:shadow-lg transition-all duration-300 hover:scale-105 cursor-pointer group"
+            style={{ background: "linear-gradient(135deg, rgb(234, 179, 8), rgb(202, 138, 4))" }}
+            onClick={() => setFilter("pending")}
+          >
+            <div className="absolute inset-0 opacity-10">
+              <div className="absolute top-0 right-0 w-20 h-20 bg-white rounded-full -mr-8 -mt-8"></div>
             </div>
-            <div>
-              <p className="text-sm text-muted-foreground">Entregados Hoy</p>
-              <p className="text-2xl font-bold">{orders.filter((o) => o.status === "delivered").length}</p>
-            </div>
-          </div>
-        </Card>
-        <Card
-          className="p-4 cursor-pointer hover:shadow-lg transition-shadow"
-          onClick={() => setFilter("all")}
-        >
-          <div className="flex items-center gap-3">
-            <div className="p-2 bg-purple-500/10 rounded-lg">
-              <Utensils className="w-5 h-5 text-purple-600" />
-            </div>
-            <div>
-              <p className="text-sm text-muted-foreground">Ingresos Hoy</p>
-              <p className="text-2xl font-bold">€{orders.reduce((sum, o) => sum + o.total, 0).toFixed(2)}</p>
+            <div className="relative flex items-center gap-3">
+              <div className="p-2 bg-white/20 rounded-lg">
+                <Clock className="w-5 h-5" />
+              </div>
+              <div>
+                <p className="text-sm opacity-90">Pendientes</p>
+                <p className="text-2xl font-bold">{orders.filter((o) => o.status === "pending").length}</p>
+              </div>
             </div>
           </div>
-        </Card>
-      </div>
-
-      {/* View Mode Switcher */}
-      <div className="flex gap-2">
-        <Button variant={filter === "all" ? "default" : "outline"} onClick={() => setFilter("all")}>
-          Todos
-        </Button>
-        <Button variant={filter === "pending" ? "default" : "outline"} onClick={() => setFilter("pending")}>
-          Pendientes
-        </Button>
-        <Button variant={filter === "preparing" ? "default" : "outline"} onClick={() => setFilter("preparing")}>
-          En Preparación
-        </Button>
-        <Button variant={filter === "delivered" ? "default" : "outline"} onClick={() => setFilter("delivered")}>
-          Entregados
-        </Button>
-      </div>
-
-      {/* Orders View - Kanban or List */}
-      {viewMode === "kanban" ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {filteredOrders.map((order) => {
-            const statusBadge = getStatusBadge(order.status)
-            const delayIndicator = getDelayIndicator(order.delayStatus)
-            const DelayIcon = delayIndicator?.icon
-
-            return (
-              <Card
-                key={order.id}
-                className={`p-6 border-0 ${statusBadge.bgColor}`}
-              >
-                <div className="space-y-4">
-                  {/* Header with status top-right and estimated time below */}
-                  <div className="flex items-start justify-between gap-3">
-                    <h3 className="text-lg font-semibold">Pedido #{order.id}</h3>
-                    <div className="flex flex-col items-end gap-2">
-                      <Badge className={statusBadge.badgeClass}>
-                        {statusBadge.label}
-                      </Badge>
-                      {order.status !== "delivered" && (
-                        <Badge className="bg-purple-800 text-white text-xs gap-1.5">
-                          <Clock className="w-3.5 h-3.5" />
-                          {order.estimatedDelivery}
-                        </Badge>
-                      )}
-                    </div>
-                  </div>
-
-                  {/* Delay indicator if needed */}
-                  {delayIndicator && DelayIcon && (
-                    <div className={`p-2 rounded-lg flex items-center gap-2 ${delayIndicator.bgColor} border ${delayIndicator.borderColor}`}>
-                      <DelayIcon className={`w-4 h-4 ${delayIndicator.color}`} />
-                      <span className={`text-sm font-medium ${delayIndicator.color}`}>{delayIndicator.label}</span>
-                    </div>
-                  )}
-
-                  {/* Order info */}
-                  <div className="space-y-2 text-sm">
-                    <div className="flex items-center gap-2">
-                      <User className="w-4 h-4 text-muted-foreground" />
-                      <span>{order.guest}</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <MapPin className="w-4 h-4 text-muted-foreground" />
-                      <span>Habitación {order.room}</span>
-                    </div>
-                  </div>
-
-                  {/* Items */}
-                  <div className="bg-white/50 rounded-lg p-3 text-sm">
-                    <h4 className="font-semibold mb-2">Items:</h4>
-                    <div className="space-y-1">
-                      {order.items.map((item, idx) => (
-                        <div key={idx} className="flex justify-between">
-                          <span>
-                            {item.quantity}x {item.name}
-                          </span>
-                          <span className="font-medium">€{(item.quantity * item.price).toFixed(2)}</span>
-                        </div>
-                      ))}
-                    </div>
-                    <div className="border-t pt-2 mt-2 flex justify-between font-semibold">
-                      <span>Total</span>
-                      <span>€{order.total.toFixed(2)}</span>
-                    </div>
-                  </div>
-
-                  {/* Delivered info */}
-                  {order.status === "delivered" && (
-                    <div className="text-sm text-green-600 flex items-center gap-1">
-                      <CheckCircle2 className="w-4 h-4" />
-                      Entregado a las {order.deliveredAt}
-                    </div>
-                  )}
-
-                  {/* Action buttons */}
-                  <div className="flex gap-2">
-                    {order.status === "pending" && (
-                      <Button size="sm" variant="default" className="flex-1">
-                        Iniciar Preparación
-                      </Button>
-                    )}
-                    {order.status === "preparing" && (
-                      <Button size="sm" variant="default" className="flex-1">
-                        Marcar Entregado
-                      </Button>
-                    )}
-                  </div>
-                </div>
-              </Card>
-            )
-          })}
+          <div
+            className="relative overflow-hidden rounded-lg p-4 text-white shadow-md hover:shadow-lg transition-all duration-300 hover:scale-105 cursor-pointer group"
+            style={{ background: "linear-gradient(135deg, rgb(37, 99, 235), rgb(29, 78, 216))" }}
+            onClick={() => setFilter("preparing")}
+          >
+            <div className="absolute inset-0 opacity-10">
+              <div className="absolute top-0 right-0 w-20 h-20 bg-white rounded-full -mr-8 -mt-8"></div>
+            </div>
+            <div className="relative flex items-center gap-3">
+              <div className="p-2 bg-white/20 rounded-lg">
+                <ChefHat className="w-5 h-5" />
+              </div>
+              <div>
+                <p className="text-sm opacity-90">En Preparación</p>
+                <p className="text-2xl font-bold">{orders.filter((o) => o.status === "preparing").length}</p>
+              </div>
+            </div>
+          </div>
+          <div
+            className="relative overflow-hidden rounded-lg p-4 text-white shadow-md hover:shadow-lg transition-all duration-300 hover:scale-105 cursor-pointer group"
+            style={{ background: "linear-gradient(135deg, rgb(34, 197, 94), rgb(22, 163, 74))" }}
+            onClick={() => setFilter("delivered")}
+          >
+            <div className="absolute inset-0 opacity-10">
+              <div className="absolute top-0 right-0 w-20 h-20 bg-white rounded-full -mr-8 -mt-8"></div>
+            </div>
+            <div className="relative flex items-center gap-3">
+              <div className="p-2 bg-white/20 rounded-lg">
+                <CheckCircle2 className="w-5 h-5" />
+              </div>
+              <div>
+                <p className="text-sm opacity-90">Entregados</p>
+                <p className="text-2xl font-bold">{orders.filter((o) => o.status === "delivered").length}</p>
+              </div>
+            </div>
+          </div>
         </div>
-      ) : (
-        /* Table View */
-        <div className="border rounded-lg overflow-hidden">
-          <table className="w-full">
-            <thead className="bg-muted border-b">
-              <tr>
-                <th className="px-4 py-3 text-left text-sm font-semibold">Pedido</th>
-                <th className="px-4 py-3 text-left text-sm font-semibold">Cliente</th>
-                <th className="px-4 py-3 text-left text-sm font-semibold">Habitación</th>
-                <th className="px-4 py-3 text-left text-sm font-semibold">Estado</th>
-                <th className="px-4 py-3 text-left text-sm font-semibold">Entrega</th>
-                <th className="px-4 py-3 text-left text-sm font-semibold">Total</th>
-                <th className="px-4 py-3 text-left text-sm font-semibold">Acciones</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y">
-              {filteredOrders.map((order) => {
-                const statusBadge = getStatusBadge(order.status)
-                const delayIndicator = getDelayIndicator(order.delayStatus)
 
-                return (
-                  <tr key={order.id} className="hover:bg-muted/50">
-                    <td className="px-4 py-3 text-sm font-medium">{order.id}</td>
-                    <td className="px-4 py-3 text-sm">{order.guest}</td>
-                    <td className="px-4 py-3 text-sm">{order.room}</td>
-                    <td className="px-4 py-3">
-                      <div className="flex items-center gap-2">
+        {/* View Mode Switcher */}
+        <div className="flex gap-2">
+          <Button variant={filter === "all" ? "default" : "outline"} onClick={() => setFilter("all")}>
+            Todos
+          </Button>
+          <Button variant={filter === "pending" ? "default" : "outline"} onClick={() => setFilter("pending")}>
+            Pendientes
+          </Button>
+          <Button variant={filter === "preparing" ? "default" : "outline"} onClick={() => setFilter("preparing")}>
+            En Preparación
+          </Button>
+          <Button variant={filter === "delivered" ? "default" : "outline"} onClick={() => setFilter("delivered")}>
+            Entregados
+          </Button>
+        </div>
+
+        {/* Orders View - Kanban or List */}
+        {viewMode === "kanban" ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {filteredOrders.map((order) => {
+              const statusBadge = getStatusBadge(order.status)
+              const delayIndicator = getDelayIndicator(order.delayStatus)
+              const DelayIcon = delayIndicator?.icon
+
+              return (
+                <Card
+                  key={order.id}
+                  className={`p-6 border-0 ${statusBadge.bgColor}`}
+                >
+                  <div className="space-y-4">
+                    {/* Header with status top-right and estimated time below */}
+                    <div className="flex items-start justify-between gap-3">
+                      <h3 className="text-lg font-semibold">Pedido #{order.id}</h3>
+                      <div className="flex flex-col items-end gap-2">
                         <Badge className={statusBadge.badgeClass}>
                           {statusBadge.label}
                         </Badge>
-                        {delayIndicator && (
-                          <span className={`text-xs font-medium ${delayIndicator.color}`}>
-                            {delayIndicator.icon === AlertTriangle ? "⚠️" : "🔴"} {delayIndicator.label}
-                          </span>
+                        {order.status !== "delivered" && (
+                          <Badge className="bg-purple-800 text-white text-xs gap-1.5">
+                            <Clock className="w-3.5 h-3.5" />
+                            {order.estimatedDelivery}
+                          </Badge>
                         )}
                       </div>
-                    </td>
-                    <td className="px-4 py-3 text-sm">
-                      {order.status !== "delivered" ? order.estimatedDelivery : `Entregado ${order.deliveredAt}`}
-                    </td>
-                    <td className="px-4 py-3 text-sm font-medium">€{order.total.toFixed(2)}</td>
-                    <td className="px-4 py-3">
+                    </div>
+
+                    {/* Delay indicator if needed */}
+                    {delayIndicator && DelayIcon && (
+                      <div className={`p-2 rounded-lg flex items-center gap-2 ${delayIndicator.bgColor} border ${delayIndicator.borderColor}`}>
+                        <DelayIcon className={`w-4 h-4 ${delayIndicator.color}`} />
+                        <span className={`text-sm font-medium ${delayIndicator.color}`}>{delayIndicator.label}</span>
+                      </div>
+                    )}
+
+                    {/* Order info */}
+                    <div className="space-y-2 text-sm">
+                      <div className="flex items-center gap-2">
+                        <User className="w-4 h-4 text-muted-foreground" />
+                        <span>{order.guest}</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <MapPin className="w-4 h-4 text-muted-foreground" />
+                        <span>Habitación {order.room}</span>
+                      </div>
+                    </div>
+
+                    {/* Items */}
+                    <div className="bg-white/50 rounded-lg p-3 text-sm">
+                      <h4 className="font-semibold mb-2">Items:</h4>
+                      <div className="space-y-1">
+                        {order.items.map((item, idx) => (
+                          <div key={idx} className="flex justify-between">
+                            <span>
+                              {item.quantity}x {item.name}
+                            </span>
+                            <span className="font-medium">€{(item.quantity * item.price).toFixed(2)}</span>
+                          </div>
+                        ))}
+                      </div>
+                      <div className="border-t pt-2 mt-2 flex justify-between font-semibold">
+                        <span>Total</span>
+                        <span>€{order.total.toFixed(2)}</span>
+                      </div>
+                    </div>
+
+                    {/* Delivered info */}
+                    {order.status === "delivered" && (
+                      <div className="text-sm text-green-600 flex items-center gap-1">
+                        <CheckCircle2 className="w-4 h-4" />
+                        Entregado a las {order.deliveredAt}
+                      </div>
+                    )}
+
+                    {/* Action buttons */}
+                    <div className="flex gap-2">
                       {order.status === "pending" && (
-                        <Button size="sm" variant="outline">
-                          Preparar
+                        <Button size="sm" variant="default" className="flex-1">
+                          Iniciar Preparación
                         </Button>
                       )}
                       {order.status === "preparing" && (
-                        <Button size="sm" variant="outline">
-                          Entregar
+                        <Button size="sm" variant="default" className="flex-1">
+                          Marcar Entregado
                         </Button>
                       )}
-                    </td>
-                  </tr>
-                )
-              })}
-            </tbody>
-          </table>
-        </div>
-      )}
-    </div>
+                    </div>
+                  </div>
+                </Card>
+              )
+            })}
+          </div>
+        ) : (
+          /* Table View */
+          <div className="border rounded-lg overflow-hidden">
+            <table className="w-full">
+              <thead className="bg-muted border-b">
+                <tr>
+                  <th className="px-4 py-3 text-left text-sm font-semibold">Pedido</th>
+                  <th className="px-4 py-3 text-left text-sm font-semibold">Cliente</th>
+                  <th className="px-4 py-3 text-left text-sm font-semibold">Habitación</th>
+                  <th className="px-4 py-3 text-left text-sm font-semibold">Estado</th>
+                  <th className="px-4 py-3 text-left text-sm font-semibold">Entrega</th>
+                  <th className="px-4 py-3 text-left text-sm font-semibold">Total</th>
+                  <th className="px-4 py-3 text-left text-sm font-semibold">Acciones</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y">
+                {filteredOrders.map((order) => {
+                  const statusBadge = getStatusBadge(order.status)
+                  const delayIndicator = getDelayIndicator(order.delayStatus)
+
+                  return (
+                    <tr key={order.id} className="hover:bg-muted/50">
+                      <td className="px-4 py-3 text-sm font-medium">{order.id}</td>
+                      <td className="px-4 py-3 text-sm">{order.guest}</td>
+                      <td className="px-4 py-3 text-sm">{order.room}</td>
+                      <td className="px-4 py-3">
+                        <div className="flex items-center gap-2">
+                          <Badge className={statusBadge.badgeClass}>
+                            {statusBadge.label}
+                          </Badge>
+                          {delayIndicator && (
+                            <span className={`text-xs font-medium ${delayIndicator.color}`}>
+                              {delayIndicator.icon === AlertTriangle ? "⚠️" : "🔴"} {delayIndicator.label}
+                            </span>
+                          )}
+                        </div>
+                      </td>
+                      <td className="px-4 py-3 text-sm">
+                        {order.status !== "delivered" ? order.estimatedDelivery : `Entregado ${order.deliveredAt}`}
+                      </td>
+                      <td className="px-4 py-3 text-sm font-medium">€{order.total.toFixed(2)}</td>
+                      <td className="px-4 py-3">
+                        {order.status === "pending" && (
+                          <Button size="sm" variant="outline">
+                            Preparar
+                          </Button>
+                        )}
+                        {order.status === "preparing" && (
+                          <Button size="sm" variant="outline">
+                            Entregar
+                          </Button>
+                        )}
+                      </td>
+                    </tr>
+                  )
+                })}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </div>
     </>
   )
 }
