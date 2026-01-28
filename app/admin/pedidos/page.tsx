@@ -10,6 +10,8 @@ export default function PedidosPage() {
   const [filter, setFilter] = useState<"all" | "pending" | "preparing" | "delivered">("all")
   const [viewMode, setViewMode] = useState<"kanban" | "list">("kanban")
   const [showNewOrderModal, setShowNewOrderModal] = useState(false)
+  const [showEditModal, setShowEditModal] = useState(false)
+  const [selectedOrder, setSelectedOrder] = useState<any>(null)
   const [searchDate, setSearchDate] = useState("2024-01-13")
   const [searchGuest, setSearchGuest] = useState("")
   const [searchRoom, setSearchRoom] = useState("")
@@ -97,6 +99,20 @@ export default function PedidosPage() {
     const roomMatch = !searchRoom || order.room.includes(searchRoom)
     return dateMatch && guestMatch && roomMatch
   })
+
+  const handleEditOrder = (order: any) => {
+    setSelectedOrder(JSON.parse(JSON.stringify(order)))
+    setShowEditModal(true)
+  }
+
+  const handleSaveOrder = () => {
+    if (selectedOrder) {
+      // Aquí iría la lógica para actualizar el pedido
+      console.log("Pedido actualizado:", selectedOrder)
+      setShowEditModal(false)
+      setSelectedOrder(null)
+    }
+  }
 
   const getStatusBadge = (status: string) => {
     const statusConfig = {
@@ -326,7 +342,8 @@ export default function PedidosPage() {
               return (
                 <Card
                   key={order.id}
-                  className={`p-6 border-0 ${statusBadge.bgColor}`}
+                  className={`p-6 border-0 ${statusBadge.bgColor} cursor-pointer hover:shadow-lg transition-shadow`}
+                  onClick={() => handleEditOrder(order)}
                 >
                   <div className="space-y-4">
                     {/* Header with status top-right and estimated time below */}
@@ -431,7 +448,7 @@ export default function PedidosPage() {
                   const delayIndicator = getDelayIndicator(order.delayStatus)
 
                   return (
-                    <tr key={order.id} className="hover:bg-muted/50">
+                    <tr key={order.id} className="hover:bg-muted/50 cursor-pointer" onClick={() => handleEditOrder(order)}>
                       <td className="px-4 py-3 text-sm font-medium">{order.id}</td>
                       <td className="px-4 py-3 text-sm">{order.guest}</td>
                       <td className="px-4 py-3 text-sm">{order.room}</td>
@@ -471,6 +488,170 @@ export default function PedidosPage() {
           </div>
         )}
       </div>
+
+      {/* Edit Order Modal */}
+      {showEditModal && selectedOrder && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
+          <div className="bg-white rounded-2xl shadow-2xl p-6 w-full max-w-2xl mx-4 max-h-[90vh] overflow-y-auto">
+            <h2 className="text-2xl font-bold text-foreground mb-6">Editar Pedido #{selectedOrder.id}</h2>
+
+            <div className="space-y-6">
+              {/* Guest and Room Info */}
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Huésped</label>
+                  <input
+                    type="text"
+                    value={selectedOrder.guest}
+                    onChange={(e) => setSelectedOrder({ ...selectedOrder, guest: e.target.value })}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Habitación</label>
+                  <input
+                    type="text"
+                    value={selectedOrder.room}
+                    onChange={(e) => setSelectedOrder({ ...selectedOrder, room: e.target.value })}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+                </div>
+              </div>
+
+              {/* Status and Timing */}
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Estado</label>
+                  <select
+                    value={selectedOrder.status}
+                    onChange={(e) => setSelectedOrder({ ...selectedOrder, status: e.target.value })}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  >
+                    <option value="pending">Pendiente</option>
+                    <option value="preparing">En Preparación</option>
+                    <option value="delivered">Entregado</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Entrega Estimada</label>
+                  <input
+                    type="text"
+                    value={selectedOrder.estimatedDelivery}
+                    onChange={(e) => setSelectedOrder({ ...selectedOrder, estimatedDelivery: e.target.value })}
+                    placeholder="HH:MM - HH:MM"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+                </div>
+              </div>
+
+              {/* Items */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Ítems</label>
+                <div className="space-y-3 bg-gray-50 p-4 rounded-lg">
+                  {selectedOrder.items.map((item: any, idx: number) => (
+                    <div key={idx} className="flex gap-3 items-end">
+                      <div className="flex-1">
+                        <input
+                          type="text"
+                          value={item.name}
+                          onChange={(e) => {
+                            const newItems = [...selectedOrder.items]
+                            newItems[idx].name = e.target.value
+                            setSelectedOrder({ ...selectedOrder, items: newItems })
+                          }}
+                          className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                          placeholder="Nombre del ítem"
+                        />
+                      </div>
+                      <div className="w-20">
+                        <input
+                          type="number"
+                          value={item.quantity}
+                          onChange={(e) => {
+                            const newItems = [...selectedOrder.items]
+                            newItems[idx].quantity = parseInt(e.target.value) || 0
+                            setSelectedOrder({ ...selectedOrder, items: newItems })
+                          }}
+                          className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                          placeholder="Qty"
+                          min="1"
+                        />
+                      </div>
+                      <div className="w-24">
+                        <input
+                          type="number"
+                          value={item.price}
+                          onChange={(e) => {
+                            const newItems = [...selectedOrder.items]
+                            newItems[idx].price = parseFloat(e.target.value) || 0
+                            setSelectedOrder({ ...selectedOrder, items: newItems })
+                          }}
+                          className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                          placeholder="Precio"
+                          step="0.01"
+                          min="0"
+                        />
+                      </div>
+                      <button
+                        onClick={() => {
+                          const newItems = selectedOrder.items.filter((_: any, i: number) => i !== idx)
+                          setSelectedOrder({ ...selectedOrder, items: newItems })
+                        }}
+                        className="px-3 py-2 bg-red-100 text-red-600 hover:bg-red-200 rounded-lg transition-colors"
+                      >
+                        ✕
+                      </button>
+                    </div>
+                  ))}
+                  <button
+                    onClick={() => {
+                      setSelectedOrder({
+                        ...selectedOrder,
+                        items: [...selectedOrder.items, { name: "", quantity: 1, price: 0 }]
+                      })
+                    }}
+                    className="w-full py-2 text-sm text-blue-600 hover:text-blue-700 font-medium"
+                  >
+                    + Agregar ítem
+                  </button>
+                </div>
+              </div>
+
+              {/* Total */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Total</label>
+                <input
+                  type="number"
+                  value={selectedOrder.total}
+                  onChange={(e) => setSelectedOrder({ ...selectedOrder, total: parseFloat(e.target.value) || 0 })}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  step="0.01"
+                  min="0"
+                />
+              </div>
+            </div>
+
+            {/* Action buttons */}
+            <div className="flex gap-3 mt-8">
+              <button
+                onClick={() => {
+                  setShowEditModal(false)
+                  setSelectedOrder(null)
+                }}
+                className="px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition-colors font-medium flex-1"
+              >
+                Cancelar
+              </button>
+              <button
+                onClick={handleSaveOrder}
+                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium flex-1"
+              >
+                Guardar Cambios
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </>
   )
 }
