@@ -174,81 +174,100 @@ export default function PedidosPage() {
 
       <div className="p-8 space-y-6">
 
-        {/* Stats */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          <div
-            className="relative overflow-hidden rounded-lg p-4 text-white shadow-md hover:shadow-lg transition-all duration-300 hover:scale-105 cursor-pointer group"
-            style={{ background: "linear-gradient(135deg, rgb(236, 72, 153), rgb(219, 39, 119))" }}
-            onClick={() => setFilter("all")}
-          >
+        <div
+          className="relative overflow-hidden rounded-lg p-4 shadow-md hover:shadow-lg transition-all duration-300 hover:scale-105 cursor-pointer group"
+          style={{
+            background: filter === "all" ? "linear-gradient(135deg, rgb(124, 58, 255), rgb(109, 40, 217))" : "white",
+            color: filter === "all" ? "white" : "black"
+          }}
+          onClick={() => setFilter("all")}
+        >
+          {filter === "all" && (
             <div className="absolute inset-0 opacity-10">
               <div className="absolute top-0 right-0 w-20 h-20 bg-white rounded-full -mr-8 -mt-8"></div>
             </div>
-            <div className="relative flex items-center gap-3">
-              <div className="p-2 bg-white/20 rounded-lg">
-                <Clock className="w-5 h-5" />
-              </div>
-              <div>
-                <p className="text-sm opacity-90">Todos</p>
-                <p className="text-2xl font-bold">{orders.length}</p>
-              </div>
+          )}
+          <div className="relative flex items-center gap-3">
+            <div className={`p-2 rounded-lg ${filter === "all" ? "bg-white/20" : "bg-gray-200"}`}>
+              <ShoppingCart className={`w-5 h-5 ${filter === "all" ? "text-white" : "text-gray-700"}`} />
             </div>
-          </div>
-          <div
-            className="relative overflow-hidden rounded-lg p-4 text-white shadow-md hover:shadow-lg transition-all duration-300 hover:scale-105 cursor-pointer group"
-            style={{ background: "linear-gradient(135deg, rgb(234, 179, 8), rgb(202, 138, 4))" }}
-            onClick={() => setFilter("pending")}
-          >
-            <div className="absolute inset-0 opacity-10">
-              <div className="absolute top-0 right-0 w-20 h-20 bg-white rounded-full -mr-8 -mt-8"></div>
-            </div>
-            <div className="relative flex items-center gap-3">
-              <div className="p-2 bg-white/20 rounded-lg">
-                <Clock className="w-5 h-5" />
-              </div>
-              <div>
-                <p className="text-sm opacity-90">Pendientes</p>
-                <p className="text-2xl font-bold">{orders.filter((o) => o.status === "pending").length}</p>
-              </div>
-            </div>
-          </div>
-          <div
-            className="relative overflow-hidden rounded-lg p-4 text-white shadow-md hover:shadow-lg transition-all duration-300 hover:scale-105 cursor-pointer group"
-            style={{ background: "linear-gradient(135deg, rgb(37, 99, 235), rgb(29, 78, 216))" }}
-            onClick={() => setFilter("preparing")}
-          >
-            <div className="absolute inset-0 opacity-10">
-              <div className="absolute top-0 right-0 w-20 h-20 bg-white rounded-full -mr-8 -mt-8"></div>
-            </div>
-            <div className="relative flex items-center gap-3">
-              <div className="p-2 bg-white/20 rounded-lg">
-                <ChefHat className="w-5 h-5" />
-              </div>
-              <div>
-                <p className="text-sm opacity-90">En Preparación</p>
-                <p className="text-2xl font-bold">{orders.filter((o) => o.status === "preparing").length}</p>
-              </div>
-            </div>
-          </div>
-          <div
-            className="relative overflow-hidden rounded-lg p-4 text-white shadow-md hover:shadow-lg transition-all duration-300 hover:scale-105 cursor-pointer group"
-            style={{ background: "linear-gradient(135deg, rgb(34, 197, 94), rgb(22, 163, 74))" }}
-            onClick={() => setFilter("delivered")}
-          >
-            <div className="absolute inset-0 opacity-10">
-              <div className="absolute top-0 right-0 w-20 h-20 bg-white rounded-full -mr-8 -mt-8"></div>
-            </div>
-            <div className="relative flex items-center gap-3">
-              <div className="p-2 bg-white/20 rounded-lg">
-                <CheckCircle2 className="w-5 h-5" />
-              </div>
-              <div>
-                <p className="text-sm opacity-90">Entregados</p>
-                <p className="text-2xl font-bold">{orders.filter((o) => o.status === "delivered").length}</p>
-              </div>
+            <div>
+              <p className={`text-sm ${filter === "all" ? "opacity-90" : "text-muted-foreground"}`}>Todos</p>
+              <p className="text-2xl font-bold">{orders.length}</p>
             </div>
           </div>
         </div>
+        <div
+          className="relative overflow-hidden rounded-lg p-4 shadow-md hover:shadow-lg transition-all duration-300 hover:scale-105 cursor-pointer group"
+          style={{
+            background: filter === "pending" ? "linear-gradient(135deg, rgb(234, 179, 8), rgb(202, 138, 4))" : "white",
+            color: filter === "pending" ? "white" : "black"
+          }}
+          onClick={() => setFilter("pending")}
+        >
+          {filter === "pending" && (
+            <div className="absolute inset-0 opacity-10">
+              <div className="absolute top-0 right-0 w-20 h-20 bg-white rounded-full -mr-8 -mt-8"></div>
+            </div>
+          )}
+          <div className="relative flex items-center gap-3">
+            <div className={`p-2 rounded-lg ${filter === "pending" ? "bg-white/20" : "bg-gray-200"}`}>
+              <Clock className={`w-5 h-5 ${filter === "pending" ? "text-white" : "text-gray-700"}`} />
+            </div>
+            <div>
+              <p className={`text-sm ${filter === "pending" ? "opacity-90" : "text-muted-foreground"}`}>Pendientes</p>
+              <p className="text-2xl font-bold">{orders.filter((o) => o.status === "pending").length}</p>
+            </div>
+          </div>
+        </div>
+        <div
+          className="relative overflow-hidden rounded-lg p-4 shadow-md hover:shadow-lg transition-all duration-300 hover:scale-105 cursor-pointer group"
+          style={{
+            background: filter === "preparing" ? "linear-gradient(135deg, rgb(37, 99, 235), rgb(29, 78, 216))" : "white",
+            color: filter === "preparing" ? "white" : "black"
+          }}
+          onClick={() => setFilter("preparing")}
+        >
+          {filter === "preparing" && (
+            <div className="absolute inset-0 opacity-10">
+              <div className="absolute top-0 right-0 w-20 h-20 bg-white rounded-full -mr-8 -mt-8"></div>
+            </div>
+          )}
+          <div className="relative flex items-center gap-3">
+            <div className={`p-2 rounded-lg ${filter === "preparing" ? "bg-white/20" : "bg-gray-200"}`}>
+              <ChefHat className={`w-5 h-5 ${filter === "preparing" ? "text-white" : "text-gray-700"}`} />
+            </div>
+            <div>
+              <p className={`text-sm ${filter === "preparing" ? "opacity-90" : "text-muted-foreground"}`}>En Preparación</p>
+              <p className="text-2xl font-bold">{orders.filter((o) => o.status === "preparing").length}</p>
+            </div>
+          </div>
+        </div>
+        <div
+          className="relative overflow-hidden rounded-lg p-4 shadow-md hover:shadow-lg transition-all duration-300 hover:scale-105 cursor-pointer group"
+          style={{
+            background: filter === "delivered" ? "linear-gradient(135deg, rgb(34, 197, 94), rgb(22, 163, 74))" : "white",
+            color: filter === "delivered" ? "white" : "black"
+          }}
+          onClick={() => setFilter("delivered")}
+        >
+          {filter === "delivered" && (
+            <div className="absolute inset-0 opacity-10">
+              <div className="absolute top-0 right-0 w-20 h-20 bg-white rounded-full -mr-8 -mt-8"></div>
+            </div>
+          )}
+          <div className="relative flex items-center gap-3">
+            <div className={`p-2 rounded-lg ${filter === "delivered" ? "bg-white/20" : "bg-gray-200"}`}>
+              <CheckCircle2 className={`w-5 h-5 ${filter === "delivered" ? "text-white" : "text-gray-700"}`} />
+            </div>
+            <div>
+              <p className={`text-sm ${filter === "delivered" ? "opacity-90" : "text-muted-foreground"}`}>Entregados</p>
+              <p className="text-2xl font-bold">{orders.filter((o) => o.status === "delivered").length}</p>
+            </div>
+          </div>
+        </div>
+      </div>
 
         {/* View Mode Switcher */}
         <div className="flex gap-2">
