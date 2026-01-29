@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import { useRouter } from "next/navigation"
 import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
@@ -175,6 +176,7 @@ const handleShowBookingsDetail = (slotBookings: Booking[]) => {
 
 export default function DashboardControl() {
   const { t } = useLanguage()
+  const router = useRouter()
   const [activeTab, setActiveTab] = useState<"rooms" | "staff" | "facilities" | "checkouts">("rooms")
   const [timelineMode, setTimelineMode] = useState<"week" | "month">("week")
   const [currentDate, setCurrentDate] = useState(new Date())
@@ -1141,7 +1143,14 @@ export default function DashboardControl() {
                   {filteredCheckouts.map((checkout) => (
                     <tr key={checkout.id} className="border-b border-gray-100 hover:bg-gray-50 transition-colors">
                       <td className="px-4 py-3 text-gray-900 font-semibold">#{checkout.room}</td>
-                      <td className="px-4 py-3 text-gray-700">{checkout.guestName}</td>
+                      <td className="px-4 py-3 text-gray-700">
+                        <button
+                          onClick={() => router.push(`/admin/clients/${checkout.id}`)}
+                          className="text-blue-600 hover:text-blue-800 hover:underline transition-colors"
+                        >
+                          {checkout.guestName}
+                        </button>
+                      </td>
                       <td className="px-4 py-3 text-right font-semibold text-gray-900">
                         ${checkout.balance.toLocaleString()}
                       </td>
@@ -1167,8 +1176,10 @@ export default function DashboardControl() {
                         {checkout.status === "pending" ? (
                           <button
                             onClick={() => handleCompleteCheckout(checkout.id)}
-                            className="px-3 py-1 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors text-xs font-medium"
+                            className="flex items-center justify-center gap-1 px-3 py-1.5 text-white rounded-lg text-xs font-medium transition-all hover:opacity-90"
+                            style={{ backgroundColor: "#235E20" }}
                           >
+                            <CheckCircle2 className="w-4 h-4" />
                             Completar
                           </button>
                         ) : (
