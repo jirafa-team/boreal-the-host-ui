@@ -20,6 +20,7 @@ const clientDetails = {
   nationality: "Argentina",
   city: "Buenos Aires",
   vip: true,
+  category: "VIP" as const,
   memberSince: "2023-03-20",
   totalVisits: 12,
   totalSpent: 8750,
@@ -216,6 +217,35 @@ export default function ClientDetailPage() {
     }
   }
 
+  const getClientTierBadge = (category: string) => {
+    const categoryConfig = {
+      Basic: {
+        className: "bg-blue-100 text-blue-800",
+        label: "Basic"
+      },
+      Preferred: {
+        className: "bg-gray-100 text-gray-800",
+        label: "Preferred"
+      },
+      Elite: {
+        className: "bg-yellow-100 text-yellow-800",
+        label: "Elite"
+      },
+      VIP: {
+        className: "bg-black text-white",
+        label: "VIP"
+      }
+    }
+
+    const config = categoryConfig[category as keyof typeof categoryConfig] || categoryConfig.Basic
+
+    return (
+      <Badge className={`${config.className} border-0`}>
+        {config.label}
+      </Badge>
+    )
+  }
+
   const getCategoryIcon = (category: string) => {
     switch (category) {
       case "Room Service":
@@ -264,12 +294,7 @@ export default function ClientDetailPage() {
                 <div className="flex-1">
                   <div className="flex items-center gap-3 mb-2">
                     <h2 className="text-2xl font-bold text-foreground">{clientDetails.name}</h2>
-                    {clientDetails.vip && (
-                      <Badge className="bg-amber-500/10 text-amber-600 border-amber-500/20">
-                        <Star className="w-3 h-3 mr-1 fill-amber-600" />
-                        VIP
-                      </Badge>
-                    )}
+                    {getClientTierBadge(clientDetails.category)}
                   </div>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-sm">
                     <div className="flex items-center gap-2 text-muted-foreground">
@@ -420,7 +445,7 @@ export default function ClientDetailPage() {
                         <div className="flex items-center gap-1 mt-1">
                           {[...Array(5)].map((_, i) => (
                             <Star
-                              key={i}
+                              key={`rating-star-${i}`}
                               className={`w-3 h-3 ${
                                 i < reservation.rating ? "fill-amber-500 text-amber-500" : "text-gray-300"
                               }`}
@@ -464,7 +489,7 @@ export default function ClientDetailPage() {
                                       </div>
                                       <ul className="text-xs text-muted-foreground space-y-1 ml-6">
                                         {purchase.items.map((item, itemIdx) => (
-                                          <li key={itemIdx}>• {item}</li>
+                                          <li key={`purchase-item-${purchase.category}-${itemIdx}`}>• {item}</li>
                                         ))}
                                       </ul>
                                     </div>
@@ -482,7 +507,7 @@ export default function ClientDetailPage() {
                                   <h4 className="text-sm font-semibold text-foreground mb-2">Actividades:</h4>
                                   <ul className="text-sm text-muted-foreground space-y-1">
                                     {reservation.activities.map((activity, idx) => (
-                                      <li key={idx} className="flex items-start gap-2">
+                                      <li key={`activity-${idx}-${activity.substring(0, 10)}`} className="flex items-start gap-2">
                                         <CheckCircle2 className="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" />
                                         {activity}
                                       </li>
