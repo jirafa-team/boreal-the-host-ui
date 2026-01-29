@@ -490,10 +490,9 @@ export default function ClientDetailPage() {
                 {clientDetails.registeredEvents
                   .filter((event) => {
                     const eventDate = new Date(event.date)
-                    const today = new Date()
-                    today.setHours(0, 0, 0, 0)
+                    const checkIn = new Date(clientDetails.currentReservation.checkIn)
                     const checkOut = new Date(clientDetails.currentReservation.checkOut)
-                    return eventDate >= today && eventDate <= checkOut
+                    return eventDate >= checkIn && eventDate <= checkOut
                   })
                   .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
                   .map((event) => (
@@ -513,10 +512,9 @@ export default function ClientDetailPage() {
                   ))}
                 {clientDetails.registeredEvents.filter((event) => {
                   const eventDate = new Date(event.date)
-                  const today = new Date()
-                  today.setHours(0, 0, 0, 0)
+                  const checkIn = new Date(clientDetails.currentReservation.checkIn)
                   const checkOut = new Date(clientDetails.currentReservation.checkOut)
-                  return eventDate >= today && eventDate <= checkOut
+                  return eventDate >= checkIn && eventDate <= checkOut
                 }).length === 0 && (
                   <p className="text-sm text-muted-foreground text-center py-4">No hay eventos próximos</p>
                 )}
