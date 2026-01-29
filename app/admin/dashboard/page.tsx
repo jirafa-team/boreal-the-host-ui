@@ -1077,16 +1077,16 @@ export default function DashboardControl() {
               <h2 className="text-2xl font-bold text-foreground">Check-outs del Día</h2>
               <div className="flex gap-3">
                 <div className="bg-green-50 rounded-lg px-6 py-4 border border-green-200 flex flex-col items-center justify-center">
-                  <p className="text-lg font-bold text-green-600 mb-2">
+                  <p className="text-5xl font-bold text-green-600 mb-2">
                     {mockCheckouts.filter(c => c.status === "completed").length}
                   </p>
-                  <p className="text-gray-600 text-sm">Completados</p>
+                  <p className="text-gray-600 text-xs">Completados</p>
                 </div>
                 <div className="bg-orange-50 rounded-lg px-6 py-4 border border-orange-200 flex flex-col items-center justify-center">
-                  <p className="text-lg font-bold text-orange-600 mb-2">
+                  <p className="text-5xl font-bold text-orange-600 mb-2">
                     {mockCheckouts.filter(c => c.status === "pending").length}
                   </p>
-                  <p className="text-gray-600 text-sm">Pendientes</p>
+                  <p className="text-gray-600 text-xs">Pendientes</p>
                 </div>
               </div>
             </div>
