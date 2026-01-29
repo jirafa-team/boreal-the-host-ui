@@ -46,15 +46,16 @@ interface Client {
   room: string
   checkIn: string
   checkOut: string
-  status: "checked-in" | "reserved" | "checked-out"
+  status: "checked-in" | "checked-out" | "reserved"
   vip: boolean
   nationality: string
   guests: number
   totalSpent: number
-  notes: string
-  groupMembers?: Guest[]
-  roomType?: "premium" | "deluxe" | "standard"
+  notes?: string
+  roomType?: "standard" | "deluxe" | "premium"
   visitCount?: number
+  groupMembers?: Array<{ id: string; name: string; email: string; phone: string; relationship: string }>
+  category?: "Basic" | "Preferred" | "Elite" | "VIP"
 }
 
 const mockClients: Client[] = [
@@ -74,6 +75,7 @@ const mockClients: Client[] = [
     notes: "Cliente frecuente, prefiere habitación con vista al mar",
     roomType: "premium",
     visitCount: 5,
+    category: "VIP",
     groupMembers: [
       { id: "1a", name: "Laura Mendoza", email: "laura.m@email.com", phone: "+34 612 345 679", relationship: "Esposa" },
     ],
@@ -94,6 +96,7 @@ const mockClients: Client[] = [
     notes: "",
     roomType: "standard",
     visitCount: 1,
+    category: "Basic",
   },
   {
     id: "3",
@@ -107,83 +110,83 @@ const mockClients: Client[] = [
     vip: true,
     nationality: "USA",
     guests: 3,
-    totalSpent: 0,
-    notes: "Aniversario de bodas, preparar decoración especial",
-    roomType: "deluxe",
-    visitCount: 2,
-    groupMembers: [
-      { id: "3a", name: "Emma Smith", email: "emma.s@email.com", phone: "+1 555 123 4568", relationship: "Esposa" },
-      { id: "3b", name: "Lucas Smith", email: "lucas.s@email.com", phone: "+1 555 123 4569", relationship: "Hijo" },
-    ],
+    totalSpent: 2800,
+    notes: "Requiere servicio concierge",
+    roomType: "premium",
+    visitCount: 8,
+    category: "Elite",
   },
   {
     id: "4",
-    name: "Sophie Dubois",
-    email: "sophie.dubois@email.com",
-    phone: "+33 6 12 34 56 78",
-    room: "401",
-    checkIn: "2025-01-08",
-    checkOut: "2025-01-11",
-    status: "checked-out",
+    name: "Sophie Laurent",
+    email: "sophie.laurent@email.com",
+    phone: "+33 612 345 678",
+    room: "405",
+    checkIn: "2025-01-16",
+    checkOut: "2025-01-18",
+    status: "checked-in",
     vip: false,
     nationality: "Francia",
-    guests: 2,
-    totalSpent: 890,
-    notes: "",
-    roomType: "standard",
-    visitCount: 2,
-    groupMembers: [
-      {
-        id: "4a",
-        name: "Pierre Dubois",
-        email: "pierre.d@email.com",
-        phone: "+33 6 12 34 56 79",
-        relationship: "Esposo",
-      },
-    ],
+    guests: 1,
+    totalSpent: 680,
+    notes: "Prefiere comidas vegetarianas",
+    roomType: "deluxe",
+    visitCount: 3,
+    category: "Preferred",
   },
   {
     id: "5",
-    name: "Alessandro Rossi",
-    email: "alessandro.rossi@email.com",
-    phone: "+39 345 678 9012",
-    room: "103",
+    name: "Ahmed Hassan",
+    email: "ahmed.hassan@email.com",
+    phone: "+966 50 123 4567",
+    room: "301",
     checkIn: "2025-01-11",
-    checkOut: "2025-01-13",
+    checkOut: "2025-01-16",
     status: "checked-in",
-    vip: false,
-    nationality: "Italia",
-    guests: 1,
-    totalSpent: 320,
-    notes: "",
-    roomType: "standard",
-    visitCount: 7,
+    vip: true,
+    nationality: "Arabia Saudita",
+    guests: 4,
+    totalSpent: 3500,
+    notes: "Cliente VIP - Primer viaje",
+    roomType: "premium",
+    visitCount: 1,
+    category: "VIP",
   },
   {
     id: "6",
-    name: "Ana Torres",
-    email: "ana.torres@email.com",
-    phone: "+34 687 234 567",
-    room: "605",
-    checkIn: "2025-01-16",
-    checkOut: "2025-01-22",
-    status: "reserved",
-    vip: true,
-    nationality: "Argentina",
+    name: "Emma Wilson",
+    email: "emma.wilson@email.com",
+    phone: "+44 20 7946 0958",
+    room: "103",
+    checkIn: "2025-01-13",
+    checkOut: "2025-01-17",
+    status: "checked-in",
+    vip: false,
+    nationality: "Reino Unido",
     guests: 2,
-    totalSpent: 0,
-    notes: "Viaje de negocios, requiere factura",
-    roomType: "premium",
+    totalSpent: 550,
+    notes: "",
+    roomType: "standard",
+    visitCount: 2,
+    category: "Basic",
+  },
+  {
+    id: "7",
+    name: "Roberto Silva",
+    email: "roberto.silva@email.com",
+    phone: "+55 11 98765-4321",
+    room: "502",
+    checkIn: "2025-01-09",
+    checkOut: "2025-01-14",
+    status: "checked-out",
+    vip: false,
+    nationality: "Brasil",
+    guests: 1,
+    totalSpent: 920,
+    notes: "Solicitó early checkout",
+    roomType: "deluxe",
     visitCount: 4,
-    groupMembers: [
-      {
-        id: "6a",
-        name: "Roberto Torres",
-        email: "roberto.t@email.com",
-        phone: "+34 687 234 568",
-        relationship: "Hermano",
-      },
-    ],
+    category: "Elite",
   },
 ]
 
@@ -208,7 +211,8 @@ export default function ClientsPage() {
     status: "active" as const,
     vip: false,
     visitCount: 1,
-    notes: ""
+    notes: "",
+    category: "Basic" as const
   })
 
   const activeClients = clients.filter((client) => client.status === "checked-in" || client.status === "reserved")
@@ -260,33 +264,34 @@ export default function ClientsPage() {
   }
 
   const getClientTierBadge = (client: Client) => {
-    const badges = []
-
-    // VIP or Premium Room Badge (Gold)
-    if (client.vip || client.roomType === "premium" || client.roomType === "deluxe") {
-      badges.push(
-        <Badge
-          key="vip"
-          className="bg-gradient-to-r from-amber-500 to-yellow-500 text-white border-0 shadow-lg shadow-amber-500/30"
-        >
-          ★ {t("admin.vip")}
-        </Badge>,
-      )
+    const category = client.category || "Basic"
+    
+    const categoryConfig = {
+      Basic: {
+        className: "bg-blue-100 text-blue-800",
+        label: "Basic"
+      },
+      Preferred: {
+        className: "bg-gray-100 text-gray-800",
+        label: "Preferred"
+      },
+      Elite: {
+        className: "bg-yellow-100 text-yellow-800",
+        label: "Elite"
+      },
+      VIP: {
+        className: "bg-black text-white",
+        label: "VIP"
+      }
     }
 
-    // Frequent Guest Badge (Silver/Blue) - 3+ visits
-    if (client.visitCount && client.visitCount >= 3) {
-      badges.push(
-        <Badge
-          key="frequent"
-          className="bg-gradient-to-r from-blue-500 to-cyan-500 text-white border-0 shadow-lg shadow-blue-500/30"
-        >
-          ♥ {t("admin.frequentGuest")}
-        </Badge>,
-      )
-    }
+    const config = categoryConfig[category]
 
-    return badges
+    return (
+      <Badge className={`${config.className} border-0`}>
+        {config.label}
+      </Badge>
+    )
   }
 
   const handleAddClient = () => {
@@ -791,6 +796,21 @@ export default function ClientsPage() {
                     min="1"
                   />
                 </div>
+              </div>
+
+              {/* Client Category */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Categoría de Cliente</label>
+                <select
+                  value={newClient.category}
+                  onChange={(e) => setNewClient({ ...newClient, category: e.target.value as "Basic" | "Preferred" | "Elite" | "VIP" })}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                >
+                  <option value="Basic">Basic</option>
+                  <option value="Preferred">Preferred</option>
+                  <option value="Elite">Elite</option>
+                  <option value="VIP">VIP</option>
+                </select>
               </div>
 
               {/* Notes */}
