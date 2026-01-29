@@ -365,6 +365,22 @@ export default function EventsManagement() {
                       </Select>
                     </div>
                   </div>
+
+                  {/* Action Buttons */}
+                  <div className="flex gap-3 justify-end pt-4 border-t mt-6">
+                    <Button
+                      variant="outline"
+                      onClick={() => setCreateDialogOpen(false)}
+                    >
+                      Cancelar
+                    </Button>
+                    <Button
+                      onClick={handleCreateEvent}
+                      disabled={!newEvent.name || !newEvent.date || !newEvent.time || !newEvent.location || !newEvent.capacity}
+                    >
+                      Guardar Evento
+                    </Button>
+                  </div>
                 </DialogContent>
               </Dialog>
             </div>
