@@ -24,6 +24,7 @@ const gradientColors: { [key: string]: string } = {
   'from-red-600 to-red-700': 'linear-gradient(135deg, rgb(220, 38, 38), rgb(185, 28, 28))',
   'from-yellow-600 to-yellow-700': 'linear-gradient(135deg, rgb(202, 138, 4), rgb(161, 98, 7))',
   'from-green-600 to-green-700': 'linear-gradient(135deg, #5b9f00, #4a7f00)',
+  'from-violet-custom to-violet-custom': 'linear-gradient(135deg, #7d1efa, #6d0ee6)',
 }
 
 export default function SettingsPage() {
@@ -619,7 +620,7 @@ export default function SettingsPage() {
     {
       label: 'Clientes',
       icon: Users,
-      color: 'from-chart-4 to-chart-4',
+      color: 'from-violet-custom to-violet-custom',
     },
   ]
 
