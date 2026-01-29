@@ -1057,7 +1057,23 @@ export default function DashboardControl() {
       {activeTab === "checkouts" && (
         <div className="px-8 py-6">
           <Card className="p-6">
-            <h2 className="text-2xl font-bold text-foreground mb-6">Check-outs del Día</h2>
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-2xl font-bold text-foreground">Check-outs del Día</h2>
+              <div className="flex gap-3">
+                <div className="bg-green-50 rounded-lg px-3 py-2 border border-green-200">
+                  <p className="text-gray-600 text-xs mb-0.5">Completados</p>
+                  <p className="text-lg font-bold text-green-600">
+                    {mockCheckouts.filter(c => c.status === "completed").length}
+                  </p>
+                </div>
+                <div className="bg-orange-50 rounded-lg px-3 py-2 border border-orange-200">
+                  <p className="text-gray-600 text-xs mb-0.5">Pendientes</p>
+                  <p className="text-lg font-bold text-orange-600">
+                    {mockCheckouts.filter(c => c.status === "pending").length}
+                  </p>
+                </div>
+              </div>
+            </div>
 
             {/* Search and Filter Section */}
             <div className="mb-6 grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -1136,21 +1152,6 @@ export default function DashboardControl() {
                   ))}
                 </tbody>
               </table>
-            </div>
-
-            <div className="mt-6 grid grid-cols-2 gap-4">
-              <div className="bg-green-50 rounded-lg p-4 border border-green-200">
-                <p className="text-gray-600 text-sm mb-1">Completados</p>
-                <p className="text-3xl font-bold text-green-600">
-                  {mockCheckouts.filter(c => c.status === "completed").length}
-                </p>
-              </div>
-              <div className="bg-orange-50 rounded-lg p-4 border border-orange-200">
-                <p className="text-gray-600 text-sm mb-1">Pendientes</p>
-                <p className="text-3xl font-bold text-orange-600">
-                  {mockCheckouts.filter(c => c.status === "pending").length}
-                </p>
-              </div>
             </div>
           </Card>
         </div>
