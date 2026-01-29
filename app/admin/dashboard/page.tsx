@@ -184,6 +184,7 @@ export default function DashboardControl() {
   const [expandedSections, setExpandedSections] = useState(new Set<string>())
   const [selectedSlotBookings, setSelectedSlotBookings] = useState<Booking[]>([])
   const [bookingsDetailOpen, setBookingsDetailOpen] = useState(false)
+  const [showCheckoutsModal, setShowCheckoutsModal] = useState(false)
 
   const mockFacilities: Facility[] = [
     { id: "1", name: "Gimnasio", type: "fitness", capacity: 15, icon: Dumbbell, color: "bg-orange-500", startTime: "06:00", endTime: "22:00" },
@@ -222,6 +223,16 @@ export default function DashboardControl() {
     setSelectedSlotBookings(bookingsList)
     setBookingsDetailOpen(true)
   }
+
+  const mockCheckouts = [
+    { id: 1, room: "301", guestName: "Carlos Mendoza", amount: 1250, status: "pending" as const },
+    { id: 2, room: "205", guestName: "María García", amount: 450, status: "paid" as const },
+    { id: 3, room: "412", guestName: "John Smith", amount: 2800, status: "pending" as const },
+    { id: 4, room: "501", guestName: "Ahmed Hassan", amount: 3500, status: "pending" as const },
+    { id: 5, room: "103", guestName: "Emma Wilson", amount: 550, status: "pending" as const },
+    { id: 6, room: "502", guestName: "Roberto Silva", amount: 920, status: "paid" as const },
+  ]
+
   const staffMembers: StaffMember[] = [
     {
       id: 1,
@@ -529,6 +540,14 @@ export default function DashboardControl() {
               <div className="absolute top-0 right-0 w-12 h-12 bg-white opacity-10 rounded-full -mr-6 -mt-6"></div>
               <Building2 className="w-4 h-4 inline mr-2 relative z-10" />
               <span className="relative z-10">Amenities</span>
+            </button>
+            <button
+              onClick={() => setShowCheckoutsModal(true)}
+              className="group relative overflow-hidden rounded-lg px-5 py-2 text-white transition-all duration-300 text-xs font-medium bg-gradient-to-br from-red-600 to-red-700 opacity-60 hover:opacity-75 shadow-sm hover:shadow-md hover:scale-105"
+            >
+              <div className="absolute top-0 right-0 w-12 h-12 bg-white opacity-10 rounded-full -mr-6 -mt-6"></div>
+              <CheckCircle2 className="w-4 h-4 inline mr-2 relative z-10" />
+              <span className="relative z-10">Check-outs del Día</span>
             </button>
           </div>
         </div>
@@ -1016,6 +1035,74 @@ export default function DashboardControl() {
                   )
                 })}
               </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Checkouts Modal */}
+      {showCheckoutsModal && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
+          <div className="bg-white rounded-2xl shadow-2xl p-6 w-full max-w-2xl mx-4 max-h-[90vh] overflow-y-auto">
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-2xl font-bold text-foreground">Check-outs del Día</h2>
+              <button
+                onClick={() => setShowCheckoutsModal(false)}
+                className="text-gray-400 hover:text-gray-600 transition-colors"
+              >
+                <AlertCircle className="w-6 h-6 rotate-45" />
+              </button>
+            </div>
+
+            <div className="space-y-3">
+              <div className="overflow-x-auto">
+                <table className="w-full">
+                  <thead>
+                    <tr className="border-b border-gray-200 bg-gray-50">
+                      <th className="text-left px-4 py-3 font-semibold text-gray-900 text-sm">Habitación</th>
+                      <th className="text-left px-4 py-3 font-semibold text-gray-900 text-sm">Cliente</th>
+                      <th className="text-right px-4 py-3 font-semibold text-gray-900 text-sm">Saldo a Pagar</th>
+                      <th className="text-center px-4 py-3 font-semibold text-gray-900 text-sm">Estado</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {mockCheckouts.map((checkout) => (
+                      <tr key={checkout.id} className="border-b border-gray-100 hover:bg-gray-50 transition-colors">
+                        <td className="px-4 py-3 text-gray-900 font-semibold">#{checkout.room}</td>
+                        <td className="px-4 py-3 text-gray-700">{checkout.guestName}</td>
+                        <td className="px-4 py-3 text-right font-semibold text-gray-900">${checkout.amount.toLocaleString()}</td>
+                        <td className="px-4 py-3 text-center">
+                          <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${
+                            checkout.status === "paid"
+                              ? "bg-green-100 text-green-800"
+                              : "bg-orange-100 text-orange-800"
+                          }`}>
+                            {checkout.status === "paid" ? "Pagado" : "Pendiente"}
+                          </span>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+
+              <div className="bg-gray-50 rounded-lg p-4 mt-6">
+                <div className="flex justify-between items-center">
+                  <span className="text-gray-700 font-medium">Total a Cobrar:</span>
+                  <span className="text-2xl font-bold text-gray-900">
+                    ${mockCheckouts.filter(c => c.status === "pending").reduce((sum, c) => sum + c.amount, 0).toLocaleString()}
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <div className="mt-6 flex gap-3 justify-end">
+              <button
+                onClick={() => setShowCheckoutsModal(false)}
+                className="px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition-colors font-medium"
+              >
+                Cerrar
+              </button>
             </div>
           </div>
         </div>
