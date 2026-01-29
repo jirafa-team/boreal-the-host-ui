@@ -434,46 +434,96 @@ export default function ClientDetailPage() {
       </div>
 
       {/* Current Reservation */}
-      {clientDetails.currentReservation && (
-        <Card className="border-l-4 border-l-green-500">
-          <CardHeader>
-            <CardTitle className="flex items-center justify-between">
-              <span>Reserva Actual</span>
-              {getStatusBadge(clientDetails.currentReservation.status)}
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              <div>
-                <p className="text-sm text-muted-foreground mb-1">Habitación</p>
-                <p className="text-lg font-semibold text-foreground">{clientDetails.currentReservation.room}</p>
-                <p className="text-sm text-muted-foreground">{clientDetails.currentReservation.roomType}</p>
+      {activeTab === "current" && clientDetails.currentReservation && (
+        <div className="grid grid-cols-2 gap-4">
+          {/* Left side - Current Reservation */}
+          <Card className="border-l-4 border-l-green-500">
+            <CardHeader>
+              <CardTitle className="flex items-center justify-between">
+                <span>Reserva Actual</span>
+                {getStatusBadge(clientDetails.currentReservation.status)}
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <p className="text-sm text-muted-foreground mb-1">Habitación</p>
+                  <p className="text-lg font-semibold text-foreground">{clientDetails.currentReservation.room}</p>
+                  <p className="text-sm text-muted-foreground">{clientDetails.currentReservation.roomType}</p>
+                </div>
+                <div>
+                  <p className="text-sm text-muted-foreground mb-1">Check-in</p>
+                  <p className="text-lg font-semibold text-foreground">
+                    {new Date(clientDetails.currentReservation.checkIn).toLocaleDateString("es-ES", {
+                      day: "2-digit",
+                      month: "short",
+                    })}
+                  </p>
+                </div>
+                <div>
+                  <p className="text-sm text-muted-foreground mb-1">Check-out</p>
+                  <p className="text-lg font-semibold text-foreground">
+                    {new Date(clientDetails.currentReservation.checkOut).toLocaleDateString("es-ES", {
+                      day: "2-digit",
+                      month: "short",
+                    })}
+                  </p>
+                </div>
+                <div>
+                  <p className="text-sm text-muted-foreground mb-1">Total</p>
+                  <p className="text-lg font-semibold text-foreground">${clientDetails.currentReservation.totalCost}</p>
+                </div>
               </div>
-              <div>
-                <p className="text-sm text-muted-foreground mb-1">Check-in</p>
-                <p className="text-lg font-semibold text-foreground">
-                  {new Date(clientDetails.currentReservation.checkIn).toLocaleDateString("es-ES", {
-                    day: "2-digit",
-                    month: "short",
-                  })}
-                </p>
+            </CardContent>
+          </Card>
+
+          {/* Right side - Current Events */}
+          <Card className="border-l-4 border-l-orange-500">
+            <CardHeader>
+              <CardTitle>Eventos Actuales</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-3">
+                {clientDetails.registeredEvents
+                  .filter((event) => {
+                    const eventDate = new Date(event.date)
+                    const checkIn = new Date(clientDetails.currentReservation.checkIn)
+                    const checkOut = new Date(clientDetails.currentReservation.checkOut)
+                    return eventDate >= checkIn && eventDate <= checkOut
+                  })
+                  .map((event) => (
+                    <div key={event.id} className="p-3 rounded-lg border bg-card hover:shadow-sm transition-shadow">
+                      <div className="flex items-start justify-between gap-2">
+                        <div className="flex-1">
+                          <p className="font-semibold text-foreground text-sm">{event.name}</p>
+                          <div className="flex items-center gap-2 text-xs text-muted-foreground mt-1">
+                            <Clock className="w-3 h-3" />
+                            {event.time}
+                          </div>
+                          <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                            <MapPin className="w-3 h-3" />
+                            {event.location}
+                          </div>
+                        </div>
+                        <div className="text-right">
+                          {getStatusBadge(event.status)}
+                          {event.price > 0 && <p className="text-sm font-semibold text-foreground mt-1">${event.price}</p>}
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                {clientDetails.registeredEvents.filter((event) => {
+                  const eventDate = new Date(event.date)
+                  const checkIn = new Date(clientDetails.currentReservation.checkIn)
+                  const checkOut = new Date(clientDetails.currentReservation.checkOut)
+                  return eventDate >= checkIn && eventDate <= checkOut
+                }).length === 0 && (
+                  <p className="text-sm text-muted-foreground text-center py-4">No hay eventos durante esta reserva</p>
+                )}
               </div>
-              <div>
-                <p className="text-sm text-muted-foreground mb-1">Check-out</p>
-                <p className="text-lg font-semibold text-foreground">
-                  {new Date(clientDetails.currentReservation.checkOut).toLocaleDateString("es-ES", {
-                    day: "2-digit",
-                    month: "short",
-                  })}
-                </p>
-              </div>
-              <div>
-                <p className="text-sm text-muted-foreground mb-1">Total</p>
-                <p className="text-lg font-semibold text-foreground">${clientDetails.currentReservation.totalCost}</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+            </CardContent>
+          </Card>
+        </div>
       )}
 
       {/* Tabs for History */}
