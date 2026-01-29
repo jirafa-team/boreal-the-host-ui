@@ -216,8 +216,8 @@ export default function PedidosPage() {
             </div>
           )}
           <div className="relative flex items-center gap-3">
-            <div className={`p-2 rounded-lg ${filter === "all" ? "bg-white/20" : "bg-gray-200"}`}>
-              <ShoppingCart className={`w-5 h-5 ${filter === "all" ? "text-white" : "text-gray-700"}`} />
+            <div className={`p-2 rounded-lg ${filter === "all" ? "bg-white/20" : "bg-violet-100"}`}>
+              <ShoppingCart className={`w-5 h-5 ${filter === "all" ? "text-white" : "text-violet-600"}`} />
             </div>
             <div>
               <p className={`text-sm ${filter === "all" ? "opacity-90" : "text-muted-foreground"}`}>Todos</p>
@@ -239,8 +239,8 @@ export default function PedidosPage() {
             </div>
           )}
           <div className="relative flex items-center gap-3">
-            <div className={`p-2 rounded-lg ${filter === "pending" ? "bg-white/20" : "bg-gray-200"}`}>
-              <Clock className={`w-5 h-5 ${filter === "pending" ? "text-white" : "text-gray-700"}`} />
+            <div className={`p-2 rounded-lg ${filter === "pending" ? "bg-white/20" : "bg-yellow-100"}`}>
+              <Clock className={`w-5 h-5 ${filter === "pending" ? "text-white" : "text-yellow-600"}`} />
             </div>
             <div>
               <p className={`text-sm ${filter === "pending" ? "opacity-90" : "text-muted-foreground"}`}>Pendientes</p>
@@ -262,8 +262,8 @@ export default function PedidosPage() {
             </div>
           )}
           <div className="relative flex items-center gap-3">
-            <div className={`p-2 rounded-lg ${filter === "preparing" ? "bg-white/20" : "bg-gray-200"}`}>
-              <ChefHat className={`w-5 h-5 ${filter === "preparing" ? "text-white" : "text-gray-700"}`} />
+            <div className={`p-2 rounded-lg ${filter === "preparing" ? "bg-white/20" : "bg-blue-100"}`}>
+              <ChefHat className={`w-5 h-5 ${filter === "preparing" ? "text-white" : "text-blue-600"}`} />
             </div>
             <div>
               <p className={`text-sm ${filter === "preparing" ? "opacity-90" : "text-muted-foreground"}`}>En Preparación</p>
@@ -285,8 +285,8 @@ export default function PedidosPage() {
             </div>
           )}
           <div className="relative flex items-center gap-3">
-            <div className={`p-2 rounded-lg ${filter === "delivered" ? "bg-white/20" : "bg-gray-200"}`}>
-              <CheckCircle2 className={`w-5 h-5 ${filter === "delivered" ? "text-white" : "text-gray-700"}`} />
+            <div className={`p-2 rounded-lg ${filter === "delivered" ? "bg-white/20" : "bg-green-100"}`}>
+              <CheckCircle2 className={`w-5 h-5 ${filter === "delivered" ? "text-white" : "text-green-600"}`} />
             </div>
             <div>
               <p className={`text-sm ${filter === "delivered" ? "opacity-90" : "text-muted-foreground"}`}>Entregados</p>
