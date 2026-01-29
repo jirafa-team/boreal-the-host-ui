@@ -1,6 +1,6 @@
 "use client"
 
-import { CheckCircle2, Star, Mail, Phone, MapPin, Eye, Clock, CreditCard, Utensils, Sparkles, Dumbbell, Droplets, ShoppingBag, ArrowLeft, Calendar } from "lucide-react"
+import { CheckCircle2, Star, Mail, Phone, MapPin, Eye, Clock, CreditCard, Utensils, Sparkles, Dumbbell, Droplets, ShoppingBag, ArrowLeft, Calendar, Edit2 } from "lucide-react"
 import { useParams, useRouter } from "next/navigation"
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
@@ -294,6 +294,46 @@ export default function ClientDetailPage() {
                   <div className="flex items-center gap-3 mb-2">
                     <h2 className="text-2xl font-bold text-foreground">{clientDetails.name}</h2>
                     {getClientTierBadge(clientDetails.category)}
+                    <Dialog>
+                      <DialogTrigger asChild>
+                        <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full">
+                          <Edit2 className="w-4 h-4" />
+                        </Button>
+                      </DialogTrigger>
+                      <DialogContent className="max-w-2xl">
+                        <DialogHeader>
+                          <DialogTitle>Editar Perfil del Cliente</DialogTitle>
+                        </DialogHeader>
+                        <div className="space-y-4 mt-4">
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                              <label className="text-sm font-medium">Nombre</label>
+                              <input type="text" defaultValue={clientDetails.name} className="w-full mt-1 px-3 py-2 border rounded-lg" />
+                            </div>
+                            <div>
+                              <label className="text-sm font-medium">Email</label>
+                              <input type="email" defaultValue={clientDetails.email} className="w-full mt-1 px-3 py-2 border rounded-lg" />
+                            </div>
+                            <div>
+                              <label className="text-sm font-medium">Teléfono</label>
+                              <input type="tel" defaultValue={clientDetails.phone} className="w-full mt-1 px-3 py-2 border rounded-lg" />
+                            </div>
+                            <div>
+                              <label className="text-sm font-medium">Ciudad</label>
+                              <input type="text" defaultValue={clientDetails.city} className="w-full mt-1 px-3 py-2 border rounded-lg" />
+                            </div>
+                          </div>
+                          <div>
+                            <label className="text-sm font-medium">Preferencias</label>
+                            <textarea defaultValue={clientDetails.notes} className="w-full mt-1 px-3 py-2 border rounded-lg h-32" />
+                          </div>
+                          <div className="flex gap-3 justify-end">
+                            <Button variant="outline">Cancelar</Button>
+                            <Button>Guardar Cambios</Button>
+                          </div>
+                        </div>
+                      </DialogContent>
+                    </Dialog>
                   </div>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-sm">
                     <div className="flex items-center gap-2 text-muted-foreground">
@@ -574,18 +614,6 @@ export default function ClientDetailPage() {
           </Card>
         </TabsContent>
       </Tabs>
-
-      {/* Notes Section */}
-      {clientDetails.notes && (
-        <Card>
-          <CardHeader>
-            <CardTitle>Notas y Preferencias</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-muted-foreground leading-relaxed">{clientDetails.notes}</p>
-          </CardContent>
-        </Card>
-      )}
 
       {/* Action Buttons */}
       <div className="flex gap-3">
