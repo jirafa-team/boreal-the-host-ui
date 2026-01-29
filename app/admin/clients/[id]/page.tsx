@@ -320,22 +320,22 @@ export default function ClientDetailPage() {
                   </div>
                 </div>
 
-                {/* KPIs - Reduced Size and Right Aligned */}
-                <div className="flex gap-2 ml-6">
-                  <div className="p-2.5 rounded-lg bg-blue-50 border border-blue-200 min-w-[110px] text-center">
-                    <p className="text-xs text-muted-foreground mb-0.5">Total Visitas</p>
-                    <p className="text-lg font-bold text-blue-600">{clientDetails.totalVisits}</p>
+                {/* KPIs - Dashboard Style */}
+                <div className="flex gap-3">
+                  <div className="bg-blue-50 rounded-lg px-6 py-4 border border-blue-200 flex flex-col items-center justify-center min-w-[130px]">
+                    <p className="text-5xl font-bold text-blue-600 mb-2">{clientDetails.totalVisits}</p>
+                    <p className="text-gray-600 text-xs">Total Visitas</p>
                   </div>
-                  <div className="p-2.5 rounded-lg bg-purple-50 border border-purple-200 min-w-[110px] text-center">
-                    <p className="text-xs text-muted-foreground mb-0.5">Total Gastado</p>
-                    <p className="text-lg font-bold text-purple-600">${clientDetails.totalSpent}</p>
+                  <div className="bg-purple-50 rounded-lg px-6 py-4 border border-purple-200 flex flex-col items-center justify-center min-w-[130px]">
+                    <p className="text-5xl font-bold text-purple-600 mb-2">{clientDetails.totalSpent}</p>
+                    <p className="text-gray-600 text-xs">Total Gastado</p>
                   </div>
-                  <div className="p-2.5 rounded-lg bg-amber-50 border border-amber-200 min-w-[110px] text-center">
-                    <p className="text-xs text-muted-foreground mb-0.5">Valoración</p>
+                  <div className="bg-amber-50 rounded-lg px-6 py-4 border border-amber-200 flex flex-col items-center justify-center min-w-[130px]">
                     <div className="flex items-center justify-center gap-1">
-                      <p className="text-lg font-bold text-amber-600">{clientDetails.averageRating}</p>
-                      <Star className="w-3 h-3 fill-amber-500 text-amber-500" />
+                      <p className="text-5xl font-bold text-amber-600">{clientDetails.averageRating}</p>
+                      <Star className="w-5 h-5 fill-amber-500 text-amber-500 mt-2" />
                     </div>
+                    <p className="text-gray-600 text-xs mt-2">Valoración</p>
                   </div>
                 </div>
               </div>
