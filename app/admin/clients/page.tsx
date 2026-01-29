@@ -324,7 +324,7 @@ export default function ClientsPage() {
   return (
     <div className="p-0 space-y-6">
       {/* Header */}
-      <header className="bg-white border-b border-gray-200">
+      <header className="sticky top-0 z-40 bg-white border-b border-gray-200 shadow-sm">
         <div className="px-8 py-6">
           <div className="flex items-center justify-between">
             <div>
