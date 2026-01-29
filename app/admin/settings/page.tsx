@@ -616,6 +616,11 @@ export default function SettingsPage() {
       icon: Compass,
       color: 'from-green-600 to-green-700',
     },
+    {
+      label: 'Clientes',
+      icon: Users,
+      color: 'from-blue-600 to-blue-700',
+    },
   ]
 
   const departmentsData = [
