@@ -2288,26 +2288,6 @@ export default function SettingsPage() {
 
             {selectedCard === 'Clientes' && (
               <div className="bg-white rounded-lg shadow-sm p-6">
-                <div className="flex items-center justify-between mb-6">
-                  <h2 className="text-2xl font-bold text-gray-900">{selectedCard}</h2>
-                  <button
-                    onClick={() => {
-                      setIsCreatingClientCategory(true)
-                      setNewClientCategoryName('')
-                    }}
-                    className="flex items-center justify-center w-12 h-12 rounded-full bg-gradient-to-br from-violet-600 to-violet-700 text-white shadow-md hover:shadow-lg transition-all duration-300 hover:scale-110 group relative"
-                    title="Añadir Categoría"
-                  >
-                    <div className="relative flex items-center justify-center">
-                      <Users className="w-5 h-5" />
-                      <span className="absolute text-lg font-bold -bottom-1 -right-0.5 text-white drop-shadow-lg">+</span>
-                    </div>
-                    <span className="absolute bottom-full mb-2 px-2 py-1 bg-gray-900 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap">
-                      Añadir Categoría
-                    </span>
-                  </button>
-                </div>
-
                 {/* Search Section */}
                 <div className="mb-6 flex gap-3">
                   <input
