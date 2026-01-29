@@ -184,7 +184,9 @@ export default function DashboardControl() {
   const [expandedSections, setExpandedSections] = useState(new Set<string>())
   const [selectedSlotBookings, setSelectedSlotBookings] = useState<Booking[]>([])
   const [bookingsDetailOpen, setBookingsDetailOpen] = useState(false)
-  const [showCheckoutsModal, setShowCheckoutsModal] = useState(false) // Declare showCheckoutsModal variable
+  const [checkoutSearchRoom, setCheckoutSearchRoom] = useState("")
+  const [checkoutSearchGuest, setCheckoutSearchGuest] = useState("")
+  const [checkoutSearchStatus, setCheckoutSearchStatus] = useState("all")
 
   const mockFacilities: Facility[] = [
     { id: "1", name: "Gimnasio", type: "fitness", capacity: 15, icon: Dumbbell, color: "bg-orange-500", startTime: "06:00", endTime: "22:00" },
@@ -232,6 +234,13 @@ export default function DashboardControl() {
     { id: 5, room: "103", guestName: "Emma Wilson", status: "pending" as const, balance: 550, lateCheckout: false },
     { id: 6, room: "502", guestName: "Roberto Silva", status: "completed" as const, balance: 0, lateCheckout: false },
   ]
+
+  const filteredCheckouts = mockCheckouts.filter(checkout => {
+    const matchesRoom = checkout.room.toLowerCase().includes(checkoutSearchRoom.toLowerCase())
+    const matchesGuest = checkout.guestName.toLowerCase().includes(checkoutSearchGuest.toLowerCase())
+    const matchesStatus = checkoutSearchStatus === "all" || checkout.status === checkoutSearchStatus
+    return matchesRoom && matchesGuest && matchesStatus
+  })
 
   const staffMembers: StaffMember[] = [
     {
@@ -1050,6 +1059,42 @@ export default function DashboardControl() {
           <Card className="p-6">
             <h2 className="text-2xl font-bold text-foreground mb-6">Check-outs del Día</h2>
 
+            {/* Search and Filter Section */}
+            <div className="mb-6 grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Buscar por Habitación</label>
+                <input
+                  type="text"
+                  placeholder="Ej: 301"
+                  value={checkoutSearchRoom}
+                  onChange={(e) => setCheckoutSearchRoom(e.target.value)}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Buscar por Cliente</label>
+                <input
+                  type="text"
+                  placeholder="Nombre del cliente"
+                  value={checkoutSearchGuest}
+                  onChange={(e) => setCheckoutSearchGuest(e.target.value)}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Filtrar por Estado</label>
+                <select
+                  value={checkoutSearchStatus}
+                  onChange={(e) => setCheckoutSearchStatus(e.target.value)}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500"
+                >
+                  <option value="all">Todos los estados</option>
+                  <option value="completed">Completado</option>
+                  <option value="pending">Pendiente</option>
+                </select>
+              </div>
+            </div>
+
             <div className="overflow-x-auto">
               <table className="w-full">
                 <thead>
@@ -1062,7 +1107,7 @@ export default function DashboardControl() {
                   </tr>
                 </thead>
                 <tbody>
-                  {mockCheckouts.map((checkout) => (
+                  {filteredCheckouts.map((checkout) => (
                     <tr key={checkout.id} className="border-b border-gray-100 hover:bg-gray-50 transition-colors">
                       <td className="px-4 py-3 text-gray-900 font-semibold">#{checkout.room}</td>
                       <td className="px-4 py-3 text-gray-700">{checkout.guestName}</td>
