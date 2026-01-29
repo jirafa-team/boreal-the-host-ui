@@ -893,7 +893,7 @@ export default function SettingsPage() {
               </div>
             )}
 
-            {selectedCard !== 'Departamentos' && selectedCard !== 'Amenities' && selectedCard !== 'Habitaciones' && selectedCard !== 'Personal' && selectedCard !== 'Eventos' && selectedCard !== 'Recomendaciones' && (
+            {selectedCard !== 'Departamentos' && selectedCard !== 'Amenities' && selectedCard !== 'Habitaciones' && selectedCard !== 'Personal' && selectedCard !== 'Eventos' && selectedCard !== 'Recomendaciones' && selectedCard !== 'Clientes' && (
               <div className="bg-white rounded-lg shadow-sm p-6 flex items-center justify-center h-64">
                 <p className="text-gray-400">Selecciona una opción para ver su configuración</p>
               </div>
