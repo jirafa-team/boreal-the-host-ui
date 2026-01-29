@@ -19,6 +19,8 @@ import {
   ChevronDown,
   ChevronRight,
   UserPlus,
+  Users,
+  History,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -346,6 +348,34 @@ export default function ClientsPage() {
                 </span>
               </button>
             </div>
+          </div>
+          
+          {/* Tab Buttons */}
+          <div className="flex gap-3 mt-4">
+            <button
+              onClick={() => setActiveTab("current")}
+              className={`group relative overflow-hidden rounded-lg px-5 py-2 text-white transition-all duration-300 text-xs font-medium ${
+                activeTab === "current"
+                  ? "bg-gradient-to-br from-blue-600 to-blue-700 shadow-lg scale-105 ring-2 ring-white ring-opacity-50"
+                  : "bg-gradient-to-br from-blue-600 to-blue-700 opacity-60 hover:opacity-75 shadow-sm hover:shadow-md hover:scale-105"
+              }`}
+            >
+              <div className="absolute top-0 right-0 w-12 h-12 bg-white opacity-10 rounded-full -mr-6 -mt-6"></div>
+              <Users className="w-4 h-4 inline mr-2 relative z-10" />
+              <span className="relative z-10">Huéspedes Actuales</span>
+            </button>
+            <button
+              onClick={() => setActiveTab("historical")}
+              className={`group relative overflow-hidden rounded-lg px-5 py-2 text-white transition-all duration-300 text-xs font-medium ${
+                activeTab === "historical"
+                  ? "bg-gradient-to-br from-slate-600 to-slate-700 shadow-lg scale-105 ring-2 ring-white ring-opacity-50"
+                  : "bg-gradient-to-br from-slate-600 to-slate-700 opacity-60 hover:opacity-75 shadow-sm hover:shadow-md hover:scale-105"
+              }`}
+            >
+              <div className="absolute top-0 right-0 w-12 h-12 bg-white opacity-10 rounded-full -mr-6 -mt-6"></div>
+              <History className="w-4 h-4 inline mr-2 relative z-10" />
+              <span className="relative z-10">Clientes Históricos</span>
+            </button>
           </div>
         </div>
       </header>
