@@ -274,320 +274,331 @@ export default function ClientsPage() {
   }
 
   return (
-    <div className="p-6 space-y-6">
+    <div className="p-0 space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold text-foreground">{t("admin.clientManagement")}</h1>
-          <p className="text-muted-foreground mt-1">{t("admin.administerHotelGuests")}</p>
-        </div>
-        <button 
-          className="relative group w-10 h-10 rounded-full bg-primary hover:bg-primary/90 text-white flex items-center justify-center transition-all shadow-md hover:shadow-lg"
-          title="Agregar cliente"
-        >
-          <UserPlus className="w-5 h-5" />
-          <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-1.5 bg-gray-900 text-white text-xs rounded pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
-            Agregar Cliente
+      <header className="bg-white border-b border-gray-200">
+        <div className="px-8 py-6">
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-2xl font-bold text-foreground">{t("admin.clientManagement")}</h1>
+              <p className="text-sm text-muted-foreground">{t("admin.administerHotelGuests")}</p>
+            </div>
+            <div className="flex gap-4 items-center ml-auto">
+              <button 
+                className="flex items-center justify-center w-10 h-10 rounded-full bg-gradient-to-br from-blue-600 to-blue-700 text-white shadow-md hover:shadow-lg transition-all duration-300 hover:scale-110 group relative"
+                title="Agregar cliente"
+              >
+                <div className="relative flex items-center justify-center">
+                  <UserPlus className="w-5 h-5" />
+                  <span className="absolute text-base font-bold -bottom-0.5 -right-0.5 text-white drop-shadow-lg">+</span>
+                </div>
+                <span className="absolute top-full mt-2 px-2 py-1 bg-gray-900 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap">
+                  Agregar Cliente
+                </span>
+              </button>
+            </div>
           </div>
-        </button>
-      </div>
+        </div>
+      </header>
 
       {/* Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <div
-          className="relative overflow-hidden rounded-lg p-4 shadow-md hover:shadow-lg transition-all duration-300 hover:scale-105 cursor-pointer group"
-          style={{
-            background: clientsFilter === "all" ? "linear-gradient(135deg, rgb(124, 58, 255), rgb(109, 40, 217))" : "white",
-            color: clientsFilter === "all" ? "white" : "black"
-          }}
-          onClick={() => setClientsFilter("all")}
-        >
-          {clientsFilter === "all" && (
-            <div className="absolute inset-0 opacity-10">
-              <div className="absolute top-0 right-0 w-20 h-20 bg-white rounded-full -mr-8 -mt-8"></div>
+      <div className="p-8 space-y-6">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+          <div
+            className="relative overflow-hidden rounded-lg p-4 shadow-md hover:shadow-lg transition-all duration-300 hover:scale-105 cursor-pointer group"
+            style={{
+              background: clientsFilter === "all" ? "linear-gradient(135deg, rgb(124, 58, 255), rgb(109, 40, 217))" : "white",
+              color: clientsFilter === "all" ? "white" : "black"
+            }}
+            onClick={() => setClientsFilter("all")}
+          >
+            {clientsFilter === "all" && (
+              <div className="absolute inset-0 opacity-10">
+                <div className="absolute top-0 right-0 w-20 h-20 bg-white rounded-full -mr-8 -mt-8"></div>
+              </div>
+            )}
+            <div className="relative flex items-center gap-3">
+              <div className={`p-2 rounded-lg ${clientsFilter === "all" ? "bg-white/20" : "bg-violet-100"}`}>
+                <UserCircle className={`w-5 h-5 ${clientsFilter === "all" ? "text-white" : "text-violet-600"}`} />
+              </div>
+              <div>
+                <p className={`text-sm ${clientsFilter === "all" ? "opacity-90" : "text-muted-foreground"}`}>{t("admin.checkInToday")}</p>
+                <p className="text-2xl font-bold">3</p>
+              </div>
             </div>
-          )}
-          <div className="relative flex items-center gap-3">
-            <div className={`p-2 rounded-lg ${clientsFilter === "all" ? "bg-white/20" : "bg-violet-100"}`}>
-              <UserCircle className={`w-5 h-5 ${clientsFilter === "all" ? "text-white" : "text-violet-600"}`} />
+          </div>
+
+          <div
+            className="relative overflow-hidden rounded-lg p-4 shadow-md hover:shadow-lg transition-all duration-300 hover:scale-105 cursor-pointer group"
+            style={{
+              background: clientsFilter === "active" ? "linear-gradient(135deg, rgb(34, 197, 94), rgb(22, 163, 74))" : "white",
+              color: clientsFilter === "active" ? "white" : "black"
+            }}
+            onClick={() => setClientsFilter("active")}
+          >
+            {clientsFilter === "active" && (
+              <div className="absolute inset-0 opacity-10">
+                <div className="absolute top-0 right-0 w-20 h-20 bg-white rounded-full -mr-8 -mt-8"></div>
+              </div>
+            )}
+            <div className="relative flex items-center gap-3">
+              <div className={`p-2 rounded-lg ${clientsFilter === "active" ? "bg-white/20" : "bg-green-100"}`}>
+                <CheckCircle2 className={`w-5 h-5 ${clientsFilter === "active" ? "text-white" : "text-green-600"}`} />
+              </div>
+              <div>
+                <p className={`text-sm ${clientsFilter === "active" ? "opacity-90" : "text-muted-foreground"}`}>{t("admin.activeGuests")}</p>
+                <p className="text-2xl font-bold">8</p>
+              </div>
             </div>
-            <div>
-              <p className={`text-sm ${clientsFilter === "all" ? "opacity-90" : "text-muted-foreground"}`}>{t("admin.checkInToday")}</p>
-              <p className="text-2xl font-bold">3</p>
+          </div>
+
+          <div
+            className="relative overflow-hidden rounded-lg p-4 shadow-md hover:shadow-lg transition-all duration-300 hover:scale-105 cursor-pointer group"
+            style={{
+              background: clientsFilter === "reserved" ? "linear-gradient(135deg, rgb(37, 99, 235), rgb(29, 78, 216))" : "white",
+              color: clientsFilter === "reserved" ? "white" : "black"
+            }}
+            onClick={() => setClientsFilter("reserved")}
+          >
+            {clientsFilter === "reserved" && (
+              <div className="absolute inset-0 opacity-10">
+                <div className="absolute top-0 right-0 w-20 h-20 bg-white rounded-full -mr-8 -mt-8"></div>
+              </div>
+            )}
+            <div className="relative flex items-center gap-3">
+              <div className={`p-2 rounded-lg ${clientsFilter === "reserved" ? "bg-white/20" : "bg-blue-100"}`}>
+                <Calendar className={`w-5 h-5 ${clientsFilter === "reserved" ? "text-white" : "text-blue-600"}`} />
+              </div>
+              <div>
+                <p className={`text-sm ${clientsFilter === "reserved" ? "opacity-90" : "text-muted-foreground"}`}>{t("admin.futureReservations")}</p>
+                <p className="text-2xl font-bold">12</p>
+              </div>
+            </div>
+          </div>
+
+          <div
+            className="relative overflow-hidden rounded-lg p-4 shadow-md hover:shadow-lg transition-all duration-300 hover:scale-105 cursor-pointer group"
+            style={{
+              background: clientsFilter === "vip" ? "linear-gradient(135deg, rgb(234, 179, 8), rgb(202, 138, 4))" : "white",
+              color: clientsFilter === "vip" ? "white" : "black"
+            }}
+            onClick={() => setClientsFilter("vip")}
+          >
+            {clientsFilter === "vip" && (
+              <div className="absolute inset-0 opacity-10">
+                <div className="absolute top-0 right-0 w-20 h-20 bg-white rounded-full -mr-8 -mt-8"></div>
+              </div>
+            )}
+            <div className="relative flex items-center gap-3">
+              <div className={`p-2 rounded-lg ${clientsFilter === "vip" ? "bg-white/20" : "bg-yellow-100"}`}>
+                <CreditCard className={`w-5 h-5 ${clientsFilter === "vip" ? "text-white" : "text-yellow-600"}`} />
+              </div>
+              <div>
+                <p className={`text-sm ${clientsFilter === "vip" ? "opacity-90" : "text-muted-foreground"}`}>{t("admin.vipClients")}</p>
+                <p className="text-2xl font-bold">5</p>
+              </div>
             </div>
           </div>
         </div>
 
-        <div
-          className="relative overflow-hidden rounded-lg p-4 shadow-md hover:shadow-lg transition-all duration-300 hover:scale-105 cursor-pointer group"
-          style={{
-            background: clientsFilter === "active" ? "linear-gradient(135deg, rgb(34, 197, 94), rgb(22, 163, 74))" : "white",
-            color: clientsFilter === "active" ? "white" : "black"
-          }}
-          onClick={() => setClientsFilter("active")}
-        >
-          {clientsFilter === "active" && (
-            <div className="absolute inset-0 opacity-10">
-              <div className="absolute top-0 right-0 w-20 h-20 bg-white rounded-full -mr-8 -mt-8"></div>
-            </div>
-          )}
-          <div className="relative flex items-center gap-3">
-            <div className={`p-2 rounded-lg ${clientsFilter === "active" ? "bg-white/20" : "bg-green-100"}`}>
-              <CheckCircle2 className={`w-5 h-5 ${clientsFilter === "active" ? "text-white" : "text-green-600"}`} />
-            </div>
-            <div>
-              <p className={`text-sm ${clientsFilter === "active" ? "opacity-90" : "text-muted-foreground"}`}>{t("admin.activeGuests")}</p>
-              <p className="text-2xl font-bold">8</p>
-            </div>
-          </div>
-        </div>
+        {/* Tabs to switch between active and historical clients */}
+        <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as "current" | "historical")}>
+          <TabsList className="grid w-full max-w-md grid-cols-2">
+            <TabsTrigger value="current" className="gap-2">
+              <CheckCircle2 className="w-4 h-4" />
+              {t("admin.currentGuests")}
+            </TabsTrigger>
+            <TabsTrigger value="historical" className="gap-2">
+              <Clock className="w-4 h-4" />
+              {t("admin.historicalClients")}
+            </TabsTrigger>
+          </TabsList>
 
-        <div
-          className="relative overflow-hidden rounded-lg p-4 shadow-md hover:shadow-lg transition-all duration-300 hover:scale-105 cursor-pointer group"
-          style={{
-            background: clientsFilter === "reserved" ? "linear-gradient(135deg, rgb(37, 99, 235), rgb(29, 78, 216))" : "white",
-            color: clientsFilter === "reserved" ? "white" : "black"
-          }}
-          onClick={() => setClientsFilter("reserved")}
-        >
-          {clientsFilter === "reserved" && (
-            <div className="absolute inset-0 opacity-10">
-              <div className="absolute top-0 right-0 w-20 h-20 bg-white rounded-full -mr-8 -mt-8"></div>
-            </div>
-          )}
-          <div className="relative flex items-center gap-3">
-            <div className={`p-2 rounded-lg ${clientsFilter === "reserved" ? "bg-white/20" : "bg-blue-100"}`}>
-              <Calendar className={`w-5 h-5 ${clientsFilter === "reserved" ? "text-white" : "text-blue-600"}`} />
-            </div>
-            <div>
-              <p className={`text-sm ${clientsFilter === "reserved" ? "opacity-90" : "text-muted-foreground"}`}>{t("admin.futureReservations")}</p>
-              <p className="text-2xl font-bold">12</p>
-            </div>
-          </div>
-        </div>
-
-        <div
-          className="relative overflow-hidden rounded-lg p-4 shadow-md hover:shadow-lg transition-all duration-300 hover:scale-105 cursor-pointer group"
-          style={{
-            background: clientsFilter === "vip" ? "linear-gradient(135deg, rgb(234, 179, 8), rgb(202, 138, 4))" : "white",
-            color: clientsFilter === "vip" ? "white" : "black"
-          }}
-          onClick={() => setClientsFilter("vip")}
-        >
-          {clientsFilter === "vip" && (
-            <div className="absolute inset-0 opacity-10">
-              <div className="absolute top-0 right-0 w-20 h-20 bg-white rounded-full -mr-8 -mt-8"></div>
-            </div>
-          )}
-          <div className="relative flex items-center gap-3">
-            <div className={`p-2 rounded-lg ${clientsFilter === "vip" ? "bg-white/20" : "bg-yellow-100"}`}>
-              <CreditCard className={`w-5 h-5 ${clientsFilter === "vip" ? "text-white" : "text-yellow-600"}`} />
-            </div>
-            <div>
-              <p className={`text-sm ${clientsFilter === "vip" ? "opacity-90" : "text-muted-foreground"}`}>{t("admin.vipClients")}</p>
-              <p className="text-2xl font-bold">5</p>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Tabs to switch between active and historical clients */}
-      <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as "current" | "historical")}>
-        <TabsList className="grid w-full max-w-md grid-cols-2">
-          <TabsTrigger value="current" className="gap-2">
-            <CheckCircle2 className="w-4 h-4" />
-            {t("admin.currentGuests")}
-          </TabsTrigger>
-          <TabsTrigger value="historical" className="gap-2">
-            <Clock className="w-4 h-4" />
-            {t("admin.historicalClients")}
-          </TabsTrigger>
-        </TabsList>
-
-        <TabsContent value={activeTab} className="space-y-4">
-          {/* Search and Filters */}
-          <Card>
-            <CardContent className="p-4">
-              <div className="flex flex-col md:flex-row gap-4">
-                <div className="flex-1 relative">
-                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                  <Input
-                    placeholder={t("admin.searchPlaceholder")}
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    className="pl-10"
-                  />
+          <TabsContent value={activeTab} className="space-y-4">
+            {/* Search and Filters */}
+            <Card>
+              <CardContent className="p-4">
+                <div className="flex flex-col md:flex-row gap-4">
+                  <div className="flex-1 relative">
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                    <Input
+                      placeholder={t("admin.searchPlaceholder")}
+                      value={searchTerm}
+                      onChange={(e) => setSearchTerm(e.target.value)}
+                      className="pl-10"
+                    />
+                  </div>
+                  <Select value={statusFilter} onValueChange={setStatusFilter}>
+                    <SelectTrigger className="w-full md:w-48">
+                      <Filter className="w-4 h-4 mr-2" />
+                      <SelectValue placeholder={t("admin.filterStatus")} />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">{t("admin.allStatuses")}</SelectItem>
+                      <SelectItem value="checked-in">{t("admin.checkedIn")}</SelectItem>
+                      <SelectItem value="reserved">{t("admin.reserved")}</SelectItem>
+                      {activeTab === "historical" && <SelectItem value="checked-out">{t("admin.checkedOut")}</SelectItem>}
+                    </SelectContent>
+                  </Select>
                 </div>
-                <Select value={statusFilter} onValueChange={setStatusFilter}>
-                  <SelectTrigger className="w-full md:w-48">
-                    <Filter className="w-4 h-4 mr-2" />
-                    <SelectValue placeholder={t("admin.filterStatus")} />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">{t("admin.allStatuses")}</SelectItem>
-                    <SelectItem value="checked-in">{t("admin.checkedIn")}</SelectItem>
-                    <SelectItem value="reserved">{t("admin.reserved")}</SelectItem>
-                    {activeTab === "historical" && <SelectItem value="checked-out">{t("admin.checkedOut")}</SelectItem>}
-                  </SelectContent>
-                </Select>
-              </div>
-            </CardContent>
-          </Card>
+              </CardContent>
+            </Card>
 
-          {/* Clients Table */}
-          <Card>
-            <CardContent className="p-0">
-              <div className="overflow-x-auto">
-                <table className="w-full">
-                  <thead className="bg-muted/50 border-b">
-                    <tr>
-                      <th className="text-left p-4 text-sm font-medium text-muted-foreground w-12"></th>
-                      <th className="text-left p-4 text-sm font-medium text-muted-foreground">{t("admin.guest")}</th>
-                      <th className="text-left p-4 text-sm font-medium text-muted-foreground">{t("admin.room")}</th>
-                      <th className="text-left p-4 text-sm font-medium text-muted-foreground">{t("admin.checkIn")}</th>
-                      <th className="text-left p-4 text-sm font-medium text-muted-foreground">{t("admin.checkOut")}</th>
-                      <th className="text-left p-4 text-sm font-medium text-muted-foreground">{t("admin.status")}</th>
-                      <th className="text-left p-4 text-sm font-medium text-muted-foreground">{t("admin.spent")}</th>
-                      <th className="text-right p-4 text-sm font-medium text-muted-foreground">{t("admin.actions")}</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y">
-                    {filteredClients.map((client) => (
-                      <>
-                        <tr key={client.id} className="hover:bg-muted/30 transition-colors">
-                          <td className="p-4">
-                            {client.groupMembers && client.groupMembers.length > 0 && (
-                              <button
-                                onClick={() => toggleExpanded(client.id)}
-                                className="hover:bg-muted rounded p-1 transition-colors"
-                              >
-                                {expandedClient === client.id ? (
-                                  <ChevronDown className="w-4 h-4 text-muted-foreground" />
-                                ) : (
-                                  <ChevronRight className="w-4 h-4 text-muted-foreground" />
-                                )}
-                              </button>
-                            )}
-                          </td>
-                          <td className="p-4">
-                            <div className="flex items-center gap-3">
-                              <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
-                                <UserCircle className="w-6 h-6 text-primary" />
-                              </div>
-                              <div>
-                                <div className="flex items-center gap-2 flex-wrap">
-                                  <Link
-                                    href={`/admin/clients/${client.id}`}
-                                    className="font-medium text-foreground hover:text-primary hover:underline"
-                                  >
-                                    {client.name}
-                                  </Link>
-                                  {getClientTierBadge(client)}
+            {/* Clients Table */}
+            <Card>
+              <CardContent className="p-0">
+                <div className="overflow-x-auto">
+                  <table className="w-full">
+                    <thead className="bg-muted/50 border-b">
+                      <tr>
+                        <th className="text-left p-4 text-sm font-medium text-muted-foreground w-12"></th>
+                        <th className="text-left p-4 text-sm font-medium text-muted-foreground">{t("admin.guest")}</th>
+                        <th className="text-left p-4 text-sm font-medium text-muted-foreground">{t("admin.room")}</th>
+                        <th className="text-left p-4 text-sm font-medium text-muted-foreground">{t("admin.checkIn")}</th>
+                        <th className="text-left p-4 text-sm font-medium text-muted-foreground">{t("admin.checkOut")}</th>
+                        <th className="text-left p-4 text-sm font-medium text-muted-foreground">{t("admin.status")}</th>
+                        <th className="text-left p-4 text-sm font-medium text-muted-foreground">{t("admin.spent")}</th>
+                        <th className="text-right p-4 text-sm font-medium text-muted-foreground">{t("admin.actions")}</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y">
+                      {filteredClients.map((client) => (
+                        <>
+                          <tr key={client.id} className="hover:bg-muted/30 transition-colors">
+                            <td className="p-4">
+                              {client.groupMembers && client.groupMembers.length > 0 && (
+                                <button
+                                  onClick={() => toggleExpanded(client.id)}
+                                  className="hover:bg-muted rounded p-1 transition-colors"
+                                >
+                                  {expandedClient === client.id ? (
+                                    <ChevronDown className="w-4 h-4 text-muted-foreground" />
+                                  ) : (
+                                    <ChevronRight className="w-4 h-4 text-muted-foreground" />
+                                  )}
+                                </button>
+                              )}
+                            </td>
+                            <td className="p-4">
+                              <div className="flex items-center gap-3">
+                                <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
+                                  <UserCircle className="w-6 h-6 text-primary" />
                                 </div>
-                                <p className="text-sm text-muted-foreground">{client.email}</p>
-                                {client.visitCount && client.visitCount > 1 && (
-                                  <p className="text-xs text-muted-foreground mt-0.5">
-                                    {client.visitCount} {t("admin.visitsToHotel")}
-                                  </p>
-                                )}
+                                <div>
+                                  <div className="flex items-center gap-2 flex-wrap">
+                                    <Link
+                                      href={`/admin/clients/${client.id}`}
+                                      className="font-medium text-foreground hover:text-primary hover:underline"
+                                    >
+                                      {client.name}
+                                    </Link>
+                                    {getClientTierBadge(client)}
+                                  </div>
+                                  <p className="text-sm text-muted-foreground">{client.email}</p>
+                                  {client.visitCount && client.visitCount > 1 && (
+                                    <p className="text-xs text-muted-foreground mt-0.5">
+                                      {client.visitCount} {t("admin.visitsToHotel")}
+                                    </p>
+                                  )}
+                                </div>
                               </div>
-                            </div>
-                          </td>
-                          <td className="p-4">
-                            <div className="flex items-center gap-2">
-                              <div className="w-8 h-8 rounded bg-primary/10 flex items-center justify-center">
-                                <span className="text-sm font-semibold text-primary">{client.room}</span>
+                            </td>
+                            <td className="p-4">
+                              <div className="flex items-center gap-2">
+                                <div className="w-8 h-8 rounded bg-primary/10 flex items-center justify-center">
+                                  <span className="text-sm font-semibold text-primary">{client.room}</span>
+                                </div>
                               </div>
-                            </div>
-                          </td>
-                          <td className="p-4">
-                            <div className="space-y-1">
-                              <div className="flex items-center gap-2 text-sm">
-                                <Calendar className="w-3 h-3 text-muted-foreground" />
-                                <span className="text-foreground">
-                                  {new Date(client.checkIn).toLocaleDateString("es-ES", {
-                                    day: "2-digit",
-                                    month: "short",
-                                  })}
-                                </span>
+                            </td>
+                            <td className="p-4">
+                              <div className="space-y-1">
+                                <div className="flex items-center gap-2 text-sm">
+                                  <Calendar className="w-3 h-3 text-muted-foreground" />
+                                  <span className="text-foreground">
+                                    {new Date(client.checkIn).toLocaleDateString("es-ES", {
+                                      day: "2-digit",
+                                      month: "short",
+                                    })}
+                                  </span>
+                                </div>
+                                <div className="flex items-center gap-2 text-sm">
+                                  <Calendar className="w-3 h-3 text-muted-foreground" />
+                                  <span className="text-foreground">
+                                    {new Date(client.checkOut).toLocaleDateString("es-ES", {
+                                      day: "2-digit",
+                                      month: "short",
+                                    })}
+                                  </span>
+                                </div>
                               </div>
-                              <div className="flex items-center gap-2 text-sm">
-                                <Calendar className="w-3 h-3 text-muted-foreground" />
-                                <span className="text-foreground">
-                                  {new Date(client.checkOut).toLocaleDateString("es-ES", {
-                                    day: "2-digit",
-                                    month: "short",
-                                  })}
-                                </span>
+                            </td>
+                            <td className="p-4">{getStatusBadge(client.status)}</td>
+                            <td className="p-4">
+                              <span className="text-foreground">{client.guests}</span>
+                            </td>
+                            <td className="p-4">
+                              <span className="font-semibold text-foreground">${client.totalSpent}</span>
+                            </td>
+                            <td className="p-4">
+                              <div className="flex items-center justify-end gap-2">
+                                <DropdownMenu>
+                                  <DropdownMenuTrigger asChild>
+                                    <Button variant="ghost" size="sm">
+                                      <MoreVertical className="w-4 h-4" />
+                                    </Button>
+                                  </DropdownMenuTrigger>
+                                  <DropdownMenuContent align="end">
+                                    <DropdownMenuItem>
+                                      <Edit className="w-4 h-4 mr-2" />
+                                      {t("admin.edit")}
+                                    </DropdownMenuItem>
+                                    <DropdownMenuItem className="text-red-600">
+                                      <Trash2 className="w-4 h-4 mr-2" />
+                                      {t("admin.delete")}
+                                    </DropdownMenuItem>
+                                  </DropdownMenuContent>
+                                </DropdownMenu>
                               </div>
-                            </div>
-                          </td>
-                          <td className="p-4">{getStatusBadge(client.status)}</td>
-                          <td className="p-4">
-                            <span className="text-foreground">{client.guests}</span>
-                          </td>
-                          <td className="p-4">
-                            <span className="font-semibold text-foreground">${client.totalSpent}</span>
-                          </td>
-                          <td className="p-4">
-                            <div className="flex items-center justify-end gap-2">
-                              <DropdownMenu>
-                                <DropdownMenuTrigger asChild>
-                                  <Button variant="ghost" size="sm">
-                                    <MoreVertical className="w-4 h-4" />
-                                  </Button>
-                                </DropdownMenuTrigger>
-                                <DropdownMenuContent align="end">
-                                  <DropdownMenuItem>
-                                    <Edit className="w-4 h-4 mr-2" />
-                                    {t("admin.edit")}
-                                  </DropdownMenuItem>
-                                  <DropdownMenuItem className="text-red-600">
-                                    <Trash2 className="w-4 h-4 mr-2" />
-                                    {t("admin.delete")}
-                                  </DropdownMenuItem>
-                                </DropdownMenuContent>
-                              </DropdownMenu>
-                            </div>
-                          </td>
-                        </tr>
+                            </td>
+                          </tr>
 
-                        {expandedClient === client.id &&
-                          client.groupMembers &&
-                          client.groupMembers.map((member) => (
-                            <tr key={member.id} className="bg-muted/20 hover:bg-muted/40 transition-colors">
-                              <td className="p-4"></td>
-                              <td className="p-4 pl-16">
-                                <div className="flex items-center gap-3">
-                                  <div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center">
-                                    <UserCircle className="w-5 h-5 text-muted-foreground" />
+                          {expandedClient === client.id &&
+                            client.groupMembers &&
+                            client.groupMembers.map((member) => (
+                              <tr key={member.id} className="bg-muted/20 hover:bg-muted/40 transition-colors">
+                                <td className="p-4"></td>
+                                <td className="p-4 pl-16">
+                                  <div className="flex items-center gap-3">
+                                    <div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center">
+                                      <UserCircle className="w-5 h-5 text-muted-foreground" />
+                                    </div>
+                                    <div>
+                                      <p className="font-medium text-sm text-foreground">{member.name}</p>
+                                      <p className="text-xs text-muted-foreground">{member.relationship}</p>
+                                    </div>
                                   </div>
-                                  <div>
-                                    <p className="font-medium text-sm text-foreground">{member.name}</p>
-                                    <p className="text-xs text-muted-foreground">{member.relationship}</p>
-                                  </div>
-                                </div>
-                              </td>
-                              <td className="p-4">
-                                <span className="text-sm text-muted-foreground">-</span>
-                              </td>
-                              <td className="p-4">
-                                <p className="text-sm text-muted-foreground">{member.email}</p>
-                              </td>
-                              <td className="p-4" colSpan={4}>
-                                <p className="text-sm text-muted-foreground">{member.phone}</p>
-                              </td>
-                            </tr>
-                          ))}
-                      </>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
-      </Tabs>
+                                </td>
+                                <td className="p-4">
+                                  <span className="text-sm text-muted-foreground">-</span>
+                                </td>
+                                <td className="p-4">
+                                  <p className="text-sm text-muted-foreground">{member.email}</p>
+                                </td>
+                                <td className="p-4" colSpan={4}>
+                                  <p className="text-sm text-muted-foreground">{member.phone}</p>
+                                </td>
+                              </tr>
+                            ))}
+                        </>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+        </Tabs>
+      </div>
     </div>
   )
 }
