@@ -56,7 +56,7 @@ export default function EventsManagement() {
   const [addPeopleDialogOpen, setAddPeopleDialogOpen] = useState(false)
   const [addPeopleSearchQuery, setAddPeopleSearchQuery] = useState("")
   const [selectedEventForPeople, setSelectedEventForPeople] = useState<Event | null>(null)
-  const [viewMode, setViewMode] = useState("list") // Declare viewMode and setViewMode
+  const [viewMode, setViewMode] = useState<"list" | "calendar">("list")
 
   const [availablePeople] = useState<Person[]>([
     {
