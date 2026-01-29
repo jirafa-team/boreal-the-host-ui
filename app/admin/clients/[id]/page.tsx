@@ -1,6 +1,6 @@
 "use client"
 
-import { CheckCircle2, Star, Mail, Phone, MapPin, Eye, Clock, CreditCard, Utensils, Sparkles, Dumbbell, Droplets, ShoppingBag, ArrowLeft, Calendar, Edit2, BookOpen, History, CalendarDays } from "lucide-react"
+import { CheckCircle2, Star, Mail, Phone, MapPin, Eye, Clock, CreditCard, Utensils, Sparkles, Dumbbell, Droplets, ShoppingBag, ArrowLeft, Calendar, Edit2, BookOpen, History, CalendarDays, DoorOpen, LogOut, DollarSign } from "lucide-react"
 import { useParams, useRouter } from "next/navigation"
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
@@ -444,34 +444,45 @@ export default function ClientDetailPage() {
                 {getStatusBadge(clientDetails.currentReservation.status)}
               </CardTitle>
             </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <p className="text-sm text-muted-foreground mb-1">Habitación</p>
-                  <p className="text-lg font-semibold text-foreground">{clientDetails.currentReservation.room}</p>
-                  <p className="text-sm text-muted-foreground">{clientDetails.currentReservation.roomType}</p>
+            <CardContent className="space-y-4">
+              <div className="flex items-center gap-3">
+                <DoorOpen className="w-5 h-5 text-green-600 flex-shrink-0" />
+                <div className="flex-1">
+                  <p className="text-sm text-muted-foreground">Habitación</p>
+                  <p className="font-semibold text-foreground">{clientDetails.currentReservation.room} - {clientDetails.currentReservation.roomType}</p>
                 </div>
-                <div>
-                  <p className="text-sm text-muted-foreground mb-1">Check-in</p>
-                  <p className="text-lg font-semibold text-foreground">
+              </div>
+              <div className="flex items-center gap-3">
+                <Calendar className="w-5 h-5 text-blue-600 flex-shrink-0" />
+                <div className="flex-1">
+                  <p className="text-sm text-muted-foreground">Check-in</p>
+                  <p className="font-semibold text-foreground">
                     {new Date(clientDetails.currentReservation.checkIn).toLocaleDateString("es-ES", {
                       day: "2-digit",
                       month: "short",
+                      year: "numeric",
                     })}
                   </p>
                 </div>
-                <div>
-                  <p className="text-sm text-muted-foreground mb-1">Check-out</p>
-                  <p className="text-lg font-semibold text-foreground">
+              </div>
+              <div className="flex items-center gap-3">
+                <LogOut className="w-5 h-5 text-orange-600 flex-shrink-0" />
+                <div className="flex-1">
+                  <p className="text-sm text-muted-foreground">Check-out</p>
+                  <p className="font-semibold text-foreground">
                     {new Date(clientDetails.currentReservation.checkOut).toLocaleDateString("es-ES", {
                       day: "2-digit",
                       month: "short",
+                      year: "numeric",
                     })}
                   </p>
                 </div>
-                <div>
-                  <p className="text-sm text-muted-foreground mb-1">Total</p>
-                  <p className="text-lg font-semibold text-foreground">${clientDetails.currentReservation.totalCost}</p>
+              </div>
+              <div className="flex items-center gap-3 pt-2 border-t">
+                <DollarSign className="w-5 h-5 text-green-600 flex-shrink-0" />
+                <div className="flex-1">
+                  <p className="text-sm text-muted-foreground">Total Costo</p>
+                  <p className="text-lg font-bold text-foreground">${clientDetails.currentReservation.totalCost}</p>
                 </div>
               </div>
             </CardContent>
@@ -480,45 +491,42 @@ export default function ClientDetailPage() {
           {/* Right side - Current Events */}
           <Card className="border-l-4 border-l-orange-500">
             <CardHeader>
-              <CardTitle>Eventos Actuales</CardTitle>
+              <CardTitle>Eventos Próximos</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="space-y-3">
+              <div className="space-y-2">
                 {clientDetails.registeredEvents
                   .filter((event) => {
                     const eventDate = new Date(event.date)
-                    const checkIn = new Date(clientDetails.currentReservation.checkIn)
+                    const today = new Date()
+                    today.setHours(0, 0, 0, 0)
                     const checkOut = new Date(clientDetails.currentReservation.checkOut)
-                    return eventDate >= checkIn && eventDate <= checkOut
+                    return eventDate >= today && eventDate <= checkOut
                   })
+                  .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
                   .map((event) => (
-                    <div key={event.id} className="p-3 rounded-lg border bg-card hover:shadow-sm transition-shadow">
+                    <div key={event.id} className="p-2.5 rounded-lg border bg-card hover:bg-accent transition-colors">
                       <div className="flex items-start justify-between gap-2">
-                        <div className="flex-1">
-                          <p className="font-semibold text-foreground text-sm">{event.name}</p>
-                          <div className="flex items-center gap-2 text-xs text-muted-foreground mt-1">
-                            <Clock className="w-3 h-3" />
-                            {event.time}
-                          </div>
-                          <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                            <MapPin className="w-3 h-3" />
-                            {event.location}
-                          </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="font-semibold text-foreground text-sm truncate">{event.name}</p>
+                          <p className="text-xs text-muted-foreground">
+                            {new Date(event.date).toLocaleDateString("es-ES", { day: "2-digit", month: "short" })} • {event.time}
+                          </p>
                         </div>
-                        <div className="text-right">
-                          {getStatusBadge(event.status)}
-                          {event.price > 0 && <p className="text-sm font-semibold text-foreground mt-1">${event.price}</p>}
-                        </div>
+                        {event.price > 0 && (
+                          <p className="text-sm font-semibold text-foreground flex-shrink-0">${event.price}</p>
+                        )}
                       </div>
                     </div>
                   ))}
                 {clientDetails.registeredEvents.filter((event) => {
                   const eventDate = new Date(event.date)
-                  const checkIn = new Date(clientDetails.currentReservation.checkIn)
+                  const today = new Date()
+                  today.setHours(0, 0, 0, 0)
                   const checkOut = new Date(clientDetails.currentReservation.checkOut)
-                  return eventDate >= checkIn && eventDate <= checkOut
+                  return eventDate >= today && eventDate <= checkOut
                 }).length === 0 && (
-                  <p className="text-sm text-muted-foreground text-center py-4">No hay eventos durante esta reserva</p>
+                  <p className="text-sm text-muted-foreground text-center py-4">No hay eventos próximos</p>
                 )}
               </div>
             </CardContent>
