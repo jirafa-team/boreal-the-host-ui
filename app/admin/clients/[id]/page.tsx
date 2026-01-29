@@ -1,6 +1,6 @@
 "use client"
 
-import { CheckCircle2, Star, Mail, Phone, MapPin, Eye, Clock, CreditCard, Utensils, Sparkles, Dumbbell, Droplets, ShoppingBag, ArrowLeft, Calendar, Edit2 } from "lucide-react"
+import { CheckCircle2, Star, Mail, Phone, MapPin, Eye, Clock, CreditCard, Utensils, Sparkles, Dumbbell, Droplets, ShoppingBag, ArrowLeft, Calendar, Edit2, BookOpen, History, CalendarDays } from "lucide-react"
 import { useParams, useRouter } from "next/navigation"
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
@@ -187,6 +187,7 @@ export default function ClientDetailPage() {
   const params = useParams()
   const router = useRouter()
   const [selectedReservation, setSelectedReservation] = useState<any>(null)
+  const [activeTab, setActiveTab] = useState<"current" | "history" | "events">("current")
 
   const getStatusBadge = (status: string) => {
     switch (status) {
@@ -391,6 +392,46 @@ export default function ClientDetailPage() {
           </div>
         </CardContent>
       </Card>
+
+      {/* View Tabs - Dashboard Style */}
+      <div className="flex gap-2 flex-wrap">
+        <button
+          onClick={() => setActiveTab("current")}
+          className={`group relative overflow-hidden rounded-lg px-5 py-2 text-white transition-all duration-300 text-xs font-medium ${
+            activeTab === "current"
+              ? "bg-gradient-to-br from-blue-600 to-blue-700 shadow-lg scale-105 ring-2 ring-white ring-opacity-50"
+              : "bg-gradient-to-br from-blue-600 to-blue-700 opacity-60 hover:opacity-75 shadow-sm hover:shadow-md hover:scale-105"
+          }`}
+        >
+          <div className="absolute top-0 right-0 w-12 h-12 bg-white opacity-10 rounded-full -mr-6 -mt-6"></div>
+          <BookOpen className="w-4 h-4 inline mr-2 relative z-10" />
+          <span className="relative z-10">Reserva Actual</span>
+        </button>
+        <button
+          onClick={() => setActiveTab("history")}
+          className={`group relative overflow-hidden rounded-lg px-5 py-2 text-white transition-all duration-300 text-xs font-medium ${
+            activeTab === "history"
+              ? "bg-gradient-to-br from-purple-600 to-purple-700 shadow-lg scale-105 ring-2 ring-white ring-opacity-50"
+              : "bg-gradient-to-br from-purple-600 to-purple-700 opacity-60 hover:opacity-75 shadow-sm hover:shadow-md hover:scale-105"
+          }`}
+        >
+          <div className="absolute top-0 right-0 w-12 h-12 bg-white opacity-10 rounded-full -mr-6 -mt-6"></div>
+          <History className="w-4 h-4 inline mr-2 relative z-10" />
+          <span className="relative z-10">Histórico</span>
+        </button>
+        <button
+          onClick={() => setActiveTab("events")}
+          className={`group relative overflow-hidden rounded-lg px-5 py-2 text-white transition-all duration-300 text-xs font-medium ${
+            activeTab === "events"
+              ? "bg-gradient-to-br from-orange-600 to-orange-700 shadow-lg scale-105 ring-2 ring-white ring-opacity-50"
+              : "bg-gradient-to-br from-orange-600 to-orange-700 opacity-60 hover:opacity-75 shadow-sm hover:shadow-md hover:scale-105"
+          }`}
+        >
+          <div className="absolute top-0 right-0 w-12 h-12 bg-white opacity-10 rounded-full -mr-6 -mt-6"></div>
+          <CalendarDays className="w-4 h-4 inline mr-2 relative z-10" />
+          <span className="relative z-10">Eventos</span>
+        </button>
+      </div>
 
       {/* Current Reservation */}
       {clientDetails.currentReservation && (
