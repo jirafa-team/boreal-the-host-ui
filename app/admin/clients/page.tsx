@@ -189,9 +189,9 @@ export default function ClientsPage() {
   const { t } = useLanguage()
   const router = useRouter()
   const [searchTerm, setSearchTerm] = useState("")
-  const [statusFilter, setStatusFilter] = useState<string>("all")
-  const [clients] = useState<Client[]>(mockClients)
+  const [statusFilter, setStatusFilter] = useState("all")
   const [activeTab, setActiveTab] = useState<"current" | "historical">("current")
+  const [clientsFilter, setClientsFilter] = useState<"all" | "active" | "reserved" | "vip">("all")
   const [expandedClient, setExpandedClient] = useState<string | null>(null)
 
   const activeClients = clients.filter((client) => client.status === "checked-in" || client.status === "reserved")
@@ -293,61 +293,101 @@ export default function ClientsPage() {
 
       {/* Stats */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <Card>
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-muted-foreground">{t("admin.checkInToday")}</p>
-                <p className="text-2xl font-bold text-foreground">3</p>
-              </div>
-              <div className="w-12 h-12 rounded-full bg-green-500/10 flex items-center justify-center">
-                <CheckCircle2 className="w-6 h-6 text-green-600" />
-              </div>
+        <div
+          className="relative overflow-hidden rounded-lg p-4 shadow-md hover:shadow-lg transition-all duration-300 hover:scale-105 cursor-pointer group"
+          style={{
+            background: clientsFilter === "all" ? "linear-gradient(135deg, rgb(124, 58, 255), rgb(109, 40, 217))" : "white",
+            color: clientsFilter === "all" ? "white" : "black"
+          }}
+          onClick={() => setClientsFilter("all")}
+        >
+          {clientsFilter === "all" && (
+            <div className="absolute inset-0 opacity-10">
+              <div className="absolute top-0 right-0 w-20 h-20 bg-white rounded-full -mr-8 -mt-8"></div>
             </div>
-          </CardContent>
-        </Card>
+          )}
+          <div className="relative flex items-center gap-3">
+            <div className={`p-2 rounded-lg ${clientsFilter === "all" ? "bg-white/20" : "bg-violet-100"}`}>
+              <UserCircle className={`w-5 h-5 ${clientsFilter === "all" ? "text-white" : "text-violet-600"}`} />
+            </div>
+            <div>
+              <p className={`text-sm ${clientsFilter === "all" ? "opacity-90" : "text-muted-foreground"}`}>{t("admin.checkInToday")}</p>
+              <p className="text-2xl font-bold">3</p>
+            </div>
+          </div>
+        </div>
 
-        <Card>
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-muted-foreground">{t("admin.activeGuests")}</p>
-                <p className="text-2xl font-bold text-foreground">8</p>
-              </div>
-              <div className="w-12 h-12 rounded-full bg-blue-500/10 flex items-center justify-center">
-                <UserCircle className="w-6 h-6 text-blue-600" />
-              </div>
+        <div
+          className="relative overflow-hidden rounded-lg p-4 shadow-md hover:shadow-lg transition-all duration-300 hover:scale-105 cursor-pointer group"
+          style={{
+            background: clientsFilter === "active" ? "linear-gradient(135deg, rgb(34, 197, 94), rgb(22, 163, 74))" : "white",
+            color: clientsFilter === "active" ? "white" : "black"
+          }}
+          onClick={() => setClientsFilter("active")}
+        >
+          {clientsFilter === "active" && (
+            <div className="absolute inset-0 opacity-10">
+              <div className="absolute top-0 right-0 w-20 h-20 bg-white rounded-full -mr-8 -mt-8"></div>
             </div>
-          </CardContent>
-        </Card>
+          )}
+          <div className="relative flex items-center gap-3">
+            <div className={`p-2 rounded-lg ${clientsFilter === "active" ? "bg-white/20" : "bg-green-100"}`}>
+              <CheckCircle2 className={`w-5 h-5 ${clientsFilter === "active" ? "text-white" : "text-green-600"}`} />
+            </div>
+            <div>
+              <p className={`text-sm ${clientsFilter === "active" ? "opacity-90" : "text-muted-foreground"}`}>{t("admin.activeGuests")}</p>
+              <p className="text-2xl font-bold">8</p>
+            </div>
+          </div>
+        </div>
 
-        <Card>
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-muted-foreground">{t("admin.futureReservations")}</p>
-                <p className="text-2xl font-bold text-foreground">12</p>
-              </div>
-              <div className="w-12 h-12 rounded-full bg-purple-500/10 flex items-center justify-center">
-                <Calendar className="w-6 h-6 text-purple-600" />
-              </div>
+        <div
+          className="relative overflow-hidden rounded-lg p-4 shadow-md hover:shadow-lg transition-all duration-300 hover:scale-105 cursor-pointer group"
+          style={{
+            background: clientsFilter === "reserved" ? "linear-gradient(135deg, rgb(37, 99, 235), rgb(29, 78, 216))" : "white",
+            color: clientsFilter === "reserved" ? "white" : "black"
+          }}
+          onClick={() => setClientsFilter("reserved")}
+        >
+          {clientsFilter === "reserved" && (
+            <div className="absolute inset-0 opacity-10">
+              <div className="absolute top-0 right-0 w-20 h-20 bg-white rounded-full -mr-8 -mt-8"></div>
             </div>
-          </CardContent>
-        </Card>
+          )}
+          <div className="relative flex items-center gap-3">
+            <div className={`p-2 rounded-lg ${clientsFilter === "reserved" ? "bg-white/20" : "bg-blue-100"}`}>
+              <Calendar className={`w-5 h-5 ${clientsFilter === "reserved" ? "text-white" : "text-blue-600"}`} />
+            </div>
+            <div>
+              <p className={`text-sm ${clientsFilter === "reserved" ? "opacity-90" : "text-muted-foreground"}`}>{t("admin.futureReservations")}</p>
+              <p className="text-2xl font-bold">12</p>
+            </div>
+          </div>
+        </div>
 
-        <Card>
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-muted-foreground">{t("admin.vipClients")}</p>
-                <p className="text-2xl font-bold text-foreground">5</p>
-              </div>
-              <div className="w-12 h-12 rounded-full bg-amber-500/10 flex items-center justify-center">
-                <CreditCard className="w-6 h-6 text-amber-600" />
-              </div>
+        <div
+          className="relative overflow-hidden rounded-lg p-4 shadow-md hover:shadow-lg transition-all duration-300 hover:scale-105 cursor-pointer group"
+          style={{
+            background: clientsFilter === "vip" ? "linear-gradient(135deg, rgb(234, 179, 8), rgb(202, 138, 4))" : "white",
+            color: clientsFilter === "vip" ? "white" : "black"
+          }}
+          onClick={() => setClientsFilter("vip")}
+        >
+          {clientsFilter === "vip" && (
+            <div className="absolute inset-0 opacity-10">
+              <div className="absolute top-0 right-0 w-20 h-20 bg-white rounded-full -mr-8 -mt-8"></div>
             </div>
-          </CardContent>
-        </Card>
+          )}
+          <div className="relative flex items-center gap-3">
+            <div className={`p-2 rounded-lg ${clientsFilter === "vip" ? "bg-white/20" : "bg-yellow-100"}`}>
+              <CreditCard className={`w-5 h-5 ${clientsFilter === "vip" ? "text-white" : "text-yellow-600"}`} />
+            </div>
+            <div>
+              <p className={`text-sm ${clientsFilter === "vip" ? "opacity-90" : "text-muted-foreground"}`}>{t("admin.vipClients")}</p>
+              <p className="text-2xl font-bold">5</p>
+            </div>
+          </div>
+        </div>
       </div>
 
       {/* Tabs to switch between active and historical clients */}
