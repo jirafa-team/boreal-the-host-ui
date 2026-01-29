@@ -188,12 +188,26 @@ const mockClients: Client[] = [
 export default function ClientsPage() {
   const { t } = useLanguage()
   const router = useRouter()
-  const [clients] = useState<Client[]>(mockClients)
+  const [clients, setClients] = useState<Client[]>(mockClients)
   const [searchTerm, setSearchTerm] = useState("")
   const [statusFilter, setStatusFilter] = useState("all")
   const [activeTab, setActiveTab] = useState<"current" | "historical">("current")
   const [clientsFilter, setClientsFilter] = useState<"all" | "active" | "reserved" | "vip">("all")
   const [expandedClient, setExpandedClient] = useState<string | null>(null)
+  const [showNewClientModal, setShowNewClientModal] = useState(false)
+  const [newClient, setNewClient] = useState({
+    name: "",
+    email: "",
+    phone: "",
+    room: "",
+    checkIn: "",
+    checkOut: "",
+    roomType: "standard" as const,
+    status: "active" as const,
+    vip: false,
+    visitCount: 1,
+    notes: ""
+  })
 
   const activeClients = clients.filter((client) => client.status === "checked-in" || client.status === "reserved")
   const historicalClients = clients.filter((client) => client.status === "checked-out")
@@ -273,6 +287,40 @@ export default function ClientsPage() {
     return badges
   }
 
+  const handleAddClient = () => {
+    if (newClient.name && newClient.email) {
+      const client: Client = {
+        id: `client-${Date.now()}`,
+        name: newClient.name,
+        email: newClient.email,
+        phone: newClient.phone,
+        room: newClient.room,
+        checkIn: newClient.checkIn,
+        checkOut: newClient.checkOut,
+        roomType: newClient.roomType,
+        status: newClient.status,
+        vip: newClient.vip,
+        visitCount: newClient.visitCount,
+        notes: newClient.notes
+      }
+      setClients([...clients, client])
+      setShowNewClientModal(false)
+      setNewClient({
+        name: "",
+        email: "",
+        phone: "",
+        room: "",
+        checkIn: "",
+        checkOut: "",
+        roomType: "standard",
+        status: "active",
+        vip: false,
+        visitCount: 1,
+        notes: ""
+      })
+    }
+  }
+
   return (
     <div className="p-0 space-y-6">
       {/* Header */}
@@ -287,6 +335,7 @@ export default function ClientsPage() {
               <button 
                 className="flex items-center justify-center w-10 h-10 rounded-full bg-gradient-to-br from-blue-600 to-blue-700 text-white shadow-md hover:shadow-lg transition-all duration-300 hover:scale-110 group relative"
                 title="Agregar cliente"
+                onClick={() => setShowNewClientModal(true)}
               >
                 <div className="relative flex items-center justify-center">
                   <UserPlus className="w-5 h-5" />
@@ -600,5 +649,166 @@ export default function ClientsPage() {
         </Tabs>
       </div>
     </div>
+
+    {/* New Client Modal */}
+    {showNewClientModal && (
+      <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
+        <div className="bg-white rounded-2xl shadow-2xl p-6 w-full max-w-2xl mx-4 max-h-[90vh] overflow-y-auto">
+          <h2 className="text-2xl font-bold text-foreground mb-6">Agregar Nuevo Cliente</h2>
+
+          <div className="space-y-6">
+            {/* Name and Email */}
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Nombre</label>
+                <input
+                  type="text"
+                  value={newClient.name}
+                  onChange={(e) => setNewClient({ ...newClient, name: e.target.value })}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  placeholder="Nombre completo"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Email</label>
+                <input
+                  type="email"
+                  value={newClient.email}
+                  onChange={(e) => setNewClient({ ...newClient, email: e.target.value })}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  placeholder="correo@ejemplo.com"
+                />
+              </div>
+            </div>
+
+            {/* Phone and Room */}
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Teléfono</label>
+                <input
+                  type="tel"
+                  value={newClient.phone}
+                  onChange={(e) => setNewClient({ ...newClient, phone: e.target.value })}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  placeholder="+1 (555) 000-0000"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Habitación</label>
+                <input
+                  type="text"
+                  value={newClient.room}
+                  onChange={(e) => setNewClient({ ...newClient, room: e.target.value })}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  placeholder="Ej: 205"
+                />
+              </div>
+            </div>
+
+            {/* Check In and Check Out */}
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Check-in</label>
+                <input
+                  type="date"
+                  value={newClient.checkIn}
+                  onChange={(e) => setNewClient({ ...newClient, checkIn: e.target.value })}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Check-out</label>
+                <input
+                  type="date"
+                  value={newClient.checkOut}
+                  onChange={(e) => setNewClient({ ...newClient, checkOut: e.target.value })}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+            </div>
+
+            {/* Room Type and Status */}
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Tipo de Habitación</label>
+                <select
+                  value={newClient.roomType}
+                  onChange={(e) => setNewClient({ ...newClient, roomType: e.target.value as "standard" | "deluxe" | "premium" })}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                >
+                  <option value="standard">Estándar</option>
+                  <option value="deluxe">Deluxe</option>
+                  <option value="premium">Premium</option>
+                </select>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Estado</label>
+                <select
+                  value={newClient.status}
+                  onChange={(e) => setNewClient({ ...newClient, status: e.target.value as "active" | "checkout" })}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                >
+                  <option value="active">Activo</option>
+                  <option value="checkout">Check-out</option>
+                </select>
+              </div>
+            </div>
+
+            {/* VIP and Visit Count */}
+            <div className="grid grid-cols-2 gap-4">
+              <div className="flex items-center">
+                <input
+                  type="checkbox"
+                  id="vip"
+                  checked={newClient.vip}
+                  onChange={(e) => setNewClient({ ...newClient, vip: e.target.checked })}
+                  className="h-4 w-4 text-blue-600 rounded"
+                />
+                <label htmlFor="vip" className="ml-2 text-sm font-medium text-gray-700">
+                  Cliente VIP
+                </label>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Número de Visitas</label>
+                <input
+                  type="number"
+                  value={newClient.visitCount}
+                  onChange={(e) => setNewClient({ ...newClient, visitCount: parseInt(e.target.value) || 1 })}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  min="1"
+                />
+              </div>
+            </div>
+
+            {/* Notes */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Notas</label>
+              <textarea
+                value={newClient.notes}
+                onChange={(e) => setNewClient({ ...newClient, notes: e.target.value })}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 min-h-20"
+                placeholder="Notas adicionales sobre el cliente..."
+              />
+            </div>
+          </div>
+
+          {/* Action buttons */}
+          <div className="flex gap-3 mt-8">
+            <button
+              onClick={() => setShowNewClientModal(false)}
+              className="px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition-colors font-medium flex-1"
+            >
+              Cancelar
+            </button>
+            <button
+              onClick={handleAddClient}
+              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium flex-1"
+            >
+              Agregar Cliente
+            </button>
+          </div>
+        </div>
+      </div>
+    )}
   )
 }
