@@ -321,21 +321,21 @@ export default function ClientDetailPage() {
                 </div>
 
                 {/* KPIs - Dashboard Style */}
-                <div className="flex gap-3">
-                  <div className="bg-blue-50 rounded-lg px-6 py-4 border border-blue-200 flex flex-col items-center justify-center min-w-[130px]">
-                    <p className="text-5xl font-bold text-blue-600 mb-2">{clientDetails.totalVisits}</p>
+                <div className="flex gap-2">
+                  <div className="bg-blue-50 rounded-lg px-5 py-3 border border-blue-200 flex flex-col items-center justify-center min-w-[104px]">
+                    <p className="text-4xl font-bold text-blue-600 mb-1">{clientDetails.totalVisits}</p>
                     <p className="text-gray-600 text-xs">Total Visitas</p>
                   </div>
-                  <div className="bg-purple-50 rounded-lg px-6 py-4 border border-purple-200 flex flex-col items-center justify-center min-w-[130px]">
-                    <p className="text-5xl font-bold text-purple-600 mb-2">{clientDetails.totalSpent}</p>
+                  <div className="bg-purple-50 rounded-lg px-5 py-3 border border-purple-200 flex flex-col items-center justify-center min-w-[104px]">
+                    <p className="text-4xl font-bold text-purple-600 mb-1">{clientDetails.totalSpent}</p>
                     <p className="text-gray-600 text-xs">Total Gastado</p>
                   </div>
-                  <div className="bg-amber-50 rounded-lg px-6 py-4 border border-amber-200 flex flex-col items-center justify-center min-w-[130px]">
+                  <div className="bg-amber-50 rounded-lg px-5 py-3 border border-amber-200 flex flex-col items-center justify-center min-w-[104px]">
                     <div className="flex items-center justify-center gap-1">
-                      <p className="text-5xl font-bold text-amber-600">{clientDetails.averageRating}</p>
-                      <Star className="w-5 h-5 fill-amber-500 text-amber-500 mt-2" />
+                      <p className="text-4xl font-bold text-amber-600">{clientDetails.averageRating}</p>
+                      <Star className="w-4 h-4 fill-amber-500 text-amber-500 mt-1" />
                     </div>
-                    <p className="text-gray-600 text-xs mt-2">Valoración</p>
+                    <p className="text-gray-600 text-xs mt-1">Valoración</p>
                   </div>
                 </div>
               </div>
