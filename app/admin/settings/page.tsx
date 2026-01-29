@@ -619,7 +619,7 @@ export default function SettingsPage() {
     {
       label: 'Clientes',
       icon: Users,
-      color: 'from-blue-600 to-blue-700',
+      color: 'from-chart-4 to-chart-4',
     },
   ]
 
