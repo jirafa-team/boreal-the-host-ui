@@ -356,8 +356,8 @@ export default function ClientsPage() {
               onClick={() => setActiveTab("current")}
               className={`group relative overflow-hidden rounded-lg px-5 py-2 text-white transition-all duration-300 text-xs font-medium ${
                 activeTab === "current"
-                  ? "bg-gradient-to-br from-blue-600 to-blue-700 shadow-lg scale-105 ring-2 ring-white ring-opacity-50"
-                  : "bg-gradient-to-br from-blue-600 to-blue-700 opacity-60 hover:opacity-75 shadow-sm hover:shadow-md hover:scale-105"
+                  ? "bg-gradient-to-br from-green-600 to-green-700 shadow-lg scale-105 ring-2 ring-white ring-opacity-50"
+                  : "bg-gradient-to-br from-green-600 to-green-700 opacity-60 hover:opacity-75 shadow-sm hover:shadow-md hover:scale-105"
               }`}
             >
               <div className="absolute top-0 right-0 w-12 h-12 bg-white opacity-10 rounded-full -mr-6 -mt-6"></div>
@@ -480,365 +480,349 @@ export default function ClientsPage() {
           </div>
         </div>
 
-        {/* Tabs to switch between active and historical clients */}
-        <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as "current" | "historical")}>
-          <TabsList className="grid w-full max-w-md grid-cols-2">
-            <TabsTrigger value="current" className="gap-2">
-              <CheckCircle2 className="w-4 h-4" />
-              {t("admin.currentGuests")}
-            </TabsTrigger>
-            <TabsTrigger value="historical" className="gap-2">
-              <Clock className="w-4 h-4" />
-              {t("admin.historicalClients")}
-            </TabsTrigger>
-          </TabsList>
+        {/* Search and Filters */}
+        <Card>
+          <CardContent className="p-4">
+            <div className="flex flex-col md:flex-row gap-4">
+              <div className="flex-1 relative">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                <Input
+                  placeholder={t("admin.searchPlaceholder")}
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="pl-10"
+                />
+              </div>
+              <Select value={statusFilter} onValueChange={setStatusFilter}>
+                <SelectTrigger className="w-full md:w-48">
+                  <Filter className="w-4 h-4 mr-2" />
+                  <SelectValue placeholder={t("admin.filterStatus")} />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">{t("admin.allStatuses")}</SelectItem>
+                  <SelectItem value="checked-in">{t("admin.checkedIn")}</SelectItem>
+                  <SelectItem value="reserved">{t("admin.reserved")}</SelectItem>
+                  {activeTab === "historical" && <SelectItem value="checked-out">{t("admin.checkedOut")}</SelectItem>}
+                </SelectContent>
+              </Select>
+            </div>
+          </CardContent>
+        </Card>
 
-          <TabsContent value={activeTab} className="space-y-4">
-            {/* Search and Filters */}
-            <Card>
-              <CardContent className="p-4">
-                <div className="flex flex-col md:flex-row gap-4">
-                  <div className="flex-1 relative">
-                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                    <Input
-                      placeholder={t("admin.searchPlaceholder")}
-                      value={searchTerm}
-                      onChange={(e) => setSearchTerm(e.target.value)}
-                      className="pl-10"
-                    />
-                  </div>
-                  <Select value={statusFilter} onValueChange={setStatusFilter}>
-                    <SelectTrigger className="w-full md:w-48">
-                      <Filter className="w-4 h-4 mr-2" />
-                      <SelectValue placeholder={t("admin.filterStatus")} />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all">{t("admin.allStatuses")}</SelectItem>
-                      <SelectItem value="checked-in">{t("admin.checkedIn")}</SelectItem>
-                      <SelectItem value="reserved">{t("admin.reserved")}</SelectItem>
-                      {activeTab === "historical" && <SelectItem value="checked-out">{t("admin.checkedOut")}</SelectItem>}
-                    </SelectContent>
-                  </Select>
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Clients Table */}
-            <Card>
-              <CardContent className="p-0">
-                <div className="overflow-x-auto">
-                  <table className="w-full">
-                    <thead className="bg-muted/50 border-b">
-                      <tr>
-                        <th className="text-left p-4 text-sm font-medium text-muted-foreground w-12"></th>
-                        <th className="text-left p-4 text-sm font-medium text-muted-foreground">{t("admin.guest")}</th>
-                        <th className="text-left p-4 text-sm font-medium text-muted-foreground">{t("admin.room")}</th>
-                        <th className="text-left p-4 text-sm font-medium text-muted-foreground">{t("admin.checkIn")}</th>
-                        <th className="text-left p-4 text-sm font-medium text-muted-foreground">{t("admin.checkOut")}</th>
-                        <th className="text-left p-4 text-sm font-medium text-muted-foreground">{t("admin.status")}</th>
-                        <th className="text-left p-4 text-sm font-medium text-muted-foreground">{t("admin.spent")}</th>
-                        <th className="text-right p-4 text-sm font-medium text-muted-foreground">{t("admin.actions")}</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y">
-                      {filteredClients.map((client) => (
-                        <>
-                          <tr key={client.id} className="hover:bg-muted/30 transition-colors">
-                            <td className="p-4">
-                              {client.groupMembers && client.groupMembers.length > 0 && (
-                                <button
-                                  onClick={() => toggleExpanded(client.id)}
-                                  className="hover:bg-muted rounded p-1 transition-colors"
-                                >
-                                  {expandedClient === client.id ? (
-                                    <ChevronDown className="w-4 h-4 text-muted-foreground" />
-                                  ) : (
-                                    <ChevronRight className="w-4 h-4 text-muted-foreground" />
-                                  )}
-                                </button>
+        {/* Clients Table */}
+        <Card>
+          <CardContent className="p-0">
+            <div className="overflow-x-auto">
+              <table className="w-full">
+                <thead className="bg-muted/50 border-b">
+                  <tr>
+                    <th className="text-left p-4 text-sm font-medium text-muted-foreground w-12"></th>
+                    <th className="text-left p-4 text-sm font-medium text-muted-foreground">{t("admin.guest")}</th>
+                    <th className="text-left p-4 text-sm font-medium text-muted-foreground">{t("admin.room")}</th>
+                    <th className="text-left p-4 text-sm font-medium text-muted-foreground">{t("admin.checkIn")}</th>
+                    <th className="text-left p-4 text-sm font-medium text-muted-foreground">{t("admin.checkOut")}</th>
+                    <th className="text-left p-4 text-sm font-medium text-muted-foreground">{t("admin.status")}</th>
+                    <th className="text-left p-4 text-sm font-medium text-muted-foreground">{t("admin.spent")}</th>
+                    <th className="text-right p-4 text-sm font-medium text-muted-foreground">{t("admin.actions")}</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y">
+                  {filteredClients.map((client) => (
+                    <>
+                      <tr key={client.id} className="hover:bg-muted/30 transition-colors">
+                        <td className="p-4">
+                          {client.groupMembers && client.groupMembers.length > 0 && (
+                            <button
+                              onClick={() => toggleExpanded(client.id)}
+                              className="hover:bg-muted rounded p-1 transition-colors"
+                            >
+                              {expandedClient === client.id ? (
+                                <ChevronDown className="w-4 h-4 text-muted-foreground" />
+                              ) : (
+                                <ChevronRight className="w-4 h-4 text-muted-foreground" />
                               )}
-                            </td>
-                            <td className="p-4">
+                            </button>
+                          )}
+                        </td>
+                        <td className="p-4">
+                          <div className="flex items-center gap-3">
+                            <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
+                              <UserCircle className="w-6 h-6 text-primary" />
+                            </div>
+                            <div>
+                              <div className="flex items-center gap-2 flex-wrap">
+                                <Link
+                                  href={`/admin/clients/${client.id}`}
+                                  className="font-medium text-foreground hover:text-primary hover:underline"
+                                >
+                                  {client.name}
+                                </Link>
+                                {getClientTierBadge(client)}
+                              </div>
+                              <p className="text-sm text-muted-foreground">{client.email}</p>
+                              {client.visitCount && client.visitCount > 1 && (
+                                <p className="text-xs text-muted-foreground mt-0.5">
+                                  {client.visitCount} {t("admin.visitsToHotel")}
+                                </p>
+                              )}
+                            </div>
+                          </div>
+                        </td>
+                        <td className="p-4">
+                          <div className="flex items-center gap-2">
+                            <div className="w-8 h-8 rounded bg-primary/10 flex items-center justify-center">
+                              <span className="text-sm font-semibold text-primary">{client.room}</span>
+                            </div>
+                          </div>
+                        </td>
+                        <td className="p-4">
+                          <div className="space-y-1">
+                            <div className="flex items-center gap-2 text-sm">
+                              <Calendar className="w-3 h-3 text-muted-foreground" />
+                              <span className="text-foreground">
+                                {new Date(client.checkIn).toLocaleDateString("es-ES", {
+                                  day: "2-digit",
+                                  month: "short",
+                                })}
+                              </span>
+                            </div>
+                            <div className="flex items-center gap-2 text-sm">
+                              <Calendar className="w-3 h-3 text-muted-foreground" />
+                              <span className="text-foreground">
+                                {new Date(client.checkOut).toLocaleDateString("es-ES", {
+                                  day: "2-digit",
+                                  month: "short",
+                                })}
+                              </span>
+                            </div>
+                          </div>
+                        </td>
+                        <td className="p-4">{getStatusBadge(client.status)}</td>
+                        <td className="p-4">
+                          <span className="text-foreground">{client.guests}</span>
+                        </td>
+                        <td className="p-4">
+                          <span className="font-semibold text-foreground">${client.totalSpent}</span>
+                        </td>
+                        <td className="p-4">
+                          <div className="flex items-center justify-end gap-2">
+                            <DropdownMenu>
+                              <DropdownMenuTrigger asChild>
+                                <Button variant="ghost" size="sm">
+                                  <MoreVertical className="w-4 h-4" />
+                                </Button>
+                              </DropdownMenuTrigger>
+                              <DropdownMenuContent align="end">
+                                <DropdownMenuItem>
+                                  <Edit className="w-4 h-4 mr-2" />
+                                  {t("admin.edit")}
+                                </DropdownMenuItem>
+                                <DropdownMenuItem className="text-red-600">
+                                  <Trash2 className="w-4 h-4 mr-2" />
+                                  {t("admin.delete")}
+                                </DropdownMenuItem>
+                              </DropdownMenuContent>
+                            </DropdownMenu>
+                          </div>
+                        </td>
+                      </tr>
+
+                      {expandedClient === client.id &&
+                        client.groupMembers &&
+                        client.groupMembers.map((member) => (
+                          <tr key={member.id} className="bg-muted/20 hover:bg-muted/40 transition-colors">
+                            <td className="p-4"></td>
+                            <td className="p-4 pl-16">
                               <div className="flex items-center gap-3">
-                                <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
-                                  <UserCircle className="w-6 h-6 text-primary" />
+                                <div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center">
+                                  <UserCircle className="w-5 h-5 text-muted-foreground" />
                                 </div>
                                 <div>
-                                  <div className="flex items-center gap-2 flex-wrap">
-                                    <Link
-                                      href={`/admin/clients/${client.id}`}
-                                      className="font-medium text-foreground hover:text-primary hover:underline"
-                                    >
-                                      {client.name}
-                                    </Link>
-                                    {getClientTierBadge(client)}
-                                  </div>
-                                  <p className="text-sm text-muted-foreground">{client.email}</p>
-                                  {client.visitCount && client.visitCount > 1 && (
-                                    <p className="text-xs text-muted-foreground mt-0.5">
-                                      {client.visitCount} {t("admin.visitsToHotel")}
-                                    </p>
-                                  )}
+                                  <p className="font-medium text-sm text-foreground">{member.name}</p>
+                                  <p className="text-xs text-muted-foreground">{member.relationship}</p>
                                 </div>
                               </div>
                             </td>
                             <td className="p-4">
-                              <div className="flex items-center gap-2">
-                                <div className="w-8 h-8 rounded bg-primary/10 flex items-center justify-center">
-                                  <span className="text-sm font-semibold text-primary">{client.room}</span>
-                                </div>
-                              </div>
+                              <span className="text-sm text-muted-foreground">-</span>
                             </td>
                             <td className="p-4">
-                              <div className="space-y-1">
-                                <div className="flex items-center gap-2 text-sm">
-                                  <Calendar className="w-3 h-3 text-muted-foreground" />
-                                  <span className="text-foreground">
-                                    {new Date(client.checkIn).toLocaleDateString("es-ES", {
-                                      day: "2-digit",
-                                      month: "short",
-                                    })}
-                                  </span>
-                                </div>
-                                <div className="flex items-center gap-2 text-sm">
-                                  <Calendar className="w-3 h-3 text-muted-foreground" />
-                                  <span className="text-foreground">
-                                    {new Date(client.checkOut).toLocaleDateString("es-ES", {
-                                      day: "2-digit",
-                                      month: "short",
-                                    })}
-                                  </span>
-                                </div>
-                              </div>
+                              <p className="text-sm text-muted-foreground">{member.email}</p>
                             </td>
-                            <td className="p-4">{getStatusBadge(client.status)}</td>
-                            <td className="p-4">
-                              <span className="text-foreground">{client.guests}</span>
-                            </td>
-                            <td className="p-4">
-                              <span className="font-semibold text-foreground">${client.totalSpent}</span>
-                            </td>
-                            <td className="p-4">
-                              <div className="flex items-center justify-end gap-2">
-                                <DropdownMenu>
-                                  <DropdownMenuTrigger asChild>
-                                    <Button variant="ghost" size="sm">
-                                      <MoreVertical className="w-4 h-4" />
-                                    </Button>
-                                  </DropdownMenuTrigger>
-                                  <DropdownMenuContent align="end">
-                                    <DropdownMenuItem>
-                                      <Edit className="w-4 h-4 mr-2" />
-                                      {t("admin.edit")}
-                                    </DropdownMenuItem>
-                                    <DropdownMenuItem className="text-red-600">
-                                      <Trash2 className="w-4 h-4 mr-2" />
-                                      {t("admin.delete")}
-                                    </DropdownMenuItem>
-                                  </DropdownMenuContent>
-                                </DropdownMenu>
-                              </div>
+                            <td className="p-4" colSpan={4}>
+                              <p className="text-sm text-muted-foreground">{member.phone}</p>
                             </td>
                           </tr>
-
-                          {expandedClient === client.id &&
-                            client.groupMembers &&
-                            client.groupMembers.map((member) => (
-                              <tr key={member.id} className="bg-muted/20 hover:bg-muted/40 transition-colors">
-                                <td className="p-4"></td>
-                                <td className="p-4 pl-16">
-                                  <div className="flex items-center gap-3">
-                                    <div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center">
-                                      <UserCircle className="w-5 h-5 text-muted-foreground" />
-                                    </div>
-                                    <div>
-                                      <p className="font-medium text-sm text-foreground">{member.name}</p>
-                                      <p className="text-xs text-muted-foreground">{member.relationship}</p>
-                                    </div>
-                                  </div>
-                                </td>
-                                <td className="p-4">
-                                  <span className="text-sm text-muted-foreground">-</span>
-                                </td>
-                                <td className="p-4">
-                                  <p className="text-sm text-muted-foreground">{member.email}</p>
-                                </td>
-                                <td className="p-4" colSpan={4}>
-                                  <p className="text-sm text-muted-foreground">{member.phone}</p>
-                                </td>
-                              </tr>
-                            ))}
-                        </>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
-        </Tabs>
+                        ))}
+                    </>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </CardContent>
+        </Card>
       </div>
-    </div>
 
-    {/* New Client Modal */}
-    {showNewClientModal && (
-      <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
-        <div className="bg-white rounded-2xl shadow-2xl p-6 w-full max-w-2xl mx-4 max-h-[90vh] overflow-y-auto">
-          <h2 className="text-2xl font-bold text-foreground mb-6">Agregar Nuevo Cliente</h2>
+      {/* New Client Modal */}
+      {showNewClientModal && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
+          <div className="bg-white rounded-2xl shadow-2xl p-6 w-full max-w-2xl mx-4 max-h-[90vh] overflow-y-auto">
+            <h2 className="text-2xl font-bold text-foreground mb-6">Agregar Nuevo Cliente</h2>
 
-          <div className="space-y-6">
-            {/* Name and Email */}
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Nombre</label>
-                <input
-                  type="text"
-                  value={newClient.name}
-                  onChange={(e) => setNewClient({ ...newClient, name: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  placeholder="Nombre completo"
-                />
+            <div className="space-y-6">
+              {/* Name and Email */}
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Nombre</label>
+                  <input
+                    type="text"
+                    value={newClient.name}
+                    onChange={(e) => setNewClient({ ...newClient, name: e.target.value })}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    placeholder="Nombre completo"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Email</label>
+                  <input
+                    type="email"
+                    value={newClient.email}
+                    onChange={(e) => setNewClient({ ...newClient, email: e.target.value })}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    placeholder="correo@ejemplo.com"
+                  />
+                </div>
               </div>
+
+              {/* Phone and Room */}
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Teléfono</label>
+                  <input
+                    type="tel"
+                    value={newClient.phone}
+                    onChange={(e) => setNewClient({ ...newClient, phone: e.target.value })}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    placeholder="+1 (555) 000-0000"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Habitación</label>
+                  <input
+                    type="text"
+                    value={newClient.room}
+                    onChange={(e) => setNewClient({ ...newClient, room: e.target.value })}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    placeholder="Ej: 205"
+                  />
+                </div>
+              </div>
+
+              {/* Check In and Check Out */}
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Check-in</label>
+                  <input
+                    type="date"
+                    value={newClient.checkIn}
+                    onChange={(e) => setNewClient({ ...newClient, checkIn: e.target.value })}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Check-out</label>
+                  <input
+                    type="date"
+                    value={newClient.checkOut}
+                    onChange={(e) => setNewClient({ ...newClient, checkOut: e.target.value })}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+                </div>
+              </div>
+
+              {/* Room Type and Status */}
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Tipo de Habitación</label>
+                  <select
+                    value={newClient.roomType}
+                    onChange={(e) => setNewClient({ ...newClient, roomType: e.target.value as "standard" | "deluxe" | "premium" })}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  >
+                    <option value="standard">Estándar</option>
+                    <option value="deluxe">Deluxe</option>
+                    <option value="premium">Premium</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Estado</label>
+                  <select
+                    value={newClient.status}
+                    onChange={(e) => setNewClient({ ...newClient, status: e.target.value as "active" | "checkout" })}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  >
+                    <option value="active">Activo</option>
+                    <option value="checkout">Check-out</option>
+                  </select>
+                </div>
+              </div>
+
+              {/* VIP and Visit Count */}
+              <div className="grid grid-cols-2 gap-4">
+                <div className="flex items-center">
+                  <input
+                    type="checkbox"
+                    id="vip"
+                    checked={newClient.vip}
+                    onChange={(e) => setNewClient({ ...newClient, vip: e.target.checked })}
+                    className="h-4 w-4 text-blue-600 rounded"
+                  />
+                  <label htmlFor="vip" className="ml-2 text-sm font-medium text-gray-700">
+                    Cliente VIP
+                  </label>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Número de Visitas</label>
+                  <input
+                    type="number"
+                    value={newClient.visitCount}
+                    onChange={(e) => setNewClient({ ...newClient, visitCount: parseInt(e.target.value) || 1 })}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 min-h-20"
+                    min="1"
+                  />
+                </div>
+              </div>
+
+              {/* Notes */}
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Email</label>
-                <input
-                  type="email"
-                  value={newClient.email}
-                  onChange={(e) => setNewClient({ ...newClient, email: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  placeholder="correo@ejemplo.com"
+                <label className="block text-sm font-medium text-gray-700 mb-2">Notas</label>
+                <textarea
+                  value={newClient.notes}
+                  onChange={(e) => setNewClient({ ...newClient, notes: e.target.value })}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 min-h-20"
+                  placeholder="Notas adicionales sobre el cliente..."
                 />
               </div>
             </div>
 
-            {/* Phone and Room */}
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Teléfono</label>
-                <input
-                  type="tel"
-                  value={newClient.phone}
-                  onChange={(e) => setNewClient({ ...newClient, phone: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  placeholder="+1 (555) 000-0000"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Habitación</label>
-                <input
-                  type="text"
-                  value={newClient.room}
-                  onChange={(e) => setNewClient({ ...newClient, room: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  placeholder="Ej: 205"
-                />
-              </div>
+            {/* Action buttons */}
+            <div className="flex gap-3 mt-8">
+              <button
+                onClick={() => setShowNewClientModal(false)}
+                className="px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition-colors font-medium flex-1"
+              >
+                Cancelar
+              </button>
+              <button
+                onClick={handleAddClient}
+                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium flex-1"
+              >
+                Agregar Cliente
+              </button>
             </div>
-
-            {/* Check In and Check Out */}
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Check-in</label>
-                <input
-                  type="date"
-                  value={newClient.checkIn}
-                  onChange={(e) => setNewClient({ ...newClient, checkIn: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Check-out</label>
-                <input
-                  type="date"
-                  value={newClient.checkOut}
-                  onChange={(e) => setNewClient({ ...newClient, checkOut: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
-              </div>
-            </div>
-
-            {/* Room Type and Status */}
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Tipo de Habitación</label>
-                <select
-                  value={newClient.roomType}
-                  onChange={(e) => setNewClient({ ...newClient, roomType: e.target.value as "standard" | "deluxe" | "premium" })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                >
-                  <option value="standard">Estándar</option>
-                  <option value="deluxe">Deluxe</option>
-                  <option value="premium">Premium</option>
-                </select>
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Estado</label>
-                <select
-                  value={newClient.status}
-                  onChange={(e) => setNewClient({ ...newClient, status: e.target.value as "active" | "checkout" })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                >
-                  <option value="active">Activo</option>
-                  <option value="checkout">Check-out</option>
-                </select>
-              </div>
-            </div>
-
-            {/* VIP and Visit Count */}
-            <div className="grid grid-cols-2 gap-4">
-              <div className="flex items-center">
-                <input
-                  type="checkbox"
-                  id="vip"
-                  checked={newClient.vip}
-                  onChange={(e) => setNewClient({ ...newClient, vip: e.target.checked })}
-                  className="h-4 w-4 text-blue-600 rounded"
-                />
-                <label htmlFor="vip" className="ml-2 text-sm font-medium text-gray-700">
-                  Cliente VIP
-                </label>
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Número de Visitas</label>
-                <input
-                  type="number"
-                  value={newClient.visitCount}
-                  onChange={(e) => setNewClient({ ...newClient, visitCount: parseInt(e.target.value) || 1 })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  min="1"
-                />
-              </div>
-            </div>
-
-            {/* Notes */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Notas</label>
-              <textarea
-                value={newClient.notes}
-                onChange={(e) => setNewClient({ ...newClient, notes: e.target.value })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 min-h-20"
-                placeholder="Notas adicionales sobre el cliente..."
-              />
-            </div>
-          </div>
-
-          {/* Action buttons */}
-          <div className="flex gap-3 mt-8">
-            <button
-              onClick={() => setShowNewClientModal(false)}
-              className="px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition-colors font-medium flex-1"
-            >
-              Cancelar
-            </button>
-            <button
-              onClick={handleAddClient}
-              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium flex-1"
-            >
-              Agregar Cliente
-            </button>
           </div>
         </div>
-      </div>
-    )}
+      )}
+    </div>
   )
 }
