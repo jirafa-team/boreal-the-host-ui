@@ -1,7 +1,7 @@
 "use client"
 
 import { Calendar } from "@/components/ui/calendar"
-import { CheckCircle2, Star, Mail, Phone, MapPin, Eye, Clock, CreditCard, Utensils, Sparkles, Dumbbell, Droplets, ShoppingBag } from "lucide-react"
+import { CheckCircle2, Star, Mail, Phone, MapPin, Eye, Clock, CreditCard, Utensils, Sparkles, Dumbbell, Droplets, ShoppingBag, ArrowLeft } from "lucide-react"
 import { useParams, useRouter } from "next/navigation"
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
