@@ -188,6 +188,7 @@ const mockClients: Client[] = [
 export default function ClientsPage() {
   const { t } = useLanguage()
   const router = useRouter()
+  const [clients] = useState<Client[]>(mockClients)
   const [searchTerm, setSearchTerm] = useState("")
   const [statusFilter, setStatusFilter] = useState("all")
   const [activeTab, setActiveTab] = useState<"current" | "historical">("current")
