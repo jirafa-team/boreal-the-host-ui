@@ -225,12 +225,12 @@ export default function DashboardControl() {
   }
 
   const mockCheckouts = [
-    { id: 1, room: "301", guestName: "Carlos Mendoza", status: "completed" as const },
-    { id: 2, room: "205", guestName: "María García", status: "completed" as const },
-    { id: 3, room: "412", guestName: "John Smith", status: "pending" as const },
-    { id: 4, room: "501", guestName: "Ahmed Hassan", status: "pending" as const },
-    { id: 5, room: "103", guestName: "Emma Wilson", status: "pending" as const },
-    { id: 6, room: "502", guestName: "Roberto Silva", status: "completed" as const },
+    { id: 1, room: "301", guestName: "Carlos Mendoza", status: "completed" as const, balance: 0, lateCheckout: false },
+    { id: 2, room: "205", guestName: "María García", status: "completed" as const, balance: 150, lateCheckout: true },
+    { id: 3, room: "412", guestName: "John Smith", status: "pending" as const, balance: 2800, lateCheckout: false },
+    { id: 4, room: "501", guestName: "Ahmed Hassan", status: "pending" as const, balance: 3500, lateCheckout: true },
+    { id: 5, room: "103", guestName: "Emma Wilson", status: "pending" as const, balance: 550, lateCheckout: false },
+    { id: 6, room: "502", guestName: "Roberto Silva", status: "completed" as const, balance: 0, lateCheckout: false },
   ]
 
   const staffMembers: StaffMember[] = [
@@ -1056,6 +1056,8 @@ export default function DashboardControl() {
                   <tr className="border-b border-gray-200 bg-gray-50">
                     <th className="text-left px-4 py-3 font-semibold text-gray-900 text-sm">Habitación</th>
                     <th className="text-left px-4 py-3 font-semibold text-gray-900 text-sm">Cliente</th>
+                    <th className="text-right px-4 py-3 font-semibold text-gray-900 text-sm">Saldo Pendiente</th>
+                    <th className="text-center px-4 py-3 font-semibold text-gray-900 text-sm">Adicionales</th>
                     <th className="text-center px-4 py-3 font-semibold text-gray-900 text-sm">Estado</th>
                   </tr>
                 </thead>
@@ -1064,6 +1066,18 @@ export default function DashboardControl() {
                     <tr key={checkout.id} className="border-b border-gray-100 hover:bg-gray-50 transition-colors">
                       <td className="px-4 py-3 text-gray-900 font-semibold">#{checkout.room}</td>
                       <td className="px-4 py-3 text-gray-700">{checkout.guestName}</td>
+                      <td className="px-4 py-3 text-right font-semibold text-gray-900">
+                        ${checkout.balance.toLocaleString()}
+                      </td>
+                      <td className="px-4 py-3 text-center">
+                        {checkout.lateCheckout ? (
+                          <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
+                            Late Check-out
+                          </span>
+                        ) : (
+                          <span className="text-gray-400 text-sm">-</span>
+                        )}
+                      </td>
                       <td className="px-4 py-3 text-center">
                         <span className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${
                           checkout.status === "completed"
