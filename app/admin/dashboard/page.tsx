@@ -187,6 +187,14 @@ export default function DashboardControl() {
   const [checkoutSearchRoom, setCheckoutSearchRoom] = useState("")
   const [checkoutSearchGuest, setCheckoutSearchGuest] = useState("")
   const [checkoutSearchStatus, setCheckoutSearchStatus] = useState("all")
+  const [checkouts, setCheckouts] = useState([
+    { id: 1, room: "301", guestName: "Carlos Mendoza", status: "completed" as const, balance: 0, lateCheckout: false },
+    { id: 2, room: "205", guestName: "María García", status: "completed" as const, balance: 150, lateCheckout: true },
+    { id: 3, room: "412", guestName: "John Smith", status: "pending" as const, balance: 2800, lateCheckout: false },
+    { id: 4, room: "501", guestName: "Ahmed Hassan", status: "pending" as const, balance: 3500, lateCheckout: true },
+    { id: 5, room: "103", guestName: "Emma Wilson", status: "pending" as const, balance: 550, lateCheckout: false },
+    { id: 6, room: "502", guestName: "Roberto Silva", status: "completed" as const, balance: 0, lateCheckout: false },
+  ])
 
   const mockFacilities: Facility[] = [
     { id: "1", name: "Gimnasio", type: "fitness", capacity: 15, icon: Dumbbell, color: "bg-orange-500", startTime: "06:00", endTime: "22:00" },
@@ -235,12 +243,18 @@ export default function DashboardControl() {
     { id: 6, room: "502", guestName: "Roberto Silva", status: "completed" as const, balance: 0, lateCheckout: false },
   ]
 
-  const filteredCheckouts = mockCheckouts.filter(checkout => {
+  const filteredCheckouts = checkouts.filter(checkout => {
     const matchesRoom = checkout.room.toLowerCase().includes(checkoutSearchRoom.toLowerCase())
     const matchesGuest = checkout.guestName.toLowerCase().includes(checkoutSearchGuest.toLowerCase())
     const matchesStatus = checkoutSearchStatus === "all" || checkout.status === checkoutSearchStatus
     return matchesRoom && matchesGuest && matchesStatus
   })
+
+  const handleCompleteCheckout = (checkoutId: number) => {
+    setCheckouts(checkouts.map(checkout =>
+      checkout.id === checkoutId ? { ...checkout, status: "completed" as const } : checkout
+    ))
+  }
 
   const staffMembers: StaffMember[] = [
     {
@@ -1120,6 +1134,7 @@ export default function DashboardControl() {
                     <th className="text-right px-4 py-3 font-semibold text-gray-900 text-sm">Saldo Pendiente</th>
                     <th className="text-center px-4 py-3 font-semibold text-gray-900 text-sm">Adicionales</th>
                     <th className="text-center px-4 py-3 font-semibold text-gray-900 text-sm">Estado</th>
+                    <th className="text-center px-4 py-3 font-semibold text-gray-900 text-sm">Acciones</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -1147,6 +1162,18 @@ export default function DashboardControl() {
                         }`}>
                           {checkout.status === "completed" ? "Completado" : "Pendiente"}
                         </span>
+                      </td>
+                      <td className="px-4 py-3 text-center">
+                        {checkout.status === "pending" ? (
+                          <button
+                            onClick={() => handleCompleteCheckout(checkout.id)}
+                            className="px-3 py-1 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors text-xs font-medium"
+                          >
+                            Completar
+                          </button>
+                        ) : (
+                          <span className="text-gray-400 text-xs">—</span>
+                        )}
                       </td>
                     </tr>
                   ))}
