@@ -97,8 +97,8 @@ const clientDetails = {
       id: "res-3",
       room: "501",
       roomType: "Suite Deluxe",
-      checkIn: "2024-04-12",
-      checkOut: "2024-04-18",
+      checkIn: "2025-01-10",
+      checkOut: "2025-01-15",
       guests: 2,
       totalCost: 1540,
       status: "completed",
@@ -444,46 +444,38 @@ export default function ClientDetailPage() {
                 {getStatusBadge(clientDetails.currentReservation.status)}
               </CardTitle>
             </CardHeader>
-            <CardContent className="space-y-4">
+            <CardContent className="space-y-3">
               <div className="flex items-center gap-3">
                 <DoorOpen className="w-5 h-5 text-green-600 flex-shrink-0" />
-                <div className="flex-1">
-                  <p className="text-sm text-muted-foreground">Habitación</p>
-                  <p className="font-semibold text-foreground">{clientDetails.currentReservation.room} - {clientDetails.currentReservation.roomType}</p>
-                </div>
+                <span className="text-sm text-muted-foreground">Habitación:</span>
+                <span className="font-semibold text-foreground">{clientDetails.currentReservation.room} - {clientDetails.currentReservation.roomType}</span>
               </div>
               <div className="flex items-center gap-3">
                 <Calendar className="w-5 h-5 text-blue-600 flex-shrink-0" />
-                <div className="flex-1">
-                  <p className="text-sm text-muted-foreground">Check-in</p>
-                  <p className="font-semibold text-foreground">
-                    {new Date(clientDetails.currentReservation.checkIn).toLocaleDateString("es-ES", {
-                      day: "2-digit",
-                      month: "short",
-                      year: "numeric",
-                    })}
-                  </p>
-                </div>
+                <span className="text-sm text-muted-foreground">Check-in:</span>
+                <span className="font-semibold text-foreground">
+                  {new Date(clientDetails.currentReservation.checkIn).toLocaleDateString("es-ES", {
+                    day: "2-digit",
+                    month: "short",
+                    year: "numeric",
+                  })}
+                </span>
               </div>
               <div className="flex items-center gap-3">
                 <LogOut className="w-5 h-5 text-orange-600 flex-shrink-0" />
-                <div className="flex-1">
-                  <p className="text-sm text-muted-foreground">Check-out</p>
-                  <p className="font-semibold text-foreground">
-                    {new Date(clientDetails.currentReservation.checkOut).toLocaleDateString("es-ES", {
-                      day: "2-digit",
-                      month: "short",
-                      year: "numeric",
-                    })}
-                  </p>
-                </div>
+                <span className="text-sm text-muted-foreground">Check-out:</span>
+                <span className="font-semibold text-foreground">
+                  {new Date(clientDetails.currentReservation.checkOut).toLocaleDateString("es-ES", {
+                    day: "2-digit",
+                    month: "short",
+                    year: "numeric",
+                  })}
+                </span>
               </div>
               <div className="flex items-center gap-3 pt-2 border-t">
                 <DollarSign className="w-5 h-5 text-green-600 flex-shrink-0" />
-                <div className="flex-1">
-                  <p className="text-sm text-muted-foreground">Total Costo</p>
-                  <p className="text-lg font-bold text-foreground">${clientDetails.currentReservation.totalCost}</p>
-                </div>
+                <span className="text-sm text-muted-foreground">Total Costo:</span>
+                <span className="text-lg font-bold text-foreground">${clientDetails.currentReservation.totalCost}</span>
               </div>
             </CardContent>
           </Card>
