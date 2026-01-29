@@ -1,29 +1,14 @@
 "use client"
 
+import { Calendar } from "@/components/ui/calendar"
+import { CheckCircle2, Star, Mail, Phone, MapPin, Eye, Clock, CreditCard, Utensils, Sparkles, Dumbbell, Droplets, ShoppingBag } from "lucide-react"
 import { useParams, useRouter } from "next/navigation"
-import { useState } from "react" // Added import for useState
-import {
-  ArrowLeft,
-  Mail,
-  Phone,
-  MapPin,
-  Calendar,
-  CreditCard,
-  Star,
-  Clock,
-  CheckCircle2,
-  ShoppingBag,
-  Utensils,
-  Dumbbell,
-  Droplets,
-  Sparkles,
-  Eye,
-} from "lucide-react"
+import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog" // Added Dialog for detail view
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import Image from "next/image"
 
 // Mock data - In production this would come from API/database
@@ -201,7 +186,7 @@ const clientDetails = {
 export default function ClientDetailPage() {
   const params = useParams()
   const router = useRouter()
-  const [selectedReservation, setSelectedReservation] = useState<any>(null) // Added state for modal
+  const [selectedReservation, setSelectedReservation] = useState<any>(null)
 
   const getStatusBadge = (status: string) => {
     switch (status) {
@@ -265,7 +250,7 @@ export default function ClientDetailPage() {
       {/* Client Header Card */}
       <Card>
         <CardContent className="p-6">
-          <div className="flex items-start gap-6">
+          <div className="flex items-start gap-6 mb-6">
             <div className="relative w-24 h-24 rounded-full overflow-hidden border-4 border-background shadow-lg">
               <Image
                 src={clientDetails.avatar || "/placeholder.svg"}
@@ -275,8 +260,8 @@ export default function ClientDetailPage() {
               />
             </div>
             <div className="flex-1">
-              <div className="flex items-start justify-between mb-4">
-                <div>
+              <div className="flex items-start justify-between">
+                <div className="flex-1">
                   <div className="flex items-center gap-3 mb-2">
                     <h2 className="text-2xl font-bold text-foreground">{clientDetails.name}</h2>
                     {clientDetails.vip && (
@@ -309,27 +294,36 @@ export default function ClientDetailPage() {
                     </div>
                   </div>
                 </div>
-              </div>
 
-              {/* Stats Row */}
-              <div className="grid grid-cols-3 gap-4">
-                <div className="p-3 rounded-lg bg-muted/50">
-                  <p className="text-sm text-muted-foreground mb-1">Total Visitas</p>
-                  <p className="text-2xl font-bold text-foreground">{clientDetails.totalVisits}</p>
-                </div>
-                <div className="p-3 rounded-lg bg-muted/50">
-                  <p className="text-sm text-muted-foreground mb-1">Total Gastado</p>
-                  <p className="text-2xl font-bold text-foreground">${clientDetails.totalSpent}</p>
-                </div>
-                <div className="p-3 rounded-lg bg-muted/50">
-                  <p className="text-sm text-muted-foreground mb-1">Valoración</p>
-                  <div className="flex items-center gap-2">
-                    <p className="text-2xl font-bold text-foreground">{clientDetails.averageRating}</p>
-                    <Star className="w-5 h-5 fill-amber-500 text-amber-500" />
+                {/* KPIs - Reduced Size and Right Aligned */}
+                <div className="flex gap-2 ml-6">
+                  <div className="p-2.5 rounded-lg bg-blue-50 border border-blue-200 min-w-[110px] text-center">
+                    <p className="text-xs text-muted-foreground mb-0.5">Total Visitas</p>
+                    <p className="text-lg font-bold text-blue-600">{clientDetails.totalVisits}</p>
+                  </div>
+                  <div className="p-2.5 rounded-lg bg-purple-50 border border-purple-200 min-w-[110px] text-center">
+                    <p className="text-xs text-muted-foreground mb-0.5">Total Gastado</p>
+                    <p className="text-lg font-bold text-purple-600">${clientDetails.totalSpent}</p>
+                  </div>
+                  <div className="p-2.5 rounded-lg bg-amber-50 border border-amber-200 min-w-[110px] text-center">
+                    <p className="text-xs text-muted-foreground mb-0.5">Valoración</p>
+                    <div className="flex items-center justify-center gap-1">
+                      <p className="text-lg font-bold text-amber-600">{clientDetails.averageRating}</p>
+                      <Star className="w-3 h-3 fill-amber-500 text-amber-500" />
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
+          </div>
+
+          {/* Preferences Section */}
+          <div className="pt-6 border-t">
+            <h3 className="font-semibold text-foreground mb-3 flex items-center gap-2">
+              <Sparkles className="w-4 h-4 text-pink-500" />
+              Preferencias del Cliente
+            </h3>
+            <p className="text-sm text-muted-foreground italic">{clientDetails.notes}</p>
           </div>
         </CardContent>
       </Card>
