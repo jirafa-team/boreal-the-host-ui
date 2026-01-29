@@ -80,6 +80,8 @@ export default function TicketsPage() {
   const [selectedTicketId, setSelectedTicketId] = useState<string | null>(null)
   const [showAssignDialog, setShowAssignDialog] = useState(false)
   const [showCompleteDialog, setShowCompleteDialog] = useState(false)
+  const [showEditModal, setShowEditModal] = useState(false)
+  const [selectedTicket, setSelectedTicket] = useState<any>(null)
   const [scheduledTime, setScheduledTime] = useState<string | null>(null)
   const [selectedStaffForSchedule, setSelectedStaffForSchedule] = useState<{ name: string; department: string } | null>(null)
   const [selectedTime, setSelectedTime] = useState<string | null>(null)
@@ -133,6 +135,23 @@ export default function TicketsPage() {
     )
     setShowCompleteDialog(false)
     setSelectedTicketId(null)
+  }
+
+  const handleEditTicket = (ticket: any) => {
+    setSelectedTicket(JSON.parse(JSON.stringify(ticket)))
+    setShowEditModal(true)
+  }
+
+  const handleSaveTicket = () => {
+    if (selectedTicket) {
+      setTickets((prevTickets) =>
+        prevTickets.map((ticket) =>
+          ticket.id === selectedTicket.id ? selectedTicket : ticket,
+        ),
+      )
+      setShowEditModal(false)
+      setSelectedTicket(null)
+    }
   }
 
   const filteredTickets = filter === "all" ? tickets : tickets.filter((t) => t.status === filter)
@@ -268,7 +287,11 @@ export default function TicketsPage() {
           const priorityBadge = getPriorityBadge(ticket.priority)
 
           return (
-            <Card key={ticket.id} className="p-6 flex flex-col">
+            <Card 
+              key={ticket.id} 
+              className="p-6 flex flex-col cursor-pointer hover:shadow-lg transition-shadow"
+              onClick={() => handleEditTicket(ticket)}
+            >
               <div className="mb-4">
                 <div className="flex items-start justify-between mb-3">
                   <h3 className="text-lg font-semibold flex-1">{ticket.title}</h3>
@@ -496,6 +519,141 @@ export default function TicketsPage() {
         })}
       </div>
       </div>
+
+      {/* Edit Ticket Modal */}
+      {showEditModal && selectedTicket && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
+          <div className="bg-white rounded-2xl shadow-2xl p-6 w-full max-w-2xl mx-4 max-h-[90vh] overflow-y-auto">
+            <h2 className="text-2xl font-bold text-foreground mb-6">Editar Ticket #{selectedTicket.id}</h2>
+
+            <div className="space-y-6">
+              {/* Title and Description */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Título</label>
+                <input
+                  type="text"
+                  value={selectedTicket.title}
+                  onChange={(e) => setSelectedTicket({ ...selectedTicket, title: e.target.value })}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Descripción</label>
+                <textarea
+                  value={selectedTicket.description}
+                  onChange={(e) => setSelectedTicket({ ...selectedTicket, description: e.target.value })}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 min-h-24"
+                />
+              </div>
+
+              {/* Guest and Room */}
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Huésped</label>
+                  <input
+                    type="text"
+                    value={selectedTicket.guest}
+                    onChange={(e) => setSelectedTicket({ ...selectedTicket, guest: e.target.value })}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Habitación</label>
+                  <input
+                    type="text"
+                    value={selectedTicket.room}
+                    onChange={(e) => setSelectedTicket({ ...selectedTicket, room: e.target.value })}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+                </div>
+              </div>
+
+              {/* Category and Priority */}
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Categoría</label>
+                  <input
+                    type="text"
+                    value={selectedTicket.category}
+                    onChange={(e) => setSelectedTicket({ ...selectedTicket, category: e.target.value })}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Prioridad</label>
+                  <select
+                    value={selectedTicket.priority}
+                    onChange={(e) => setSelectedTicket({ ...selectedTicket, priority: e.target.value })}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  >
+                    <option value="low">Baja</option>
+                    <option value="medium">Media</option>
+                    <option value="high">Alta</option>
+                  </select>
+                </div>
+              </div>
+
+              {/* Status and Assigned To */}
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Estado</label>
+                  <select
+                    value={selectedTicket.status}
+                    onChange={(e) => setSelectedTicket({ ...selectedTicket, status: e.target.value })}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  >
+                    <option value="pending">Pendiente</option>
+                    <option value="in-progress">En Proceso</option>
+                    <option value="resolved">Resuelto</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Asignado a</label>
+                  <input
+                    type="text"
+                    value={selectedTicket.assignedTo || ""}
+                    onChange={(e) => setSelectedTicket({ ...selectedTicket, assignedTo: e.target.value || null })}
+                    placeholder="Nombre - Departamento"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+                </div>
+              </div>
+
+              {/* Scheduled Time */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Hora Programada</label>
+                <input
+                  type="text"
+                  value={selectedTicket.scheduledTime || ""}
+                  onChange={(e) => setSelectedTicket({ ...selectedTicket, scheduledTime: e.target.value || null })}
+                  placeholder="HH:MM"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+            </div>
+
+            {/* Action buttons */}
+            <div className="flex gap-3 mt-8">
+              <button
+                onClick={() => {
+                  setShowEditModal(false)
+                  setSelectedTicket(null)
+                }}
+                className="px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition-colors font-medium flex-1"
+              >
+                Cancelar
+              </button>
+              <button
+                onClick={handleSaveTicket}
+                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium flex-1"
+              >
+                Guardar Cambios
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
