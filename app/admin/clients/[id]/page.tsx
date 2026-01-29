@@ -320,7 +320,7 @@ export default function ClientDetailPage() {
                 </div>
 
                 {/* KPIs - Dashboard Style */}
-                <div className="flex gap-1.5">
+                <div className="flex gap-1.5 -mt-4">
                   <div className="bg-blue-50 rounded-lg px-4 py-2 border border-blue-200 flex flex-col items-center justify-center min-w-[83px]">
                     <p className="text-3xl font-bold text-blue-600 mb-0.5">{clientDetails.totalVisits}</p>
                     <p className="text-gray-600 text-xs">Total Visitas</p>
