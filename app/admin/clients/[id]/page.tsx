@@ -267,14 +267,19 @@ export default function ClientDetailPage() {
   return (
     <div className="p-6 space-y-6">
       {/* Header with Back Button */}
-      <div className="flex items-center gap-4">
-        <Button variant="ghost" size="icon" onClick={() => router.back()}>
-          <ArrowLeft className="w-5 h-5" />
-        </Button>
-        <div className="flex-1">
-          <h1 className="text-3xl font-bold text-foreground">Detalles del Cliente</h1>
-          <p className="text-muted-foreground mt-1">Información completa y historial</p>
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-4">
+          <Button variant="ghost" size="icon" onClick={() => router.back()}>
+            <ArrowLeft className="w-5 h-5" />
+          </Button>
+          <div className="flex-1">
+            <h1 className="text-3xl font-bold text-foreground">Detalles del Cliente</h1>
+            <p className="text-muted-foreground mt-1">Información completa y historial</p>
+          </div>
         </div>
+        <Button size="icon" className="h-10 w-10 rounded-full shadow-lg hover:shadow-xl transition-shadow">
+          <Mail className="w-5 h-5" />
+        </Button>
       </div>
 
       {/* Client Header Card */}
