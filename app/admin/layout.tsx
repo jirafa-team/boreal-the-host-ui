@@ -1,7 +1,7 @@
 "use client"
 
 import type React from "react"
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import {
   Hotel,
   Calendar,
@@ -33,9 +33,29 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const [sidebarOpen, setSidebarOpen] = useState(true)
-  const [expandedSections, setExpandedSections] = useState<Set<string>>(new Set(["general", "spaces"]))
+  const [expandedSections, setExpandedSections] = useState<Set<string>>(new Set())
+  const [isLoaded, setIsLoaded] = useState(false)
   const pathname = usePathname()
   const { t, language, setLanguage } = useLanguage()
+
+  // Cargar estado del sidebar desde localStorage
+  useEffect(() => {
+    const savedSections = localStorage.getItem("adminSidebarSections")
+    if (savedSections) {
+      setExpandedSections(new Set(JSON.parse(savedSections)))
+    } else {
+      // Valores por defecto en primera carga
+      setExpandedSections(new Set(["general", "spaces"]))
+    }
+    setIsLoaded(true)
+  }, [])
+
+  // Guardar estado cuando cambia
+  useEffect(() => {
+    if (isLoaded) {
+      localStorage.setItem("adminSidebarSections", JSON.stringify(Array.from(expandedSections)))
+    }
+  }, [expandedSections, isLoaded])
 
   // Ocultar sidebar en la página de selección de establecimiento
   const hideSidebar = pathname === '/admin/select-establishment'
