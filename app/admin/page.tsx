@@ -40,6 +40,25 @@ const ticketsData = [
   { date: "Domingo", abiertos: 5, cerrados: 10 },
 ]
 
+// Mock data for orders demand by hour
+const ordersDemanData = [
+  { time: "06:00", pedidos: 3 },
+  { time: "07:00", pedidos: 8 },
+  { time: "08:00", pedidos: 14 },
+  { time: "09:00", pedidos: 22 },
+  { time: "10:00", pedidos: 28 },
+  { time: "11:00", pedidos: 35 },
+  { time: "12:00", pedidos: 42 },
+  { time: "13:00", pedidos: 38 },
+  { time: "14:00", pedidos: 25 },
+  { time: "15:00", pedidos: 18 },
+  { time: "16:00", pedidos: 12 },
+  { time: "17:00", pedidos: 9 },
+  { time: "18:00", pedidos: 15 },
+  { time: "19:00", pedidos: 32 },
+  { time: "20:00", pedidos: 28 },
+]
+
 export default function AdminDashboard() {
   const { t } = useLanguage()
   const [selectedMode, setSelectedMode] = useState("hotel")
@@ -236,6 +255,21 @@ export default function AdminDashboard() {
               </ResponsiveContainer>
             </Card>
           </div>
+
+          {/* Orders Demand Chart - Full Width */}
+          <Card className="p-6">
+            <h2 className="text-lg font-semibold text-foreground mb-4">Demanda de Pedidos por Hora</h2>
+            <ResponsiveContainer width="100%" height={300}>
+              <LineChart data={ordersDemanData}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="time" />
+                <YAxis />
+                <Tooltip />
+                <Legend />
+                <Line type="monotone" dataKey="pedidos" stroke="#8b5cf6" strokeWidth={2} name="Pedidos" dot={{ fill: "#8b5cf6", r: 4 }} />
+              </LineChart>
+            </ResponsiveContainer>
+          </Card>
 
           {/* Recent Activity */}
           <Card className="p-6">
