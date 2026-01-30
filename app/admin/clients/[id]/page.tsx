@@ -472,11 +472,10 @@ export default function ClientDetailPage() {
                   })}
                 </span>
               </div>
-              <div className="pt-3 border-t">
-                <div className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-orange-50 to-orange-100 rounded-full border border-orange-200">
-                  <DollarSign className="w-4 h-4 text-orange-600" />
-                  <span className="text-sm font-semibold text-orange-700">Saldo pendiente: ${clientDetails.currentReservation.totalCost}</span>
-                </div>
+              <div className="flex items-center gap-3 pt-2 border-t">
+                <DollarSign className="w-5 h-5 text-orange-600 flex-shrink-0" />
+                <span className="text-sm text-muted-foreground">Saldo pendiente:</span>
+                <span className="text-lg font-bold text-orange-600">${clientDetails.currentReservation.totalCost}</span>
               </div>
             </CardContent>
           </Card>
@@ -523,47 +522,6 @@ export default function ClientDetailPage() {
             </CardContent>
           </Card>
         </div>
-
-        {/* Orders Panel */}
-        <Card className="border-l-4 border-l-blue-500">
-          <CardHeader>
-            <CardTitle>Pedidos de la Estadía</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-3">
-              {clientDetails.currentReservation.purchases && clientDetails.currentReservation.purchases.length > 0 ? (
-                clientDetails.currentReservation.purchases.map((purchase, idx) => (
-                  <div key={`purchase-${idx}`} className="p-3 rounded-lg border bg-card hover:shadow-sm transition-shadow">
-                    <div className="flex items-start justify-between mb-2">
-                      <h4 className="font-semibold text-foreground text-sm">{purchase.category}</h4>
-                      <span className="text-sm font-bold text-blue-600">${purchase.total}</span>
-                    </div>
-                    <ul className="text-xs text-muted-foreground space-y-1">
-                      {purchase.items.map((item, itemIdx) => (
-                        <li key={`item-${itemIdx}`} className="flex items-center gap-2">
-                          <span className="text-blue-400">•</span>
-                          {item}
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                ))
-              ) : (
-                <p className="text-sm text-muted-foreground text-center py-4">No hay pedidos registrados</p>
-              )}
-              {clientDetails.currentReservation.purchases && clientDetails.currentReservation.purchases.length > 0 && (
-                <div className="pt-3 border-t">
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm font-semibold text-foreground">Total pedidos:</span>
-                    <span className="text-lg font-bold text-blue-600">
-                      ${clientDetails.currentReservation.purchases.reduce((sum, p) => sum + p.total, 0)}
-                    </span>
-                  </div>
-                </div>
-              )}
-            </div>
-          </CardContent>
-        </Card>
       )}
 
       {/* Reservation History */}
