@@ -2,13 +2,35 @@
 
 import { useState } from "react"
 
-import { Hotel, Bell, LayoutGrid, Users, BarChart3 } from "lucide-react"
+import { Hotel, Bell, LayoutGrid, Users, BarChart3, Calendar } from "lucide-react"
 import { Card } from "@/components/ui/card"
 import { useLanguage } from "@/lib/i18n-context"
 
+// Mock data for different dates
+const kpiDataByDate: Record<string, { rooms: number; occupancy: number; available: number; bookings: number }> = {
+  "today": { rooms: 48, occupancy: 78, available: 11, bookings: 23 },
+  "tomorrow": { rooms: 48, occupancy: 82, available: 9, bookings: 18 },
+  "in-2-days": { rooms: 48, occupancy: 45, available: 26, bookings: 12 },
+  "in-3-days": { rooms: 48, occupancy: 95, available: 2, bookings: 31 },
+}
+
 export default function AdminDashboard() {
   const { t } = useLanguage()
-  const [selectedMode, setSelectedMode] = useState("hotel"); // Declare selectedMode variable
+  const [selectedMode, setSelectedMode] = useState("hotel")
+  const [selectedDate, setSelectedDate] = useState("today")
+
+  const getDateLabel = (dateKey: string) => {
+    const today = new Date()
+    const dateMap: Record<string, string> = {
+      "today": today.toLocaleDateString("es-ES", { day: "2-digit", month: "short", year: "numeric" }),
+      "tomorrow": new Date(today.getTime() + 86400000).toLocaleDateString("es-ES", { day: "2-digit", month: "short", year: "numeric" }),
+      "in-2-days": new Date(today.getTime() + 172800000).toLocaleDateString("es-ES", { day: "2-digit", month: "short", year: "numeric" }),
+      "in-3-days": new Date(today.getTime() + 259200000).toLocaleDateString("es-ES", { day: "2-digit", month: "short", year: "numeric" }),
+    }
+    return dateMap[dateKey] || dateKey
+  }
+
+  const getKPIData = () => kpiDataByDate[selectedDate] || kpiDataByDate["today"]
 
   return (
     <>
@@ -25,6 +47,34 @@ export default function AdminDashboard() {
       </header>
 
       <div className="p-8">
+        {/* Date Filter */}
+        <div className="mb-6 flex items-center gap-2 flex-wrap">
+          <div className="flex items-center gap-2">
+            <Calendar className="w-5 h-5 text-muted-foreground" />
+            <span className="text-sm font-medium text-muted-foreground">{t("admin.date")}:</span>
+          </div>
+          <div className="flex gap-2 flex-wrap">
+            {[
+              { key: "today", label: "Hoy" },
+              { key: "tomorrow", label: "Mañana" },
+              { key: "in-2-days", label: "En 2 días" },
+              { key: "in-3-days", label: "En 3 días" },
+            ].map((date) => (
+              <button
+                key={date.key}
+                onClick={() => setSelectedDate(date.key)}
+                className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-all ${
+                  selectedDate === date.key
+                    ? "bg-primary text-white shadow-md"
+                    : "bg-muted text-muted-foreground hover:bg-muted/80"
+                }`}
+              >
+                {date.label} <span className="text-xs opacity-75">({getDateLabel(date.key)})</span>
+              </button>
+            ))}
+          </div>
+        </div>
+
         {/* Stats Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
           <div
@@ -46,7 +96,7 @@ export default function AdminDashboard() {
               </div>
               <div>
                 <p className={`text-sm ${selectedMode === "hotel" ? "opacity-90" : "text-muted-foreground"}`}>{t("admin.totalRooms")}</p>
-                <p className="text-2xl font-bold">48</p>
+                <p className="text-2xl font-bold">{getKPIData().rooms}</p>
               </div>
             </div>
           </div>
@@ -70,7 +120,7 @@ export default function AdminDashboard() {
               </div>
               <div>
                 <p className={`text-sm ${selectedMode === "occupancy" ? "opacity-90" : "text-muted-foreground"}`}>{t("admin.occupancyRate")}</p>
-                <p className="text-2xl font-bold">78%</p>
+                <p className="text-2xl font-bold">{getKPIData().occupancy}%</p>
               </div>
             </div>
           </div>
@@ -94,7 +144,7 @@ export default function AdminDashboard() {
               </div>
               <div>
                 <p className={`text-sm ${selectedMode === "available" ? "opacity-90" : "text-muted-foreground"}`}>{t("admin.availableNow")}</p>
-                <p className="text-2xl font-bold">11</p>
+                <p className="text-2xl font-bold">{getKPIData().available}</p>
               </div>
             </div>
           </div>
@@ -118,7 +168,7 @@ export default function AdminDashboard() {
               </div>
               <div>
                 <p className={`text-sm ${selectedMode === "bookings" ? "opacity-90" : "text-muted-foreground"}`}>{t("admin.bookingsToday")}</p>
-                <p className="text-2xl font-bold">23</p>
+                <p className="text-2xl font-bold">{getKPIData().bookings}</p>
               </div>
             </div>
           </div>
