@@ -361,18 +361,18 @@ export default function ClientDetailPage() {
                 </div>
 
                 {/* KPIs - Dashboard Style */}
-                <div className="flex gap-1.5 -mt-4">
-                  <div className="bg-blue-50 rounded-lg px-4 py-2 border border-blue-200 flex flex-col items-center justify-center min-w-[83px]">
-                    <p className="text-3xl font-bold text-blue-600 mb-0.5">{clientDetails.totalVisits}</p>
+                <div className="flex gap-1 -mt-4">
+                  <div className="bg-blue-50 rounded-lg px-3 py-1.5 border border-blue-200 flex flex-col items-center justify-center min-w-[70px]">
+                    <p className="text-2xl font-bold text-blue-600 mb-0.5">{clientDetails.totalVisits}</p>
                     <p className="text-gray-600 text-xs">Total Visitas</p>
                   </div>
-                  <div className="bg-purple-50 rounded-lg px-4 py-2 border border-purple-200 flex flex-col items-center justify-center min-w-[83px]">
-                    <p className="text-3xl font-bold text-purple-600 mb-0.5">{clientDetails.totalSpent}</p>
+                  <div className="bg-purple-50 rounded-lg px-3 py-1.5 border border-purple-200 flex flex-col items-center justify-center min-w-[70px]">
+                    <p className="text-2xl font-bold text-purple-600 mb-0.5">{clientDetails.totalSpent}</p>
                     <p className="text-gray-600 text-xs">Total Gastado</p>
                   </div>
-                  <div className="bg-amber-50 rounded-lg px-4 py-2 border border-amber-200 flex flex-col items-center justify-center min-w-[83px]">
+                  <div className="bg-amber-50 rounded-lg px-3 py-1.5 border border-amber-200 flex flex-col items-center justify-center min-w-[70px]">
                     <div className="flex items-center justify-center gap-0.5">
-                      <p className="text-3xl font-bold text-amber-600">{clientDetails.averageRating}</p>
+                      <p className="text-2xl font-bold text-amber-600">{clientDetails.averageRating}</p>
                       <Star className="w-3 h-3 fill-amber-500 text-amber-500 mt-0.5" />
                     </div>
                     <p className="text-gray-600 text-xs mt-0.5">Valoración</p>
