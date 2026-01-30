@@ -473,9 +473,10 @@ export default function ClientDetailPage() {
                 </span>
               </div>
               <div className="flex items-center gap-3 pt-2 border-t">
-                <DollarSign className="w-5 h-5 text-orange-600 flex-shrink-0" />
-                <span className="text-sm text-muted-foreground">Saldo pendiente:</span>
-                <span className="text-lg font-bold text-orange-600">${clientDetails.currentReservation.totalCost}</span>
+                <Badge className="bg-orange-100 text-orange-800 border-0">
+                  <DollarSign className="w-3 h-3 mr-1" />
+                  Saldo: ${clientDetails.currentReservation.totalCost}
+                </Badge>
               </div>
             </CardContent>
           </Card>
@@ -524,7 +525,52 @@ export default function ClientDetailPage() {
         </div>
       )}
 
-      {/* Reservation History */}
+      {/* Orders During Current Reservation */}
+      {activeTab === "current" && clientDetails.currentReservation && (
+        <Card>
+          <CardHeader>
+            <CardTitle>Pedidos Durante la Reserva</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="overflow-x-auto">
+              <table className="w-full">
+                <thead>
+                  <tr className="border-b border-border">
+                    <th className="text-left py-3 px-4 font-semibold text-foreground">Fecha</th>
+                    <th className="text-left py-3 px-4 font-semibold text-foreground">Categoría</th>
+                    <th className="text-left py-3 px-4 font-semibold text-foreground">Descripción</th>
+                    <th className="text-right py-3 px-4 font-semibold text-foreground">Monto</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {[
+                    { date: "2025-01-11", category: "Room Service", description: "Desayuno completo + Café", amount: 45 },
+                    { date: "2025-01-11", category: "Spa", description: "Masaje relajante (60 min)", amount: 120 },
+                    { date: "2025-01-12", category: "Room Service", description: "Almuerzo ejecutivo", amount: 65 },
+                    { date: "2025-01-12", category: "Bar", description: "Botella de vino tinto", amount: 85 },
+                    { date: "2025-01-13", category: "Restaurante", description: "Cena gourmet para 2", amount: 180 },
+                    { date: "2025-01-13", category: "Evento", description: "Cena de Gala de Año Nuevo", amount: 150 },
+                    { date: "2025-01-14", category: "Spa", description: "Tratamiento facial premium", amount: 95 },
+                  ].map((order, idx) => (
+                    <tr key={idx} className="border-b border-border/50 hover:bg-accent/50 transition-colors">
+                      <td className="py-3 px-4 text-sm text-muted-foreground">{new Date(order.date).toLocaleDateString("es-ES", { day: "2-digit", month: "short" })}</td>
+                      <td className="py-3 px-4 text-sm font-medium text-foreground">{order.category}</td>
+                      <td className="py-3 px-4 text-sm text-foreground">{order.description}</td>
+                      <td className="py-3 px-4 text-sm font-semibold text-right text-foreground">${order.amount}</td>
+                    </tr>
+                  ))}
+                </tbody>
+                <tfoot>
+                  <tr className="border-t-2 border-border bg-accent/20">
+                    <td colSpan={3} className="py-3 px-4 text-sm font-semibold text-foreground">Total Pedidos:</td>
+                    <td className="py-3 px-4 text-sm font-bold text-right text-foreground">$935</td>
+                  </tr>
+                </tfoot>
+              </table>
+            </div>
+          </CardContent>
+        </Card>
+      )}
       {activeTab === "history" && (
         <div className="space-y-4">
           <Card>
