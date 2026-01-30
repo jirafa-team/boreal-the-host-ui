@@ -336,91 +336,64 @@ export default function ClientDetailPage() {
                       </DialogContent>
                     </Dialog>
                   </div>
-
-                  {/* Email Indicator */}
-                  <div className="flex gap-2 mb-4">
-                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-sm">
+                    <div className="flex items-center gap-2 text-muted-foreground">
                       <Mail className="w-4 h-4" />
                       {clientDetails.email}
                     </div>
-                  </div>
-
-                  {/* KPIs */}
-                  <div className="flex gap-1.5 -mt-4">
-                    <div className="bg-blue-50 rounded-lg px-4 py-2 border border-blue-200 flex flex-col items-center justify-center min-w-[83px]">
-                      <p className="text-3xl font-bold text-blue-600 mb-0.5">{clientDetails.totalVisits}</p>
-                      <p className="text-gray-600 text-xs">Total Visitas</p>
+                    <div className="flex items-center gap-2 text-muted-foreground">
+                      <Phone className="w-4 h-4" />
+                      {clientDetails.phone}
                     </div>
-                    <div className="bg-purple-50 rounded-lg px-4 py-2 border border-purple-200 flex flex-col items-center justify-center min-w-[83px]">
-                      <p className="text-3xl font-bold text-purple-600 mb-0.5">{clientDetails.totalSpent}</p>
-                      <p className="text-gray-600 text-xs">Total Gastado</p>
+                    <div className="flex items-center gap-2 text-muted-foreground">
+                      <MapPin className="w-4 h-4" />
+                      {clientDetails.city}, {clientDetails.nationality}
                     </div>
-                    <div className="bg-amber-50 rounded-lg px-4 py-2 border border-amber-200 flex flex-col items-center justify-center min-w-[83px]">
-                      <div className="flex items-center justify-center gap-0.5">
-                        <p className="text-3xl font-bold text-amber-600">{clientDetails.averageRating}</p>
-                        <Star className="w-3 h-3 fill-amber-500 text-amber-500 mt-0.5" />
-                      </div>
-                      <p className="text-gray-600 text-xs mt-0.5">Valoración</p>
-                    </div>
-                  </div>
-
-                  {/* Email Button */}
-                  <div className="flex justify-center pt-4">
-                    <div className="group relative">
-                      <Button
-                        size="icon"
-                        className="h-12 w-12 rounded-full bg-blue-600 hover:bg-blue-700"
-                        title="Enviar email"
-                      >
-                        <Mail className="w-5 h-5" />
-                      </Button>
-                      <span className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-3 py-1.5 bg-gray-900 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">
-                        Enviar email
-                      </span>
+                    <div className="flex items-center gap-2 text-muted-foreground">
+                      <Calendar className="w-4 h-4" />
+                      Miembro desde{" "}
+                      {new Date(clientDetails.memberSince).toLocaleDateString("es-ES", {
+                        month: "long",
+                        year: "numeric",
+                      })}
                     </div>
                   </div>
                 </div>
-              </div>
 
-              {/* Contact Information */}
-              <div className="grid grid-cols-3 gap-4 pt-6 border-t">
-                <div>
-                  <p className="text-xs text-muted-foreground mb-1 flex items-center gap-2">
-                    <Mail className="w-3 h-3" />
-                    Email
-                  </p>
-                  <a href={`mailto:${clientDetails.email}`} className="text-sm font-medium text-blue-600 hover:underline">
-                    {clientDetails.email}
-                  </a>
-                </div>
-                <div>
-                  <p className="text-xs text-muted-foreground mb-1 flex items-center gap-2">
-                    <Phone className="w-3 h-3" />
-                    Teléfono
-                  </p>
-                  <a href={`tel:${clientDetails.phone}`} className="text-sm font-medium text-foreground">
-                    {clientDetails.phone}
-                  </a>
-                </div>
-                <div>
-                  <p className="text-xs text-muted-foreground mb-1 flex items-center gap-2">
-                    <MapPin className="w-3 h-3" />
-                    Ubicación
-                  </p>
-                  <p className="text-sm font-medium text-foreground">{clientDetails.city}</p>
+                {/* KPIs - Dashboard Style */}
+                <div className="flex gap-1.5 -mt-4">
+                  <div className="bg-blue-50 rounded-lg px-4 py-2 border border-blue-200 flex flex-col items-center justify-center min-w-[83px]">
+                    <p className="text-3xl font-bold text-blue-600 mb-0.5">{clientDetails.totalVisits}</p>
+                    <p className="text-gray-600 text-xs">Total Visitas</p>
+                  </div>
+                  <div className="bg-purple-50 rounded-lg px-4 py-2 border border-purple-200 flex flex-col items-center justify-center min-w-[83px]">
+                    <p className="text-3xl font-bold text-purple-600 mb-0.5">{clientDetails.totalSpent}</p>
+                    <p className="text-gray-600 text-xs">Total Gastado</p>
+                  </div>
+                  <div className="bg-amber-50 rounded-lg px-4 py-2 border border-amber-200 flex flex-col items-center justify-center min-w-[83px]">
+                    <div className="flex items-center justify-center gap-0.5">
+                      <p className="text-3xl font-bold text-amber-600">{clientDetails.averageRating}</p>
+                      <Star className="w-3 h-3 fill-amber-500 text-amber-500 mt-0.5" />
+                    </div>
+                    <p className="text-gray-600 text-xs mt-0.5">Valoración</p>
+                  </div>
                 </div>
               </div>
+            </div>
+          </div>
 
-              {/* Preferences Section */}
-              <div className="pt-6 border-t">
-                <h3 className="font-semibold text-foreground mb-3 flex items-center gap-2">
-                  <Sparkles className="w-4 h-4 text-pink-500" />
-                  Preferencias del Cliente
-                </h3>
-                <p className="text-sm text-muted-foreground italic">{clientDetails.notes}</p>
-              </div>
-            </CardContent>
-          </Card>
+          {/* Preferences Section */}
+          <div className="pt-6 border-t">
+            <h3 className="font-semibold text-foreground mb-3 flex items-center gap-2">
+              <Sparkles className="w-4 h-4 text-pink-500" />
+              Preferencias del Cliente
+            </h3>
+            <p className="text-sm text-muted-foreground italic">{clientDetails.notes}</p>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* View Tabs - Dashboard Style */}
       <div className="flex gap-2 flex-wrap">
         <button
           onClick={() => setActiveTab("current")}
@@ -754,6 +727,10 @@ export default function ClientDetailPage() {
 
       {/* Action Buttons */}
       <div className="flex gap-3">
+        <Button className="flex-1">
+          <Mail className="w-4 h-4 mr-2" />
+          Enviar Email
+        </Button>
         <Button variant="outline" className="flex-1 bg-transparent">
           <CreditCard className="w-4 h-4 mr-2" />
           Ver Facturación
