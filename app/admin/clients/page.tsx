@@ -1,5 +1,6 @@
 "use client"
 
+import React from "react"
 import { useLanguage } from "@/lib/i18n-context"
 import { useState } from "react"
 import { useRouter } from "next/navigation"
@@ -533,8 +534,8 @@ export default function ClientsPage() {
                 </thead>
                 <tbody className="divide-y">
                   {filteredClients.map((client) => (
-                    <>
-                      <tr key={client.id} className="hover:bg-muted/30 transition-colors">
+                    <React.Fragment key={client.id}>
+                      <tr className="hover:bg-muted/30 transition-colors">
                         <td className="p-4">
                           {client.groupMembers && client.groupMembers.length > 0 && (
                             <button
@@ -659,7 +660,7 @@ export default function ClientsPage() {
                             </td>
                           </tr>
                         ))}
-                    </>
+                    </React.Fragment>
                   ))}
                 </tbody>
               </table>
