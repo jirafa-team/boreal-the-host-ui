@@ -729,14 +729,6 @@ export default function ClientDetailPage() {
           </Card>
         </div>
       )}
-
-      {/* Action Buttons */}
-      <div className="flex gap-3">
-        <Button variant="outline" className="flex-1 bg-transparent">
-          <CreditCard className="w-4 h-4 mr-2" />
-          Ver Facturación
-        </Button>
-      </div>
     </div>
   )
 }
