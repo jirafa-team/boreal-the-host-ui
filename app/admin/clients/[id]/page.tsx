@@ -539,31 +539,62 @@ export default function ClientDetailPage() {
                     <th className="text-left py-3 px-4 font-semibold text-foreground">Fecha</th>
                     <th className="text-left py-3 px-4 font-semibold text-foreground">Categoría</th>
                     <th className="text-left py-3 px-4 font-semibold text-foreground">Descripción</th>
+                    <th className="text-left py-3 px-4 font-semibold text-foreground">Estado</th>
+                    <th className="text-left py-3 px-4 font-semibold text-foreground">Pago</th>
                     <th className="text-right py-3 px-4 font-semibold text-foreground">Monto</th>
                   </tr>
                 </thead>
                 <tbody>
                   {[
-                    { date: "2025-01-11", category: "Room Service", description: "Desayuno completo + Café", amount: 45 },
-                    { date: "2025-01-11", category: "Spa", description: "Masaje relajante (60 min)", amount: 120 },
-                    { date: "2025-01-12", category: "Room Service", description: "Almuerzo ejecutivo", amount: 65 },
-                    { date: "2025-01-12", category: "Bar", description: "Botella de vino tinto", amount: 85 },
-                    { date: "2025-01-13", category: "Restaurante", description: "Cena gourmet para 2", amount: 180 },
-                    { date: "2025-01-13", category: "Evento", description: "Cena de Gala de Año Nuevo", amount: 150 },
-                    { date: "2025-01-14", category: "Spa", description: "Tratamiento facial premium", amount: 95 },
-                  ].map((order, idx) => (
-                    <tr key={idx} className="border-b border-border/50 hover:bg-accent/50 transition-colors">
-                      <td className="py-3 px-4 text-sm text-muted-foreground">{new Date(order.date).toLocaleDateString("es-ES", { day: "2-digit", month: "short" })}</td>
-                      <td className="py-3 px-4 text-sm font-medium text-foreground">{order.category}</td>
-                      <td className="py-3 px-4 text-sm text-foreground">{order.description}</td>
-                      <td className="py-3 px-4 text-sm font-semibold text-right text-foreground">${order.amount}</td>
-                    </tr>
-                  ))}
+                    { date: "2025-01-11", category: "Room Service", description: "Desayuno completo + Café", amount: 45, status: "Entregado", paid: true },
+                    { date: "2025-01-11", category: "Spa", description: "Masaje relajante (60 min)", amount: 120, status: "Completado", paid: true },
+                    { date: "2025-01-12", category: "Room Service", description: "Almuerzo ejecutivo", amount: 65, status: "Entregado", paid: true },
+                    { date: "2025-01-12", category: "Bar", description: "Botella de vino tinto", amount: 85, status: "Entregado", paid: false },
+                    { date: "2025-01-13", category: "Restaurante", description: "Cena gourmet para 2", amount: 180, status: "Entregado", paid: false },
+                    { date: "2025-01-13", category: "Evento", description: "Cena de Gala de Año Nuevo", amount: 150, status: "En preparación", paid: false },
+                    { date: "2025-01-14", category: "Spa", description: "Tratamiento facial premium", amount: 95, status: "Pendiente", paid: false },
+                  ].map((order, idx) => {
+                    const getStatusBadgeOrder = (status: string) => {
+                      const statusConfig: Record<string, { className: string }> = {
+                        "Entregado": { className: "bg-green-100 text-green-800" },
+                        "Completado": { className: "bg-green-100 text-green-800" },
+                        "En preparación": { className: "bg-blue-100 text-blue-800" },
+                        "Pendiente": { className: "bg-yellow-100 text-yellow-800" },
+                      }
+                      const config = statusConfig[status] || { className: "bg-gray-100 text-gray-800" }
+                      return <span className={`text-xs px-2 py-1 rounded ${config.className}`}>{status}</span>
+                    }
+
+                    return (
+                      <tr key={idx} className="border-b border-border/50 hover:bg-accent/50 transition-colors">
+                        <td className="py-3 px-4 text-sm text-muted-foreground">{new Date(order.date).toLocaleDateString("es-ES", { day: "2-digit", month: "short" })}</td>
+                        <td className="py-3 px-4 text-sm font-medium text-foreground">{order.category}</td>
+                        <td className="py-3 px-4 text-sm text-foreground">{order.description}</td>
+                        <td className="py-3 px-4 text-sm">{getStatusBadgeOrder(order.status)}</td>
+                        <td className="py-3 px-4 text-sm">
+                          <Badge className={order.paid ? "bg-green-100 text-green-800 border-0" : "bg-red-100 text-red-800 border-0"}>
+                            {order.paid ? "Pagado" : "Pendiente"}
+                          </Badge>
+                        </td>
+                        <td className="py-3 px-4 text-sm font-semibold text-right text-foreground">${order.amount}</td>
+                      </tr>
+                    )
+                  })}
                 </tbody>
                 <tfoot>
                   <tr className="border-t-2 border-border bg-accent/20">
-                    <td colSpan={3} className="py-3 px-4 text-sm font-semibold text-foreground">Total Pedidos:</td>
-                    <td className="py-3 px-4 text-sm font-bold text-right text-foreground">$935</td>
+                    <td colSpan={5} className="py-3 px-4 text-sm font-semibold text-foreground">Saldo Pendiente:</td>
+                    <td className="py-3 px-4 text-sm font-bold text-right text-orange-600">
+                      ${[
+                        { paid: true, amount: 45 },
+                        { paid: true, amount: 120 },
+                        { paid: true, amount: 65 },
+                        { paid: false, amount: 85 },
+                        { paid: false, amount: 180 },
+                        { paid: false, amount: 150 },
+                        { paid: false, amount: 95 },
+                      ].reduce((sum, order) => sum + (order.paid ? 0 : order.amount), 0)}
+                    </td>
                   </tr>
                 </tfoot>
               </table>
