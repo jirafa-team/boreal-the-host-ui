@@ -378,13 +378,6 @@ export default function ClientDetailPage() {
                     <p className="text-gray-600 text-xs mt-0.5">Valoración</p>
                   </div>
                 </div>
-
-                {/* Email Button - Circular */}
-                <div className="mt-4 flex justify-center">
-                  <Button size="icon" className="h-12 w-12 rounded-full shadow-lg hover:shadow-xl transition-shadow">
-                    <Mail className="w-5 h-5" />
-                  </Button>
-                </div>
               </div>
             </div>
           </div>
