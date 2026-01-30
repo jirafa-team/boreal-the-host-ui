@@ -51,7 +51,7 @@ export default function AdminDashboard() {
         <div className="mb-6 flex items-center gap-2 flex-wrap">
           <div className="flex items-center gap-2">
             <Calendar className="w-5 h-5 text-muted-foreground" />
-            <span className="text-sm font-medium text-muted-foreground">{t("admin.date")}:</span>
+            <span className="text-sm font-medium text-muted-foreground">Fecha:</span>
           </div>
           <div className="flex gap-2 flex-wrap">
             {[
