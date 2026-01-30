@@ -524,6 +524,130 @@ export default function ClientDetailPage() {
         </div>
       )}
 
+      {/* Reservation History */}
+      {activeTab === "history" && (
+        <div className="space-y-4">
+          <Card>
+            <CardHeader>
+              <CardTitle>Historial de Reservas</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                {clientDetails.previousReservations.map((reservation) => (
+                  <div key={reservation.id} className="p-5 rounded-lg border bg-card hover:shadow-md transition-shadow">
+                    <div className="flex items-start justify-between">
+                      <div className="flex items-start gap-3">
+                        <div className="w-12 h-12 rounded bg-primary/10 flex items-center justify-center">
+                          <span className="text-lg font-bold text-primary">{reservation.room}</span>
+                        </div>
+                        <div>
+                          <p className="font-semibold text-foreground">{reservation.roomType}</p>
+                          <div className="flex items-center gap-4 text-sm text-muted-foreground mt-1">
+                            <div className="flex items-center gap-1">
+                              <Calendar className="w-3 h-3" />
+                              {new Date(reservation.checkIn).toLocaleDateString("es-ES", {
+                                day: "2-digit",
+                                month: "short",
+                                year: "numeric",
+                              })}
+                            </div>
+                            <span>→</span>
+                            <div className="flex items-center gap-1">
+                              <Calendar className="w-3 h-3" />
+                              {new Date(reservation.checkOut).toLocaleDateString("es-ES", {
+                                day: "2-digit",
+                                month: "short",
+                                year: "numeric",
+                              })}
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      <div className="text-right">
+                        <p className="font-bold text-foreground text-lg">${reservation.totalCost}</p>
+                        <div className="flex items-center gap-1 mt-1">
+                          {[...Array(5)].map((_, i) => (
+                            <Star
+                              key={`rating-star-${i}`}
+                              className={`w-3 h-3 ${
+                                i < reservation.rating ? "fill-amber-500 text-amber-500" : "text-gray-300"
+                              }`}
+                            />
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center justify-between pt-3 border-t mt-3">
+                      <div className="text-sm text-muted-foreground">
+                        {reservation.guests} {reservation.guests === 1 ? "huésped" : "huéspedes"}
+                      </div>
+                      <div className="flex items-center gap-2">
+                        {getStatusBadge(reservation.status)}
+                      </div>
+                    </div>
+                  </div>
+                ))}
+                {clientDetails.previousReservations.length === 0 && (
+                  <p className="text-center text-muted-foreground py-8">No hay reservas anteriores</p>
+                )}
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      )}
+
+      {/* Events */}
+      {activeTab === "events" && (
+        <div className="space-y-4">
+          <Card>
+            <CardHeader>
+              <CardTitle>Eventos Inscritos</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-3">
+                {clientDetails.registeredEvents.map((event) => (
+                  <div key={event.id} className="p-4 rounded-lg border bg-card hover:shadow-sm transition-shadow">
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="flex-1">
+                        <p className="font-semibold text-foreground">{event.name}</p>
+                        <div className="flex items-center gap-4 text-sm text-muted-foreground mt-2">
+                          <div className="flex items-center gap-1">
+                            <Calendar className="w-3 h-3" />
+                            {new Date(event.date).toLocaleDateString("es-ES", {
+                              day: "2-digit",
+                              month: "short",
+                              year: "numeric",
+                            })}
+                          </div>
+                          <div className="flex items-center gap-1">
+                            <Clock className="w-3 h-3" />
+                            {event.time}
+                          </div>
+                          <div className="flex items-center gap-1">
+                            <MapPin className="w-3 h-3" />
+                            {event.location}
+                          </div>
+                        </div>
+                      </div>
+                      <div className="text-right flex-shrink-0">
+                        {getStatusBadge(event.status)}
+                        {event.price > 0 && (
+                          <p className="text-sm font-semibold text-foreground mt-2">${event.price}</p>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                ))}
+                {clientDetails.registeredEvents.length === 0 && (
+                  <p className="text-center text-muted-foreground py-8">No hay eventos inscritos</p>
+                )}
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      )}
+
       {/* Action Buttons */}
       <div className="flex gap-3">
         <Button className="flex-1">
