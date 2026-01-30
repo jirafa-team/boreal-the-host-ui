@@ -26,62 +26,102 @@ export default function AdminDashboard() {
 
       <div className="p-8">
         {/* Stats Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          <Card className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-muted-foreground">
-                  {t("admin.totalRooms")}
-                </p>
-                <p className="text-3xl font-bold text-foreground mt-2">48</p>
-                <p className="text-xs text-muted-foreground mt-1">+2 {t("admin.sinceLastMonth")}</p>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+          <div
+            className="relative overflow-hidden rounded-lg p-4 shadow-md hover:shadow-lg transition-all duration-300 hover:scale-105 cursor-pointer"
+            style={{
+              background: selectedMode === "hotel" ? "linear-gradient(135deg, rgb(29, 78, 216), rgb(37, 99, 235))" : "white",
+              color: selectedMode === "hotel" ? "white" : "black"
+            }}
+            onClick={() => setSelectedMode("hotel")}
+          >
+            {selectedMode === "hotel" && (
+              <div className="absolute inset-0 opacity-10">
+                <div className="absolute top-0 right-0 w-20 h-20 bg-white rounded-full -mr-8 -mt-8"></div>
               </div>
-              <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center">
-                <Hotel className="w-6 h-6 text-primary" />
+            )}
+            <div className="relative flex items-center gap-3">
+              <div className={`p-2 rounded-lg ${selectedMode === "hotel" ? "bg-white/20" : "bg-primary/10"}`}>
+                <Hotel className={`w-5 h-5 ${selectedMode === "hotel" ? "text-white" : "text-primary"}`} />
+              </div>
+              <div>
+                <p className={`text-sm ${selectedMode === "hotel" ? "opacity-90" : "text-muted-foreground"}`}>{t("admin.totalRooms")}</p>
+                <p className="text-2xl font-bold">48</p>
               </div>
             </div>
-          </Card>
+          </div>
 
-          <Card className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-muted-foreground">{t("admin.occupancyRate")}</p>
-                <p className="text-3xl font-bold text-foreground mt-2">78%</p>
-                <p className="text-xs text-green-600 mt-1">+5% {t("admin.thisWeek")}</p>
+          <div
+            className="relative overflow-hidden rounded-lg p-4 shadow-md hover:shadow-lg transition-all duration-300 hover:scale-105 cursor-pointer"
+            style={{
+              background: selectedMode === "occupancy" ? "linear-gradient(135deg, rgb(34, 197, 94), rgb(22, 163, 74))" : "white",
+              color: selectedMode === "occupancy" ? "white" : "black"
+            }}
+            onClick={() => setSelectedMode("occupancy")}
+          >
+            {selectedMode === "occupancy" && (
+              <div className="absolute inset-0 opacity-10">
+                <div className="absolute top-0 right-0 w-20 h-20 bg-white rounded-full -mr-8 -mt-8"></div>
               </div>
-              <div className="w-12 h-12 bg-chart-2/10 rounded-lg flex items-center justify-center">
-                <BarChart3 className="w-6 h-6 text-chart-2" />
+            )}
+            <div className="relative flex items-center gap-3">
+              <div className={`p-2 rounded-lg ${selectedMode === "occupancy" ? "bg-white/20" : "bg-green-100"}`}>
+                <BarChart3 className={`w-5 h-5 ${selectedMode === "occupancy" ? "text-white" : "text-green-600"}`} />
+              </div>
+              <div>
+                <p className={`text-sm ${selectedMode === "occupancy" ? "opacity-90" : "text-muted-foreground"}`}>{t("admin.occupancyRate")}</p>
+                <p className="text-2xl font-bold">78%</p>
               </div>
             </div>
-          </Card>
+          </div>
 
-          <Card className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-muted-foreground">{t("admin.availableNow")}</p>
-                <p className="text-3xl font-bold text-foreground mt-2">11</p>
-                <p className="text-xs text-muted-foreground mt-1">
-                  {t("admin.ofTotal")} 48 {t("admin.total")}
-                </p>
+          <div
+            className="relative overflow-hidden rounded-lg p-4 shadow-md hover:shadow-lg transition-all duration-300 hover:scale-105 cursor-pointer"
+            style={{
+              background: selectedMode === "available" ? "linear-gradient(135deg, rgb(124, 58, 255), rgb(109, 40, 217))" : "white",
+              color: selectedMode === "available" ? "white" : "black"
+            }}
+            onClick={() => setSelectedMode("available")}
+          >
+            {selectedMode === "available" && (
+              <div className="absolute inset-0 opacity-10">
+                <div className="absolute top-0 right-0 w-20 h-20 bg-white rounded-full -mr-8 -mt-8"></div>
               </div>
-              <div className="w-12 h-12 bg-chart-3/10 rounded-lg flex items-center justify-center">
-                <LayoutGrid className="w-6 h-6 text-chart-3" />
+            )}
+            <div className="relative flex items-center gap-3">
+              <div className={`p-2 rounded-lg ${selectedMode === "available" ? "bg-white/20" : "bg-purple-100"}`}>
+                <LayoutGrid className={`w-5 h-5 ${selectedMode === "available" ? "text-white" : "text-purple-600"}`} />
+              </div>
+              <div>
+                <p className={`text-sm ${selectedMode === "available" ? "opacity-90" : "text-muted-foreground"}`}>{t("admin.availableNow")}</p>
+                <p className="text-2xl font-bold">11</p>
               </div>
             </div>
-          </Card>
+          </div>
 
-          <Card className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-muted-foreground">{t("admin.bookingsToday")}</p>
-                <p className="text-3xl font-bold text-foreground mt-2">23</p>
-                <p className="text-xs text-muted-foreground mt-1">8 {t("admin.pendingCheckins")}</p>
+          <div
+            className="relative overflow-hidden rounded-lg p-4 shadow-md hover:shadow-lg transition-all duration-300 hover:scale-105 cursor-pointer"
+            style={{
+              background: selectedMode === "bookings" ? "linear-gradient(135deg, rgb(234, 179, 8), rgb(202, 138, 4))" : "white",
+              color: selectedMode === "bookings" ? "white" : "black"
+            }}
+            onClick={() => setSelectedMode("bookings")}
+          >
+            {selectedMode === "bookings" && (
+              <div className="absolute inset-0 opacity-10">
+                <div className="absolute top-0 right-0 w-20 h-20 bg-white rounded-full -mr-8 -mt-8"></div>
               </div>
-              <div className="w-12 h-12 bg-chart-4/10 rounded-lg flex items-center justify-center">
-                <Users className="w-6 h-6 text-chart-4" />
+            )}
+            <div className="relative flex items-center gap-3">
+              <div className={`p-2 rounded-lg ${selectedMode === "bookings" ? "bg-white/20" : "bg-yellow-100"}`}>
+                <Users className={`w-5 h-5 ${selectedMode === "bookings" ? "text-white" : "text-yellow-600"}`} />
+              </div>
+              <div>
+                <p className={`text-sm ${selectedMode === "bookings" ? "opacity-90" : "text-muted-foreground"}`}>{t("admin.bookingsToday")}</p>
+                <p className="text-2xl font-bold">23</p>
               </div>
             </div>
-          </Card>
+          </div>
         </div>
 
         {/* Two Column Layout */}
