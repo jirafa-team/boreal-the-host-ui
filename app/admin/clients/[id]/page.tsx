@@ -473,7 +473,7 @@ export default function ClientDetailPage() {
                 </span>
               </div>
               <div className="flex items-center gap-3 pt-2 border-t">
-                <Badge className="bg-orange-100 text-orange-800 border-0">
+                <Badge className="bg-red-100 text-red-800 border-0">
                   <DollarSign className="w-3 h-3 mr-1" />
                   Saldo: ${clientDetails.currentReservation.totalCost}
                 </Badge>
@@ -584,7 +584,7 @@ export default function ClientDetailPage() {
                 <tfoot>
                   <tr className="border-t-2 border-border bg-accent/20">
                     <td colSpan={5} className="py-3 px-4 text-sm font-semibold text-foreground">Saldo Pendiente:</td>
-                    <td className="py-3 px-4 text-sm font-bold text-right text-orange-600">
+                    <td className="py-3 px-4 text-sm font-bold text-right text-red-800">
                       ${[
                         { paid: true, amount: 45 },
                         { paid: true, amount: 120 },
