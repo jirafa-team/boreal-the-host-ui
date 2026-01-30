@@ -292,7 +292,7 @@ export default function ClientDetailPage() {
             <div className="flex-1">
               <div className="flex items-start justify-between">
                 <div className="flex-1">
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-3 mb-2">
                     <h2 className="text-2xl font-bold text-foreground">{clientDetails.name}</h2>
                     {getClientTierBadge(clientDetails.category)}
                     <Dialog>
@@ -335,9 +335,6 @@ export default function ClientDetailPage() {
                         </div>
                       </DialogContent>
                     </Dialog>
-                    <Button size="icon" className="h-8 w-8 rounded-full" variant="ghost">
-                      <Mail className="w-4 h-4" />
-                    </Button>
                   </div>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-sm">
                     <div className="flex items-center gap-2 text-muted-foreground">
@@ -382,7 +379,17 @@ export default function ClientDetailPage() {
                   </div>
                 </div>
 
-                {/* Preferences Section */}
+                {/* Email Button - Circular */}
+                <div className="mt-4 flex justify-center">
+                  <Button size="icon" className="h-12 w-12 rounded-full shadow-lg hover:shadow-xl transition-shadow">
+                    <Mail className="w-5 h-5" />
+                  </Button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Preferences Section */}
           <div className="pt-6 border-t">
             <h3 className="font-semibold text-foreground mb-3 flex items-center gap-2">
               <Sparkles className="w-4 h-4 text-pink-500" />
