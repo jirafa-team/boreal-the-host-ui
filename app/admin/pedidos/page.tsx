@@ -342,7 +342,7 @@ export default function PedidosPage() {
               return (
                 <Card
                   key={order.id}
-                  className={`p-6 border-0 ${statusBadge.bgColor} cursor-pointer hover:shadow-lg transition-shadow`}
+                  className="p-6 border cursor-pointer hover:shadow-lg transition-shadow"
                   onClick={() => handleEditOrder(order)}
                 >
                   <div className="space-y-4">
