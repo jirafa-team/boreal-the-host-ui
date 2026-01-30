@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts"
 
 import { Hotel, Bell, LayoutGrid, Users, BarChart3, Calendar } from "lucide-react"
 import { Card } from "@/components/ui/card"
@@ -13,6 +14,31 @@ const kpiDataByDate: Record<string, { rooms: number; occupancy: number; availabl
   "in-2-days": { rooms: 48, occupancy: 45, available: 26, bookings: 12 },
   "in-3-days": { rooms: 48, occupancy: 95, available: 2, bookings: 31 },
 }
+
+// Mock data for check-in/check-out chart
+const checkInCheckOutData = [
+  { time: "06:00", checkIn: 2, checkOut: 1 },
+  { time: "07:00", checkIn: 5, checkOut: 2 },
+  { time: "08:00", checkIn: 8, checkOut: 4 },
+  { time: "09:00", checkIn: 12, checkOut: 6 },
+  { time: "10:00", checkIn: 15, checkOut: 10 },
+  { time: "11:00", checkIn: 11, checkOut: 14 },
+  { time: "12:00", checkIn: 8, checkOut: 18 },
+  { time: "13:00", checkIn: 5, checkOut: 12 },
+  { time: "14:00", checkIn: 3, checkOut: 8 },
+  { time: "15:00", checkIn: 4, checkOut: 5 },
+]
+
+// Mock data for tickets chart
+const ticketsData = [
+  { date: "Lunes", abiertos: 12, cerrados: 8 },
+  { date: "Martes", abiertos: 15, cerrados: 11 },
+  { date: "Miércoles", abiertos: 10, cerrados: 14 },
+  { date: "Jueves", abiertos: 18, cerrados: 12 },
+  { date: "Viernes", abiertos: 22, cerrados: 19 },
+  { date: "Sábado", abiertos: 8, cerrados: 15 },
+  { date: "Domingo", abiertos: 5, cerrados: 10 },
+]
 
 export default function AdminDashboard() {
   const { t } = useLanguage()
@@ -176,6 +202,41 @@ export default function AdminDashboard() {
 
         {/* Two Column Layout */}
         <div className="grid grid-cols-1 gap-6">
+          {/* Charts Section */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            {/* Check-in / Check-out Chart */}
+            <Card className="p-6">
+              <h2 className="text-lg font-semibold text-foreground mb-4">Check-in / Check-out por Hora</h2>
+              <ResponsiveContainer width="100%" height={300}>
+                <LineChart data={checkInCheckOutData}>
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis dataKey="time" />
+                  <YAxis />
+                  <Tooltip />
+                  <Legend />
+                  <Line type="monotone" dataKey="checkIn" stroke="#2563eb" strokeWidth={2} name="Check-in" />
+                  <Line type="monotone" dataKey="checkOut" stroke="#dc2626" strokeWidth={2} name="Check-out" />
+                </LineChart>
+              </ResponsiveContainer>
+            </Card>
+
+            {/* Tickets Chart */}
+            <Card className="p-6">
+              <h2 className="text-lg font-semibold text-foreground mb-4">Incidencias/Tickets</h2>
+              <ResponsiveContainer width="100%" height={300}>
+                <BarChart data={ticketsData}>
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis dataKey="date" />
+                  <YAxis />
+                  <Tooltip />
+                  <Legend />
+                  <Bar dataKey="abiertos" fill="#f97316" name="Abiertos" />
+                  <Bar dataKey="cerrados" fill="#22c55e" name="Cerrados" />
+                </BarChart>
+              </ResponsiveContainer>
+            </Card>
+          </div>
+
           {/* Recent Activity */}
           <Card className="p-6">
             <h2 className="text-lg font-semibold text-foreground mb-4">{t("admin.recentActivity")}</h2>

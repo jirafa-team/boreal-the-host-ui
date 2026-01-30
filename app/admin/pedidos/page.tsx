@@ -362,14 +362,6 @@ export default function PedidosPage() {
                       </div>
                     </div>
 
-                    {/* Delay indicator if needed */}
-                    {delayIndicator && DelayIcon && (
-                      <div className={`p-2 rounded-lg flex items-center gap-2 ${delayIndicator.bgColor} border ${delayIndicator.borderColor}`}>
-                        <DelayIcon className={`w-4 h-4 ${delayIndicator.color}`} />
-                        <span className={`text-sm font-medium ${delayIndicator.color}`}>{delayIndicator.label}</span>
-                      </div>
-                    )}
-
                     {/* Order info */}
                     <div className="space-y-2 text-sm">
                       <div className="flex items-center gap-2">
@@ -400,6 +392,14 @@ export default function PedidosPage() {
                         <span>€{order.total.toFixed(2)}</span>
                       </div>
                     </div>
+
+                    {/* Delay indicator if needed */}
+                    {delayIndicator && DelayIcon && (
+                      <div className={`p-2 rounded-lg flex items-center gap-2 ${delayIndicator.bgColor} border ${delayIndicator.borderColor}`}>
+                        <DelayIcon className={`w-4 h-4 ${delayIndicator.color}`} />
+                        <span className={`text-sm font-medium ${delayIndicator.color}`}>{delayIndicator.label}</span>
+                      </div>
+                    )}
 
                     {/* Delivered info */}
                     {order.status === "delivered" && (
