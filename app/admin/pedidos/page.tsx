@@ -342,10 +342,10 @@ export default function PedidosPage() {
               return (
                 <Card
                   key={order.id}
-                  className="p-6 border cursor-pointer hover:shadow-lg transition-shadow"
+                  className="p-6 border cursor-pointer hover:shadow-lg transition-shadow flex flex-col h-full"
                   onClick={() => handleEditOrder(order)}
                 >
-                  <div className="space-y-4">
+                  <div className="space-y-4 flex-1">
                     {/* Header with status top-right and estimated time below */}
                     <div className="flex items-start justify-between gap-3">
                       <h3 className="text-lg font-semibold">Pedido #{order.id}</h3>
@@ -408,20 +408,20 @@ export default function PedidosPage() {
                         Entregado a las {order.deliveredAt}
                       </div>
                     )}
+                  </div>
 
-                    {/* Action buttons */}
-                    <div className="flex gap-2">
-                      {order.status === "pending" && (
-                        <Button size="sm" variant="default" className="flex-1">
-                          Iniciar Preparación
-                        </Button>
-                      )}
-                      {order.status === "preparing" && (
-                        <Button size="sm" className="flex-1 text-white hover:opacity-90 border-0" style={{ backgroundColor: "#235E20" }}>
-                          Marcar Entregado
-                        </Button>
-                      )}
-                    </div>
+                  {/* Action buttons */}
+                  <div className="flex gap-2 pt-4 mt-4 border-t">
+                    {order.status === "pending" && (
+                      <Button size="sm" variant="default" className="flex-1">
+                        Iniciar Preparación
+                      </Button>
+                    )}
+                    {order.status === "preparing" && (
+                      <Button size="sm" className="flex-1 text-white hover:opacity-90 border-0" style={{ backgroundColor: "#235E20" }}>
+                        Marcar Entregado
+                      </Button>
+                    )}
                   </div>
                 </Card>
               )
