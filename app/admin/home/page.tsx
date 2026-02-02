@@ -79,7 +79,7 @@ export default function AdminHomePage() {
       title: t("admin.spaces"),
       items: [
         { href: "/admin/rooms", label: t("admin.rooms"), icon: Hotel, color: "from-purple-600 to-purple-700" },
-        { href: "/admin/space-builder", label: t("admin.spaceDesign"), icon: LayoutGrid, color: "from-indigo-600 to-indigo-700" },
+        // { href: "/admin/space-builder", label: t("admin.spaceDesign"), icon: LayoutGrid, color: "from-indigo-600 to-indigo-700" },
         { href: "/admin/facilities", label: "Amenities", icon: Building2, color: "from-orange-600 to-orange-700" },
       ],
       columns: 2,
