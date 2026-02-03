@@ -488,21 +488,17 @@ export default function RoomsManagement() {
             {layoutMode === "grid" && (
               <div className="flex items-center gap-2">
                 <label className="text-sm font-medium text-foreground">
-                  {language === 'es' || language === 'pt' ? 'Fecha (dd/mm/aaaa):' : 'Date (mm/dd/yyyy):'}
+                  {language === 'es' || language === 'pt' ? 'Fecha:' : 'Date:'}
                 </label>
-                <input
-                  type="text"
-                  placeholder={language === 'es' || language === 'pt' ? 'dd/mm/aaaa' : 'mm/dd/yyyy'}
-                  value={convertISOToLocaleFormat(selectedDate)}
-                  onChange={(e) => {
-                    const isoDate = convertLocaleToISO(e.target.value)
-                    // Validate format
-                    if (/^\d{4}-\d{2}-\d{2}$/.test(isoDate)) {
-                      setSelectedDate(isoDate)
-                    }
-                  }}
-                  className="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 w-32"
-                />
+                <div className="relative">
+                  <Calendar className="absolute left-2 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />
+                  <input
+                    type="date"
+                    value={selectedDate}
+                    onChange={(e) => setSelectedDate(e.target.value)}
+                    className="px-3 py-2 pl-8 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 w-40"
+                  />
+                </div>
               </div>
             )}
           </div>
@@ -652,19 +648,15 @@ export default function RoomsManagement() {
                 >
                   <ChevronLeft className="w-5 h-5" />
                 </button>
-                <input
-                  type="text"
-                  placeholder={language === 'es' || language === 'pt' ? 'dd/mm/aaaa' : 'mm/dd/yyyy'}
-                  value={convertISOToLocaleFormat(currentDate.toISOString().split('T')[0])}
-                  onChange={(e) => {
-                    const isoDate = convertLocaleToISO(e.target.value)
-                    // Validate format
-                    if (/^\d{4}-\d{2}-\d{2}$/.test(isoDate)) {
-                      setCurrentDate(new Date(isoDate))
-                    }
-                  }}
-                  className="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 w-32"
-                />
+                <div className="relative">
+                  <Calendar className="absolute left-2 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />
+                  <input
+                    type="date"
+                    value={currentDate.toISOString().split('T')[0]}
+                    onChange={(e) => setCurrentDate(new Date(e.target.value))}
+                    className="px-3 py-2 pl-8 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 w-40"
+                  />
+                </div>
                 <button
                   onClick={() => navigateDate("next")}
                   className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
