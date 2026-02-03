@@ -243,6 +243,33 @@ export default function RoomsManagement() {
     return date.toLocaleDateString("es-ES", { weekday: "long", year: "numeric", month: "long", day: "numeric" })
   }
 
+  // Convert between ISO date format (yyyy-MM-dd) and locale-specific format
+  const convertISOToLocaleFormat = (isoDate: string): string => {
+    const [year, month, day] = isoDate.split('-')
+    if (useLanguage().language === 'es' || useLanguage().language === 'pt') {
+      return `${day}/${month}/${year}` // dd/mm/yyyy
+    }
+    return `${month}/${day}/${year}` // mm/dd/yyyy
+  }
+
+  const convertLocaleToISO = (localeDate: string): string => {
+    const parts = localeDate.split('/')
+    if (useLanguage().language === 'es' || useLanguage().language === 'pt') {
+      // Input is dd/mm/yyyy
+      if (parts.length === 3) {
+        return `${parts[2]}-${parts[1]}-${parts[0]}`
+      }
+    } else {
+      // Input is mm/dd/yyyy
+      if (parts.length === 3) {
+        return `${parts[2]}-${parts[0]}-${parts[1]}`
+      }
+    }
+    return localeDate
+  }
+
+  const { language } = useLanguage()
+
   const navigateDate = (direction: "prev" | "next") => {
     const newDate = new Date(currentDate)
     if (viewMode === "day") {
@@ -460,12 +487,21 @@ export default function RoomsManagement() {
             {/* Date Filter - Only for Grid View */}
             {layoutMode === "grid" && (
               <div className="flex items-center gap-2">
-                <label className="text-sm font-medium text-foreground">Fecha:</label>
+                <label className="text-sm font-medium text-foreground">
+                  {language === 'es' || language === 'pt' ? 'Fecha (dd/mm/aaaa):' : 'Date (mm/dd/yyyy):'}
+                </label>
                 <input
-                  type="date"
-                  value={selectedDate}
-                  onChange={(e) => setSelectedDate(e.target.value)}
-                  className="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  type="text"
+                  placeholder={language === 'es' || language === 'pt' ? 'dd/mm/aaaa' : 'mm/dd/yyyy'}
+                  value={convertISOToLocaleFormat(selectedDate)}
+                  onChange={(e) => {
+                    const isoDate = convertLocaleToISO(e.target.value)
+                    // Validate format
+                    if (/^\d{4}-\d{2}-\d{2}$/.test(isoDate)) {
+                      setSelectedDate(isoDate)
+                    }
+                  }}
+                  className="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 w-32"
                 />
               </div>
             )}
@@ -612,20 +648,27 @@ export default function RoomsManagement() {
                 <button
                   onClick={() => navigateDate("prev")}
                   className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
-                  title="Fecha anterior"
+                  title={language === 'es' || language === 'pt' ? "Fecha anterior" : "Previous date"}
                 >
                   <ChevronLeft className="w-5 h-5" />
                 </button>
                 <input
-                  type="date"
-                  value={currentDate.toISOString().split('T')[0]}
-                  onChange={(e) => setCurrentDate(new Date(e.target.value))}
-                  className="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  type="text"
+                  placeholder={language === 'es' || language === 'pt' ? 'dd/mm/aaaa' : 'mm/dd/yyyy'}
+                  value={convertISOToLocaleFormat(currentDate.toISOString().split('T')[0])}
+                  onChange={(e) => {
+                    const isoDate = convertLocaleToISO(e.target.value)
+                    // Validate format
+                    if (/^\d{4}-\d{2}-\d{2}$/.test(isoDate)) {
+                      setCurrentDate(new Date(isoDate))
+                    }
+                  }}
+                  className="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 w-32"
                 />
                 <button
                   onClick={() => navigateDate("next")}
                   className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
-                  title="Fecha siguiente"
+                  title={language === 'es' || language === 'pt' ? "Fecha siguiente" : "Next date"}
                 >
                   <ChevronRight className="w-5 h-5" />
                 </button>
