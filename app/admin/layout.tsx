@@ -74,8 +74,8 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       items: [
         { href: "/admin/home", label: t("admin.home"), icon: Home },
         { href: "/admin/dashboard", label: t("admin.controlDashboard"), icon: BarChart3 },
-        { href: "/admin", label: t("admin.dashboard"), icon: BarChart3 },
-        { href: "/admin/sales-assistant", label: t("admin.salesAssistant"), icon: TrendingUp },
+        // { href: "/admin", label: t("admin.dashboard"), icon: BarChart3 },
+        // { href: "/admin/sales-assistant", label: t("admin.salesAssistant"), icon: TrendingUp },
       ],
     },
     {
@@ -92,9 +92,9 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       title: t("admin.services"),
       items: [
         { href: "/admin/staff", label: t("admin.staff"), icon: Sparkles },
-        { href: "/admin/events", label: t("admin.events"), icon: Calendar },
-        { href: "/admin/tickets", label: t("admin.tickets"), icon: Ticket },
-        { href: "/admin/pedidos", label: t("admin.orders"), icon: ShoppingBag },
+        // { href: "/admin/events", label: t("admin.events"), icon: Calendar },
+        // { href: "/admin/tickets", label: t("admin.tickets"), icon: Ticket },
+        // { href: "/admin/pedidos", label: t("admin.orders"), icon: ShoppingBag },
       ],
     },
     {
@@ -102,8 +102,8 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       title: t("admin.communication"),
       items: [
         { href: "/admin/clients", label: t("admin.clients"), icon: Users },
-        { href: "/admin/notifications", label: t("admin.notifications"), icon: Bell },
-        { href: "/admin/recommendations", label: t("admin.recommendations"), icon: Compass },
+        // { href: "/admin/notifications", label: t("admin.notifications"), icon: Bell },
+        // { href: "/admin/recommendations", label: t("admin.recommendations"), icon: Compass },
       ],
     },
     {

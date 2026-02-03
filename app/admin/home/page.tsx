@@ -70,8 +70,8 @@ export default function AdminHomePage() {
     {
       title: t("admin.general"),
       items: [
-        { href: "/admin", label: t("admin.dashboard"), icon: BarChart3, color: "from-blue-600 to-blue-700" },
-        { href: "/admin/sales-assistant", label: t("admin.salesAssistant"), icon: TrendingUp, color: "from-green-600 to-green-700" },
+        // { href: "/admin", label: t("admin.dashboard"), icon: BarChart3, color: "from-blue-600 to-blue-700" },
+        // { href: "/admin/sales-assistant", label: t("admin.salesAssistant"), icon: TrendingUp, color: "from-green-600 to-green-700" },
       ],
       columns: 2,
     },
@@ -88,9 +88,9 @@ export default function AdminHomePage() {
       title: t("admin.services"),
       items: [
         { href: "/admin/staff", label: "Personal", icon: Sparkles, color: "from-pink-600 to-pink-700" },
-        { href: "/admin/events", label: t("admin.events"), icon: Calendar, color: "from-red-600 to-red-700" },
-        { href: "/admin/tickets", label: t("admin.tickets"), icon: Ticket, color: "from-yellow-600 to-yellow-700" },
-        { href: "/admin/pedidos", label: t("admin.orders"), icon: ShoppingBag, color: "pedidos-custom" },
+        // { href: "/admin/events", label: t("admin.events"), icon: Calendar, color: "from-red-600 to-red-700" },
+        // { href: "/admin/tickets", label: t("admin.tickets"), icon: Ticket, color: "from-yellow-600 to-yellow-700" },
+        // { href: "/admin/pedidos", label: t("admin.orders"), icon: ShoppingBag, color: "pedidos-custom" },
       ],
       columns: 2,
     },
@@ -98,8 +98,8 @@ export default function AdminHomePage() {
       title: t("admin.communication"),
       items: [
         { href: "/admin/clients", label: t("admin.clients"), icon: Users, color: "clientes-custom" },
-        { href: "/admin/notifications", label: t("admin.notifications"), icon: Bell, color: "notificaciones-custom" },
-        { href: "/admin/recommendations", label: t("admin.recommendations"), icon: Compass, color: "recomendaciones-custom" },
+        // { href: "/admin/notifications", label: t("admin.notifications"), icon: Bell, color: "notificaciones-custom" },
+        // { href: "/admin/recommendations", label: t("admin.recommendations"), icon: Compass, color: "recomendaciones-custom" },
       ],
       columns: 3,
     },
