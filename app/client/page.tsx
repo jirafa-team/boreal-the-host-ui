@@ -351,7 +351,7 @@ export default function ClientPage({ searchParams }: { searchParams: { type?: st
                 </div>
                 <Button
                   size="sm"
-                  className="bg-white text-[#11AFBE] hover:bg-white/90 font-semibold px-3 h-8 rounded-full"
+                  className="bg-violet-600 text-white hover:bg-violet-700 font-semibold px-3 h-8 rounded-full"
                 >
                   Extender
                 </Button>
