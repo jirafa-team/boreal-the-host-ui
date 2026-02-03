@@ -70,7 +70,7 @@ export default function AdminHomePage() {
     {
       title: t("admin.general"),
       items: [
-        { href: "/admin/dashboard", label: t("admin.controlDashboard"), icon: BarChart3, color: "from-blue-600 to-blue-700" },
+        { href: "/admin/dashboard", label: t("admin.controlDashboard"), icon: BarChart3, color: "from-green-600 to-green-700" },
         // { href: "/admin/sales-assistant", label: t("admin.salesAssistant"), icon: TrendingUp, color: "from-green-600 to-green-700" },
       ],
       columns: 2,
