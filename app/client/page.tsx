@@ -150,6 +150,18 @@ const poolOccupancy = {
   "6:00 PM": { reserved: 45, capacity: 50 },
 }
 
+// Mock data for gym occupancy by time slot
+const gymOccupancy = {
+  "6:00 AM": { reserved: 20, capacity: 40 },
+  "7:00 AM": { reserved: 35, capacity: 40 },
+  "8:00 AM": { reserved: 38, capacity: 40 },
+  "9:00 AM": { reserved: 10, capacity: 40 },
+  "5:00 PM": { reserved: 32, capacity: 40 },
+  "6:00 PM": { reserved: 39, capacity: 40 },
+  "7:00 PM": { reserved: 25, capacity: 40 },
+  "8:00 PM": { reserved: 12, capacity: 40 },
+}
+
 export default function ClientPage({ searchParams }: { searchParams: { type?: string } }) {
   const searchParamsHook = useSearchParams()
   const clientType = searchParams.type || "normal"
@@ -158,6 +170,18 @@ export default function ClientPage({ searchParams }: { searchParams: { type?: st
   // Calculate occupancy percentage and get color
   const getPoolOccupancyInfo = (time: string) => {
     const occupancy = poolOccupancy[time as keyof typeof poolOccupancy]
+    if (!occupancy) return { percent: 0, color: "text-green-600", bgColor: "bg-green-100" }
+    
+    const percent = Math.round((occupancy.reserved / occupancy.capacity) * 100)
+    
+    if (percent <= 33) return { percent, color: "text-green-600", bgColor: "bg-green-100" }
+    if (percent <= 66) return { percent, color: "text-amber-600", bgColor: "bg-amber-100" }
+    return { percent, color: "text-red-600", bgColor: "bg-red-100" }
+  }
+
+  // Calculate occupancy percentage for gym and get color
+  const getGymOccupancyInfo = (time: string) => {
+    const occupancy = gymOccupancy[time as keyof typeof gymOccupancy]
     if (!occupancy) return { percent: 0, color: "text-green-600", bgColor: "bg-green-100" }
     
     const percent = Math.round((occupancy.reserved / occupancy.capacity) * 100)
@@ -755,20 +779,26 @@ export default function ClientPage({ searchParams }: { searchParams: { type?: st
                               "6:00 PM",
                               "7:00 PM",
                               "8:00 PM",
-                            ].map((time) => (
-                              <div
-                                key={time}
-                                className="flex items-center space-x-3 p-3 rounded-lg hover:bg-accent cursor-pointer"
-                              >
-                                <RadioGroupItem value={time} id={`gym-${time}`} />
-                                <Label htmlFor={`gym-${time}`} className="flex-1 cursor-pointer font-medium">
-                                  {time}
-                                </Label>
-                                <Badge variant="secondary" className="text-xs">
-                                  Disponible
-                                </Badge>
-                              </div>
-                            ))}
+                            ].map((time) => {
+                              const { percent, color, bgColor } = getGymOccupancyInfo(time)
+                              return (
+                                <div
+                                  key={time}
+                                  className="flex items-center justify-between space-x-3 p-3 rounded-lg hover:bg-accent cursor-pointer"
+                                >
+                                  <div className="flex items-center space-x-3 flex-1">
+                                    <RadioGroupItem value={time} id={`gym-${time}`} />
+                                    <Label htmlFor={`gym-${time}`} className="flex-1 cursor-pointer font-medium">
+                                      {time}
+                                    </Label>
+                                  </div>
+                                  <div className={`flex items-center gap-2 px-2 py-1 rounded ${bgColor}`}>
+                                    <Users className={`w-3.5 h-3.5 ${color}`} />
+                                    <span className={`text-xs font-semibold ${color}`}>{percent}%</span>
+                                  </div>
+                                </div>
+                              )
+                            })}
                           </RadioGroup>
                         </div>
                         <Button className="w-full" size="lg" onClick={() => setShowGymDialog(false)}>
