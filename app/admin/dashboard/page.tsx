@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation"
 import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { ChevronLeft, ChevronRight, Search, Hotel, Users, Building2, Clock, AlertCircle, CheckCircle2, Dumbbell, Waves, Sparkles, Video, Coffee, UtensilsCrossed } from "lucide-react"
+import { ChevronLeft, ChevronRight, Search, Hotel, Users, Building2, Clock, AlertCircle, CheckCircle2, Dumbbell, Waves, Sparkles, Video, Coffee, UtensilsCrossed, Calendar } from "lucide-react"
 import { useLanguage } from "@/lib/i18n-context"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -494,6 +494,16 @@ export default function DashboardControl() {
     setCurrentDate(newDate)
   }
 
+  const convertISOToLocaleFormat = (isoDate: string): string => {
+    const [year, month, day] = isoDate.split('-')
+    if (t("locale") === "es" || t("locale") === "pt") {
+      return `${day}/${month}/${year}` // dd/mm/yyyy
+    }
+    return `${month}/${day}/${year}` // mm/dd/yyyy
+  }
+
+  const { language } = useLanguage()
+
   const toggleSection = (section: string) => {
     const sections = new Set(expandedSections)
     if (sections.has(section)) {
@@ -594,7 +604,7 @@ export default function DashboardControl() {
         <div className="px-8 py-6">
           <Card className="p-6 overflow-x-auto">
             {/* Filters and View Toggle */}
-            <div className="flex items-end justify-between gap-4 mb-6 pb-6 border-b border-border">
+            <div className="flex items-end justify-between gap-4 mb-6 pb-6 border-b border-border flex-wrap">
               <div className="flex-1 max-w-xs">
                 <label className="text-sm font-medium text-foreground block mb-2">Buscar habitación</label>
                 <div className="relative">
@@ -608,27 +618,61 @@ export default function DashboardControl() {
                 </div>
               </div>
               
-              <div className="flex items-center gap-3">
-                <span className={`text-sm font-medium ${timelineMode === "week" ? "text-foreground" : "text-muted-foreground"}`}>
-                  Semana
-                </span>
-                <button
-                  onClick={() => setTimelineMode(timelineMode === "week" ? "month" : "week")}
-                  className={`relative inline-flex h-8 w-14 items-center rounded-full transition-colors ${
-                    timelineMode === "month"
-                      ? "bg-lime-600"
-                      : "bg-gray-300"
-                  }`}
-                >
-                  <span
-                    className={`inline-block h-6 w-6 transform rounded-full bg-white transition-transform ${
-                      timelineMode === "month" ? "translate-x-7" : "translate-x-1"
+              {/* Timeline Mode Toggle & Date Navigation */}
+              <div className="flex items-center gap-4 flex-wrap">
+                {/* Week/Month Toggle */}
+                <div className="flex items-center gap-3">
+                  <span className={`text-sm font-medium ${timelineMode === "week" ? "text-foreground" : "text-muted-foreground"}`}>
+                    Semana
+                  </span>
+                  <button
+                    onClick={() => setTimelineMode(timelineMode === "week" ? "month" : "week")}
+                    className={`relative inline-flex h-8 w-14 items-center rounded-full transition-colors ${
+                      timelineMode === "month"
+                        ? "bg-lime-600"
+                        : "bg-gray-300"
                     }`}
-                  />
-                </button>
-                <span className={`text-sm font-medium ${timelineMode === "month" ? "text-foreground" : "text-muted-foreground"}`}>
-                  Mes
-                </span>
+                  >
+                    <span
+                      className={`inline-block h-6 w-6 transform rounded-full bg-white transition-transform ${
+                        timelineMode === "month" ? "translate-x-7" : "translate-x-1"
+                      }`}
+                    />
+                  </button>
+                  <span className={`text-sm font-medium ${timelineMode === "month" ? "text-foreground" : "text-muted-foreground"}`}>
+                    Mes
+                  </span>
+                </div>
+
+                {/* Date Navigation */}
+                <div className="flex items-center gap-3">
+                  <button
+                    onClick={() => navigateDate("prev")}
+                    className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                    title={language === 'es' || language === 'pt' ? "Fecha anterior" : "Previous date"}
+                  >
+                    <ChevronLeft className="w-5 h-5" />
+                  </button>
+                  <div className="relative">
+                    <input
+                      type="date"
+                      value={currentDate.toISOString().split('T')[0]}
+                      onChange={(e) => setCurrentDate(new Date(e.target.value))}
+                      className="absolute inset-0 opacity-0 cursor-pointer w-full h-full"
+                    />
+                    <div className="pointer-events-none flex items-center gap-2 px-3 py-2 border border-gray-300 rounded-lg bg-white w-40">
+                      <Calendar className="w-4 h-4 text-muted-foreground" />
+                      <span className="text-sm">{convertISOToLocaleFormat(currentDate.toISOString().split('T')[0])}</span>
+                    </div>
+                  </div>
+                  <button
+                    onClick={() => navigateDate("next")}
+                    className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                    title={language === 'es' || language === 'pt' ? "Fecha siguiente" : "Next date"}
+                  >
+                    <ChevronRight className="w-5 h-5" />
+                  </button>
+                </div>
               </div>
             </div>
 
