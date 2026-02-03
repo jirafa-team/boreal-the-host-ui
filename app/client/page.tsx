@@ -335,16 +335,18 @@ export default function ClientPage({ searchParams }: { searchParams: { type?: st
           
           {/* Tu Estancia Chip */}
           {!isFutureReservation && (
-            <div className="flex items-center gap-3 bg-white/15 backdrop-blur-sm rounded-full px-4 py-2.5 border border-white/20">
-              <Calendar className="w-4 h-4 text-white" />
-              <div className="text-center">
-                <p className="text-xs opacity-80 font-medium">Sale</p>
-                <p className="text-sm font-bold text-white">{userData.checkOut}</p>
+            <div className="flex items-center gap-4 bg-white/15 backdrop-blur-sm rounded-full px-4 py-2.5 border border-white/20">
+              <div className="flex items-center gap-2">
+                <Calendar className="w-4 h-4 text-white" />
+                <div className="text-center">
+                  <p className="text-xs opacity-80 font-medium">Check-out</p>
+                  <p className="text-sm font-bold text-white">{userData.checkOut}</p>
+                </div>
               </div>
-              <div className="hidden sm:block w-px h-8 bg-white/20"></div>
+              <div className="w-px h-8 bg-white/20"></div>
               <div className="text-center">
-                <p className="text-xs opacity-80 font-medium">{userData.nights} noches</p>
-                <p className="text-sm font-bold text-white">Check-out</p>
+                <p className="text-2xl font-bold text-white">{userData.nights}</p>
+                <p className="text-xs opacity-80 font-medium">noches</p>
               </div>
             </div>
           )}
