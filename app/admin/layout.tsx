@@ -145,7 +145,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             </Button>
           </div>
 
-          <nav className="flex-1 p-2 space-y-4 overflow-y-auto">
+          <nav className="flex-1 p-2 space-y-2 overflow-y-auto">
             {navSections.map((section) => (
               <div key={section.id}>
                 {sidebarOpen ? (
@@ -162,7 +162,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                       />
                     </button>
                     {expandedSections.has(section.id) && (
-                      <div className="space-y-1">
+                      <div className="space-y-1 mb-2">
                         {section.items.map((item) => {
                           const Icon = item.icon
                           const isActive = pathname === item.href
