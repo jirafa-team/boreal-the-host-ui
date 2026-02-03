@@ -161,26 +161,24 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                         }`}
                       />
                     </button>
-                    {expandedSections.has(section.id) && (
-                      <div className="space-y-1 mb-2">
-                        {section.items.map((item) => {
-                          const Icon = item.icon
-                          const isActive = pathname === item.href
-                          return (
-                            <Link
-                              key={item.href}
-                              href={item.href}
-                              className={`flex items-center gap-3 px-3 py-1.5 text-xs rounded-lg transition-colors ${
-                                isActive ? "bg-white/20 text-white font-medium" : "text-white/90 hover:bg-white/10"
-                              }`}
-                            >
-                              <Icon className="w-5 h-5 shrink-0" />
-                              <span>{item.label}</span>
-                            </Link>
-                          )
-                        })}
-                      </div>
-                    )}
+                    <div className="space-y-1 mb-2">
+                      {section.items.map((item) => {
+                        const Icon = item.icon
+                        const isActive = pathname === item.href
+                        return (
+                          <Link
+                            key={item.href}
+                            href={item.href}
+                            className={`flex items-center gap-3 px-3 py-1.5 text-xs rounded-lg transition-colors ${
+                              isActive ? "bg-white/20 text-white font-medium" : "text-white/90 hover:bg-white/10"
+                            }`}
+                          >
+                            <Icon className="w-5 h-5 shrink-0" />
+                            <span>{item.label}</span>
+                          </Link>
+                        )
+                      })}
+                    </div>
                   </>
                 ) : (
                   <div className="space-y-1">
