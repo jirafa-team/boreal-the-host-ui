@@ -70,7 +70,7 @@ export default function AdminHomePage() {
     {
       title: t("admin.general"),
       items: [
-        // { href: "/admin", label: t("admin.dashboard"), icon: BarChart3, color: "from-blue-600 to-blue-700" },
+        { href: "/admin/dashboard", label: t("admin.controlDashboard"), icon: BarChart3, color: "from-blue-600 to-blue-700" },
         // { href: "/admin/sales-assistant", label: t("admin.salesAssistant"), icon: TrendingUp, color: "from-green-600 to-green-700" },
       ],
       columns: 2,
@@ -122,192 +122,45 @@ export default function AdminHomePage() {
           <p className="text-gray-600 mt-1">{t("admin.selectFeature") || "Selecciona una opción para comenzar"}</p>
         </div>
 
-        {/* Menu Sections - Two Column Layout */}
-        <div className="w-full grid grid-cols-2 gap-8">
-          {/* Left Column: General, Servicios, Gestión */}
-          <div className="space-y-8">
-            {menuSections.slice(0, 1).map((section) => (
-              <div key={section.title}>
-                <h2 className="text-base font-semibold text-gray-900 mb-3 hidden">{section.title}</h2>
-                <div className={`grid gap-3 grid-cols-2`}>
-                  {section.items.map((item) => {
-                    const Icon = item.icon
-                    return (
-                      <button
-                        key={item.href}
-                        onClick={() => router.push(item.href)}
-                        className="group relative overflow-hidden rounded-lg p-3 text-white shadow-md hover:shadow-lg transition-all duration-300 hover:scale-105"
-                        style={{
-                          background: solidColors[item.color] || gradientColors[item.color] || "linear-gradient(135deg, rgb(71, 85, 105), rgb(51, 65, 85))"
-                        }}
-                      >
-                        <div className="absolute inset-0 opacity-10">
-                          <div className="absolute top-0 right-0 w-20 h-20 bg-white rounded-full -mr-8 -mt-8"></div>
-                        </div>
-                        <div className="relative flex flex-col items-start h-full">
-                          <div className="mb-2">
-                            <Icon className="w-5 h-5" />
-                          </div>
-                          <h3 className="text-sm font-semibold mb-2 text-left line-clamp-2">{item.label}</h3>
-                          <div className="mt-auto flex items-center gap-1 text-xs opacity-90">
-                            <span>Acceder</span>
-                            <ArrowRight className="w-3 h-3 group-hover:translate-x-0.5 transition-transform" />
-                          </div>
-                        </div>
-                      </button>
-                    )
-                  })}
-                </div>
-              </div>
-            ))}
-
-            {/* Servicios Section */}
-            {menuSections.slice(2, 3).map((section) => (
-              <div key={section.title}>
-                <h2 className="text-base font-semibold text-gray-900 mb-3 hidden">{section.title}</h2>
-                <div className="grid gap-3 grid-cols-2">
-                  {section.items.map((item) => {
-                    const Icon = item.icon
-                    return (
-                      <button
-                        key={item.href}
-                        onClick={() => router.push(item.href)}
-                        className="group relative overflow-hidden rounded-lg p-3 text-white shadow-md hover:shadow-lg transition-all duration-300 hover:scale-105"
-                        style={{
-                          background: solidColors[item.color] || gradientColors[item.color] || "linear-gradient(135deg, rgb(71, 85, 105), rgb(51, 65, 85))"
-                        }}
-                      >
-                        <div className="absolute inset-0 opacity-10">
-                          <div className="absolute top-0 right-0 w-20 h-20 bg-white rounded-full -mr-8 -mt-8"></div>
-                        </div>
-                        <div className="relative flex flex-col items-start h-full">
-                          <div className="mb-2">
-                            <Icon className="w-5 h-5" />
-                          </div>
-                          <h3 className="text-sm font-semibold mb-2 text-left line-clamp-2">{item.label}</h3>
-                          <div className="mt-auto flex items-center gap-1 text-xs opacity-90">
-                            <span>Acceder</span>
-                            <ArrowRight className="w-3 h-3 group-hover:translate-x-0.5 transition-transform" />
-                          </div>
-                        </div>
-                      </button>
-                    )
-                  })}
-                </div>
-              </div>
-            ))}
-
-            {/* Gestión Section */}
-            {menuSections.slice(4, 5).map((section) => (
-              <div key={section.title}>
-                <h2 className="text-base font-semibold text-gray-900 mb-3 hidden">{section.title}</h2>
-                <div className="grid gap-3 grid-cols-2">
-                  {section.items.map((item) => {
-                    const Icon = item.icon
-                    return (
-                      <button
-                        key={item.href}
-                        onClick={() => router.push(item.href)}
-                        className="group relative overflow-hidden rounded-lg p-3 text-white shadow-md hover:shadow-lg transition-all duration-300 hover:scale-105"
-                        style={{
-                          background: solidColors[item.color] || gradientColors[item.color] || "linear-gradient(135deg, rgb(71, 85, 105), rgb(51, 65, 85))"
-                        }}
-                      >
-                        <div className="absolute inset-0 opacity-10">
-                          <div className="absolute top-0 right-0 w-20 h-20 bg-white rounded-full -mr-8 -mt-8"></div>
-                        </div>
-                        <div className="relative flex flex-col items-start h-full">
-                          <div className="mb-2">
-                            <Icon className="w-5 h-5" />
-                          </div>
-                          <h3 className="text-sm font-semibold mb-2 text-left line-clamp-2">{item.label}</h3>
-                          <div className="mt-auto flex items-center gap-1 text-xs opacity-90">
-                            <span>Acceder</span>
-                            <ArrowRight className="w-3 h-3 group-hover:translate-x-0.5 transition-transform" />
-                          </div>
-                        </div>
-                      </button>
-                    )
-                  })}
-                </div>
-              </div>
-            ))}
-          </div>
-
-          {/* Right Column: Espacios, Comunicación */}
-          <div className="space-y-8">
-            {/* Espacios Section */}
-            {menuSections.slice(1, 2).map((section) => (
-              <div key={section.title}>
-                <h2 className="text-base font-semibold text-gray-900 mb-3 hidden">{section.title}</h2>
-                <div className="grid gap-3 grid-cols-2">
-                  {section.items.map((item) => {
-                    const Icon = item.icon
-                    return (
-                      <button
-                        key={item.href}
-                        onClick={() => router.push(item.href)}
-                        className="group relative overflow-hidden rounded-lg p-3 text-white shadow-md hover:shadow-lg transition-all duration-300 hover:scale-105"
-                        style={{
-                          background: solidColors[item.color] || gradientColors[item.color] || "linear-gradient(135deg, rgb(71, 85, 105), rgb(51, 65, 85))"
-                        }}
-                      >
-                        <div className="absolute inset-0 opacity-10">
-                          <div className="absolute top-0 right-0 w-20 h-20 bg-white rounded-full -mr-8 -mt-8"></div>
-                        </div>
-                        <div className="relative flex flex-col items-start h-full">
-                          <div className="mb-2">
-                            <Icon className="w-5 h-5" />
-                          </div>
-                          <h3 className="text-sm font-semibold mb-2 text-left line-clamp-2">{item.label}</h3>
-                          <div className="mt-auto flex items-center gap-1 text-xs opacity-90">
-                            <span>Acceder</span>
-                            <ArrowRight className="w-3 h-3 group-hover:translate-x-0.5 transition-transform" />
-                          </div>
-                        </div>
-                      </button>
-                    )
-                  })}
-                </div>
-              </div>
-            ))}
-
-            {/* Comunicación Section */}
-            {menuSections.slice(3, 4).map((section) => (
-              <div key={section.title}>
-                <h2 className="text-base font-semibold text-gray-900 mb-3 hidden">{section.title}</h2>
-                <div className="grid gap-3 grid-cols-2">
-                  {section.items.map((item) => {
-                    const Icon = item.icon
-                    return (
-                      <button
-                        key={item.href}
-                        onClick={() => router.push(item.href)}
-                        className="group relative overflow-hidden rounded-lg p-3 text-white shadow-md hover:shadow-lg transition-all duration-300 hover:scale-105"
-                        style={{
-                          background: solidColors[item.color] || gradientColors[item.color] || "linear-gradient(135deg, rgb(71, 85, 105), rgb(51, 65, 85))"
-                        }}
-                      >
-                        <div className="absolute inset-0 opacity-10">
-                          <div className="absolute top-0 right-0 w-20 h-20 bg-white rounded-full -mr-8 -mt-8"></div>
-                        </div>
-                        <div className="relative flex flex-col items-start h-full">
-                          <div className="mb-2">
-                            <Icon className="w-5 h-5" />
-                          </div>
-                          <h3 className="text-sm font-semibold mb-2 text-left line-clamp-2">{item.label}</h3>
-                          <div className="mt-auto flex items-center gap-1 text-xs opacity-90">
-                            <span>Acceder</span>
-                            <ArrowRight className="w-3 h-3 group-hover:translate-x-0.5 transition-transform" />
-                          </div>
-                        </div>
-                      </button>
-                    )
-                  })}
-                </div>
-              </div>
-            ))}
-          </div>
+        {/* Menu Sections - Unified Grid */}
+        <div className="w-full grid grid-cols-4 gap-4">
+          {/* Collect all visible items */}
+          {(() => {
+            const allItems = [];
+            menuSections.forEach((section) => {
+              section.items.forEach((item) => {
+                allItems.push({ ...item, sectionId: section.title });
+              });
+            });
+            
+            return allItems.map((item) => {
+              const Icon = item.icon
+              return (
+                <button
+                  key={item.href}
+                  onClick={() => router.push(item.href)}
+                  className="group relative overflow-hidden rounded-lg p-4 text-white shadow-md hover:shadow-lg transition-all duration-300 hover:scale-105 min-h-32 flex flex-col"
+                  style={{
+                    background: solidColors[item.color] || gradientColors[item.color] || "linear-gradient(135deg, rgb(71, 85, 105), rgb(51, 65, 85))"
+                  }}
+                >
+                  <div className="absolute inset-0 opacity-10">
+                    <div className="absolute top-0 right-0 w-20 h-20 bg-white rounded-full -mr-8 -mt-8"></div>
+                  </div>
+                  <div className="relative flex flex-col items-start h-full">
+                    <div className="mb-3">
+                      <Icon className="w-6 h-6" />
+                    </div>
+                    <h3 className="text-sm font-semibold mb-auto text-left line-clamp-2">{item.label}</h3>
+                    <div className="flex items-center gap-1 text-xs opacity-90 mt-4">
+                      <span>Acceder</span>
+                      <ArrowRight className="w-3 h-3 group-hover:translate-x-0.5 transition-transform" />
+                    </div>
+                  </div>
+                </button>
+              )
+            })
+          })()}
         </div>
       </div>
     </div>
