@@ -30,6 +30,7 @@ export default function RoomsManagement() {
   const [layoutMode, setLayoutMode] = useState<LayoutMode>("grid")
   const [timelineMode, setTimelineMode] = useState<"week" | "month">("week")
   const [currentDate, setCurrentDate] = useState(new Date())
+  const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0])
   const [searchTerm, setSearchTerm] = useState("")
   const [statusFilter, setStatusFilter] = useState<RoomStatus | null>(null)
   const [showCreateModal, setShowCreateModal] = useState(false)
@@ -170,11 +171,37 @@ export default function RoomsManagement() {
   }
 
   const filteredRooms = rooms.filter(
-    (room) =>
-      (statusFilter === null || room.status === statusFilter) &&
-      (room.number.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      room.type.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      room.guest?.toLowerCase().includes(searchTerm.toLowerCase())),
+    (room) => {
+      const matchesStatus = statusFilter === null || room.status === statusFilter
+      const matchesSearch = room.number.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                           room.type.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                           room.guest?.toLowerCase().includes(searchTerm.toLowerCase())
+      
+      // Filter by selected date for grid view
+      if (layoutMode === "grid") {
+        const selectedDateObj = new Date(selectedDate)
+        selectedDateObj.setHours(0, 0, 0, 0)
+        
+        if (room.status === "maintenance") return matchesStatus && matchesSearch
+        if (room.checkIn && room.checkOut) {
+          const checkIn = new Date(room.checkIn)
+          const checkOut = new Date(room.checkOut)
+          checkIn.setHours(0, 0, 0, 0)
+          checkOut.setHours(0, 0, 0, 0)
+          
+          if (selectedDateObj >= checkIn && selectedDateObj <= checkOut) {
+            return matchesStatus && matchesSearch
+          }
+        }
+        // If no reservation, check if it's available
+        if (!room.checkIn || !room.checkOut) {
+          return matchesStatus && matchesSearch
+        }
+        return false
+      }
+      
+      return matchesStatus && matchesSearch
+    },
   )
 
   const getStatusColor = (status: RoomStatus) => {
@@ -418,9 +445,9 @@ export default function RoomsManagement() {
 
         {/* Controls */}
         <Card className="p-6 mb-6">
-          <div className="flex gap-4 items-center">
+          <div className="flex gap-4 items-center flex-wrap">
             {/* Search */}
-            <div className="relative flex-1 max-w-md w-full">
+            <div className="relative flex-1 min-w-xs max-w-md w-full">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
               <Input
                 placeholder={t("admin.searchRoomsPlaceholder")}
@@ -429,6 +456,19 @@ export default function RoomsManagement() {
                 className="pl-10"
               />
             </div>
+
+            {/* Date Filter - Only for Grid View */}
+            {layoutMode === "grid" && (
+              <div className="flex items-center gap-2">
+                <label className="text-sm font-medium text-foreground">Fecha:</label>
+                <input
+                  type="date"
+                  value={selectedDate}
+                  onChange={(e) => setSelectedDate(e.target.value)}
+                  className="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                />
+              </div>
+            )}
           </div>
         </Card>
 
@@ -548,22 +588,48 @@ export default function RoomsManagement() {
         ) : (
           /* Kanban Timeline View */
           <div className="space-y-4">
-            {/* Timeline Mode Toggle */}
-            <div className="flex gap-2">
-              <Button
-                variant={timelineMode === "week" ? "default" : "outline"}
-                size="sm"
-                onClick={() => setTimelineMode("week")}
-              >
-                {t("admin.weekView")}
-              </Button>
-              <Button
-                variant={timelineMode === "month" ? "default" : "outline"}
-                size="sm"
-                onClick={() => setTimelineMode("month")}
-              >
-                {t("admin.monthView")}
-              </Button>
+            {/* Timeline Mode Toggle & Date Navigation */}
+            <div className="flex gap-2 justify-between items-center flex-wrap">
+              <div className="flex gap-2">
+                <Button
+                  variant={timelineMode === "week" ? "default" : "outline"}
+                  size="sm"
+                  onClick={() => setTimelineMode("week")}
+                >
+                  {t("admin.weekView")}
+                </Button>
+                <Button
+                  variant={timelineMode === "month" ? "default" : "outline"}
+                  size="sm"
+                  onClick={() => setTimelineMode("month")}
+                >
+                  {t("admin.monthView")}
+                </Button>
+              </div>
+              
+              {/* Date Navigation for Timeline */}
+              <div className="flex items-center gap-3">
+                <button
+                  onClick={() => navigateDate("prev")}
+                  className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                  title="Fecha anterior"
+                >
+                  <ChevronLeft className="w-5 h-5" />
+                </button>
+                <input
+                  type="date"
+                  value={currentDate.toISOString().split('T')[0]}
+                  onChange={(e) => setCurrentDate(new Date(e.target.value))}
+                  className="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                />
+                <button
+                  onClick={() => navigateDate("next")}
+                  className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                  title="Fecha siguiente"
+                >
+                  <ChevronRight className="w-5 h-5" />
+                </button>
+              </div>
             </div>
 
             {/* Timeline Table */}
