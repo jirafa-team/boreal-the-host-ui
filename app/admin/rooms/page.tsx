@@ -491,13 +491,16 @@ export default function RoomsManagement() {
                   {language === 'es' || language === 'pt' ? 'Fecha:' : 'Date:'}
                 </label>
                 <div className="relative">
-                  <Calendar className="absolute left-2 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />
                   <input
                     type="date"
                     value={selectedDate}
                     onChange={(e) => setSelectedDate(e.target.value)}
-                    className="px-3 py-2 pl-8 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 w-40"
+                    className="absolute inset-0 opacity-0 cursor-pointer w-full h-full"
                   />
+                  <div className="pointer-events-none flex items-center gap-2 px-3 py-2 border border-gray-300 rounded-lg bg-white w-40">
+                    <Calendar className="w-4 h-4 text-muted-foreground" />
+                    <span className="text-sm">{convertISOToLocaleFormat(selectedDate)}</span>
+                  </div>
                 </div>
               </div>
             )}
@@ -649,13 +652,16 @@ export default function RoomsManagement() {
                   <ChevronLeft className="w-5 h-5" />
                 </button>
                 <div className="relative">
-                  <Calendar className="absolute left-2 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />
                   <input
                     type="date"
                     value={currentDate.toISOString().split('T')[0]}
                     onChange={(e) => setCurrentDate(new Date(e.target.value))}
-                    className="px-3 py-2 pl-8 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 w-40"
+                    className="absolute inset-0 opacity-0 cursor-pointer w-full h-full"
                   />
+                  <div className="pointer-events-none flex items-center gap-2 px-3 py-2 border border-gray-300 rounded-lg bg-white w-40">
+                    <Calendar className="w-4 h-4 text-muted-foreground" />
+                    <span className="text-sm">{convertISOToLocaleFormat(currentDate.toISOString().split('T')[0])}</span>
+                  </div>
                 </div>
                 <button
                   onClick={() => navigateDate("next")}
