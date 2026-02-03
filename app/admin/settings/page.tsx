@@ -676,16 +676,16 @@ export default function SettingsPage() {
       icon: Sparkles,
       color: 'from-pink-600 to-pink-700',
     },
-    {
-      label: 'Eventos',
-      icon: Calendar,
-      color: 'from-red-600 to-red-700',
-    },
-    {
-      label: 'Recomendaciones',
-      icon: Compass,
-      color: 'from-green-600 to-green-700',
-    },
+    // { HIDDEN - Eventos option temporarily disabled
+    //   label: 'Eventos',
+    //   icon: Calendar,
+    //   color: 'from-red-600 to-red-700',
+    // },
+    // { HIDDEN - Recomendaciones option temporarily disabled
+    //   label: 'Recomendaciones',
+    //   icon: Compass,
+    //   color: 'from-green-600 to-green-700',
+    // },
     {
       label: 'Clientes',
       icon: Users,
