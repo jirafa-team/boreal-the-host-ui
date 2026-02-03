@@ -1613,6 +1613,7 @@ export default function ClientPage({ searchParams }: { searchParams: { type?: st
             <Home className="w-5 h-5" />
             <span className="text-xs font-medium">Inicio</span>
           </button>
+          {/* HIDDEN - Órdenes, Eventos, and Avisos menu items temporarily disabled
           <button
             onClick={() => setActiveTab("ordenes")}
             className={`flex flex-col items-center gap-1 px-4 py-2 rounded-xl transition-all ${
@@ -1641,6 +1642,7 @@ export default function ClientPage({ searchParams }: { searchParams: { type?: st
             <span className="text-xs font-medium">Avisos</span>
             <div className="absolute top-1 right-3 w-2 h-2 bg-destructive rounded-full animate-pulse" />
           </button>
+          */}
           <button
             onClick={() => setActiveTab("perfil")}
             className={`flex flex-col items-center gap-1 px-4 py-2 rounded-xl transition-all ${
