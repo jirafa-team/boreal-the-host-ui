@@ -341,32 +341,6 @@ export default function ClientPage({ searchParams }: { searchParams: { type?: st
             </div>
           </div>
         </div>
-
-        {/* Stay Information Bar - Moved to Header */}
-        {!isFutureReservation && (
-          <div className="flex items-center justify-between gap-3 text-white text-sm">
-            <div className="flex items-center gap-4 flex-1">
-              <div className="flex items-center gap-2">
-                <Calendar className="w-4 h-4" />
-                <div>
-                  <p className="text-xs opacity-75">Check-out</p>
-                  <p className="font-semibold">{userData.checkOut}</p>
-                </div>
-              </div>
-              <div className="w-px h-8 bg-white/20"></div>
-              <div>
-                <p className="text-xs opacity-75">Duración</p>
-                <p className="font-semibold">{userData.nights} noches</p>
-              </div>
-            </div>
-            <Button
-              size="sm"
-              className="bg-white text-[#11AFBE] hover:bg-white/90 border-0 font-semibold"
-            >
-              Extender
-            </Button>
-          </div>
-        )}
       </div>
       {isFutureReservation ? (
         <div className="p-4 pb-20 flex-1">
@@ -469,7 +443,7 @@ export default function ClientPage({ searchParams }: { searchParams: { type?: st
                   </div>
                 </div>
 
-                <div className="mx-4 px-4 py-3 bg-gradient-to-r from-[#11AFBE] to-[#773CCA] rounded-lg hidden">
+                <div className="mx-4 px-4 py-3 bg-gradient-to-r from-[#11AFBE] to-[#773CCA] rounded-lg">
                   <div className="flex items-center justify-between gap-4">
                     <div className="flex-1">
                       <h3 className="text-2xl font-bold text-white mb-2">Tu Estancia</h3>
