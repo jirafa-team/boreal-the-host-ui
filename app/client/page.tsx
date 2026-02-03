@@ -138,10 +138,34 @@ const clientEvents = [
   },
 ]
 
+// Mock data for pool occupancy by time slot
+const poolOccupancy = {
+  "9:00 AM": { reserved: 15, capacity: 50 },
+  "10:00 AM": { reserved: 8, capacity: 50 },
+  "11:00 AM": { reserved: 32, capacity: 50 },
+  "12:00 PM": { reserved: 42, capacity: 50 },
+  "3:00 PM": { reserved: 12, capacity: 50 },
+  "4:00 PM": { reserved: 28, capacity: 50 },
+  "5:00 PM": { reserved: 38, capacity: 50 },
+  "6:00 PM": { reserved: 45, capacity: 50 },
+}
+
 export default function ClientPage({ searchParams }: { searchParams: { type?: string } }) {
   const searchParamsHook = useSearchParams()
   const clientType = searchParams.type || "normal"
   const router = useRouter()
+
+  // Calculate occupancy percentage and get color
+  const getPoolOccupancyInfo = (time: string) => {
+    const occupancy = poolOccupancy[time as keyof typeof poolOccupancy]
+    if (!occupancy) return { percent: 0, color: "text-green-600", bgColor: "bg-green-100" }
+    
+    const percent = Math.round((occupancy.reserved / occupancy.capacity) * 100)
+    
+    if (percent <= 33) return { percent, color: "text-green-600", bgColor: "bg-green-100" }
+    if (percent <= 66) return { percent, color: "text-amber-600", bgColor: "bg-amber-100" }
+    return { percent, color: "text-red-600", bgColor: "bg-red-100" }
+  }
 
   const futureUserData = {
     name: "Ana",
@@ -807,20 +831,26 @@ export default function ClientPage({ searchParams }: { searchParams: { type?: st
                               "4:00 PM",
                               "5:00 PM",
                               "6:00 PM",
-                            ].map((time) => (
-                              <div
-                                key={time}
-                                className="flex items-center space-x-3 p-3 rounded-lg hover:bg-accent cursor-pointer"
-                              >
-                                <RadioGroupItem value={time} id={`pool-${time}`} />
-                                <Label htmlFor={`pool-${time}`} className="flex-1 cursor-pointer font-medium">
-                                  {time}
-                                </Label>
-                                <Badge variant="secondary" className="text-xs">
-                                  Disponible
-                                </Badge>
-                              </div>
-                            ))}
+                            ].map((time) => {
+                              const { percent, color, bgColor } = getPoolOccupancyInfo(time)
+                              return (
+                                <div
+                                  key={time}
+                                  className="flex items-center justify-between space-x-3 p-3 rounded-lg hover:bg-accent cursor-pointer"
+                                >
+                                  <div className="flex items-center space-x-3 flex-1">
+                                    <RadioGroupItem value={time} id={`pool-${time}`} />
+                                    <Label htmlFor={`pool-${time}`} className="flex-1 cursor-pointer font-medium">
+                                      {time}
+                                    </Label>
+                                  </div>
+                                  <div className={`flex items-center gap-2 px-2 py-1 rounded ${bgColor}`}>
+                                    <Users className={`w-3.5 h-3.5 ${color}`} />
+                                    <span className={`text-xs font-semibold ${color}`}>{percent}%</span>
+                                  </div>
+                                </div>
+                              )
+                            })}
                           </RadioGroup>
                         </div>
                         <Button className="w-full" size="lg" onClick={() => setPoolDialogOpen(false)}>
