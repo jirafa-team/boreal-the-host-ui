@@ -175,7 +175,7 @@ const handleShowBookingsDetail = (slotBookings: Booking[]) => {
 }
 
 export default function DashboardControl() {
-  const { t } = useLanguage()
+  const { t, language } = useLanguage()
   const router = useRouter()
   const [activeTab, setActiveTab] = useState<"rooms" | "staff" | "facilities" | "checkouts">("rooms")
   const [timelineMode, setTimelineMode] = useState<"week" | "month">("week")
@@ -496,13 +496,11 @@ export default function DashboardControl() {
 
   const convertISOToLocaleFormat = (isoDate: string): string => {
     const [year, month, day] = isoDate.split('-')
-    if (t("locale") === "es" || t("locale") === "pt") {
+    if (language === 'es' || language === 'pt') {
       return `${day}/${month}/${year}` // dd/mm/yyyy
     }
     return `${month}/${day}/${year}` // mm/dd/yyyy
   }
-
-  const { language } = useLanguage()
 
   const toggleSection = (section: string) => {
     const sections = new Set(expandedSections)
