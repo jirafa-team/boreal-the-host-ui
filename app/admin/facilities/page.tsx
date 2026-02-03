@@ -14,8 +14,8 @@ import {
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Plus, Dumbbell, Waves, Sparkles, Video, Coffee, UtensilsCrossed, LayoutGrid, Clock, Users, Building2, Calendar as CalendarIcon } from "lucide-react"
-
+import { Plus, Dumbbell, Waves, Sparkles, Video, Coffee, UtensilsCrossed, LayoutGrid, Clock, Users, Building2, Calendar as CalendarIcon, ChevronLeft, ChevronRight, Calendar } from "lucide-react"
+import { useLanguage } from "@/lib/i18n-context"
 import React from "react"
 
 type Facility = {
