@@ -128,7 +128,7 @@ export default function AdminHomePage() {
           <div className="space-y-8">
             {menuSections.slice(0, 1).map((section) => (
               <div key={section.title}>
-                <h2 className="text-base font-semibold text-gray-900 mb-3">{section.title}</h2>
+                <h2 className="text-base font-semibold text-gray-900 mb-3 hidden">{section.title}</h2>
                 <div className={`grid gap-3 grid-cols-2`}>
                   {section.items.map((item) => {
                     const Icon = item.icon
@@ -164,7 +164,7 @@ export default function AdminHomePage() {
             {/* Servicios Section */}
             {menuSections.slice(2, 3).map((section) => (
               <div key={section.title}>
-                <h2 className="text-base font-semibold text-gray-900 mb-3">{section.title}</h2>
+                <h2 className="text-base font-semibold text-gray-900 mb-3 hidden">{section.title}</h2>
                 <div className="grid gap-3 grid-cols-2">
                   {section.items.map((item) => {
                     const Icon = item.icon
@@ -200,7 +200,7 @@ export default function AdminHomePage() {
             {/* Gestión Section */}
             {menuSections.slice(4, 5).map((section) => (
               <div key={section.title}>
-                <h2 className="text-base font-semibold text-gray-900 mb-3">{section.title}</h2>
+                <h2 className="text-base font-semibold text-gray-900 mb-3 hidden">{section.title}</h2>
                 <div className="grid gap-3 grid-cols-2">
                   {section.items.map((item) => {
                     const Icon = item.icon
@@ -239,7 +239,7 @@ export default function AdminHomePage() {
             {/* Espacios Section */}
             {menuSections.slice(1, 2).map((section) => (
               <div key={section.title}>
-                <h2 className="text-base font-semibold text-gray-900 mb-3">{section.title}</h2>
+                <h2 className="text-base font-semibold text-gray-900 mb-3 hidden">{section.title}</h2>
                 <div className="grid gap-3 grid-cols-2">
                   {section.items.map((item) => {
                     const Icon = item.icon
@@ -275,7 +275,7 @@ export default function AdminHomePage() {
             {/* Comunicación Section */}
             {menuSections.slice(3, 4).map((section) => (
               <div key={section.title}>
-                <h2 className="text-base font-semibold text-gray-900 mb-3">{section.title}</h2>
+                <h2 className="text-base font-semibold text-gray-900 mb-3 hidden">{section.title}</h2>
                 <div className="grid gap-3 grid-cols-2">
                   {section.items.map((item) => {
                     const Icon = item.icon

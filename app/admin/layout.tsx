@@ -152,7 +152,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                   <>
                     <button
                       onClick={() => toggleSection(section.id)}
-                      className="w-full px-3 mb-2 text-[10px] font-semibold text-white/70 uppercase tracking-wider hover:text-white/90 flex items-center justify-between transition-colors"
+                      className="w-full px-3 mb-2 text-[10px] font-semibold text-white/70 uppercase tracking-wider hover:text-white/90 flex items-center justify-between transition-colors hidden"
                     >
                       <span>{section.title}</span>
                       <ChevronDown
