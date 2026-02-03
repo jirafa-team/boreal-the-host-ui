@@ -495,6 +495,7 @@ export default function ClientPage({ searchParams }: { searchParams: { type?: st
                   </Card>
                 </div>
 
+                {/* HIDDEN - Room service order Pizza Margherita temporarily disabled
                 <div className="mx-4 bg-white rounded-lg shadow-sm border border-orange-300 p-4">
                   <div className="mb-3">
                     <div className="flex items-center justify-between mb-1">
@@ -513,6 +514,7 @@ export default function ClientPage({ searchParams }: { searchParams: { type?: st
                     </div>
                   </div>
                 </div>
+                */}
 
                 <div className="px-4 pt-4 pb-2 bg-white">
                   <h2 className="text-2xl font-bold text-black">Reserva</h2>
