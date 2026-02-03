@@ -954,6 +954,7 @@ export default function ClientPage({ searchParams }: { searchParams: { type?: st
                   </Card>
                 </div>
 
+                {/* HIDDEN - Second Necesitas Ayuda section temporarily disabled
                 <div className="px-4 pt-4 pb-4 bg-white">
                   <Card
                     className="relative overflow-hidden cursor-pointer hover:shadow-lg transition-all h-32"
@@ -979,7 +980,9 @@ export default function ClientPage({ searchParams }: { searchParams: { type?: st
                     </div>
                   </Card>
                 </div>
+                */}
 
+                {/* HIDDEN - Ciudad y Recomendaciones section temporarily disabled
                 <div className="px-4 pt-4 pb-2 bg-white">
                   <h2 className="text-2xl font-bold text-black">Ciudad</h2>
                 </div>
@@ -1062,6 +1065,7 @@ export default function ClientPage({ searchParams }: { searchParams: { type?: st
                     </Link>
                   </div>
                 </div>
+                */}
               </div>
             )}
 
