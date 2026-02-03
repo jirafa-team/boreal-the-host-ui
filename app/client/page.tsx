@@ -958,20 +958,20 @@ export default function ClientPage({ searchParams }: { searchParams: { type?: st
                   <Card
                     className="relative overflow-hidden cursor-pointer hover:shadow-lg transition-all h-32"
                     onClick={() => {
-                      router.push("/client/support")
+                      router.push("/client/help-form")
                     }}
                   >
-                    <Image src="/hotel-concierge-help-desk.jpg" alt="Ayuda y Soporte" fill className="object-cover" />
+                    <Image src="/hotel-concierge-help-desk.jpg" alt="Ayuda" fill className="object-cover" />
                     <div className="absolute inset-0 bg-gradient-to-r from-red-900/70 to-red-700/50" />
                     <div className="absolute inset-0 flex items-center justify-between px-6">
                       <div className="flex items-center gap-4">
                         <div className="bg-white/20 backdrop-blur-sm p-3 rounded-full">
-                          <AlertCircle className="w-8 h-8 text-white" />
+                          <MessageCircle className="w-8 h-8 text-white" />
                         </div>
                         <div>
-                          <h3 className="text-xl font-bold text-white mb-2">Reportar Inconveniente</h3>
+                          <h3 className="text-xl font-bold text-white mb-2">¿Necesitas Ayuda?</h3>
                           <div className="inline-flex items-center gap-1.5 bg-white/20 backdrop-blur-sm text-white text-xs px-3 py-1 rounded-full">
-                            <span>Solicitar ayuda directa</span>
+                            <span>Estamos aquí para ti</span>
                           </div>
                         </div>
                       </div>
