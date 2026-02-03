@@ -936,7 +936,7 @@ export default function ClientPage({ searchParams }: { searchParams: { type?: st
                     onClick={() => router.push("/client/help-form")}
                   >
                     <Image src="/hotel-concierge-help-desk.jpg" alt="Asistencia" fill className="object-cover" />
-                    <div className="absolute inset-0 bg-gradient-to-r from-[#11AFBF]/95 to-[#11AFBF]/80" />
+                    <div className="absolute inset-0 bg-gradient-to-r from-red-900/70 to-red-700/50" />
                     <div className="relative h-full flex items-center justify-between p-5">
                       <div className="flex items-center gap-4">
                         <div className="bg-white/20 backdrop-blur-sm p-3 rounded-full">
