@@ -344,9 +344,17 @@ export default function ClientPage({ searchParams }: { searchParams: { type?: st
                 </div>
               </div>
               <div className="w-px h-8 bg-white/20"></div>
-              <div className="text-center">
-                <p className="text-2xl font-bold text-white">{userData.nights}</p>
-                <p className="text-xs opacity-80 font-medium">noches</p>
+              <div className="flex items-center gap-3">
+                <div className="text-center">
+                  <p className="text-2xl font-bold text-white">{userData.nights}</p>
+                  <p className="text-xs opacity-80 font-medium">noches</p>
+                </div>
+                <Button
+                  size="sm"
+                  className="bg-white text-[#11AFBE] hover:bg-white/90 font-semibold px-3 h-8 rounded-full"
+                >
+                  Extender
+                </Button>
               </div>
             </div>
           )}
