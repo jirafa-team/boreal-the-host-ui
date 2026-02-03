@@ -642,6 +642,29 @@ export default function RoomsManagement() {
                 </Button>
               </div>
               
+              {/* Timeline Mode Toggle */}
+              <div className="flex items-center gap-3">
+                <span className={`text-sm font-medium ${timelineMode === "week" ? "text-foreground" : "text-muted-foreground"}`}>
+                  Semana
+                </span>
+                <button
+                  onClick={() => setTimelineMode(timelineMode === "week" ? "month" : "week")}
+                  className={`relative inline-flex h-8 w-14 items-center rounded-full transition-colors ${
+                    timelineMode === "month"
+                      ? "bg-lime-600"
+                      : "bg-gray-300"
+                  }`}
+                >
+                  <span
+                    className={`inline-block h-6 w-6 transform rounded-full bg-white transition-transform ${
+                      timelineMode === "month" ? "translate-x-7" : "translate-x-1"
+                    }`}
+                  />
+                </button>
+                <span className={`text-sm font-medium ${timelineMode === "month" ? "text-foreground" : "text-muted-foreground"}`}>
+                  Mes
+                </span>
+              
               {/* Date Navigation for Timeline */}
               <div className="flex items-center gap-3">
                 <button
