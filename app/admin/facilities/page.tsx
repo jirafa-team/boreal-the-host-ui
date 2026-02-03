@@ -566,13 +566,25 @@ export default function FacilitiesPage() {
                         {facility.capacity}
                       </span>
                     </div>
-                    
-                    {/* Current Occupancy */}
+                  </div>
+
+                  {/* Current Occupancy Progress Bar */}
+                  <div className="mt-4 mb-2">
                     {(() => {
-                      const { occupancyPercent, currentBookings } = getCurrentOccupancy(facility.id)
+                      const { occupancyPercent } = getCurrentOccupancy(facility.id)
+                      const barColor = occupancyPercent === 0 ? "bg-gray-300" : occupancyPercent <= 33 ? "bg-green-500" : occupancyPercent <= 66 ? "bg-amber-500" : "bg-red-500"
                       return (
-                        <div className={`text-xs font-bold px-2 py-1 rounded-md ${getOccupancyBgColor(occupancyPercent)} ${getOccupancyColor(occupancyPercent)}`}>
-                          {occupancyPercent}% Ocupación
+                        <div className="space-y-1">
+                          <div className="flex items-center justify-between text-xs">
+                            <span className="text-muted-foreground">Ocupación</span>
+                            <span className="font-medium text-foreground">{occupancyPercent}%</span>
+                          </div>
+                          <div className="w-full h-1.5 bg-gray-200 rounded-full overflow-hidden">
+                            <div
+                              className={`h-full ${barColor} transition-all duration-300`}
+                              style={{ width: `${occupancyPercent}%` }}
+                            />
+                          </div>
                         </div>
                       )
                     })()}
