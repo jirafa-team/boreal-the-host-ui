@@ -322,8 +322,8 @@ export default function ClientPage({ searchParams }: { searchParams: { type?: st
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">
       <div className="p-4 text-white sticky top-0 z-10" style={{ backgroundColor: "#11AFBE" }}>
-        <div className="flex items-center justify-between mb-4">
-          <div>
+        <div className="flex items-center justify-between gap-4 flex-wrap">
+          <div className="flex-1">
             <h1 className="text-3xl font-bold">Hola, {userData.name}</h1>
             {!isFutureReservation && (
               <p className="text-sm opacity-90 mt-2 flex items-center gap-2">
@@ -332,6 +332,23 @@ export default function ClientPage({ searchParams }: { searchParams: { type?: st
               </p>
             )}
           </div>
+          
+          {/* Tu Estancia Chip */}
+          {!isFutureReservation && (
+            <div className="flex items-center gap-3 bg-white/15 backdrop-blur-sm rounded-full px-4 py-2.5 border border-white/20">
+              <Calendar className="w-4 h-4 text-white" />
+              <div className="text-center">
+                <p className="text-xs opacity-80 font-medium">Sale</p>
+                <p className="text-sm font-bold text-white">{userData.checkOut}</p>
+              </div>
+              <div className="hidden sm:block w-px h-8 bg-white/20"></div>
+              <div className="text-center">
+                <p className="text-xs opacity-80 font-medium">{userData.nights} noches</p>
+                <p className="text-sm font-bold text-white">Check-out</p>
+              </div>
+            </div>
+          )}
+          
           <div
             style={{ background: "linear-gradient(135deg, #6f65d0 0%, #67f1d0 100%)" }}
             className="w-14 h-14 rounded-full flex items-center justify-center shadow-lg p-[2px]"
@@ -440,31 +457,6 @@ export default function ClientPage({ searchParams }: { searchParams: { type?: st
                         </div>
                       </div>
                     ))}
-                  </div>
-                </div>
-
-                <div className="mx-4 px-4 py-3 bg-gradient-to-r from-[#11AFBE] to-[#773CCA] rounded-lg">
-                  <div className="flex items-center justify-between gap-4">
-                    <div className="flex-1">
-                      <h3 className="text-2xl font-bold text-white mb-2">Tu Estancia</h3>
-                      <div className="inline-flex items-center gap-1.5 bg-white text-[#773CCA] text-sm px-3 py-1.5 rounded-full font-semibold">
-                        <Calendar className="w-4 h-4" />
-                        Check-out: {userData.checkOut}
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-3">
-                      <div className="text-center">
-                        <p className="text-3xl font-bold text-white">{userData.nights}</p>
-                        <p className="text-xs text-white/70">Noches</p>
-                      </div>
-                      <Button
-                        size="sm"
-                        style={{ backgroundColor: "#11AFBF" }}
-                        className="text-white border-0 hover:opacity-90"
-                      >
-                        Extender
-                      </Button>
-                    </div>
                   </div>
                 </div>
 
