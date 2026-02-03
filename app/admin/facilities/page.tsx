@@ -211,6 +211,21 @@ export default function FacilitiesPage() {
     return { occupancyPercent, currentBookings }
   }
 
+  // Determine if facility is multi-party (gym, pool, spa) or single-party (conference room)
+  const isMultiPartyFacility = (facilityType: string): boolean => {
+    return ["fitness", "recreation", "wellness", "dining"].includes(facilityType)
+  }
+
+  // Get a specific booking for a time slot
+  const getBookingForSlot = (facilityId: string, timeSlot: string): Booking | undefined => {
+    return bookings.find((b) => {
+      if (b.facilityId !== facilityId) return false
+      const bookingStart = parseInt(b.time.split(":")[0])
+      const slotStart = parseInt(timeSlot.split(":")[0])
+      return bookingStart === slotStart
+    })
+  }
+
   // Determine occupancy color
   const getOccupancyColor = (percent: number): string => {
     if (percent === 0) return "text-gray-500"
