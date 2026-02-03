@@ -1069,7 +1069,7 @@ export default function ClientPage({ searchParams }: { searchParams: { type?: st
                       time: "Hace 2 horas",
                       read: false,
                     },
-                    { title: "Room service", message: "Tu pedido está en camino", time: "Hace 30 min", read: false },
+                    // { title: "Room service", message: "Tu pedido está en camino", time: "Hace 30 min", read: false }, // HIDDEN - Room service notifications temporarily disabled
                   ].map((notif, idx) => (
                     <Card key={idx} className={`p-4 ${!notif.read ? "bg-primary/5 border-primary/20" : ""}`}>
                       <div className="flex items-start justify-between">
