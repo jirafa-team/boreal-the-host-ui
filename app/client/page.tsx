@@ -162,6 +162,18 @@ const gymOccupancy = {
   "8:00 PM": { reserved: 12, capacity: 40 },
 }
 
+// Mock data for breakfast occupancy by time slot
+const breakfastOccupancy = {
+  "6:30 AM": { reserved: 25, capacity: 60 },
+  "7:00 AM": { reserved: 42, capacity: 60 },
+  "7:30 AM": { reserved: 56, capacity: 60 },
+  "8:00 AM": { reserved: 48, capacity: 60 },
+  "8:30 AM": { reserved: 35, capacity: 60 },
+  "9:00 AM": { reserved: 18, capacity: 60 },
+  "9:30 AM": { reserved: 8, capacity: 60 },
+  "10:00 AM": { reserved: 5, capacity: 60 },
+}
+
 export default function ClientPage({ searchParams }: { searchParams: { type?: string } }) {
   const searchParamsHook = useSearchParams()
   const clientType = searchParams.type || "normal"
@@ -182,6 +194,18 @@ export default function ClientPage({ searchParams }: { searchParams: { type?: st
   // Calculate occupancy percentage for gym and get color
   const getGymOccupancyInfo = (time: string) => {
     const occupancy = gymOccupancy[time as keyof typeof gymOccupancy]
+    if (!occupancy) return { percent: 0, color: "text-green-600", bgColor: "bg-green-100" }
+    
+    const percent = Math.round((occupancy.reserved / occupancy.capacity) * 100)
+    
+    if (percent <= 33) return { percent, color: "text-green-600", bgColor: "bg-green-100" }
+    if (percent <= 66) return { percent, color: "text-amber-600", bgColor: "bg-amber-100" }
+    return { percent, color: "text-red-600", bgColor: "bg-red-100" }
+  }
+
+  // Calculate occupancy percentage for breakfast and get color
+  const getBreakfastOccupancyInfo = (time: string) => {
+    const occupancy = breakfastOccupancy[time as keyof typeof breakfastOccupancy]
     if (!occupancy) return { percent: 0, color: "text-green-600", bgColor: "bg-green-100" }
     
     const percent = Math.round((occupancy.reserved / occupancy.capacity) * 100)
@@ -618,6 +642,7 @@ export default function ClientPage({ searchParams }: { searchParams: { type?: st
                         </DialogHeader>
                         <div className="grid grid-cols-2 gap-3 py-4">
                           {[
+                            "6:30 AM",
                             "7:00 AM",
                             "7:30 AM",
                             "8:00 AM",
@@ -625,20 +650,34 @@ export default function ClientPage({ searchParams }: { searchParams: { type?: st
                             "9:00 AM",
                             "9:30 AM",
                             "10:00 AM",
-                            "10:30 AM",
-                          ].map((time) => (
-                            <Button
-                              key={time}
-                              variant={breakfastTime === time ? "default" : "outline"}
-                              onClick={() => {
-                                setBreakfastTime(time)
-                                setShowBreakfastDialog(false)
-                              }}
-                              className="h-12"
-                            >
-                              {time}
-                            </Button>
-                          ))}
+                          ].map((time) => {
+                            const { percent, color, bgColor } = getBreakfastOccupancyInfo(time)
+                            return (
+                              <div
+                                key={time}
+                                className="flex items-center justify-between space-x-3 p-3 rounded-lg hover:bg-accent cursor-pointer border border-transparent hover:border-gray-300"
+                                onClick={() => {
+                                  setBreakfastTime(time)
+                                  setShowBreakfastDialog(false)
+                                }}
+                              >
+                                <div className="flex items-center space-x-3 flex-1">
+                                  <input
+                                    type="radio"
+                                    name="breakfast-time"
+                                    checked={breakfastTime === time}
+                                    onChange={() => {}}
+                                    className="cursor-pointer"
+                                  />
+                                  <span className="font-medium">{time}</span>
+                                </div>
+                                <div className={`flex items-center gap-2 px-2 py-1 rounded ${bgColor}`}>
+                                  <Users className={`w-3.5 h-3.5 ${color}`} />
+                                  <span className={`text-xs font-semibold ${color}`}>{percent}%</span>
+                                </div>
+                              </div>
+                            )
+                          })}
                         </div>
                       </DialogContent>
                     </Dialog>
