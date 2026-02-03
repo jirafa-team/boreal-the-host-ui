@@ -226,6 +226,11 @@ export default function FacilitiesPage() {
     return "bg-red-100"
   }
 
+  // Determine if facility is multi-party (gym, pool, spa) or single-party (conference room)
+  const isMultiPartyFacility = (facilityType: string): boolean => {
+    return ["fitness", "recreation", "wellness", "dining"].includes(facilityType)
+  }
+
   return (
     <>
       {/* Header */}
