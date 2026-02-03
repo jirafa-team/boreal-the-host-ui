@@ -190,9 +190,40 @@ export default function FacilitiesPage() {
     setBookingsDetailOpen(true)
   }
 
-  // Determine if facility is multi-party (gym, pool, spa) or single-party (conference room)
-  const isMultiPartyFacility = (facilityType: string): boolean => {
-    return ["fitness", "recreation", "wellness", "dining"].includes(facilityType)
+  // Get current occupancy percentage for a facility (based on current time)
+  const getCurrentOccupancy = (facilityId: string): { occupancyPercent: number; currentBookings: Booking[] } => {
+    const now = new Date()
+    const currentHour = now.getHours()
+    const currentMinute = now.getMinutes()
+    const currentTimeInHours = currentHour + currentMinute / 60
+    
+    const facility = facilities.find((f) => f.id === facilityId)
+    if (!facility) return { occupancyPercent: 0, currentBookings: [] }
+    
+    const currentBookings = bookings.filter((b) => {
+      if (b.facilityId !== facilityId) return false
+      const bookingStart = parseInt(b.time.split(":")[0]) + parseInt(b.time.split(":")[1] || "0") / 60
+      const bookingEnd = bookingStart + b.duration / 60
+      return currentTimeInHours >= bookingStart && currentTimeInHours < bookingEnd
+    })
+    
+    const occupancyPercent = Math.round((currentBookings.length / facility.capacity) * 100)
+    return { occupancyPercent, currentBookings }
+  }
+
+  // Determine occupancy color
+  const getOccupancyColor = (percent: number): string => {
+    if (percent === 0) return "text-gray-500"
+    if (percent <= 33) return "text-green-600"
+    if (percent <= 66) return "text-amber-600"
+    return "text-red-600"
+  }
+
+  const getOccupancyBgColor = (percent: number): string => {
+    if (percent === 0) return "bg-gray-100"
+    if (percent <= 33) return "bg-green-100"
+    if (percent <= 66) return "bg-amber-100"
+    return "bg-red-100"
   }
 
   return (
@@ -535,6 +566,16 @@ export default function FacilitiesPage() {
                         {facility.capacity}
                       </span>
                     </div>
+                    
+                    {/* Current Occupancy */}
+                    {(() => {
+                      const { occupancyPercent, currentBookings } = getCurrentOccupancy(facility.id)
+                      return (
+                        <div className={`text-xs font-bold px-2 py-1 rounded-md ${getOccupancyBgColor(occupancyPercent)} ${getOccupancyColor(occupancyPercent)}`}>
+                          {occupancyPercent}% Ocupación
+                        </div>
+                      )
+                    })()}
                   </div>
 
                   <Button
