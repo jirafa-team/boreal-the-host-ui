@@ -473,7 +473,7 @@ export default function ClientPage({ searchParams }: { searchParams: { type?: st
                 <div className="px-4 pt-4 pb-4 bg-white">
                   <Card
                     className="relative overflow-hidden cursor-pointer hover:shadow-lg transition-all h-32"
-                    onClick={() => router.push("/client/room-service-menu")}
+                    onClick={() => {}} // DISABLED - Room Service functionality temporarily hidden
                   >
                     <Image src="/club-sandwich.jpg" alt="Room Service" fill className="object-cover" />
                     <div className="absolute inset-0 bg-gradient-to-r from-black/70 to-black/40" />
@@ -1136,7 +1136,7 @@ export default function ClientPage({ searchParams }: { searchParams: { type?: st
 
                 <Card
                   className="relative overflow-hidden cursor-pointer hover:shadow-lg transition-all h-32"
-                  onClick={() => router.push("/client/room-service-menu")}
+                  onClick={() => {}} // DISABLED - Room Service functionality temporarily hidden
                 >
                   <Image src="/club-sandwich.jpg" alt="Room Service" fill className="object-cover" />
                   <div className="absolute inset-0 bg-gradient-to-r from-black/70 to-black/40" />
