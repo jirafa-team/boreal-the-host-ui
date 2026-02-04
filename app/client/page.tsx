@@ -500,24 +500,32 @@ export default function ClientPage({ searchParams }: { searchParams: { type?: st
             {activeTab === "inicio" && (
               <div className="space-y-6">
                 <div className="px-4 pt-4">
-                  <div className="bg-gradient-to-r from-[#773CCA] to-[#11AFBE] rounded-xl p-4 text-white">
-                    <div className="flex items-center gap-2 mb-2">
-                      <Clock className="h-5 w-5" />
-                      <p className="text-sm font-medium">Próxima Actividad</p>
+                  <div className="relative overflow-hidden rounded-xl p-4 text-white" style={{ background: "linear-gradient(135deg, #0f172a 0%, #1e3a8a 50%, #581c87 100%)" }}>
+                    {/* Radial gradient overlays for subtle metallic effects */}
+                    <div className="absolute inset-0 opacity-30 pointer-events-none">
+                      <div className="absolute top-0 right-0 w-64 h-64 bg-blue-300 rounded-full mix-blend-screen filter blur-3xl"></div>
+                      <div className="absolute bottom-0 left-0 w-64 h-64 bg-purple-300 rounded-full mix-blend-screen filter blur-3xl"></div>
                     </div>
-                    <p className="text-lg font-semibold mb-3">Desayuno - 8:00 AM</p>
-                    <div className="flex gap-3 justify-center">
-                      <div className="bg-white/20 backdrop-blur-sm rounded-lg px-4 py-2 text-center min-w-[70px]">
-                        <p className="text-2xl font-bold">{String(timeRemaining.hours).padStart(2, "0")}</p>
-                        <p className="text-xs opacity-90">Horas</p>
+                    
+                    <div className="relative z-10">
+                      <div className="flex items-center gap-2 mb-2">
+                        <Clock className="h-5 w-5" />
+                        <p className="text-sm font-medium">Próxima Actividad</p>
                       </div>
-                      <div className="bg-white/20 backdrop-blur-sm rounded-lg px-4 py-2 text-center min-w-[70px]">
-                        <p className="text-2xl font-bold">{String(timeRemaining.minutes).padStart(2, "0")}</p>
-                        <p className="text-xs opacity-90">Minutos</p>
-                      </div>
-                      <div className="bg-white/20 backdrop-blur-sm rounded-lg px-4 py-2 text-center min-w-[70px]">
-                        <p className="text-2xl font-bold">{String(timeRemaining.seconds).padStart(2, "0")}</p>
-                        <p className="text-xs opacity-90">Segundos</p>
+                      <p className="text-lg font-semibold mb-3">Desayuno - 8:00 AM</p>
+                      <div className="flex gap-3 justify-center">
+                        <div className="bg-white/20 backdrop-blur-sm rounded-lg px-4 py-2 text-center min-w-[70px]">
+                          <p className="text-2xl font-bold">{String(timeRemaining.hours).padStart(2, "0")}</p>
+                          <p className="text-xs opacity-90">Horas</p>
+                        </div>
+                        <div className="bg-white/20 backdrop-blur-sm rounded-lg px-4 py-2 text-center min-w-[70px]">
+                          <p className="text-2xl font-bold">{String(timeRemaining.minutes).padStart(2, "0")}</p>
+                          <p className="text-xs opacity-90">Minutos</p>
+                        </div>
+                        <div className="bg-white/20 backdrop-blur-sm rounded-lg px-4 py-2 text-center min-w-[70px]">
+                          <p className="text-2xl font-bold">{String(timeRemaining.seconds).padStart(2, "0")}</p>
+                          <p className="text-xs opacity-90">Segundos</p>
+                        </div>
                       </div>
                     </div>
                   </div>
