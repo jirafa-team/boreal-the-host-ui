@@ -116,6 +116,17 @@ export default function AdminHomePage() {
   return (
     <div className="flex-1 overflow-auto bg-gray-50">
       <div className="max-w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Agentic Mode Button */}
+        <div className="mb-6 flex justify-end">
+          <button
+            onClick={() => router.push("/admin/agentico")}
+            className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white font-medium rounded-lg shadow-md hover:shadow-lg transition-all duration-300"
+          >
+            <Sparkles className="w-4 h-4" />
+            Modo Agentico
+          </button>
+        </div>
+
         {/* Header */}
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900">{t("admin.home")}</h1>
