@@ -393,9 +393,15 @@ export default function ClientPage({ searchParams }: { searchParams: { type?: st
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">
-      <div className="p-4 text-white sticky top-0 z-10" style={{ backgroundColor: "#11AFBE" }}>
-        <div className="flex items-center justify-between gap-4 flex-wrap">
-          <div className="flex-1">
+      <div className="p-4 text-white sticky top-0 z-10 relative overflow-hidden" style={{ background: "linear-gradient(135deg, #0f172a 0%, #1e3a8a 50%, #581c87 100%)" }}>
+        {/* Radial gradient overlays for subtle effects */}
+        <div className="absolute inset-0 opacity-20 pointer-events-none">
+          <div className="absolute top-0 right-0 w-96 h-96 bg-blue-400 rounded-full mix-blend-screen filter blur-3xl"></div>
+          <div className="absolute bottom-0 left-0 w-96 h-96 bg-purple-400 rounded-full mix-blend-screen filter blur-3xl"></div>
+        </div>
+        
+        <div className="flex items-center justify-between gap-4 flex-wrap relative z-10">
+          <div className="flex-1 relative z-10">
             <h1 className="text-3xl font-bold">Hola, {userData.name}</h1>
             {!isFutureReservation && (
               <p className="text-sm opacity-90 mt-2 flex items-center gap-2">
@@ -407,7 +413,7 @@ export default function ClientPage({ searchParams }: { searchParams: { type?: st
           
           {/* Tu Estancia Chip */}
           {!isFutureReservation && (
-            <div className="flex items-center gap-4 bg-white/15 backdrop-blur-sm rounded-full px-4 py-2.5 border border-white/20">
+            <div className="flex items-center gap-4 bg-white/15 backdrop-blur-sm rounded-full px-4 py-2.5 border border-white/20 relative z-10">
               <div className="flex items-center gap-2">
                 <Calendar className="w-4 h-4 text-white" />
                 <div className="text-center">
@@ -433,7 +439,7 @@ export default function ClientPage({ searchParams }: { searchParams: { type?: st
           
           <div
             style={{ background: "linear-gradient(135deg, #6f65d0 0%, #67f1d0 100%)" }}
-            className="w-14 h-14 rounded-full flex items-center justify-center shadow-lg p-[2px]"
+            className="w-14 h-14 rounded-full flex items-center justify-center shadow-lg p-[2px] relative z-10"
           >
             <div className="w-full h-full bg-[#233b64] rounded-full flex items-center justify-center">
               <span className="text-2xl font-bold text-white">{userData.initials}</span>
