@@ -59,6 +59,14 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
   // Ocultar sidebar en la página de selección de establecimiento
   const hideSidebar = pathname === '/admin/select-establishment'
+  
+  // Detectar si estamos en modo agentico
+  const isAgenticoMode = pathname === '/admin/agentico'
+  
+  // Clase de fondo dinámico del sidebar
+  const sidebarBgClass = isAgenticoMode 
+    ? "bg-gradient-to-br from-purple-950 via-slate-950 to-slate-950"
+    : "bg-gradient-to-b from-gray-900 to-black"
 
   const languages = [
     { code: "es", name: "Español", label: "ES" },
@@ -131,7 +139,9 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       {!hideSidebar && (
         <aside
           className={`${sidebarOpen ? "w-64" : "w-20"} border-r transition-all duration-300 flex flex-col`}
-          style={{ backgroundColor: "#034AAE" }}
+          style={isAgenticoMode ? {
+            background: "linear-gradient(135deg, rgb(88, 28, 135) 0%, rgb(15, 23, 42) 50%, rgb(6, 18, 32) 100%)"
+          } : { backgroundColor: "#034AAE" }}
         >
           <div className="p-4 border-b border-white/10 flex items-center justify-between">
             {sidebarOpen && <h2 className="font-bold text-lg text-white">{t("admin.adminPanel")}</h2>}
@@ -152,7 +162,11 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                   <>
                     <button
                       onClick={() => toggleSection(section.id)}
-                      className="w-full px-3 mb-2 text-[10px] font-semibold text-white/70 uppercase tracking-wider hover:text-white/90 flex items-center justify-between transition-colors"
+                      className={`w-full px-3 mb-2 text-[10px] font-semibold uppercase tracking-wider flex items-center justify-between transition-colors ${
+                        isAgenticoMode
+                          ? "text-pink-200/70 hover:text-pink-100"
+                          : "text-white/70 hover:text-white/90"
+                      }`}
                     >
                       <span>{section.title}</span>
                       <ChevronDown
@@ -171,7 +185,13 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                               key={item.href}
                               href={item.href}
                               className={`flex items-center gap-3 px-3 py-1.5 text-xs rounded-lg transition-colors ${
-                                isActive ? "bg-white/20 text-white font-medium" : "text-white/90 hover:bg-white/10"
+                                isActive 
+                                  ? isAgenticoMode 
+                                    ? "bg-gradient-to-r from-pink-500/30 to-purple-500/30 text-pink-100 font-medium border border-pink-400/50"
+                                    : "bg-white/20 text-white font-medium"
+                                  : isAgenticoMode
+                                    ? "text-slate-200/70 hover:text-pink-200 hover:bg-pink-500/10"
+                                    : "text-white/90 hover:bg-white/10"
                               }`}
                             >
                               <Icon className="w-5 h-5 shrink-0" />
