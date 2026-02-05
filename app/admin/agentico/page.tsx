@@ -173,7 +173,7 @@ export default function AgenticoPage() {
                 <div key={tab.id} className="flex items-center">
                   <button
                     onClick={() => setActiveTab(tab.id)}
-                    className={`px-4 py-1.5 text-xs font-medium rounded-t transition-all ${
+                    className={`px-3 py-1 text-xs font-medium rounded-t transition-all ${
                       activeTab === tab.id
                         ? "bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-lg shadow-blue-500/20"
                         : "text-slate-300 hover:text-slate-200"
@@ -183,7 +183,7 @@ export default function AgenticoPage() {
                   </button>
                   <button
                     onClick={() => closePanelTab(tab.id)}
-                    className="ml-1 px-2 py-1 text-xs text-slate-400 hover:text-slate-200 transition-colors rounded"
+                    className="ml-0.5 px-1.5 py-0.5 text-xs text-slate-400 hover:text-slate-200 transition-colors rounded"
                   >
                     ✕
                   </button>
