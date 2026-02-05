@@ -14,11 +14,9 @@ export default function AgenticoPage() {
   const [isLoading, setIsLoading] = useState(false)
   const [activeTab, setActiveTab] = useState<"analysis" | "completed" | "monitoring" | string>("analysis")
   const [chatExpanded, setChatExpanded] = useState(false)
-  const [expandedPanel, setExpandedPanel] = useState<string | null>(null)
   const [openedPanelTabs, setOpenedPanelTabs] = useState<Array<{ id: string; title: string }>>([])
 
   const handlePanelClick = (panelId: string, panelTitle: string) => {
-    setExpandedPanel(panelId)
     // Add tab if not already open
     if (!openedPanelTabs.find(tab => tab.id === panelId)) {
       const newTab = { id: panelId, title: panelTitle }
@@ -515,143 +513,6 @@ export default function AgenticoPage() {
               )}
             </div>
           ))}
-
-          {/* Expanded Panel Modal */}
-          {expandedPanel && (
-            <div className="fixed inset-0 bg-slate-950/95 backdrop-blur-sm z-50 flex items-center justify-center p-6">
-              <div className="w-full max-w-4xl bg-slate-900 border border-green-700/30 rounded-lg shadow-2xl flex flex-col max-h-[90vh]">
-                {/* Header */}
-                <div className="flex items-center justify-between p-6 border-b border-green-700/20">
-                  <h2 className="text-lg font-semibold text-green-300">
-                    {expandedPanel === "pie-chart" && "Distribución de Tareas"}
-                    {expandedPanel === "data-table" && "Tareas Completadas Recientemente"}
-                    {expandedPanel === "summary" && "Resumen de Resultados"}
-                  </h2>
-                  <button
-                    onClick={() => setExpandedPanel(null)}
-                    className="p-2 rounded-lg bg-slate-800/50 border border-slate-700/50 text-slate-300 hover:bg-slate-700/50 hover:text-red-400 transition-all"
-                  >
-                    <X className="w-5 h-5" />
-                  </button>
-                </div>
-
-                {/* Content */}
-                <div className="flex-1 overflow-y-auto p-6">
-                  {expandedPanel === "pie-chart" && (
-                    <div>
-                      <ResponsiveContainer width="100%" height={400}>
-                        <PieChart>
-                          <Pie
-                            data={[
-                              { name: "Análisis", value: 40 },
-                              { name: "Reportes", value: 25 },
-                              { name: "Optimización", value: 20 },
-                              { name: "Auditoría", value: 15 }
-                            ]}
-                            cx="50%"
-                            cy="50%"
-                            innerRadius={80}
-                            outerRadius={120}
-                            paddingAngle={2}
-                            dataKey="value"
-                          >
-                            <Cell fill="#10b981" />
-                            <Cell fill="#34d399" />
-                            <Cell fill="#6ee7b7" />
-                            <Cell fill="#a7f3d0" />
-                          </Pie>
-                          <Tooltip contentStyle={{ backgroundColor: "#1e293b", border: "1px solid #10b981" }} />
-                        </PieChart>
-                      </ResponsiveContainer>
-                      <div className="mt-6 grid grid-cols-2 md:grid-cols-4 gap-4">
-                        {[
-                          { name: "Análisis", value: "40%", color: "bg-green-500" },
-                          { name: "Reportes", value: "25%", color: "bg-emerald-500" },
-                          { name: "Optimización", value: "20%", color: "bg-teal-500" },
-                          { name: "Auditoría", value: "15%", color: "bg-cyan-500" }
-                        ].map((item, idx) => (
-                          <div key={idx} className="p-3 rounded-lg bg-slate-800/50 border border-slate-700/30">
-                            <div className="flex items-center gap-2 mb-1">
-                              <div className={`w-3 h-3 rounded-full ${item.color}`}></div>
-                              <p className="text-sm font-medium text-slate-200">{item.name}</p>
-                            </div>
-                            <p className="text-2xl font-bold text-green-400">{item.value}</p>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-
-                  {expandedPanel === "data-table" && (
-                    <div className="overflow-x-auto">
-                      <table className="w-full">
-                        <thead>
-                          <tr className="border-b border-green-700/20 bg-slate-800/30">
-                            <th className="px-4 py-3 text-left text-slate-300 font-semibold">Tarea</th>
-                            <th className="px-4 py-3 text-left text-slate-300 font-semibold">Completada</th>
-                            <th className="px-4 py-3 text-left text-slate-300 font-semibold">Duración</th>
-                            <th className="px-4 py-3 text-left text-slate-300 font-semibold">Estado</th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          {[
-                            { title: "Revisar ocupación semanal", time: "Hace 2 horas", duration: "45 min" },
-                            { title: "Generar reporte de check-ins", time: "Hace 4 horas", duration: "30 min" },
-                            { title: "Análisis de satisfacción", time: "Hace 1 día", duration: "2h 15min" },
-                            { title: "Optimización de precios", time: "Hace 2 días", duration: "1h 30min" },
-                            { title: "Reporte de ingresos", time: "Hace 3 días", duration: "1h 20min" },
-                            { title: "Auditoría de guests", time: "Hace 1 semana", duration: "4h 45min" }
-                          ].map((task, idx) => (
-                            <tr key={idx} className="border-b border-slate-700/20 hover:bg-slate-800/30 transition-colors">
-                              <td className="px-4 py-3 text-slate-100">{task.title}</td>
-                              <td className="px-4 py-3 text-slate-400">{task.time}</td>
-                              <td className="px-4 py-3 text-slate-400">{task.duration}</td>
-                              <td className="px-4 py-3">
-                                <span className="inline-flex items-center gap-1 text-green-400 text-sm">
-                                  <CheckCircle className="w-4 h-4" />
-                                  Completado
-                                </span>
-                              </td>
-                            </tr>
-                          ))}
-                        </tbody>
-                      </table>
-                    </div>
-                  )}
-
-                  {expandedPanel === "summary" && (
-                    <div className="space-y-6">
-                      {[
-                        {
-                          title: "Análisis Completados",
-                          color: "bg-green-400",
-                          description: "Se revisaron 6 análisis principales sobre ocupación, ingresos y satisfacción de huéspedes. Los datos mostran una tendencia positiva en reservas para julio con un incremento del 20%. Se identificaron patrones en comportamiento de guests y se recomendaron estrategias de retención."
-                        },
-                        {
-                          title: "Reportes Generados",
-                          color: "bg-emerald-400",
-                          description: "Se generaron reportes consolidados de check-ins con datos actualizados. Se identificaron 5 check-ins próximos en las siguientes 2 horas en las habitaciones 5 y 7. Los reportes incluyen análisis de tendencias y proyecciones."
-                        },
-                        {
-                          title: "Optimizaciones Realizadas",
-                          color: "bg-teal-400",
-                          description: "Se ajustaron tarifas según la demanda proyectada basada en datos históricos. La ocupación actual está en 78%, con una baja del 12% desde la semana pasada. Se recomiendan estrategias de promoción específicas para los próximos 7 días."
-                        }
-                      ].map((item, idx) => (
-                        <div key={idx} className="p-4 rounded-lg border border-slate-700/30 bg-slate-800/30">
-                          <div className="flex items-center gap-3 mb-2">
-                            <div className={`w-3 h-3 rounded-full ${item.color}`}></div>
-                            <h3 className="text-lg font-semibold text-slate-100">{item.title}</h3>
-                          </div>
-                          <p className="text-slate-300 leading-relaxed">{item.description}</p>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </div>
-              </div>
-            </div>
-          )}
 
           {activeTab === "monitoring" && (
             <div className="flex-1 overflow-y-auto space-y-4">
