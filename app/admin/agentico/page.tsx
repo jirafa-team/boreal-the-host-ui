@@ -436,6 +436,29 @@ export default function AgenticoPage() {
             </div>
           )}
         </div>
+
+        {/* Agent Input - Fixed at bottom, spans all tabs */}
+        <div className="absolute bottom-0 right-0 left-80 p-6 bg-gradient-to-t from-slate-950 via-slate-950/90 to-transparent border-t border-emerald-700/20">
+          <div className="flex gap-3">
+            <input
+              type="text"
+              value={message}
+              onChange={(e) => setMessage(e.target.value)}
+              onKeyPress={(e) => e.key === "Enter" && handleSendMessage()}
+              placeholder="Ingresa instrucciones al agente..."
+              className="flex-1 px-4 py-3 bg-slate-800 border border-slate-700 rounded-lg text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all"
+              disabled={isLoading}
+            />
+            <Button
+              onClick={handleSendMessage}
+              disabled={!message.trim() || isLoading}
+              className="bg-gradient-to-r from-emerald-600 to-cyan-600 hover:from-emerald-500 hover:to-cyan-500 text-white gap-2 px-6 shadow-lg"
+            >
+              <Send className="w-4 h-4" />
+              Enviar
+            </Button>
+          </div>
+        </div>
       </div>
     </div>
   )
