@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation"
 import { LineChart, Line, BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
-import { ArrowLeft, Bot, Send, History, MessageSquare, Settings, Zap, BarChart3, Users, Briefcase, TrendingUp, Headphones, Users2, UserCheck, CheckCircle, Clock } from "lucide-react"
+import { ArrowLeft, Bot, Send, History, MessageSquare, Settings, Zap, BarChart3, Users, Briefcase, TrendingUp, Headphones, Users2, UserCheck, CheckCircle, Clock, ChevronUp, ChevronDown } from "lucide-react"
 
 export default function AgenticoPage() {
   const router = useRouter()
@@ -13,6 +13,7 @@ export default function AgenticoPage() {
   const [messages, setMessages] = useState<Array<{ role: string; content: string }>>([])
   const [isLoading, setIsLoading] = useState(false)
   const [activeTab, setActiveTab] = useState<"analysis" | "completed" | "monitoring">("analysis")
+  const [chatExpanded, setChatExpanded] = useState(false)
 
   const handleSendMessage = async () => {
     if (!message.trim()) return
@@ -75,9 +76,10 @@ export default function AgenticoPage() {
       </div>
 
       {/* Main Content with Sidebar and Tabs */}
-      <div className="h-[calc(100vh-80px)] flex gap-6 p-6">
-        {/* Left Sidebar Panel */}
-        <div className="w-64 flex flex-col gap-4">
+      <div className={`h-[calc(100vh-80px)] flex gap-6 p-6 transition-all duration-300 ${chatExpanded ? "relative" : ""}`}>
+        {/* Left Sidebar Panel - Hidden when chat expanded */}
+        {!chatExpanded && (
+          <div className="w-64 flex flex-col gap-4">
           {/* Daily Summary - Compact KPI Layout */}
           <Card className="p-4 border border-emerald-700/30 bg-gradient-to-br from-slate-900/70 to-slate-800/50 backdrop-blur-sm">
             <div className="space-y-3">
@@ -138,9 +140,10 @@ export default function AgenticoPage() {
             </div>
           </Card>
         </div>
+        )}
 
         {/* Right Content Area */}
-        <div className="flex-1 flex flex-col">
+        <div className={`flex flex-col ${chatExpanded ? "flex-1" : "flex-1"}`}>
           {/* Tabs Navigation with Continuity */}
           <div className="bg-slate-800/30 border border-slate-700/50 rounded-lg p-0.5 mb-4 flex gap-0.5">
             {[
@@ -439,7 +442,14 @@ export default function AgenticoPage() {
 
         {/* Agent Input - Fixed at bottom, spans all tabs */}
         <div className="absolute bottom-0 right-0 left-80 p-6 bg-gradient-to-t from-slate-950 via-slate-950/90 to-transparent border-t border-emerald-700/20">
-          <div className="flex gap-3">
+          <div className="flex gap-3 items-center">
+            <button
+              onClick={() => setChatExpanded(!chatExpanded)}
+              className="flex-shrink-0 p-2 rounded-lg bg-slate-800/50 border border-slate-700/50 text-slate-300 hover:bg-slate-700/50 hover:text-emerald-300 transition-all"
+              title={chatExpanded ? "Cerrar chat" : "Expandir chat"}
+            >
+              {chatExpanded ? <ChevronDown className="w-5 h-5" /> : <ChevronUp className="w-5 h-5" />}
+            </button>
             <input
               type="text"
               value={message}
@@ -452,13 +462,63 @@ export default function AgenticoPage() {
             <Button
               onClick={handleSendMessage}
               disabled={!message.trim() || isLoading}
-              className="bg-gradient-to-r from-emerald-600 to-cyan-600 hover:from-emerald-500 hover:to-cyan-500 text-white gap-2 px-6 shadow-lg"
+              className="bg-gradient-to-r from-emerald-600 to-cyan-600 hover:from-emerald-500 hover:to-cyan-500 text-white gap-2 px-6 shadow-lg flex-shrink-0"
             >
               <Send className="w-4 h-4" />
               Enviar
             </Button>
           </div>
         </div>
+
+        {/* Chat Expanded View */}
+        {chatExpanded && (
+          <div className="fixed inset-0 top-20 bg-slate-950/95 backdrop-blur-sm z-40 flex flex-col">
+            <div className="flex items-center justify-between p-6 border-b border-emerald-700/20">
+              <h2 className="text-lg font-semibold text-emerald-300">Conversación</h2>
+              <button
+                onClick={() => setChatExpanded(false)}
+                className="p-2 rounded-lg bg-slate-800/50 border border-slate-700/50 text-slate-300 hover:bg-slate-700/50 transition-all"
+              >
+                <ChevronDown className="w-5 h-5" />
+              </button>
+            </div>
+            <div className="flex-1 overflow-y-auto p-6 space-y-4">
+              {messages.length === 0 ? (
+                <div className="flex items-center justify-center h-full text-slate-400">
+                  <p>Sin mensajes aún. Comienza a escribir instrucciones al agente.</p>
+                </div>
+              ) : (
+                messages.map((msg, idx) => (
+                  <div
+                    key={idx}
+                    className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}
+                  >
+                    <div
+                      className={`max-w-2xl px-4 py-3 rounded-lg ${
+                        msg.role === "user"
+                          ? "bg-gradient-to-r from-emerald-600 to-cyan-600 text-white rounded-br-none shadow-lg"
+                          : "bg-slate-800 text-slate-100 border border-slate-700 rounded-bl-none shadow-lg"
+                      }`}
+                    >
+                      <p className="text-sm">{msg.content}</p>
+                    </div>
+                  </div>
+                ))
+              )}
+              {isLoading && (
+                <div className="flex justify-start">
+                  <div className="bg-slate-800 border border-slate-700 text-slate-100 px-4 py-3 rounded-lg rounded-bl-none shadow-lg">
+                    <div className="flex gap-2">
+                      <div className="w-2 h-2 rounded-full bg-emerald-400 animate-bounce" style={{ animationDelay: "0ms" }}></div>
+                      <div className="w-2 h-2 rounded-full bg-cyan-400 animate-bounce" style={{ animationDelay: "150ms" }}></div>
+                      <div className="w-2 h-2 rounded-full bg-blue-400 animate-bounce" style={{ animationDelay: "300ms" }}></div>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
       </div>
     </div>
   )
