@@ -9,9 +9,7 @@ import { ArrowLeft, Bot, Send, History, MessageSquare, Settings, Zap, BarChart3,
 export default function AgenticoPage() {
   const router = useRouter()
   const [message, setMessage] = useState("")
-  const [messages, setMessages] = useState<Array<{ role: string; content: string }>>([
-    { role: "assistant", content: "Hola, soy tu asistente agentico. ¿Cómo puedo ayudarte hoy?" }
-  ])
+  const [messages, setMessages] = useState<Array<{ role: string; content: string }>>([])
   const [isLoading, setIsLoading] = useState(false)
 
   const handleSendMessage = async () => {
@@ -136,14 +134,6 @@ export default function AgenticoPage() {
                 )
               })}
             </div>
-          </Card>
-
-          {/* Settings */}
-          <Card className="p-4 border border-purple-700/30 bg-slate-900/50 backdrop-blur-sm">
-            <button className="w-full flex items-center gap-2 text-purple-300 hover:text-purple-200 transition-colors text-sm">
-              <Settings className="w-4 h-4" />
-              Configuración
-            </button>
           </Card>
         </div>
 
