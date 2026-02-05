@@ -4,7 +4,7 @@ import { useState } from "react"
 import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
-import { ArrowLeft, Bot, Send, History, MessageSquare, Settings, Zap, BarChart3, Users } from "lucide-react"
+import { ArrowLeft, Bot, Send, History, MessageSquare, Settings, Zap, BarChart3, Users, Briefcase, TrendingUp, Headphones, Users2, UserCheck } from "lucide-react"
 
 export default function AgenticoPage() {
   const router = useRouter()
@@ -37,6 +37,14 @@ export default function AgenticoPage() {
     { icon: BarChart3, label: "Ocupación diaria", command: "¿Cuál es la ocupación de hoy?" },
     { icon: Users, label: "Check-ins próximos", command: "Muéstrame los check-ins del próximo día" },
     { icon: Zap, label: "Pedidos pendientes", command: "¿Cuántos pedidos están pendientes?" },
+  ]
+
+  const areas = [
+    { id: "marketing", name: "Marketing", icon: TrendingUp, active: true },
+    { id: "sales", name: "Ventas", icon: BarChart3, active: true },
+    { id: "support", name: "Atención al cliente", icon: Headphones, active: false },
+    { id: "users", name: "Usuarios", icon: Users2, active: false },
+    { id: "staff", name: "Personal", icon: UserCheck, active: true },
   ]
 
   return (
@@ -101,22 +109,32 @@ export default function AgenticoPage() {
             </div>
           </Card>
 
-          {/* Historial */}
-          <Card className="p-4 border border-blue-700/30 bg-slate-900/50 backdrop-blur-sm flex-1 flex flex-col">
-            <h3 className="text-sm font-semibold text-blue-300 mb-3 flex items-center gap-2">
-              <History className="w-4 h-4" />
-              Historial
+          {/* Agent Hub */}
+          <Card className="p-4 border border-purple-700/30 bg-slate-900/50 backdrop-blur-sm flex-1 flex flex-col">
+            <h3 className="text-sm font-semibold text-purple-300 mb-3 flex items-center gap-2">
+              <Briefcase className="w-4 h-4" />
+              Agent Hub
             </h3>
             <div className="space-y-2 flex-1 overflow-y-auto">
-              <div className="px-3 py-2 rounded-lg bg-slate-800/50 border border-slate-700/50 text-slate-300 text-xs hover:bg-blue-600/20 cursor-pointer transition-all">
-                Consulta de ocupación
-              </div>
-              <div className="px-3 py-2 rounded-lg bg-slate-800/50 border border-slate-700/50 text-slate-300 text-xs hover:bg-blue-600/20 cursor-pointer transition-all">
-                Reporte de check-ins
-              </div>
-              <div className="px-3 py-2 rounded-lg bg-slate-800/50 border border-slate-700/50 text-slate-300 text-xs hover:bg-blue-600/20 cursor-pointer transition-all">
-                Análisis de pedidos
-              </div>
+              {areas.map((area) => {
+                const Icon = area.icon
+                return (
+                  <button
+                    key={area.id}
+                    className={`w-full px-3 py-2.5 rounded-lg transition-all flex items-center gap-2.5 text-xs font-medium ${
+                      area.active
+                        ? "bg-gradient-to-r from-purple-600/40 to-pink-600/40 border border-purple-500/60 text-purple-100 shadow-lg shadow-purple-500/20"
+                        : "bg-slate-800/50 border border-slate-700/50 text-slate-300 hover:bg-slate-700/50"
+                    }`}
+                  >
+                    <Icon className="w-4 h-4 flex-shrink-0" />
+                    <span className="flex-1 text-left">{area.name}</span>
+                    {area.active && (
+                      <div className="w-2 h-2 rounded-full bg-green-400 shadow-lg shadow-green-400/50 animate-pulse"></div>
+                    )}
+                  </button>
+                )
+              })}
             </div>
           </Card>
 
