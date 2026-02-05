@@ -141,8 +141,8 @@ export default function AgenticoPage() {
         {/* Right Content Area */}
         <div className="flex-1 flex flex-col">
           {/* Tabs Navigation */}
-          <div className="border-b border-emerald-700/20 bg-slate-900/30 backdrop-blur-sm mb-4 -mx-6 px-6 py-3">
-            <div className="flex gap-6">
+          <div className="mb-4">
+            <div className="flex gap-3">
               {[
                 { id: "analysis", label: "En Análisis" },
                 { id: "completed", label: "Tareas Completadas" },
@@ -151,10 +151,10 @@ export default function AgenticoPage() {
                 <button
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id as "analysis" | "completed" | "monitoring")}
-                  className={`pb-2 px-1 text-sm font-medium border-b-2 transition-colors ${
+                  className={`px-4 py-2 text-sm font-medium rounded-lg transition-all ${
                     activeTab === tab.id
-                      ? "text-emerald-300 border-emerald-400"
-                      : "text-slate-400 border-transparent hover:text-slate-300"
+                      ? "bg-gradient-to-r from-emerald-600 to-cyan-600 text-white shadow-lg shadow-emerald-500/30"
+                      : "bg-slate-800/50 text-slate-300 hover:bg-slate-700/50 border border-slate-700/50"
                   }`}
                 >
                   {tab.label}
