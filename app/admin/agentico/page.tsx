@@ -2,7 +2,7 @@
 
 import { useState } from "react"
 import { useRouter } from "next/navigation"
-import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts"
+import { LineChart, Line, BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { ArrowLeft, Bot, Send, History, MessageSquare, Settings, Zap, BarChart3, Users, Briefcase, TrendingUp, Headphones, Users2, UserCheck, CheckCircle, Clock } from "lucide-react"
@@ -236,44 +236,105 @@ export default function AgenticoPage() {
           )}
 
           {activeTab === "completed" && (
-            <div className="flex-1 overflow-y-auto">
-              <div className="space-y-4">
-                {/* Tasks List */}
-                <div className="border border-green-700/30 rounded-lg overflow-hidden">
-                  <table className="w-full text-sm">
-                    <thead>
-                      <tr className="bg-slate-800/50 border-b border-green-700/20">
-                        <th className="px-4 py-3 text-left text-slate-300 font-semibold">Tarea</th>
-                        <th className="px-4 py-3 text-left text-slate-300 font-semibold">Completada</th>
-                        <th className="px-4 py-3 text-left text-slate-300 font-semibold">Duración</th>
-                        <th className="px-4 py-3 text-left text-slate-300 font-semibold">Estado</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {[
-                        { title: "Revisar ocupación semanal", time: "Hace 2 horas", duration: "45 min", status: "✓" },
-                        { title: "Generar reporte de check-ins", time: "Hace 4 horas", duration: "30 min", status: "✓" },
-                        { title: "Análisis de satisfacción", time: "Hace 1 día", duration: "2h 15min", status: "✓" },
-                        { title: "Optimización de precios", time: "Hace 2 días", duration: "1h 30min", status: "✓" },
-                        { title: "Reporte de ingresos", time: "Hace 3 días", duration: "1h 20min", status: "✓" },
-                        { title: "Auditoría de guests", time: "Hace 1 semana", duration: "4h 45min", status: "✓" }
-                      ].map((task, idx) => (
-                        <tr key={idx} className="border-b border-slate-700/30 hover:bg-slate-800/30 transition-colors">
-                          <td className="px-4 py-3 text-slate-100">{task.title}</td>
-                          <td className="px-4 py-3 text-slate-400">{task.time}</td>
-                          <td className="px-4 py-3 text-slate-400">{task.duration}</td>
-                          <td className="px-4 py-3">
-                            <span className="flex items-center gap-1 text-green-400">
-                              <CheckCircle className="w-4 h-4" />
-                              Completado
-                            </span>
-                          </td>
+            <div className="flex-1 overflow-y-auto space-y-4">
+              <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+                {/* Pie Chart Panel */}
+                <Card className="p-4 border border-green-700/30 bg-slate-800/50 lg:col-span-1">
+                  <h3 className="text-sm font-semibold text-green-300 mb-3">Distribución de Tareas</h3>
+                  <ResponsiveContainer width="100%" height={220}>
+                    <PieChart>
+                      <Pie
+                        data={[
+                          { name: "Análisis", value: 40 },
+                          { name: "Reportes", value: 25 },
+                          { name: "Optimización", value: 20 },
+                          { name: "Auditoría", value: 15 }
+                        ]}
+                        cx="50%"
+                        cy="50%"
+                        innerRadius={60}
+                        outerRadius={80}
+                        paddingAngle={2}
+                        dataKey="value"
+                      >
+                        <Cell fill="#10b981" />
+                        <Cell fill="#34d399" />
+                        <Cell fill="#6ee7b7" />
+                        <Cell fill="#a7f3d0" />
+                      </Pie>
+                      <Tooltip contentStyle={{ backgroundColor: "#1e293b", border: "1px solid #10b981" }} />
+                    </PieChart>
+                  </ResponsiveContainer>
+                  <div className="text-xs text-slate-400 mt-2 space-y-1">
+                    <div className="flex items-center gap-2">
+                      <div className="w-2 h-2 rounded-full bg-green-500"></div>Análisis: 40%
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <div className="w-2 h-2 rounded-full bg-emerald-500"></div>Reportes: 25%
+                    </div>
+                  </div>
+                </Card>
+
+                {/* Data Table Panel */}
+                <Card className="p-4 border border-green-700/30 bg-slate-800/50 lg:col-span-2 overflow-hidden">
+                  <h3 className="text-sm font-semibold text-green-300 mb-3">Tareas Completadas Recientemente</h3>
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-xs">
+                      <thead>
+                        <tr className="border-b border-green-700/20">
+                          <th className="px-3 py-2 text-left text-slate-400">Tarea</th>
+                          <th className="px-3 py-2 text-left text-slate-400">Completada</th>
+                          <th className="px-3 py-2 text-left text-slate-400">Duración</th>
                         </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
+                      </thead>
+                      <tbody>
+                        {[
+                          { title: "Revisar ocupación semanal", time: "Hace 2 horas", duration: "45 min" },
+                          { title: "Generar reporte de check-ins", time: "Hace 4 horas", duration: "30 min" },
+                          { title: "Análisis de satisfacción", time: "Hace 1 día", duration: "2h 15min" },
+                          { title: "Optimización de precios", time: "Hace 2 días", duration: "1h 30min" },
+                          { title: "Reporte de ingresos", time: "Hace 3 días", duration: "1h 20min" },
+                          { title: "Auditoría de guests", time: "Hace 1 semana", duration: "4h 45min" }
+                        ].map((task, idx) => (
+                          <tr key={idx} className="border-b border-slate-700/20 hover:bg-slate-700/30 transition-colors">
+                            <td className="px-3 py-2 text-slate-100">{task.title}</td>
+                            <td className="px-3 py-2 text-slate-400">{task.time}</td>
+                            <td className="px-3 py-2 text-slate-400">{task.duration}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </Card>
               </div>
+
+              {/* Results Summary Panel */}
+              <Card className="p-6 border border-green-700/30 bg-gradient-to-br from-slate-800/50 to-slate-900/50">
+                <h3 className="text-sm font-semibold text-green-300 mb-4">Resumen de Resultados</h3>
+                <div className="space-y-3 text-sm text-slate-200">
+                  <div className="flex items-start gap-3">
+                    <div className="w-2 h-2 rounded-full bg-green-400 mt-1.5 flex-shrink-0"></div>
+                    <div>
+                      <p className="font-medium">Análisis Completados</p>
+                      <p className="text-slate-400">Se revisaron 6 análisis principales sobre ocupación, ingresos y satisfacción de huéspedes. Los datos mostran una tendencia positiva en reservas para julio con un incremento del 20%.</p>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-3">
+                    <div className="w-2 h-2 rounded-full bg-emerald-400 mt-1.5 flex-shrink-0"></div>
+                    <div>
+                      <p className="font-medium">Reportes Generados</p>
+                      <p className="text-slate-400">Se generaron reportes de check-ins con datos consolidados. Se identificaron 5 check-ins próximos en las siguientes 2 horas en las habitaciones 5 y 7.</p>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-3">
+                    <div className="w-2 h-2 rounded-full bg-teal-400 mt-1.5 flex-shrink-0"></div>
+                    <div>
+                      <p className="font-medium">Optimizaciones Realizadas</p>
+                      <p className="text-slate-400">Se ajustaron tarifas según la demanda proyectada. La ocupación actual está en 78%, con una baja del 12% desde la semana pasada. Se recomiendan estrategias de promoción.</p>
+                    </div>
+                  </div>
+                </div>
+              </Card>
             </div>
           )}
 
