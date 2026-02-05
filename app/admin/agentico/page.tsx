@@ -164,6 +164,7 @@ export default function AgenticoPage() {
           </div>
 
           {/* Tab Content */}
+          {activeTab === "analysis" && (
             <>
               {/* Chat Area for Analysis Tab */}
               <div className="flex-1 overflow-y-auto space-y-4 mb-4">
