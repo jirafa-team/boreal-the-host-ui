@@ -11,6 +11,7 @@ export default function AgenticoPage() {
   const [message, setMessage] = useState("")
   const [messages, setMessages] = useState<Array<{ role: string; content: string }>>([])
   const [isLoading, setIsLoading] = useState(false)
+  const [activeTab, setActiveTab] = useState<"analysis" | "completed" | "monitoring">("analysis")
 
   const handleSendMessage = async () => {
     if (!message.trim()) return
@@ -69,6 +70,29 @@ export default function AgenticoPage() {
               </div>
             </div>
           </div>
+        </div>
+      </div>
+
+      {/* Tabs Section */}
+      <div className="border-b border-emerald-700/20 bg-slate-950/50 backdrop-blur-sm">
+        <div className="px-6 flex gap-8">
+          {[
+            { id: "analysis", label: "En Análisis" },
+            { id: "completed", label: "Tareas Completadas" },
+            { id: "monitoring", label: "Monitoreo" }
+          ].map((tab) => (
+            <button
+              key={tab.id}
+              onClick={() => setActiveTab(tab.id as "analysis" | "completed" | "monitoring")}
+              className={`py-3 px-1 text-sm font-medium border-b-2 transition-colors ${
+                activeTab === tab.id
+                  ? "text-emerald-300 border-emerald-400"
+                  : "text-slate-400 border-transparent hover:text-slate-300"
+              }`}
+            >
+              {tab.label}
+            </button>
+          ))}
         </div>
       </div>
 
@@ -137,61 +161,121 @@ export default function AgenticoPage() {
           </Card>
         </div>
 
-        {/* Right Chat Area */}
+        {/* Right Content Area */}
         <div className="flex-1 flex flex-col">
-          {/* Chat Area */}
-          <div className="flex-1 overflow-y-auto space-y-4 mb-4">
-            {messages.map((msg, idx) => (
-              <div
-                key={idx}
-                className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}
-              >
-                <div
-                  className={`max-w-md px-4 py-3 rounded-lg ${
-                    msg.role === "user"
-                      ? "bg-gradient-to-r from-emerald-600 to-cyan-600 text-white rounded-br-none shadow-lg"
-                      : "bg-slate-800 text-slate-100 border border-slate-700 rounded-bl-none shadow-lg"
-                  }`}
-                >
-                  <p className="text-sm">{msg.content}</p>
-                </div>
-              </div>
-            ))}
-            {isLoading && (
-              <div className="flex justify-start">
-                <div className="bg-slate-800 border border-slate-700 text-slate-100 px-4 py-3 rounded-lg rounded-bl-none shadow-lg">
-                  <div className="flex gap-2">
-                    <div className="w-2 h-2 rounded-full bg-emerald-400 animate-bounce" style={{ animationDelay: "0ms" }}></div>
-                    <div className="w-2 h-2 rounded-full bg-cyan-400 animate-bounce" style={{ animationDelay: "150ms" }}></div>
-                    <div className="w-2 h-2 rounded-full bg-blue-400 animate-bounce" style={{ animationDelay: "300ms" }}></div>
+          {activeTab === "analysis" && (
+            <>
+              {/* Chat Area for Analysis Tab */}
+              <div className="flex-1 overflow-y-auto space-y-4 mb-4">
+                {messages.map((msg, idx) => (
+                  <div
+                    key={idx}
+                    className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}
+                  >
+                    <div
+                      className={`max-w-md px-4 py-3 rounded-lg ${
+                        msg.role === "user"
+                          ? "bg-gradient-to-r from-emerald-600 to-cyan-600 text-white rounded-br-none shadow-lg"
+                          : "bg-slate-800 text-slate-100 border border-slate-700 rounded-bl-none shadow-lg"
+                      }`}
+                    >
+                      <p className="text-sm">{msg.content}</p>
+                    </div>
                   </div>
+                ))}
+                {isLoading && (
+                  <div className="flex justify-start">
+                    <div className="bg-slate-800 border border-slate-700 text-slate-100 px-4 py-3 rounded-lg rounded-bl-none shadow-lg">
+                      <div className="flex gap-2">
+                        <div className="w-2 h-2 rounded-full bg-emerald-400 animate-bounce" style={{ animationDelay: "0ms" }}></div>
+                        <div className="w-2 h-2 rounded-full bg-cyan-400 animate-bounce" style={{ animationDelay: "150ms" }}></div>
+                        <div className="w-2 h-2 rounded-full bg-blue-400 animate-bounce" style={{ animationDelay: "300ms" }}></div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* Input Area for Analysis */}
+              <div className="border-t border-emerald-700/30 bg-slate-900/80 backdrop-blur-sm p-4 rounded-lg">
+                <div className="flex gap-3">
+                  <input
+                    type="text"
+                    value={message}
+                    onChange={(e) => setMessage(e.target.value)}
+                    onKeyPress={(e) => e.key === "Enter" && handleSendMessage()}
+                    placeholder="Escribe tu comando aquí... (ej: 'Cuál es la ocupación de hoy?')"
+                    className="flex-1 px-4 py-3 bg-slate-800 border border-slate-700 rounded-lg text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all"
+                    disabled={isLoading}
+                  />
+                  <Button
+                    onClick={handleSendMessage}
+                    disabled={!message.trim() || isLoading}
+                    className="bg-gradient-to-r from-emerald-600 to-cyan-600 hover:from-emerald-500 hover:to-cyan-500 text-white gap-2 px-6 shadow-lg"
+                  >
+                    <Send className="w-4 h-4" />
+                    Enviar
+                  </Button>
                 </div>
               </div>
-            )}
-          </div>
+            </>
+          )}
 
-          {/* Input Area */}
-          <div className="border-t border-emerald-700/30 bg-slate-900/80 backdrop-blur-sm p-4 rounded-lg">
-            <div className="flex gap-3">
-              <input
-                type="text"
-                value={message}
-                onChange={(e) => setMessage(e.target.value)}
-                onKeyPress={(e) => e.key === "Enter" && handleSendMessage()}
-                placeholder="Escribe tu comando aquí... (ej: 'Cuál es la ocupación de hoy?')"
-                className="flex-1 px-4 py-3 bg-slate-800 border border-slate-700 rounded-lg text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all"
-                disabled={isLoading}
-              />
-              <Button
-                onClick={handleSendMessage}
-                disabled={!message.trim() || isLoading}
-                className="bg-gradient-to-r from-emerald-600 to-cyan-600 hover:from-emerald-500 hover:to-cyan-500 text-white gap-2 px-6 shadow-lg"
-              >
-                <Send className="w-4 h-4" />
-                Enviar
-              </Button>
+          {activeTab === "completed" && (
+            <div className="flex-1 overflow-y-auto p-6">
+              <div className="space-y-3">
+                <h2 className="text-lg font-semibold text-emerald-300 mb-4">Tareas Completadas</h2>
+                {[
+                  { title: "Revisar ocupación semanal", time: "Hace 2 horas" },
+                  { title: "Generar reporte de check-ins", time: "Hace 4 horas" },
+                  { title: "Análisis de satisfacción", time: "Hace 1 día" },
+                  { title: "Optimización de precios", time: "Hace 2 días" }
+                ].map((task, idx) => (
+                  <div key={idx} className="p-4 rounded-lg border border-green-700/30 bg-slate-800/50 hover:bg-slate-700/50 transition-colors">
+                    <div className="flex items-start gap-3">
+                      <div className="w-2 h-2 rounded-full bg-green-400 mt-2"></div>
+                      <div className="flex-1">
+                        <p className="text-slate-100 font-medium text-sm">{task.title}</p>
+                        <p className="text-slate-400 text-xs mt-1">{task.time}</p>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
             </div>
-          </div>
+          )}
+
+          {activeTab === "monitoring" && (
+            <div className="flex-1 overflow-y-auto p-6">
+              <div className="space-y-3">
+                <h2 className="text-lg font-semibold text-blue-300 mb-4">Monitoreo en Tiempo Real</h2>
+                {[
+                  { metric: "Ocupación actual", value: "78%", status: "normal", trend: "↓ 12%" },
+                  { metric: "Check-ins esperados", value: "5", status: "warning", trend: "Próximas 2h" },
+                  { metric: "Tickets abiertos", value: "17", status: "alert", trend: "+3 hoy" },
+                  { metric: "Velocidad promedio", value: "45min", status: "normal", trend: "↓ 5min" }
+                ].map((item, idx) => (
+                  <div key={idx} className={`p-4 rounded-lg border ${
+                    item.status === "alert" ? "border-red-700/30 bg-red-900/10" :
+                    item.status === "warning" ? "border-orange-700/30 bg-orange-900/10" :
+                    "border-blue-700/30 bg-blue-900/10"
+                  }`}>
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="text-slate-100 font-medium text-sm">{item.metric}</p>
+                        <p className="text-slate-400 text-xs mt-1">{item.trend}</p>
+                      </div>
+                      <p className={`text-2xl font-bold ${
+                        item.status === "alert" ? "text-red-400" :
+                        item.status === "warning" ? "text-orange-400" :
+                        "text-blue-400"
+                      }`}>{item.value}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </div>
