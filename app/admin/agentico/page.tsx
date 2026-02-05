@@ -140,27 +140,25 @@ export default function AgenticoPage() {
 
         {/* Right Content Area */}
         <div className="flex-1 flex flex-col">
-          {/* Tabs Navigation */}
-          <div className="mb-4">
-            <div className="flex gap-3">
-              {[
-                { id: "analysis", label: "En Análisis" },
-                { id: "completed", label: "Tareas Completadas" },
-                { id: "monitoring", label: "Monitoreo" }
-              ].map((tab) => (
-                <button
-                  key={tab.id}
-                  onClick={() => setActiveTab(tab.id as "analysis" | "completed" | "monitoring")}
-                  className={`px-4 py-2 text-sm font-medium rounded-lg transition-all ${
-                    activeTab === tab.id
-                      ? "bg-gradient-to-r from-emerald-600 to-cyan-600 text-white shadow-lg shadow-emerald-500/30"
-                      : "bg-slate-800/50 text-slate-300 hover:bg-slate-700/50 border border-slate-700/50"
-                  }`}
-                >
-                  {tab.label}
-                </button>
-              ))}
-            </div>
+          {/* Tabs Navigation with Continuity */}
+          <div className="bg-slate-800/30 border border-slate-700/50 rounded-lg p-1 mb-4 flex gap-1">
+            {[
+              { id: "analysis", label: "En Análisis" },
+              { id: "completed", label: "Tareas Completadas" },
+              { id: "monitoring", label: "Monitoreo" }
+            ].map((tab) => (
+              <button
+                key={tab.id}
+                onClick={() => setActiveTab(tab.id as "analysis" | "completed" | "monitoring")}
+                className={`flex-1 px-4 py-2.5 text-sm font-medium rounded transition-all ${
+                  activeTab === tab.id
+                    ? "bg-gradient-to-r from-emerald-600 to-cyan-600 text-white shadow-lg shadow-emerald-500/20"
+                    : "text-slate-300 hover:text-slate-200"
+                }`}
+              >
+                {tab.label}
+              </button>
+            ))}
           </div>
 
           {/* Tab Content */}
