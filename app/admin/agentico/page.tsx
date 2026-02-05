@@ -73,30 +73,7 @@ export default function AgenticoPage() {
         </div>
       </div>
 
-      {/* Tabs Section */}
-      <div className="border-b border-emerald-700/20 bg-slate-950/50 backdrop-blur-sm">
-        <div className="px-6 flex gap-8">
-          {[
-            { id: "analysis", label: "En Análisis" },
-            { id: "completed", label: "Tareas Completadas" },
-            { id: "monitoring", label: "Monitoreo" }
-          ].map((tab) => (
-            <button
-              key={tab.id}
-              onClick={() => setActiveTab(tab.id as "analysis" | "completed" | "monitoring")}
-              className={`py-3 px-1 text-sm font-medium border-b-2 transition-colors ${
-                activeTab === tab.id
-                  ? "text-emerald-300 border-emerald-400"
-                  : "text-slate-400 border-transparent hover:text-slate-300"
-              }`}
-            >
-              {tab.label}
-            </button>
-          ))}
-        </div>
-      </div>
-
-      {/* Main Content with Sidebar */}
+      {/* Main Content with Sidebar and Tabs */}
       <div className="h-[calc(100vh-80px)] flex gap-6 p-6">
         {/* Left Sidebar Panel */}
         <div className="w-64 flex flex-col gap-4">
@@ -163,7 +140,30 @@ export default function AgenticoPage() {
 
         {/* Right Content Area */}
         <div className="flex-1 flex flex-col">
-          {activeTab === "analysis" && (
+          {/* Tabs Navigation */}
+          <div className="border-b border-emerald-700/20 bg-slate-900/30 backdrop-blur-sm mb-4 -mx-6 px-6 py-3">
+            <div className="flex gap-6">
+              {[
+                { id: "analysis", label: "En Análisis" },
+                { id: "completed", label: "Tareas Completadas" },
+                { id: "monitoring", label: "Monitoreo" }
+              ].map((tab) => (
+                <button
+                  key={tab.id}
+                  onClick={() => setActiveTab(tab.id as "analysis" | "completed" | "monitoring")}
+                  className={`pb-2 px-1 text-sm font-medium border-b-2 transition-colors ${
+                    activeTab === tab.id
+                      ? "text-emerald-300 border-emerald-400"
+                      : "text-slate-400 border-transparent hover:text-slate-300"
+                  }`}
+                >
+                  {tab.label}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Tab Content */}
             <>
               {/* Chat Area for Analysis Tab */}
               <div className="flex-1 overflow-y-auto space-y-4 mb-4">
