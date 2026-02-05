@@ -73,27 +73,6 @@ export default function AgenticoPage() {
         </div>
       </div>
 
-      {/* Tabs Section */}
-      <div className="border-b border-emerald-700/20 bg-slate-950/50 backdrop-blur-sm">
-        <div className="px-6 flex gap-8">
-          {[
-            { id: "analysis", label: "En Análisis" },
-            { id: "completed", label: "Tareas Completadas" },
-            { id: "monitoring", label: "Monitoreo" }
-          ].map((tab) => (
-            <button
-              key={tab.id}
-              onClick={() => setActiveTab(tab.id as "analysis" | "completed" | "monitoring")}
-              className={`py-3 px-1 text-sm font-medium border-b-2 transition-colors ${
-                activeTab === tab.id
-                  ? "text-emerald-300 border-emerald-400"
-                  : "text-slate-400 border-transparent hover:text-slate-300"
-              }`}
-            >
-              {tab.label}
-            </button>
-          ))}
-        </div>
       </div>
 
       {/* Main Content with Sidebar */}
@@ -163,6 +142,26 @@ export default function AgenticoPage() {
 
         {/* Right Content Area */}
         <div className="flex-1 flex flex-col">
+          {/* Tabs Section - Now with gradient background instead of underline */}
+          <div className="flex gap-3 mb-6 bg-slate-900/30 rounded-lg p-1 w-fit">
+            {[
+              { id: "analysis", label: "En Análisis" },
+              { id: "completed", label: "Tareas Completadas" },
+              { id: "monitoring", label: "Monitoreo" }
+            ].map((tab) => (
+              <button
+                key={tab.id}
+                onClick={() => setActiveTab(tab.id as "analysis" | "completed" | "monitoring")}
+                className={`py-2 px-4 text-sm font-medium rounded-md transition-all ${
+                  activeTab === tab.id
+                    ? "bg-gradient-to-r from-emerald-600 to-cyan-600 text-white shadow-lg"
+                    : "text-slate-300 hover:text-slate-200 hover:bg-slate-800/50"
+                }`}
+              >
+                {tab.label}
+              </button>
+            ))}
+          </div>
           {activeTab === "analysis" && (
             <>
               {/* Chat Area for Analysis Tab */}
