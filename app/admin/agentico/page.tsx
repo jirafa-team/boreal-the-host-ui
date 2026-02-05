@@ -70,42 +70,34 @@ export default function AgenticoPage() {
       <div className="h-[calc(100vh-80px)] flex gap-6 p-6">
         {/* Left Sidebar Panel */}
         <div className="w-64 flex flex-col gap-4">
-          {/* Daily Summary */}
-          <Card className="p-5 border border-emerald-700/30 bg-gradient-to-br from-slate-900/70 to-slate-800/50 backdrop-blur-sm">
-            <div className="space-y-4">
-              <div>
-                <h3 className="text-lg font-semibold text-emerald-300">
-                  👋 Hola, <span className="text-cyan-300">Carlos</span>!
-                </h3>
-                <p className="text-xs text-slate-400 mt-1">Este es el estado actual:</p>
-              </div>
+          {/* Daily Summary - Compact KPI Layout */}
+          <Card className="p-4 border border-emerald-700/30 bg-gradient-to-br from-slate-900/70 to-slate-800/50 backdrop-blur-sm">
+            <div className="space-y-3">
+              <h3 className="text-sm font-semibold text-emerald-300">
+                Hola, <span className="text-cyan-300">Carlos</span>
+              </h3>
 
-              <div className="space-y-3">
-                <div className="flex items-start gap-3 p-3 rounded-lg bg-slate-800/50 border border-red-700/20">
-                  <span className="text-lg mt-0.5">📉</span>
-                  <div className="flex-1">
-                    <p className="text-sm text-slate-200">Ocupación bajó 12% desde la semana pasada</p>
-                  </div>
+              <div className="grid grid-cols-3 gap-2">
+                {/* Occupancy KPI */}
+                <div className="p-2 rounded-lg bg-slate-800/50 border border-red-700/30 text-center hover:bg-red-900/20 transition-colors">
+                  <p className="text-xl font-bold text-red-400">-12%</p>
+                  <p className="text-xs text-slate-300">Ocupación</p>
                 </div>
 
-                <div className="flex items-start gap-3 p-3 rounded-lg bg-slate-800/50 border border-orange-700/20">
-                  <span className="text-lg mt-0.5">⚠️</span>
-                  <div className="flex-1">
-                    <p className="text-sm text-slate-200">17 tickets sin seguimiento</p>
-                  </div>
+                {/* Tickets KPI */}
+                <div className="p-2 rounded-lg bg-slate-800/50 border border-orange-700/30 text-center hover:bg-orange-900/20 transition-colors">
+                  <p className="text-xl font-bold text-orange-400">17</p>
+                  <p className="text-xs text-slate-300">Tickets</p>
                 </div>
 
-                <div className="flex items-start gap-3 p-3 rounded-lg bg-slate-800/50 border border-green-700/20">
-                  <span className="text-lg mt-0.5">📈</span>
-                  <div className="flex-1">
-                    <p className="text-sm text-slate-200">Reservas para julio aumentaron 20%</p>
-                  </div>
+                {/* Reservations KPI */}
+                <div className="p-2 rounded-lg bg-slate-800/50 border border-green-700/30 text-center hover:bg-green-900/20 transition-colors">
+                  <p className="text-xl font-bold text-green-400">+20%</p>
+                  <p className="text-xs text-slate-300">Reservas</p>
                 </div>
               </div>
 
-              <div className="pt-2 border-t border-slate-700/50">
-                <p className="text-sm font-medium text-emerald-300">¿En qué trabajamos hoy?</p>
-              </div>
+              <p className="text-xs text-emerald-300 font-medium">¿En qué trabajamos hoy?</p>
             </div>
           </Card>
 
