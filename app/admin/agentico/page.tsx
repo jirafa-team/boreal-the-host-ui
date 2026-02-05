@@ -163,80 +163,118 @@ export default function AgenticoPage() {
 
           {/* Tab Content */}
           {activeTab === "analysis" && (
-            <>
-              {/* Chat Area for Analysis Tab */}
-              <div className="flex-1 overflow-y-auto space-y-4 mb-4">
-                {messages.map((msg, idx) => (
+            <div className="flex-1 overflow-y-auto">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {[
+                  { 
+                    title: "Análisis de ocupación",
+                    icon: "📊",
+                    status: "En progreso",
+                    summary: "Revisando tasas de ocupación\npor rango horario"
+                  },
+                  { 
+                    title: "Reporte de ingresos",
+                    icon: "💰",
+                    status: "En progreso",
+                    summary: "Calculando ingresos totales\nde la semana actual"
+                  },
+                  { 
+                    title: "Análisis de guests",
+                    icon: "👥",
+                    status: "En progreso",
+                    summary: "Segmentando guests por\nperfiles de estancia"
+                  },
+                  { 
+                    title: "Predicción de demanda",
+                    icon: "🔮",
+                    status: "En progreso",
+                    summary: "Aplicando ML para próximos\n30 días"
+                  },
+                  { 
+                    title: "Análisis de satisfacción",
+                    icon: "⭐",
+                    status: "En progreso",
+                    summary: "Procesando reviews y ratings\nde huéspedes"
+                  },
+                  { 
+                    title: "Optimización precios",
+                    icon: "📈",
+                    status: "En progreso",
+                    summary: "Ajustando tarifas según\nmercado actual"
+                  }
+                ].map((task, idx) => (
                   <div
                     key={idx}
-                    className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}
+                    className="aspect-square bg-gradient-to-br from-slate-800 to-slate-900 border border-emerald-700/30 rounded-lg p-4 flex flex-col hover:border-emerald-600/50 hover:shadow-lg hover:shadow-emerald-500/10 transition-all cursor-pointer group"
                   >
-                    <div
-                      className={`max-w-md px-4 py-3 rounded-lg ${
-                        msg.role === "user"
-                          ? "bg-gradient-to-r from-emerald-600 to-cyan-600 text-white rounded-br-none shadow-lg"
-                          : "bg-slate-800 text-slate-100 border border-slate-700 rounded-bl-none shadow-lg"
-                      }`}
-                    >
-                      <p className="text-sm">{msg.content}</p>
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="text-2xl">{task.icon}</span>
+                      <div className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></div>
+                    </div>
+                    <h3 className="font-semibold text-sm text-slate-100 group-hover:text-emerald-300 transition-colors line-clamp-1">{task.title}</h3>
+                    <p className="text-xs text-emerald-400/70 mb-auto">Estado: {task.status}</p>
+                    <div className="border-t border-slate-700/50 pt-2 mt-auto">
+                      <p className="text-xs text-slate-300 leading-tight">{task.summary}</p>
                     </div>
                   </div>
                 ))}
-                {isLoading && (
-                  <div className="flex justify-start">
-                    <div className="bg-slate-800 border border-slate-700 text-slate-100 px-4 py-3 rounded-lg rounded-bl-none shadow-lg">
-                      <div className="flex gap-2">
-                        <div className="w-2 h-2 rounded-full bg-emerald-400 animate-bounce" style={{ animationDelay: "0ms" }}></div>
-                        <div className="w-2 h-2 rounded-full bg-cyan-400 animate-bounce" style={{ animationDelay: "150ms" }}></div>
-                        <div className="w-2 h-2 rounded-full bg-blue-400 animate-bounce" style={{ animationDelay: "300ms" }}></div>
-                      </div>
-                    </div>
-                  </div>
-                )}
               </div>
-
-              {/* Input Area for Analysis */}
-              <div className="border-t border-emerald-700/30 bg-slate-900/80 backdrop-blur-sm p-4 rounded-lg">
-                <div className="flex gap-3">
-                  <input
-                    type="text"
-                    value={message}
-                    onChange={(e) => setMessage(e.target.value)}
-                    onKeyPress={(e) => e.key === "Enter" && handleSendMessage()}
-                    placeholder="Escribe tu comando aquí... (ej: 'Cuál es la ocupación de hoy?')"
-                    className="flex-1 px-4 py-3 bg-slate-800 border border-slate-700 rounded-lg text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all"
-                    disabled={isLoading}
-                  />
-                  <Button
-                    onClick={handleSendMessage}
-                    disabled={!message.trim() || isLoading}
-                    className="bg-gradient-to-r from-emerald-600 to-cyan-600 hover:from-emerald-500 hover:to-cyan-500 text-white gap-2 px-6 shadow-lg"
-                  >
-                    <Send className="w-4 h-4" />
-                    Enviar
-                  </Button>
-                </div>
-              </div>
-            </>
+            </div>
           )}
 
           {activeTab === "completed" && (
-            <div className="flex-1 overflow-y-auto p-6">
-              <div className="space-y-3">
-                <h2 className="text-lg font-semibold text-emerald-300 mb-4">Tareas Completadas</h2>
+            <div className="flex-1 overflow-y-auto">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {[
-                  { title: "Revisar ocupación semanal", time: "Hace 2 horas" },
-                  { title: "Generar reporte de check-ins", time: "Hace 4 horas" },
-                  { title: "Análisis de satisfacción", time: "Hace 1 día" },
-                  { title: "Optimización de precios", time: "Hace 2 días" }
+                  { 
+                    title: "Revisar ocupación semanal",
+                    icon: "✅",
+                    time: "Hace 2 horas",
+                    summary: "Se completó análisis de ocupación\npara toda la semana"
+                  },
+                  { 
+                    title: "Generar reporte de check-ins",
+                    icon: "📋",
+                    time: "Hace 4 horas",
+                    summary: "Reporte generado con datos de\ntodos los check-ins"
+                  },
+                  { 
+                    title: "Análisis de satisfacción",
+                    icon: "⭐",
+                    time: "Hace 1 día",
+                    summary: "Se procesaron 150 reviews\ny se calculó promedio"
+                  },
+                  { 
+                    title: "Optimización de precios",
+                    icon: "💲",
+                    time: "Hace 2 días",
+                    summary: "Tarifas ajustadas según\ndemanda proyectada"
+                  },
+                  { 
+                    title: "Reporte de ingresos",
+                    icon: "💰",
+                    time: "Hace 3 días",
+                    summary: "Ingresos totales calculados\ncon variación mensual"
+                  },
+                  { 
+                    title: "Auditoría de guests",
+                    icon: "👤",
+                    time: "Hace 1 semana",
+                    summary: "Se revisaron 500+ perfiles\ny se segmentaron datos"
+                  }
                 ].map((task, idx) => (
-                  <div key={idx} className="p-4 rounded-lg border border-green-700/30 bg-slate-800/50 hover:bg-slate-700/50 transition-colors">
-                    <div className="flex items-start gap-3">
-                      <div className="w-2 h-2 rounded-full bg-green-400 mt-2"></div>
-                      <div className="flex-1">
-                        <p className="text-slate-100 font-medium text-sm">{task.title}</p>
-                        <p className="text-slate-400 text-xs mt-1">{task.time}</p>
-                      </div>
+                  <div
+                    key={idx}
+                    className="aspect-square bg-gradient-to-br from-slate-800 to-slate-900 border border-green-700/30 rounded-lg p-4 flex flex-col hover:border-green-600/50 hover:shadow-lg hover:shadow-green-500/10 transition-all cursor-pointer group"
+                  >
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="text-2xl">{task.icon}</span>
+                      <div className="w-2 h-2 rounded-full bg-green-400"></div>
+                    </div>
+                    <h3 className="font-semibold text-sm text-slate-100 group-hover:text-green-300 transition-colors line-clamp-1">{task.title}</h3>
+                    <p className="text-xs text-green-400/70 mb-auto">{task.time}</p>
+                    <div className="border-t border-slate-700/50 pt-2 mt-auto">
+                      <p className="text-xs text-slate-300 leading-tight">{task.summary}</p>
                     </div>
                   </div>
                 ))}
@@ -245,33 +283,78 @@ export default function AgenticoPage() {
           )}
 
           {activeTab === "monitoring" && (
-            <div className="flex-1 overflow-y-auto p-6">
-              <div className="space-y-3">
-                <h2 className="text-lg font-semibold text-blue-300 mb-4">Monitoreo en Tiempo Real</h2>
+            <div className="flex-1 overflow-y-auto">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {[
-                  { metric: "Ocupación actual", value: "78%", status: "normal", trend: "↓ 12%" },
-                  { metric: "Check-ins esperados", value: "5", status: "warning", trend: "Próximas 2h" },
-                  { metric: "Tickets abiertos", value: "17", status: "alert", trend: "+3 hoy" },
-                  { metric: "Velocidad promedio", value: "45min", status: "normal", trend: "↓ 5min" }
-                ].map((item, idx) => (
-                  <div key={idx} className={`p-4 rounded-lg border ${
-                    item.status === "alert" ? "border-red-700/30 bg-red-900/10" :
-                    item.status === "warning" ? "border-orange-700/30 bg-orange-900/10" :
-                    "border-blue-700/30 bg-blue-900/10"
-                  }`}>
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <p className="text-slate-100 font-medium text-sm">{item.metric}</p>
-                        <p className="text-slate-400 text-xs mt-1">{item.trend}</p>
+                  { 
+                    title: "Ocupación actual",
+                    icon: "📊",
+                    value: "78%",
+                    status: "normal",
+                    summary: "↓ 12% desde hace una semana\nTendencia: bajando"
+                  },
+                  { 
+                    title: "Check-ins próximos",
+                    icon: "📍",
+                    value: "5",
+                    status: "warning",
+                    summary: "Esperados en próximas 2 horas\nHabitaciones: 5 y 7"
+                  },
+                  { 
+                    title: "Tickets abiertos",
+                    icon: "🎫",
+                    value: "17",
+                    status: "alert",
+                    summary: "+3 nuevos hoy\n6 sin asignar"
+                  },
+                  { 
+                    title: "Velocidad promedio",
+                    icon: "⏱️",
+                    value: "45m",
+                    status: "normal",
+                    summary: "↓ 5 min. respecto a ayer\nMejora: +11%"
+                  },
+                  { 
+                    title: "Revenue en tiempo real",
+                    icon: "💵",
+                    value: "$2.8K",
+                    status: "normal",
+                    summary: "Hoy hasta el momento\n↑ $300 proyectado"
+                  },
+                  { 
+                    title: "Satisfacción guests",
+                    icon: "😊",
+                    value: "4.6/5",
+                    status: "normal",
+                    summary: "Rating promedio hoy\n94 reviews procesados"
+                  }
+                ].map((item, idx) => {
+                  const statusColors = {
+                    alert: "border-red-700/30 bg-red-900/10 hover:border-red-600/50 hover:shadow-red-500/10",
+                    warning: "border-orange-700/30 bg-orange-900/10 hover:border-orange-600/50 hover:shadow-orange-500/10",
+                    normal: "border-blue-700/30 bg-blue-900/10 hover:border-blue-600/50 hover:shadow-blue-500/10"
+                  }
+                  const textColors = {
+                    alert: "text-red-400",
+                    warning: "text-orange-400",
+                    normal: "text-blue-400"
+                  }
+                  return (
+                    <div
+                      key={idx}
+                      className={`aspect-square rounded-lg p-4 flex flex-col hover:shadow-lg transition-all cursor-pointer group border ${statusColors[item.status as keyof typeof statusColors]}`}
+                    >
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="text-2xl">{item.icon}</span>
                       </div>
-                      <p className={`text-2xl font-bold ${
-                        item.status === "alert" ? "text-red-400" :
-                        item.status === "warning" ? "text-orange-400" :
-                        "text-blue-400"
-                      }`}>{item.value}</p>
+                      <h3 className="font-semibold text-sm text-slate-100 group-hover:text-slate-50 transition-colors line-clamp-1">{item.title}</h3>
+                      <p className={`text-2xl font-bold mb-auto ${textColors[item.status as keyof typeof textColors]}`}>{item.value}</p>
+                      <div className="border-t border-slate-700/50 pt-2 mt-auto">
+                        <p className="text-xs text-slate-300 leading-tight">{item.summary}</p>
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  )
+                })}
               </div>
             </div>
           )}
