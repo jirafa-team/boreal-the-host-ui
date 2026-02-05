@@ -166,35 +166,34 @@ export default function AgenticoPage() {
 
         {/* Right Content Area */}
         <div className={`flex flex-col ${chatExpanded ? "flex-1" : "flex-1"}`}>
-          {/* Tabs Navigation with Continuity - Dynamic */}
-          <div className="bg-slate-800/30 border border-slate-700/50 rounded-lg p-0.5 mb-4 flex gap-0.5 overflow-x-auto">
-            {/* Opened Panel Tabs */}
-            {openedPanelTabs.map((tab) => (
-              <div key={tab.id} className="flex items-center">
-                <button
-                  onClick={() => setActiveTab(tab.id)}
-                  className={`px-4 py-1.5 text-xs font-medium rounded transition-all ${
-                    activeTab === tab.id
-                      ? "bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-lg shadow-blue-500/20"
-                      : "text-slate-300 hover:text-slate-200"
-                  }`}
-                >
-                  {tab.title}
-                </button>
-                <button
-                  onClick={() => closePanelTab(tab.id)}
-                  className="ml-1 px-2 py-1 text-xs text-slate-400 hover:text-slate-200 transition-colors rounded"
-                >
-                  ✕
-                </button>
-              </div>
-            ))}
+          {/* Opened Panel Tabs - Top Level */}
+          {openedPanelTabs.length > 0 && (
+            <div className="bg-slate-800/20 border-b border-slate-700/30 rounded-t-lg p-0.5 flex gap-0.5 overflow-x-auto">
+              {openedPanelTabs.map((tab) => (
+                <div key={tab.id} className="flex items-center">
+                  <button
+                    onClick={() => setActiveTab(tab.id)}
+                    className={`px-4 py-1.5 text-xs font-medium rounded-t transition-all ${
+                      activeTab === tab.id
+                        ? "bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-lg shadow-blue-500/20"
+                        : "text-slate-300 hover:text-slate-200"
+                    }`}
+                  >
+                    {tab.title}
+                  </button>
+                  <button
+                    onClick={() => closePanelTab(tab.id)}
+                    className="ml-1 px-2 py-1 text-xs text-slate-400 hover:text-slate-200 transition-colors rounded"
+                  >
+                    ✕
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
 
-            {/* Divider */}
-            {openedPanelTabs.length > 0 && (
-              <div className="w-px bg-slate-700/30 mx-1"></div>
-            )}
-
+          {/* Tabs Navigation with Continuity - Default Tabs */}
+          <div className={`bg-slate-800/30 border border-slate-700/50 ${openedPanelTabs.length > 0 ? "rounded-b-lg border-t-0" : "rounded-lg"} p-0.5 mb-4 flex gap-0.5 overflow-x-auto`}>
             {/* Default Tabs */}
             {[
               { id: "analysis", label: "En Análisis" },
