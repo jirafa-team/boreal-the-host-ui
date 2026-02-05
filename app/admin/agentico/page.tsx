@@ -2,9 +2,10 @@
 
 import { useState } from "react"
 import { useRouter } from "next/navigation"
+import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
-import { ArrowLeft, Bot, Send, History, MessageSquare, Settings, Zap, BarChart3, Users, Briefcase, TrendingUp, Headphones, Users2, UserCheck } from "lucide-react"
+import { ArrowLeft, Bot, Send, History, MessageSquare, Settings, Zap, BarChart3, Users, Briefcase, TrendingUp, Headphones, Users2, UserCheck, CheckCircle, Clock } from "lucide-react"
 
 export default function AgenticoPage() {
   const router = useRouter()
@@ -164,57 +165,69 @@ export default function AgenticoPage() {
           {/* Tab Content */}
           {activeTab === "analysis" && (
             <div className="flex-1 overflow-y-auto">
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
                 {[
                   { 
                     title: "Análisis de ocupación",
                     icon: "📊",
                     status: "En progreso",
-                    summary: "Revisando tasas de ocupación\npor rango horario"
+                    summary: "Revisando tasas\npor hora"
                   },
                   { 
                     title: "Reporte de ingresos",
                     icon: "💰",
                     status: "En progreso",
-                    summary: "Calculando ingresos totales\nde la semana actual"
+                    summary: "Cálculo semanal\nen progreso"
                   },
                   { 
                     title: "Análisis de guests",
                     icon: "👥",
                     status: "En progreso",
-                    summary: "Segmentando guests por\nperfiles de estancia"
+                    summary: "Segmentación\npor perfil"
                   },
                   { 
-                    title: "Predicción de demanda",
+                    title: "Predicción demanda",
                     icon: "🔮",
                     status: "En progreso",
-                    summary: "Aplicando ML para próximos\n30 días"
+                    summary: "ML próximos\n30 días"
                   },
                   { 
-                    title: "Análisis de satisfacción",
+                    title: "Satisfacción",
                     icon: "⭐",
                     status: "En progreso",
-                    summary: "Procesando reviews y ratings\nde huéspedes"
+                    summary: "Reviews y ratings\nen proceso"
                   },
                   { 
-                    title: "Optimización precios",
+                    title: "Optimización",
                     icon: "📈",
                     status: "En progreso",
-                    summary: "Ajustando tarifas según\nmercado actual"
+                    summary: "Ajuste de tarifas\nactualizado"
+                  },
+                  { 
+                    title: "Tendencias",
+                    icon: "📉",
+                    status: "En progreso",
+                    summary: "Análisis histórico\ncomparativo"
+                  },
+                  { 
+                    title: "Segmentación",
+                    icon: "🎯",
+                    status: "En progreso",
+                    summary: "Clasificación\nde huéspedes"
                   }
                 ].map((task, idx) => (
                   <div
                     key={idx}
-                    className="aspect-square bg-gradient-to-br from-slate-800 to-slate-900 border border-emerald-700/30 rounded-lg p-4 flex flex-col hover:border-emerald-600/50 hover:shadow-lg hover:shadow-emerald-500/10 transition-all cursor-pointer group"
+                    className="bg-gradient-to-br from-slate-800 to-slate-900 border border-emerald-700/30 rounded-lg p-3 flex flex-col hover:border-emerald-600/50 hover:shadow-lg hover:shadow-emerald-500/10 transition-all cursor-pointer group min-h-32"
                   >
-                    <div className="flex items-center justify-between mb-2">
-                      <span className="text-2xl">{task.icon}</span>
-                      <div className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></div>
+                    <div className="flex items-center justify-between mb-1.5">
+                      <span className="text-lg">{task.icon}</span>
+                      <div className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></div>
                     </div>
-                    <h3 className="font-semibold text-sm text-slate-100 group-hover:text-emerald-300 transition-colors line-clamp-1">{task.title}</h3>
-                    <p className="text-xs text-emerald-400/70 mb-auto">Estado: {task.status}</p>
-                    <div className="border-t border-slate-700/50 pt-2 mt-auto">
-                      <p className="text-xs text-slate-300 leading-tight">{task.summary}</p>
+                    <h3 className="font-semibold text-xs text-slate-100 group-hover:text-emerald-300 transition-colors line-clamp-1">{task.title}</h3>
+                    <p className="text-xs text-emerald-400/70 mb-auto text-[10px]">En progreso</p>
+                    <div className="border-t border-slate-700/50 pt-1.5 mt-auto">
+                      <p className="text-xs text-slate-300 leading-tight line-clamp-2">{task.summary}</p>
                     </div>
                   </div>
                 ))}
@@ -224,138 +237,141 @@ export default function AgenticoPage() {
 
           {activeTab === "completed" && (
             <div className="flex-1 overflow-y-auto">
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {[
-                  { 
-                    title: "Revisar ocupación semanal",
-                    icon: "✅",
-                    time: "Hace 2 horas",
-                    summary: "Se completó análisis de ocupación\npara toda la semana"
-                  },
-                  { 
-                    title: "Generar reporte de check-ins",
-                    icon: "📋",
-                    time: "Hace 4 horas",
-                    summary: "Reporte generado con datos de\ntodos los check-ins"
-                  },
-                  { 
-                    title: "Análisis de satisfacción",
-                    icon: "⭐",
-                    time: "Hace 1 día",
-                    summary: "Se procesaron 150 reviews\ny se calculó promedio"
-                  },
-                  { 
-                    title: "Optimización de precios",
-                    icon: "💲",
-                    time: "Hace 2 días",
-                    summary: "Tarifas ajustadas según\ndemanda proyectada"
-                  },
-                  { 
-                    title: "Reporte de ingresos",
-                    icon: "💰",
-                    time: "Hace 3 días",
-                    summary: "Ingresos totales calculados\ncon variación mensual"
-                  },
-                  { 
-                    title: "Auditoría de guests",
-                    icon: "👤",
-                    time: "Hace 1 semana",
-                    summary: "Se revisaron 500+ perfiles\ny se segmentaron datos"
-                  }
-                ].map((task, idx) => (
-                  <div
-                    key={idx}
-                    className="aspect-square bg-gradient-to-br from-slate-800 to-slate-900 border border-green-700/30 rounded-lg p-4 flex flex-col hover:border-green-600/50 hover:shadow-lg hover:shadow-green-500/10 transition-all cursor-pointer group"
-                  >
-                    <div className="flex items-center justify-between mb-2">
-                      <span className="text-2xl">{task.icon}</span>
-                      <div className="w-2 h-2 rounded-full bg-green-400"></div>
-                    </div>
-                    <h3 className="font-semibold text-sm text-slate-100 group-hover:text-green-300 transition-colors line-clamp-1">{task.title}</h3>
-                    <p className="text-xs text-green-400/70 mb-auto">{task.time}</p>
-                    <div className="border-t border-slate-700/50 pt-2 mt-auto">
-                      <p className="text-xs text-slate-300 leading-tight">{task.summary}</p>
-                    </div>
-                  </div>
-                ))}
+              <div className="space-y-4">
+                {/* Tasks List */}
+                <div className="border border-green-700/30 rounded-lg overflow-hidden">
+                  <table className="w-full text-sm">
+                    <thead>
+                      <tr className="bg-slate-800/50 border-b border-green-700/20">
+                        <th className="px-4 py-3 text-left text-slate-300 font-semibold">Tarea</th>
+                        <th className="px-4 py-3 text-left text-slate-300 font-semibold">Completada</th>
+                        <th className="px-4 py-3 text-left text-slate-300 font-semibold">Duración</th>
+                        <th className="px-4 py-3 text-left text-slate-300 font-semibold">Estado</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {[
+                        { title: "Revisar ocupación semanal", time: "Hace 2 horas", duration: "45 min", status: "✓" },
+                        { title: "Generar reporte de check-ins", time: "Hace 4 horas", duration: "30 min", status: "✓" },
+                        { title: "Análisis de satisfacción", time: "Hace 1 día", duration: "2h 15min", status: "✓" },
+                        { title: "Optimización de precios", time: "Hace 2 días", duration: "1h 30min", status: "✓" },
+                        { title: "Reporte de ingresos", time: "Hace 3 días", duration: "1h 20min", status: "✓" },
+                        { title: "Auditoría de guests", time: "Hace 1 semana", duration: "4h 45min", status: "✓" }
+                      ].map((task, idx) => (
+                        <tr key={idx} className="border-b border-slate-700/30 hover:bg-slate-800/30 transition-colors">
+                          <td className="px-4 py-3 text-slate-100">{task.title}</td>
+                          <td className="px-4 py-3 text-slate-400">{task.time}</td>
+                          <td className="px-4 py-3 text-slate-400">{task.duration}</td>
+                          <td className="px-4 py-3">
+                            <span className="flex items-center gap-1 text-green-400">
+                              <CheckCircle className="w-4 h-4" />
+                              Completado
+                            </span>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
               </div>
             </div>
           )}
 
           {activeTab === "monitoring" && (
-            <div className="flex-1 overflow-y-auto">
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div className="flex-1 overflow-y-auto space-y-4">
+              {/* Occupancy Chart */}
+              <Card className="p-4 border border-blue-700/30 bg-slate-800/50">
+                <h3 className="text-sm font-semibold text-blue-300 mb-3">Ocupación por Hora</h3>
+                <ResponsiveContainer width="100%" height={250}>
+                  <LineChart data={[
+                    { time: "00:00", value: 45 },
+                    { time: "04:00", value: 38 },
+                    { time: "08:00", value: 62 },
+                    { time: "12:00", value: 78 },
+                    { time: "16:00", value: 85 },
+                    { time: "20:00", value: 92 },
+                    { time: "23:00", value: 78 }
+                  ]}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="#334155" />
+                    <XAxis dataKey="time" stroke="#94a3b8" />
+                    <YAxis stroke="#94a3b8" />
+                    <Tooltip contentStyle={{ backgroundColor: "#1e293b", border: "1px solid #0f766e" }} />
+                    <Line type="monotone" dataKey="value" stroke="#06b6d4" strokeWidth={2} dot={{ fill: "#06b6d4", r: 4 }} />
+                  </LineChart>
+                </ResponsiveContainer>
+              </Card>
+
+              {/* Performance Metrics */}
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                 {[
-                  { 
-                    title: "Ocupación actual",
-                    icon: "📊",
-                    value: "78%",
-                    status: "normal",
-                    summary: "↓ 12% desde hace una semana\nTendencia: bajando"
-                  },
-                  { 
-                    title: "Check-ins próximos",
-                    icon: "📍",
-                    value: "5",
-                    status: "warning",
-                    summary: "Esperados en próximas 2 horas\nHabitaciones: 5 y 7"
-                  },
-                  { 
-                    title: "Tickets abiertos",
-                    icon: "🎫",
-                    value: "17",
-                    status: "alert",
-                    summary: "+3 nuevos hoy\n6 sin asignar"
-                  },
-                  { 
-                    title: "Velocidad promedio",
-                    icon: "⏱️",
-                    value: "45m",
-                    status: "normal",
-                    summary: "↓ 5 min. respecto a ayer\nMejora: +11%"
-                  },
-                  { 
-                    title: "Revenue en tiempo real",
-                    icon: "💵",
-                    value: "$2.8K",
-                    status: "normal",
-                    summary: "Hoy hasta el momento\n↑ $300 proyectado"
-                  },
-                  { 
-                    title: "Satisfacción guests",
-                    icon: "😊",
-                    value: "4.6/5",
-                    status: "normal",
-                    summary: "Rating promedio hoy\n94 reviews procesados"
-                  }
-                ].map((item, idx) => {
-                  const statusColors = {
-                    alert: "border-red-700/30 bg-red-900/10 hover:border-red-600/50 hover:shadow-red-500/10",
-                    warning: "border-orange-700/30 bg-orange-900/10 hover:border-orange-600/50 hover:shadow-orange-500/10",
-                    normal: "border-blue-700/30 bg-blue-900/10 hover:border-blue-600/50 hover:shadow-blue-500/10"
-                  }
-                  const textColors = {
-                    alert: "text-red-400",
-                    warning: "text-orange-400",
-                    normal: "text-blue-400"
-                  }
-                  return (
-                    <div
-                      key={idx}
-                      className={`aspect-square rounded-lg p-4 flex flex-col hover:shadow-lg transition-all cursor-pointer group border ${statusColors[item.status as keyof typeof statusColors]}`}
-                    >
-                      <div className="flex items-center justify-between mb-2">
-                        <span className="text-2xl">{item.icon}</span>
-                      </div>
-                      <h3 className="font-semibold text-sm text-slate-100 group-hover:text-slate-50 transition-colors line-clamp-1">{item.title}</h3>
-                      <p className={`text-2xl font-bold mb-auto ${textColors[item.status as keyof typeof textColors]}`}>{item.value}</p>
-                      <div className="border-t border-slate-700/50 pt-2 mt-auto">
-                        <p className="text-xs text-slate-300 leading-tight">{item.summary}</p>
-                      </div>
-                    </div>
-                  )
-                })}
+                  { label: "Ocupación", value: "78%", color: "text-blue-400" },
+                  { label: "Check-ins", value: "5", color: "text-orange-400" },
+                  { label: "Tickets", value: "17", color: "text-red-400" },
+                  { label: "Velocidad", value: "45m", color: "text-green-400" }
+                ].map((metric, idx) => (
+                  <div key={idx} className="bg-slate-800/50 border border-slate-700/50 rounded-lg p-3">
+                    <p className="text-xs text-slate-400">{metric.label}</p>
+                    <p className={`text-2xl font-bold ${metric.color} mt-1`}>{metric.value}</p>
+                  </div>
+                ))}
               </div>
+
+              {/* Revenue Chart */}
+              <Card className="p-4 border border-green-700/30 bg-slate-800/50">
+                <h3 className="text-sm font-semibold text-green-300 mb-3">Ingresos Diarios</h3>
+                <ResponsiveContainer width="100%" height={200}>
+                  <BarChart data={[
+                    { day: "Lun", revenue: 2400 },
+                    { day: "Mar", revenue: 2210 },
+                    { day: "Mié", revenue: 2290 },
+                    { day: "Jue", revenue: 2800 },
+                    { day: "Vie", revenue: 3200 },
+                    { day: "Sab", revenue: 3800 },
+                    { day: "Dom", revenue: 2800 }
+                  ]}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="#334155" />
+                    <XAxis dataKey="day" stroke="#94a3b8" />
+                    <YAxis stroke="#94a3b8" />
+                    <Tooltip contentStyle={{ backgroundColor: "#1e293b", border: "1px solid #16a34a" }} />
+                    <Bar dataKey="revenue" fill="#22c55e" />
+                  </BarChart>
+                </ResponsiveContainer>
+              </Card>
+
+              {/* Status Table */}
+              <Card className="p-4 border border-slate-700/30 bg-slate-800/50 overflow-hidden">
+                <h3 className="text-sm font-semibold text-slate-300 mb-3">Estado de Sistemas</h3>
+                <div className="overflow-x-auto">
+                  <table className="w-full text-xs">
+                    <thead>
+                      <tr className="border-b border-slate-700/30">
+                        <th className="px-3 py-2 text-left text-slate-400">Sistema</th>
+                        <th className="px-3 py-2 text-left text-slate-400">Estado</th>
+                        <th className="px-3 py-2 text-left text-slate-400">Última actualización</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {[
+                        { system: "API Principal", status: "Online", time: "Hace 1min" },
+                        { system: "Base de datos", status: "Online", time: "Hace 2min" },
+                        { system: "Reservas", status: "Online", time: "Hace 5min" },
+                        { system: "Reportes", status: "Online", time: "Hace 10min" }
+                      ].map((item, idx) => (
+                        <tr key={idx} className="border-b border-slate-700/20 hover:bg-slate-700/30">
+                          <td className="px-3 py-2 text-slate-100">{item.system}</td>
+                          <td className="px-3 py-2">
+                            <span className="inline-flex items-center gap-1 text-green-400">
+                              <div className="w-2 h-2 rounded-full bg-green-400"></div>
+                              {item.status}
+                            </span>
+                          </td>
+                          <td className="px-3 py-2 text-slate-400">{item.time}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </Card>
             </div>
           )}
         </div>
