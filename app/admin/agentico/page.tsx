@@ -70,40 +70,42 @@ export default function AgenticoPage() {
       <div className="h-[calc(100vh-80px)] flex gap-6 p-6">
         {/* Left Sidebar Panel */}
         <div className="w-64 flex flex-col gap-4">
-          {/* Quick Actions */}
-          <Card className="p-4 border border-emerald-700/30 bg-slate-900/50 backdrop-blur-sm">
-            <h3 className="text-sm font-semibold text-emerald-300 mb-3 flex items-center gap-2">
-              <Zap className="w-4 h-4" />
-              Acciones Rápidas
-            </h3>
-            <div className="space-y-2">
-              {quickActions.map((action, idx) => {
-                const Icon = action.icon
-                return (
-                  <button
-                    key={idx}
-                    onClick={() => {
-                      setMessage(action.command)
-                      setTimeout(() => {
-                        const newMessages = [...messages, { role: "user", content: action.command }]
-                        setMessages(newMessages)
-                        setIsLoading(true)
-                        setTimeout(() => {
-                          setMessages([
-                            ...newMessages,
-                            { role: "assistant", content: "Procesando tu solicitud..." }
-                          ])
-                          setIsLoading(false)
-                        }, 1000)
-                      }, 100)
-                    }}
-                    className="w-full text-left px-3 py-2 rounded-lg bg-slate-800/50 hover:bg-emerald-600/20 border border-slate-700/50 hover:border-emerald-600/50 text-slate-200 hover:text-emerald-200 transition-all text-xs flex items-center gap-2"
-                  >
-                    <Icon className="w-3.5 h-3.5" />
-                    {action.label}
-                  </button>
-                )
-              })}
+          {/* Daily Summary */}
+          <Card className="p-5 border border-emerald-700/30 bg-gradient-to-br from-slate-900/70 to-slate-800/50 backdrop-blur-sm">
+            <div className="space-y-4">
+              <div>
+                <h3 className="text-lg font-semibold text-emerald-300">
+                  👋 Hola, <span className="text-cyan-300">Carlos</span>!
+                </h3>
+                <p className="text-xs text-slate-400 mt-1">Este es el estado actual:</p>
+              </div>
+
+              <div className="space-y-3">
+                <div className="flex items-start gap-3 p-3 rounded-lg bg-slate-800/50 border border-red-700/20">
+                  <span className="text-lg mt-0.5">📉</span>
+                  <div className="flex-1">
+                    <p className="text-sm text-slate-200">Ocupación bajó 12% desde la semana pasada</p>
+                  </div>
+                </div>
+
+                <div className="flex items-start gap-3 p-3 rounded-lg bg-slate-800/50 border border-orange-700/20">
+                  <span className="text-lg mt-0.5">⚠️</span>
+                  <div className="flex-1">
+                    <p className="text-sm text-slate-200">17 tickets sin seguimiento</p>
+                  </div>
+                </div>
+
+                <div className="flex items-start gap-3 p-3 rounded-lg bg-slate-800/50 border border-green-700/20">
+                  <span className="text-lg mt-0.5">📈</span>
+                  <div className="flex-1">
+                    <p className="text-sm text-slate-200">Reservas para julio aumentaron 20%</p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="pt-2 border-t border-slate-700/50">
+                <p className="text-sm font-medium text-emerald-300">¿En qué trabajamos hoy?</p>
+              </div>
             </div>
           </Card>
 
