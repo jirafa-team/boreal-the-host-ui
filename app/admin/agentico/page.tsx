@@ -4,7 +4,7 @@ import { useState } from "react"
 import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
-import { ArrowLeft, Bot, Zap, Brain, MessageCircle, Send } from "lucide-react"
+import { ArrowLeft, Bot, Send, History, MessageSquare, Settings, Zap, BarChart3, Users } from "lucide-react"
 
 export default function AgenticoPage() {
   const router = useRouter()
@@ -33,6 +33,12 @@ export default function AgenticoPage() {
     }, 1000)
   }
 
+  const quickActions = [
+    { icon: BarChart3, label: "Ocupación diaria", command: "¿Cuál es la ocupación de hoy?" },
+    { icon: Users, label: "Check-ins próximos", command: "Muéstrame los check-ins del próximo día" },
+    { icon: Zap, label: "Pedidos pendientes", command: "¿Cuántos pedidos están pendientes?" },
+  ]
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950">
       {/* Header with Boreal Colors */}
@@ -60,100 +66,129 @@ export default function AgenticoPage() {
         </div>
       </div>
 
-      {/* Main Content */}
-      <div className="max-w-4xl mx-auto h-[calc(100vh-80px)] flex flex-col">
-        {/* Features Info */}
-        {messages.length === 1 && (
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 p-6">
-            <Card className="p-4 border border-emerald-700/30 bg-slate-900/50 backdrop-blur-sm hover:bg-slate-800/50 hover:border-emerald-600/50 transition-all">
-              <div className="flex items-start gap-3">
-                <div className="p-2 rounded-lg bg-emerald-900/50">
-                  <Zap className="w-5 h-5 text-emerald-400" />
-                </div>
-                <div>
-                  <h3 className="font-semibold text-emerald-100">Acciones Rápidas</h3>
-                  <p className="text-sm text-slate-300 mt-1">Ejecuta comandos y automatiza tareas</p>
-                </div>
-              </div>
-            </Card>
+      {/* Main Content with Sidebar */}
+      <div className="h-[calc(100vh-80px)] flex gap-6 p-6">
+        {/* Left Sidebar Panel */}
+        <div className="w-64 flex flex-col gap-4">
+          {/* Quick Actions */}
+          <Card className="p-4 border border-emerald-700/30 bg-slate-900/50 backdrop-blur-sm">
+            <h3 className="text-sm font-semibold text-emerald-300 mb-3 flex items-center gap-2">
+              <Zap className="w-4 h-4" />
+              Acciones Rápidas
+            </h3>
+            <div className="space-y-2">
+              {quickActions.map((action, idx) => {
+                const Icon = action.icon
+                return (
+                  <button
+                    key={idx}
+                    onClick={() => {
+                      setMessage(action.command)
+                      setTimeout(() => {
+                        const newMessages = [...messages, { role: "user", content: action.command }]
+                        setMessages(newMessages)
+                        setIsLoading(true)
+                        setTimeout(() => {
+                          setMessages([
+                            ...newMessages,
+                            { role: "assistant", content: "Procesando tu solicitud..." }
+                          ])
+                          setIsLoading(false)
+                        }, 1000)
+                      }, 100)
+                    }}
+                    className="w-full text-left px-3 py-2 rounded-lg bg-slate-800/50 hover:bg-emerald-600/20 border border-slate-700/50 hover:border-emerald-600/50 text-slate-200 hover:text-emerald-200 transition-all text-xs flex items-center gap-2"
+                  >
+                    <Icon className="w-3.5 h-3.5" />
+                    {action.label}
+                  </button>
+                )
+              })}
+            </div>
+          </Card>
 
-            <Card className="p-4 border border-blue-700/30 bg-slate-900/50 backdrop-blur-sm hover:bg-slate-800/50 hover:border-blue-600/50 transition-all">
-              <div className="flex items-start gap-3">
-                <div className="p-2 rounded-lg bg-blue-900/50">
-                  <Brain className="w-5 h-5 text-blue-400" />
-                </div>
-                <div>
-                  <h3 className="font-semibold text-blue-100">Análisis Inteligente</h3>
-                  <p className="text-sm text-slate-300 mt-1">Obtén insights sobre tu negocio</p>
-                </div>
+          {/* Historial */}
+          <Card className="p-4 border border-blue-700/30 bg-slate-900/50 backdrop-blur-sm flex-1 flex flex-col">
+            <h3 className="text-sm font-semibold text-blue-300 mb-3 flex items-center gap-2">
+              <History className="w-4 h-4" />
+              Historial
+            </h3>
+            <div className="space-y-2 flex-1 overflow-y-auto">
+              <div className="px-3 py-2 rounded-lg bg-slate-800/50 border border-slate-700/50 text-slate-300 text-xs hover:bg-blue-600/20 cursor-pointer transition-all">
+                Consulta de ocupación
               </div>
-            </Card>
-
-            <Card className="p-4 border border-purple-700/30 bg-slate-900/50 backdrop-blur-sm hover:bg-slate-800/50 hover:border-purple-600/50 transition-all">
-              <div className="flex items-start gap-3">
-                <div className="p-2 rounded-lg bg-purple-900/50">
-                  <MessageCircle className="w-5 h-5 text-purple-400" />
-                </div>
-                <div>
-                  <h3 className="font-semibold text-purple-100">Conversación Natural</h3>
-                  <p className="text-sm text-slate-300 mt-1">Comunícate en lenguaje natural</p>
-                </div>
+              <div className="px-3 py-2 rounded-lg bg-slate-800/50 border border-slate-700/50 text-slate-300 text-xs hover:bg-blue-600/20 cursor-pointer transition-all">
+                Reporte de check-ins
               </div>
-            </Card>
-          </div>
-        )}
-
-        {/* Chat Area */}
-        <div className="flex-1 overflow-y-auto p-6 space-y-4">
-          {messages.map((msg, idx) => (
-            <div
-              key={idx}
-              className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}
-            >
-              <div
-                className={`max-w-xs lg:max-w-md px-4 py-3 rounded-lg ${
-                  msg.role === "user"
-                    ? "bg-gradient-to-r from-emerald-600 to-cyan-600 text-white rounded-br-none shadow-lg"
-                    : "bg-slate-800 text-slate-100 border border-slate-700 rounded-bl-none shadow-lg"
-                }`}
-              >
-                <p className="text-sm">{msg.content}</p>
+              <div className="px-3 py-2 rounded-lg bg-slate-800/50 border border-slate-700/50 text-slate-300 text-xs hover:bg-blue-600/20 cursor-pointer transition-all">
+                Análisis de pedidos
               </div>
             </div>
-          ))}
-          {isLoading && (
-            <div className="flex justify-start">
-              <div className="bg-slate-800 border border-slate-700 text-slate-100 px-4 py-3 rounded-lg rounded-bl-none shadow-lg">
-                <div className="flex gap-2">
-                  <div className="w-2 h-2 rounded-full bg-emerald-400 animate-bounce" style={{ animationDelay: "0ms" }}></div>
-                  <div className="w-2 h-2 rounded-full bg-cyan-400 animate-bounce" style={{ animationDelay: "150ms" }}></div>
-                  <div className="w-2 h-2 rounded-full bg-blue-400 animate-bounce" style={{ animationDelay: "300ms" }}></div>
-                </div>
-              </div>
-            </div>
-          )}
+          </Card>
+
+          {/* Settings */}
+          <Card className="p-4 border border-purple-700/30 bg-slate-900/50 backdrop-blur-sm">
+            <button className="w-full flex items-center gap-2 text-purple-300 hover:text-purple-200 transition-colors text-sm">
+              <Settings className="w-4 h-4" />
+              Configuración
+            </button>
+          </Card>
         </div>
 
-        {/* Input Area */}
-        <div className="border-t border-emerald-700/30 bg-slate-900/80 backdrop-blur-sm p-6">
-          <div className="flex gap-3">
-            <input
-              type="text"
-              value={message}
-              onChange={(e) => setMessage(e.target.value)}
-              onKeyPress={(e) => e.key === "Enter" && handleSendMessage()}
-              placeholder="Escribe tu comando aquí... (ej: 'Cuál es la ocupación de hoy?')"
-              className="flex-1 px-4 py-3 bg-slate-800 border border-slate-700 rounded-lg text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all"
-              disabled={isLoading}
-            />
-            <Button
-              onClick={handleSendMessage}
-              disabled={!message.trim() || isLoading}
-              className="bg-gradient-to-r from-emerald-600 to-cyan-600 hover:from-emerald-500 hover:to-cyan-500 text-white gap-2 px-6 shadow-lg"
-            >
-              <Send className="w-4 h-4" />
-              Enviar
-            </Button>
+        {/* Right Chat Area */}
+        <div className="flex-1 flex flex-col">
+          {/* Chat Area */}
+          <div className="flex-1 overflow-y-auto space-y-4 mb-4">
+            {messages.map((msg, idx) => (
+              <div
+                key={idx}
+                className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}
+              >
+                <div
+                  className={`max-w-md px-4 py-3 rounded-lg ${
+                    msg.role === "user"
+                      ? "bg-gradient-to-r from-emerald-600 to-cyan-600 text-white rounded-br-none shadow-lg"
+                      : "bg-slate-800 text-slate-100 border border-slate-700 rounded-bl-none shadow-lg"
+                  }`}
+                >
+                  <p className="text-sm">{msg.content}</p>
+                </div>
+              </div>
+            ))}
+            {isLoading && (
+              <div className="flex justify-start">
+                <div className="bg-slate-800 border border-slate-700 text-slate-100 px-4 py-3 rounded-lg rounded-bl-none shadow-lg">
+                  <div className="flex gap-2">
+                    <div className="w-2 h-2 rounded-full bg-emerald-400 animate-bounce" style={{ animationDelay: "0ms" }}></div>
+                    <div className="w-2 h-2 rounded-full bg-cyan-400 animate-bounce" style={{ animationDelay: "150ms" }}></div>
+                    <div className="w-2 h-2 rounded-full bg-blue-400 animate-bounce" style={{ animationDelay: "300ms" }}></div>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Input Area */}
+          <div className="border-t border-emerald-700/30 bg-slate-900/80 backdrop-blur-sm p-4 rounded-lg">
+            <div className="flex gap-3">
+              <input
+                type="text"
+                value={message}
+                onChange={(e) => setMessage(e.target.value)}
+                onKeyPress={(e) => e.key === "Enter" && handleSendMessage()}
+                placeholder="Escribe tu comando aquí... (ej: 'Cuál es la ocupación de hoy?')"
+                className="flex-1 px-4 py-3 bg-slate-800 border border-slate-700 rounded-lg text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all"
+                disabled={isLoading}
+              />
+              <Button
+                onClick={handleSendMessage}
+                disabled={!message.trim() || isLoading}
+                className="bg-gradient-to-r from-emerald-600 to-cyan-600 hover:from-emerald-500 hover:to-cyan-500 text-white gap-2 px-6 shadow-lg"
+              >
+                <Send className="w-4 h-4" />
+                Enviar
+              </Button>
+            </div>
           </div>
         </div>
       </div>
