@@ -614,7 +614,7 @@ export default function StaffManagement() {
                       <DialogTitle>Añadir Nuevo Personal</DialogTitle>
                       <DialogDescription>Registra un nuevo miembro del equipo de staff</DialogDescription>
                     </DialogHeader>
-                  <div className="space-y-4 py-4">
+                    <div className="space-y-4 py-4">
                     <div>
                       <Label htmlFor="name">Nombre Completo</Label>
                       <Input id="name" placeholder="Ej: María González" />
@@ -722,7 +722,7 @@ export default function StaffManagement() {
               </Dialog>
             </div>
           </div>
-      </header>
+        </header>
 
       {/* Main Content */}
       <div className="p-6 space-y-6">
