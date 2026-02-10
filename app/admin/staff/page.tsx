@@ -722,7 +722,8 @@ export default function StaffManagement() {
               </Dialog>
             </div>
           </div>
-        </header>
+        </div>
+      </header>
 
       {/* Main Content */}
       <div className="p-6 space-y-6">
