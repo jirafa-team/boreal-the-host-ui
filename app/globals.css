@@ -4,45 +4,31 @@
 @custom-variant dark (&:is(.dark *));
 
 :root {
-  /* Brand Color - Professional teal/blue */
   --primary: oklch(0.55 0.18 220);
   --primary-foreground: oklch(0.99 0 0);
-
-  /* Neutrals */
   --background: oklch(0.98 0 0);
   --foreground: oklch(0.15 0 0);
   --card: oklch(1 0 0);
   --card-foreground: oklch(0.15 0 0);
   --popover: oklch(1 0 0);
   --popover-foreground: oklch(0.15 0 0);
-
-  /* Accents */
   --secondary: oklch(0.94 0.01 220);
   --secondary-foreground: oklch(0.15 0 0);
   --muted: oklch(0.96 0.005 220);
   --muted-foreground: oklch(0.5 0.01 220);
   --accent: oklch(0.94 0.01 220);
   --accent-foreground: oklch(0.15 0 0);
-
-  /* Status */
   --destructive: oklch(0.577 0.245 27.325);
   --destructive-foreground: oklch(0.99 0 0);
-
-  /* UI */
   --border: oklch(0.9 0.005 220);
   --input: oklch(0.9 0.005 220);
   --ring: oklch(0.55 0.18 220);
-
-  /* Charts */
   --chart-1: oklch(0.55 0.18 220);
   --chart-2: oklch(0.6 0.15 180);
   --chart-3: oklch(0.65 0.12 260);
   --chart-4: oklch(0.7 0.1 140);
   --chart-5: oklch(0.75 0.08 40);
-
-  --radius: 0.5rem;
-
-  /* Sidebar */
+  --radius: 0.625rem;
   --sidebar: oklch(0.99 0 0);
   --sidebar-foreground: oklch(0.15 0 0);
   --sidebar-primary: oklch(0.55 0.18 220);
@@ -89,8 +75,7 @@
 }
 
 @theme inline {
-  --font-sans: "Geist", "Geist Fallback";
-  --font-mono: "Geist Mono", "Geist Mono Fallback";
+  /* optional: --font-sans, --font-serif, --font-mono if they are applied in the layout.tsx */
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-card: var(--card);
@@ -135,34 +120,5 @@
   }
   body {
     @apply bg-background text-foreground;
-  }
-}
-
-@layer utilities {
-  @keyframes blob {
-    0% {
-      transform: translate(0px, 0px) scale(1);
-    }
-    33% {
-      transform: translate(30px, -50px) scale(1.1);
-    }
-    66% {
-      transform: translate(-20px, 20px) scale(0.9);
-    }
-    100% {
-      transform: translate(0px, 0px) scale(1);
-    }
-  }
-
-  .animate-blob {
-    animation: blob 7s infinite;
-  }
-
-  .animation-delay-2000 {
-    animation-delay: 2s;
-  }
-
-  .animation-delay-4000 {
-    animation-delay: 4s;
   }
 }

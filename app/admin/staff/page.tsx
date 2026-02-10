@@ -1,9 +1,7 @@
 "use client"
 
 import { CardContent } from "@/components/ui/card"
-
 import { CardHeader } from "@/components/ui/card"
-
 import { useState } from "react"
 import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
@@ -18,9 +16,10 @@ import {
 } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Users, Clock, CheckCircle2, AlertCircle, User, Plus, Calendar, LayoutGrid } from "lucide-react"
+import { Users, Clock, CheckCircle2, AlertCircle, User, Plus, Calendar, LayoutGrid, Book as Broom, Wrench, Shield, ReceiptText, UtensilsCrossed, UserPlus } from "lucide-react"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { useLanguage } from "@/lib/i18n-context"
+import { Search } from "lucide-react" // Import the Search component
 
 type StaffMember = {
   id: number
@@ -466,10 +465,12 @@ export default function StaffManagement() {
   ])
 
   const [selectedStaff, setSelectedStaff] = useState<StaffMember | null>(null)
+  const [editingStaff, setEditingStaff] = useState<StaffMember | null>(null)
   const [viewMode, setViewMode] = useState<"overview" | "kanban">("overview")
   const [collapsedStaff, setCollapsedStaff] = useState<Set<number>>(new Set())
   const [searchName, setSearchName] = useState("")
   const [filterDepartment, setFilterDepartment] = useState("all")
+  const [filterDate, setFilterDate] = useState("")
 
   const availableStaff = staff.filter((s) => s.status === "available")
   const busyStaff = staff.filter((s) => s.status === "busy")
@@ -559,94 +560,117 @@ export default function StaffManagement() {
   }
 
   return (
-    <div className="p-6 space-y-6">
+    <>
       {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold text-foreground">{t("admin.staffTitle")}</h1>
-          <p className="text-muted-foreground mt-1">{t("admin.manageYour")} {t("admin.staffMembers")}</p>
-        </div>
-        <div className="flex gap-3">
-          <Button
-            variant={viewMode === "overview" ? "default" : "outline"}
-            onClick={() => setViewMode("overview")}
-            size="sm"
-          >
-            {t("admin.overview")}
-          </Button>
-          <Button
-            variant={viewMode === "kanban" ? "default" : "outline"}
-            onClick={() => setViewMode("kanban")}
-            size="sm"
-          >
-            <LayoutGrid className="w-4 h-4 mr-2" />
-            Kanban
-          </Button>
-          <Dialog>
-            <DialogTrigger asChild>
-              <Button>
-                <Plus className="w-4 h-4 mr-2" />
-                {t("admin.addStaff")}
-              </Button>
-            </DialogTrigger>
-            <DialogContent>
-              <DialogHeader>
-                <DialogTitle>Añadir Nuevo Personal</DialogTitle>
-                <DialogDescription>Registra un nuevo miembro del equipo de staff</DialogDescription>
-              </DialogHeader>
-              <div className="space-y-4 py-4">
-                <div>
-                  <Label htmlFor="name">Nombre Completo</Label>
-                  <Input id="name" placeholder="Ej: María González" />
-                </div>
-                <div>
-                  <Label htmlFor="department">Departamento</Label>
-                  <Select>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Seleccionar departamento" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="Limpieza">Limpieza</SelectItem>
-                      <SelectItem value="Mantenimiento">Mantenimiento</SelectItem>
-                      <SelectItem value="Seguridad">Seguridad</SelectItem>
-                      <SelectItem value="Recepción">Recepción</SelectItem>
-                      <SelectItem value="Servicio">Servicio</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div>
-                  <Label htmlFor="shift">Turno</Label>
-                  <Select>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Seleccionar turno" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="morning">Mañana (7:00 AM - 3:00 PM)</SelectItem>
-                      <SelectItem value="afternoon">Tarde (11:00 AM - 7:00 PM)</SelectItem>
-                      <SelectItem value="evening">Noche (3:00 PM - 11:00 PM)</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div>
-                  <Label htmlFor="capacity">Capacidad Diaria (tareas)</Label>
-                  <Input id="capacity" type="number" placeholder="8" defaultValue="8" />
-                </div>
+      <header className="bg-card border-b border-border sticky top-0 z-10">
+        <div className="px-8 py-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-2xl font-bold text-foreground">{t("admin.staffTitle")}</h1>
+              <p className="text-sm text-muted-foreground">{t("admin.manageYour")} {t("admin.staffMembers")}</p>
+            </div>
+            <div className="flex gap-4 items-center ml-auto">
+              {/* View Mode Toggle */}
+              <div className="inline-flex h-10 items-center rounded-lg bg-gray-100 p-1 border border-gray-200">
+                <button
+                  onClick={() => setViewMode("overview")}
+                  className={`px-5 py-2 rounded-md font-medium text-sm transition-all ${
+                    viewMode === "overview"
+                      ? "text-white shadow-md"
+                      : "text-gray-700 hover:text-gray-900"
+                  }`}
+                  style={viewMode === "overview" ? { backgroundColor: "#394a63" } : {}}
+                >
+                  General
+                </button>
+                <button
+                  onClick={() => setViewMode("kanban")}
+                  className={`px-5 py-2 rounded-md font-medium text-sm transition-all ${
+                    viewMode === "kanban"
+                      ? "text-white shadow-md"
+                      : "text-gray-700 hover:text-gray-900"
+                  }`}
+                  style={viewMode === "kanban" ? { backgroundColor: "#394a63" } : {}}
+                >
+                  Kanban
+                </button>
               </div>
-              <Button className="w-full">Registrar Personal</Button>
-            </DialogContent>
-          </Dialog>
+              
+              <Dialog>
+                <DialogTrigger asChild>
+                  <button 
+                    className="flex items-center justify-center w-10 h-10 rounded-full bg-gradient-to-br from-primary to-primary/80 text-white shadow-md hover:shadow-lg transition-all duration-300 hover:scale-110 group relative"
+                    title="Agregar personal"
+                  >
+                    <UserPlus className="w-5 h-5" />
+                    <span className="absolute top-full mt-2 px-2 py-1 bg-gray-900 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap">
+                      Agregar personal
+                    </span>
+                  </button>
+                </DialogTrigger>
+                <DialogContent>
+                  <DialogHeader>
+                    <DialogTitle>Añadir Nuevo Personal</DialogTitle>
+                    <DialogDescription>Registra un nuevo miembro del equipo de staff</DialogDescription>
+                  </DialogHeader>
+                  <div className="space-y-4 py-4">
+                    <div>
+                      <Label htmlFor="name">Nombre Completo</Label>
+                      <Input id="name" placeholder="Ej: María González" />
+                    </div>
+                    <div>
+                      <Label htmlFor="department">Departamento</Label>
+                      <Select>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Seleccionar departamento" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="Limpieza">Limpieza</SelectItem>
+                          <SelectItem value="Mantenimiento">Mantenimiento</SelectItem>
+                          <SelectItem value="Seguridad">Seguridad</SelectItem>
+                          <SelectItem value="Recepción">Recepción</SelectItem>
+                          <SelectItem value="Servicio">Servicio</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div>
+                      <Label htmlFor="shift">Turno</Label>
+                      <Select>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Seleccionar turno" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="morning">Mañana (7:00 AM - 3:00 PM)</SelectItem>
+                          <SelectItem value="afternoon">Tarde (11:00 AM - 7:00 PM)</SelectItem>
+                          <SelectItem value="evening">Noche (3:00 PM - 11:00 PM)</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div>
+                      <Label htmlFor="capacity">Capacidad Diaria (tareas)</Label>
+                      <Input id="capacity" type="number" placeholder="8" defaultValue="8" />
+                    </div>
+                  </div>
+                  <Button className="w-full">Registrar Personal</Button>
+                </DialogContent>
+              </Dialog>
+            </div>
+          </div>
         </div>
-      </div>
+      </header>
+
+      {/* Main Content */}
+      <div className="p-6 space-y-6">
 
       {/* Stats Cards by Department - Only show in overview */}
       {viewMode === "overview" && (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
           {[
-            { dept: "Limpieza", icon: "🧹", color: "from-green-500 to-emerald-600", iconBg: "bg-green-600", textColor: "text-white" },
-            { dept: "Mantenimiento", icon: "🔧", color: "from-blue-500 to-cyan-600", iconBg: "bg-blue-600", textColor: "text-white" },
-            { dept: "Seguridad", icon: "🛡️", color: "from-red-500 to-rose-600", iconBg: "bg-red-600", textColor: "text-white" },
-            { dept: "Recepción", icon: "📋", color: "from-purple-500 to-violet-600", iconBg: "bg-purple-600", textColor: "text-white" },
-            { dept: "Servicio", icon: "🍽️", color: "from-orange-500 to-amber-600", iconBg: "bg-orange-600", textColor: "text-white" },
+            { dept: "Limpieza", icon: Broom, color: "from-green-400 to-green-600", iconBg: "bg-green-600", textColor: "text-white" },
+            { dept: "Mantenimiento", icon: Wrench, color: "from-yellow-500 to-yellow-600", iconBg: "bg-yellow-600", textColor: "text-white" },
+            { dept: "Seguridad", icon: Shield, color: "from-red-600 to-red-700", iconBg: "bg-red-700", textColor: "text-white" },
+            { dept: "Recepción", icon: ReceiptText, color: "from-pink-600 to-pink-700", iconBg: "bg-pink-700", textColor: "text-white" },
+            { dept: "Servicio", icon: UtensilsCrossed, color: "from-violet-500 to-violet-700", iconBg: "bg-violet-700", textColor: "text-white" },
           ].map((deptInfo) => {
             const deptStaff = staff.filter((s) => s.department === deptInfo.dept)
             const availableCount = deptStaff.filter((s) => s.status === "available").length
@@ -654,48 +678,50 @@ export default function StaffManagement() {
             const offCount = deptStaff.filter((s) => s.status === "off").length
             const capacityPercentage = Math.round((busyCount / deptStaff.length) * 100) || 0
             return (
-              <Card key={deptInfo.dept} className={`relative overflow-hidden p-6 bg-gradient-to-br ${deptInfo.color} shadow-lg hover:shadow-xl transition-shadow border-0`}>
-                {/* Background pattern */}
-                <div className="absolute top-0 right-0 opacity-10 text-4xl">{deptInfo.icon}</div>
+              <Card key={deptInfo.dept} className="relative overflow-hidden bg-background hover:shadow-md transition-shadow border border-border p-0">
+                {/* Title Header */}
+                <div className={`bg-gradient-to-br ${deptInfo.color} p-3 relative overflow-hidden`}>
+                  {/* Background circle decoration */}
+                  <div className="absolute inset-0 opacity-20">
+                    <div className="absolute top-0 right-0 w-16 h-16 bg-white rounded-full -mr-4 -mt-4"></div>
+                  </div>
+                  
+                  {/* Content */}
+                  <div className="relative flex items-center justify-between">
+                    <h3 className={`font-semibold text-sm ${deptInfo.textColor}`}>{deptInfo.dept}</h3>
+                    <deptInfo.icon className="w-5 h-5 text-white" />
+                  </div>
+                </div>
                 
                 {/* Content */}
-                <div className="relative space-y-4">
-                  <div className="flex items-center justify-between">
-                    <h3 className={`font-bold text-lg ${deptInfo.textColor}`}>{deptInfo.dept}</h3>
-                    <div className={`text-2xl p-2 rounded-lg ${deptInfo.iconBg} bg-opacity-30`}>{deptInfo.icon}</div>
-                  </div>
-                  
-                  {/* Total Staff */}
-                  <div className={`${deptInfo.textColor}`}>
-                    <p className="text-sm opacity-90">Personal Total</p>
-                    <p className="text-4xl font-bold">{deptStaff.length}</p>
-                  </div>
-                  
-                  {/* Status breakdown */}
-                  <div className="space-y-2 pt-2 border-t border-white/20">
-                    <div className="flex items-center justify-between text-sm">
-                      <span className={`${deptInfo.textColor} opacity-90`}>Disponible</span>
-                      <span className={`${deptInfo.textColor} font-bold`}>{availableCount}</span>
+                <div className="px-3 py-2 space-y-2">
+                  {/* Status breakdown - Horizontal */}
+                  <div className="flex items-center justify-between gap-2 border-b border-border pb-2">
+                    <div className="flex-1 text-center">
+                      <span className="font-semibold text-xs text-foreground block">{availableCount}</span>
+                      <span className="text-muted-foreground text-xs block">Disponible</span>
                     </div>
-                    <div className="flex items-center justify-between text-sm">
-                      <span className={`${deptInfo.textColor} opacity-90`}>Ocupado</span>
-                      <span className={`${deptInfo.textColor} font-bold`}>{busyCount}</span>
+                    <div className="w-px h-6 bg-border"></div>
+                    <div className="flex-1 text-center">
+                      <span className="font-semibold text-xs text-foreground block">{busyCount}</span>
+                      <span className="text-muted-foreground text-xs block">Ocupado</span>
                     </div>
-                    <div className="flex items-center justify-between text-sm">
-                      <span className={`${deptInfo.textColor} opacity-90`}>Descanso</span>
-                      <span className={`${deptInfo.textColor} font-bold`}>{offCount}</span>
+                    <div className="w-px h-6 bg-border"></div>
+                    <div className="flex-1 text-center">
+                      <span className="font-semibold text-xs text-foreground block">{offCount}</span>
+                      <span className="text-muted-foreground text-xs block">Descanso</span>
                     </div>
                   </div>
                   
-                  {/* Capacity bar */}
-                  <div className="pt-2">
-                    <div className="flex items-center justify-between text-sm mb-2">
-                      <span className={`${deptInfo.textColor} opacity-90`}>Ocupación</span>
-                      <span className={`${deptInfo.textColor} font-bold`}>{capacityPercentage}%</span>
+                  {/* Capacity bar - Refined */}
+                  <div className="pt-1">
+                    <div className="flex items-center justify-between mb-1">
+                      <span className="text-muted-foreground text-xs">Ocupación</span>
+                      <span className="font-semibold text-xs text-foreground">{capacityPercentage}%</span>
                     </div>
-                    <div className="w-full bg-white/20 rounded-full h-2">
+                    <div className="w-full bg-border rounded-full h-0.5 overflow-hidden shadow-inner">
                       <div
-                        className="bg-white rounded-full h-2 transition-all"
+                        className={`bg-gradient-to-r ${deptInfo.color} rounded-full h-0.5 transition-all duration-500`}
                         style={{ width: `${capacityPercentage}%` }}
                       />
                     </div>
@@ -711,9 +737,21 @@ export default function StaffManagement() {
         <div>
           {/* Staff List - Grid Layout */}
           <Card className="p-6">
-            <h2 className="text-xl font-bold text-foreground mb-4">{t("admin.staffMembers")}</h2>
+            <div className="flex-1 max-w-xs mb-4">
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                <Input
+                  placeholder="Ej: María, Roberto..."
+                  value={searchName}
+                  onChange={(e) => setSearchName(e.target.value)}
+                  className="pl-10"
+                />
+              </div>
+            </div>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-              {staff.map((member) => (
+              {staff
+                .filter((member) => member.name.toLowerCase().includes(searchName.toLowerCase()))
+                .map((member) => (
                 <Card
                   key={member.id}
                   className={`p-4 cursor-pointer hover:shadow-md transition-shadow ${
@@ -786,6 +824,16 @@ export default function StaffManagement() {
                     <SelectItem value="Servicio">Servicio</SelectItem>
                   </SelectContent>
                 </Select>
+              </div>
+              <div className="w-48">
+                <Label htmlFor="filter-date" className="text-sm font-medium">Filtrar por fecha</Label>
+                <Input
+                  id="filter-date"
+                  type="date"
+                  value={filterDate}
+                  onChange={(e) => setFilterDate(e.target.value)}
+                  className="mt-2"
+                />
               </div>
             </div>
           </Card>
@@ -871,46 +919,7 @@ export default function StaffManagement() {
                                               !
                                             </Badge>
                                           )}
-      </div>
-
-      {/* KPI Card */}
-      <Card className="border-0 shadow-lg bg-gradient-to-br from-slate-50 to-slate-100">
-        <CardHeader className="text-center pb-6 border-b">
-          <h2 className="text-2xl font-bold text-foreground">
-            Equipo de Personal <span className="text-muted-foreground">({staff.length})</span>
-          </h2>
-        </CardHeader>
-        <CardContent className="pt-8">
-          <div className="grid grid-cols-3 gap-8">
-            {/* Panel 1: Available */}
-            <div className="flex flex-col items-center justify-center py-8 px-4 rounded-lg bg-white border border-green-200 hover:shadow-md transition-shadow">
-              <div className="text-5xl font-bold text-green-600 mb-3">{availableStaff.length}</div>
-              <div className="flex items-center gap-2 text-green-700 font-semibold">
-                <CheckCircle2 className="w-5 h-5" />
-                Disponibles
-              </div>
-            </div>
-
-            {/* Panel 2: Busy */}
-            <div className="flex flex-col items-center justify-center py-8 px-4 rounded-lg bg-white border border-yellow-200 hover:shadow-md transition-shadow">
-              <div className="text-5xl font-bold text-yellow-600 mb-3">{busyStaff.length}</div>
-              <div className="flex items-center gap-2 text-yellow-700 font-semibold">
-                <Clock className="w-5 h-5" />
-                Ocupadas
-              </div>
-            </div>
-
-            {/* Panel 3: Off */}
-            <div className="flex flex-col items-center justify-center py-8 px-4 rounded-lg bg-white border border-gray-200 hover:shadow-md transition-shadow">
-              <div className="text-5xl font-bold text-gray-600 mb-3">{staff.filter((s) => s.status === "off").length}</div>
-              <div className="flex items-center gap-2 text-gray-700 font-semibold">
-                <AlertCircle className="w-5 h-5" />
-                Libres
-              </div>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
+                                        </div>
                                         <p className="text-[10px] text-muted-foreground truncate">{task.guestName}</p>
                                         <Badge className={getRequestStatusColor(task.status) + " text-[10px] px-1 py-0"}>
                                           {getRequestStatusText(task.status)}
@@ -938,45 +947,149 @@ export default function StaffManagement() {
 
       {/* Staff Detail Dialog */}
       {selectedStaff && (
-        <Dialog open={!!selectedStaff} onOpenChange={() => setSelectedStaff(null)}>
-          <DialogContent>
+        <Dialog open={!!selectedStaff} onOpenChange={() => {
+          setSelectedStaff(null)
+          setEditingStaff(null)
+        }}>
+          <DialogContent className="max-w-md">
             <DialogHeader>
-              <DialogTitle>Detalles del Personal</DialogTitle>
+              <DialogTitle>{editingStaff ? "Editar Personal" : "Detalles del Personal"}</DialogTitle>
             </DialogHeader>
-            <div className="space-y-4">
-              <div className="flex items-center gap-4">
-                <div className="w-16 h-16 bg-gradient-to-br from-primary to-primary/80 rounded-full flex items-center justify-center text-white font-bold text-xl">
-                  {selectedStaff.avatar}
+            
+            {!editingStaff ? (
+              // View Mode
+              <div className="space-y-4">
+                <div className="flex items-center gap-4">
+                  <div className="w-16 h-16 bg-gradient-to-br from-primary to-primary/80 rounded-full flex items-center justify-center text-white font-bold text-xl">
+                    {selectedStaff.avatar}
+                  </div>
+                  <div>
+                    <h3 className="text-xl font-semibold text-foreground">{selectedStaff.name}</h3>
+                    <Badge className={getStatusColor(selectedStaff.status) + " text-white mt-1"}>
+                      {getStatusText(selectedStaff.status)}
+                    </Badge>
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <div className="flex justify-between py-2 border-b border-border">
+                    <span className="text-muted-foreground">Departamento</span>
+                    <span className="font-medium text-foreground">{selectedStaff.department}</span>
+                  </div>
+                  <div className="flex justify-between py-2 border-b border-border">
+                    <span className="text-muted-foreground">Turno</span>
+                    <span className="font-medium text-foreground">{selectedStaff.shift}</span>
+                  </div>
+                  <div className="flex justify-between py-2 border-b border-border">
+                    <span className="text-muted-foreground">Tareas de hoy</span>
+                    <span className="font-medium text-foreground">
+                      {selectedStaff.tasksToday} / {selectedStaff.maxCapacity}
+                    </span>
+                  </div>
+                  {selectedStaff.currentRoom && (
+                    <div className="flex justify-between py-2 border-b border-border">
+                      <span className="text-muted-foreground">Habitación actual</span>
+                      <span className="font-medium text-foreground">{selectedStaff.currentRoom}</span>
+                    </div>
+                  )}
+                </div>
+                <Button 
+                  onClick={() => setEditingStaff(selectedStaff)}
+                  className="w-full mt-4"
+                >
+                  Editar
+                </Button>
+              </div>
+            ) : (
+              // Edit Mode
+              <div className="space-y-4">
+                <div>
+                  <Label htmlFor="edit-name" className="text-sm font-medium">Nombre</Label>
+                  <Input
+                    id="edit-name"
+                    value={editingStaff.name}
+                    onChange={(e) => setEditingStaff({...editingStaff, name: e.target.value})}
+                    className="mt-1"
+                  />
                 </div>
                 <div>
-                  <h3 className="text-xl font-semibold text-foreground">{selectedStaff.name}</h3>
-                  <Badge className={getStatusColor(selectedStaff.status) + " text-white mt-1"}>
-                    {getStatusText(selectedStaff.status)}
-                  </Badge>
+                  <Label htmlFor="edit-dept" className="text-sm font-medium">Departamento</Label>
+                  <Select 
+                    value={editingStaff.department}
+                    onValueChange={(value) => setEditingStaff({...editingStaff, department: value as any})}
+                  >
+                    <SelectTrigger id="edit-dept" className="mt-1">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="Limpieza">Limpieza</SelectItem>
+                      <SelectItem value="Mantenimiento">Mantenimiento</SelectItem>
+                      <SelectItem value="Seguridad">Seguridad</SelectItem>
+                      <SelectItem value="Recepción">Recepción</SelectItem>
+                      <SelectItem value="Servicio">Servicio</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div>
+                  <Label htmlFor="edit-status" className="text-sm font-medium">Estado</Label>
+                  <Select 
+                    value={editingStaff.status}
+                    onValueChange={(value) => setEditingStaff({...editingStaff, status: value as any})}
+                  >
+                    <SelectTrigger id="edit-status" className="mt-1">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="available">Disponible</SelectItem>
+                      <SelectItem value="busy">Ocupada</SelectItem>
+                      <SelectItem value="off">Descanso</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div>
+                  <Label htmlFor="edit-shift" className="text-sm font-medium">Turno</Label>
+                  <Input
+                    id="edit-shift"
+                    value={editingStaff.shift}
+                    onChange={(e) => setEditingStaff({...editingStaff, shift: e.target.value})}
+                    className="mt-1"
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="edit-tasks" className="text-sm font-medium">Tareas de hoy</Label>
+                  <Input
+                    id="edit-tasks"
+                    type="number"
+                    min="0"
+                    value={editingStaff.tasksToday}
+                    onChange={(e) => setEditingStaff({...editingStaff, tasksToday: parseInt(e.target.value) || 0})}
+                    className="mt-1"
+                  />
+                </div>
+                <div className="flex gap-2 mt-6">
+                  <Button 
+                    variant="outline"
+                    onClick={() => setEditingStaff(null)}
+                    className="flex-1"
+                  >
+                    Cancelar
+                  </Button>
+                  <Button 
+                    onClick={() => {
+                      setStaff(staff.map(s => s.id === editingStaff.id ? editingStaff : s))
+                      setSelectedStaff(editingStaff)
+                      setEditingStaff(null)
+                    }}
+                    className="flex-1"
+                  >
+                    Guardar
+                  </Button>
                 </div>
               </div>
-              <div className="space-y-2">
-                <div className="flex justify-between py-2 border-b border-border">
-                  <span className="text-muted-foreground">Turno</span>
-                  <span className="font-medium text-foreground">{selectedStaff.shift}</span>
-                </div>
-                <div className="flex justify-between py-2 border-b border-border">
-                  <span className="text-muted-foreground">Tareas de hoy</span>
-                  <span className="font-medium text-foreground">
-                    {selectedStaff.tasksToday} / {selectedStaff.maxCapacity}
-                  </span>
-                </div>
-                {selectedStaff.currentRoom && (
-                  <div className="flex justify-between py-2 border-b border-border">
-                    <span className="text-muted-foreground">Habitación actual</span>
-                    <span className="font-medium text-foreground">{selectedStaff.currentRoom}</span>
-                  </div>
-                )}
-              </div>
-            </div>
+            )}
           </DialogContent>
         </Dialog>
       )}
-    </div>
+      </div>
+    </>
   )
 }

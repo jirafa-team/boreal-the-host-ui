@@ -1,10 +1,12 @@
 "use client"
 
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
 import { useState } from "react"
 import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { Clock, AlertCircle, CheckCircle2, User, MapPin, Calendar } from "lucide-react"
+import { Clock, AlertCircle, CheckCircle2, User, MapPin, Calendar, TicketPlus, CheckCircle } from "lucide-react"
 import {
   Dialog,
   DialogContent,
@@ -30,6 +32,7 @@ export default function TicketsPage() {
       createdAt: "2024-01-13 14:30",
       description: "El aire acondicionado de la habitación no enciende",
       assignedTo: null as string | null,
+      scheduledTime: null as string | null,
     },
     {
       id: "T-002",
@@ -43,6 +46,7 @@ export default function TicketsPage() {
       createdAt: "2024-01-13 12:15",
       description: "Solicité ensalada César pero recibí una ensalada mixta",
       assignedTo: "Juan López - Cocina",
+      scheduledTime: null as string | null,
     },
     {
       id: "T-003",
@@ -56,6 +60,7 @@ export default function TicketsPage() {
       createdAt: "2024-01-13 10:00",
       description: "Faltan toallas en el baño después de la limpieza",
       assignedTo: "María Rodríguez - Limpieza",
+      scheduledTime: null as string | null,
     },
     {
       id: "T-004",
@@ -75,20 +80,32 @@ export default function TicketsPage() {
   const [selectedTicketId, setSelectedTicketId] = useState<string | null>(null)
   const [showAssignDialog, setShowAssignDialog] = useState(false)
   const [showCompleteDialog, setShowCompleteDialog] = useState(false)
+  const [showEditModal, setShowEditModal] = useState(false)
+  const [selectedTicket, setSelectedTicket] = useState<any>(null)
+  const [scheduledTime, setScheduledTime] = useState<string | null>(null)
+  const [selectedStaffForSchedule, setSelectedStaffForSchedule] = useState<{ name: string; department: string } | null>(null)
+  const [selectedTime, setSelectedTime] = useState<string | null>(null)
+
+  const availableHours = ["08:00", "09:00", "10:00", "11:00", "12:00", "13:00", "14:00", "15:00", "16:00", "17:00", "18:00", "19:00", "20:00"]
 
   const staffMembers = [
-    { id: "1", name: "Juan López", department: "Cocina" },
-    { id: "2", name: "María Rodríguez", department: "Limpieza" },
-    { id: "3", name: "Carlos Sánchez", department: "Seguridad" },
-    { id: "4", name: "Ana García", department: "Recepción" },
-    { id: "5", name: "Roberto Martínez", department: "Mantenimiento" },
-    { id: "6", name: "Patricia López", department: "Servicio de Piso" },
-    { id: "7", name: "Diego Fernández", department: "Mantenimiento" },
-    { id: "8", name: "Laura González", department: "Limpieza" },
+    { id: "1", name: "Juan López", department: "Cocina", availableHours: ["08:00", "09:00", "10:00", "11:00", "12:00", "18:00", "19:00", "20:00"] },
+    { id: "2", name: "María Rodríguez", department: "Limpieza", availableHours: ["08:00", "09:00", "10:00", "13:00", "14:00", "15:00", "16:00"] },
+    { id: "3", name: "Carlos Sánchez", department: "Seguridad", availableHours: ["08:00", "11:00", "12:00", "13:00", "16:00", "17:00", "18:00", "19:00", "20:00"] },
+    { id: "4", name: "Ana García", department: "Recepción", availableHours: ["08:00", "09:00", "10:00", "11:00", "12:00", "13:00", "14:00", "15:00", "16:00", "17:00"] },
+    { id: "5", name: "Roberto Martínez", department: "Mantenimiento", availableHours: ["09:00", "10:00", "11:00", "14:00", "15:00", "16:00", "17:00", "18:00"] },
+    { id: "6", name: "Patricia López", department: "Servicio de Piso", availableHours: ["08:00", "09:00", "10:00", "11:00", "12:00", "13:00", "14:00"] },
+    { id: "7", name: "Diego Fernández", department: "Mantenimiento", availableHours: ["13:00", "14:00", "15:00", "16:00", "17:00", "18:00", "19:00"] },
+    { id: "8", name: "Laura González", department: "Limpieza", availableHours: ["09:00", "10:00", "11:00", "12:00", "13:00", "14:00", "15:00", "16:00", "17:00"] },
   ]
 
+  const getAvailableStaffForTime = (time: string | null) => {
+    if (!time) return []
+    return staffMembers.filter((staff) => staff.availableHours.includes(time))
+  }
+
   const handleAssignTicket = (staffName: string, staffDepartment: string) => {
-    if (!selectedTicketId) return
+    if (!selectedTicketId || !selectedTime) return
 
     setTickets((prevTickets) =>
       prevTickets.map((ticket) =>
@@ -96,6 +113,7 @@ export default function TicketsPage() {
           ? {
               ...ticket,
               assignedTo: `${staffName} - ${staffDepartment}`,
+              scheduledTime: selectedTime,
               status: ticket.status === "pending" ? "in-progress" : ticket.status,
             }
           : ticket,
@@ -103,6 +121,8 @@ export default function TicketsPage() {
     )
     setShowAssignDialog(false)
     setSelectedTicketId(null)
+    setSelectedTime(null)
+    setSelectedStaffForSchedule(null)
   }
 
   const handleCompleteTicket = () => {
@@ -115,6 +135,23 @@ export default function TicketsPage() {
     )
     setShowCompleteDialog(false)
     setSelectedTicketId(null)
+  }
+
+  const handleEditTicket = (ticket: any) => {
+    setSelectedTicket(JSON.parse(JSON.stringify(ticket)))
+    setShowEditModal(true)
+  }
+
+  const handleSaveTicket = () => {
+    if (selectedTicket) {
+      setTickets((prevTickets) =>
+        prevTickets.map((ticket) =>
+          ticket.id === selectedTicket.id ? selectedTicket : ticket,
+        ),
+      )
+      setShowEditModal(false)
+      setSelectedTicket(null)
+    }
   }
 
   const filteredTickets = filter === "all" ? tickets : tickets.filter((t) => t.status === filter)
@@ -138,90 +175,123 @@ export default function TicketsPage() {
   }
 
   return (
-    <div className="p-8 space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold">Tickets de Soporte</h1>
-          <p className="text-muted-foreground">Gestiona los reportes y solicitudes de los huéspedes</p>
+    <div className="p-8">
+      {/* Header */}
+      <header className="bg-card border-b border-border sticky top-0 z-10 -mx-8 -mt-8 px-8 py-4 mb-8">
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-2xl font-bold text-foreground">Tickets de Soporte</h1>
+            <p className="text-sm text-muted-foreground">Gestiona los reportes y solicitudes de los huéspedes</p>
+          </div>
+          <div className="flex gap-4 items-center ml-auto">
+            <Dialog>
+              <DialogTrigger asChild>
+                <button 
+                  className="flex items-center justify-center w-10 h-10 rounded-full bg-gradient-to-br from-primary to-primary/80 text-white shadow-md hover:shadow-lg transition-all duration-300 hover:scale-110 group relative"
+                  title="Nuevo ticket"
+                >
+                  <TicketPlus className="w-5 h-5" />
+                  <span className="absolute top-full mt-2 px-2 py-1 bg-gray-900 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap">
+                    Nuevo Ticket
+                  </span>
+                </button>
+              </DialogTrigger>
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle>Crear Nuevo Ticket</DialogTitle>
+                  <DialogDescription>Registra un nuevo ticket de soporte</DialogDescription>
+                </DialogHeader>
+                <div className="space-y-4 py-4">
+                  <div>
+                    <Label htmlFor="ticket-title">Título</Label>
+                    <Input id="ticket-title" placeholder="Ej: Aire acondicionado no funciona" />
+                  </div>
+                  <div>
+                    <Label htmlFor="ticket-description">Descripción</Label>
+                    <Input id="ticket-description" placeholder="Describe el problema..." />
+                  </div>
+                  <div>
+                    <Label htmlFor="ticket-category">Categoría</Label>
+                    <Input id="ticket-category" placeholder="Ej: Mantenimiento" />
+                  </div>
+                </div>
+                <Button className="w-full">Crear Ticket</Button>
+              </DialogContent>
+            </Dialog>
+          </div>
+        </div>
+      </header>
+
+      <div className="space-y-6">
+
+      {/* Stats as Filters */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+        <div 
+          onClick={() => setFilter("all")}
+          className={`p-4 relative rounded-3xl shadow-2xl text-center cursor-pointer transition-all overflow-hidden ${filter === "all" ? 'text-white' : 'bg-white/95 backdrop-blur-lg hover:shadow-lg'}`}
+          style={filter === "all" ? { backgroundColor: "#1E40AF" } : {}}
+        >
+          {filter === "all" && (
+            <div className="absolute -top-16 -right-16 w-28 h-28 rounded-full" style={{ backgroundColor: "rgba(255, 255, 255, 0.2)" }} />
+          )}
+          <div className="relative z-10">
+            <p className={`text-6xl font-bold mb-1 ${filter === "all" ? 'text-white' : 'text-blue-600'}`}>{tickets.length}</p>
+            <p className={`text-xs font-medium ${filter === "all" ? 'text-blue-100' : 'text-muted-foreground'}`}>Todos</p>
+          </div>
+        </div>
+        <div 
+          onClick={() => setFilter("pending")}
+          className={`p-4 relative rounded-3xl shadow-2xl text-center cursor-pointer transition-all overflow-hidden ${filter === "pending" ? 'text-white' : 'bg-white/95 backdrop-blur-lg hover:shadow-lg'}`}
+          style={filter === "pending" ? { backgroundColor: "#CA8A04" } : {}}
+        >
+          {filter === "pending" && (
+            <div className="absolute -top-16 -right-16 w-28 h-28 rounded-full" style={{ backgroundColor: "rgba(255, 255, 255, 0.2)" }} />
+          )}
+          <div className="relative z-10">
+            <p className={`text-6xl font-bold mb-1 ${filter === "pending" ? 'text-white' : 'text-yellow-600'}`}>{tickets.filter((t) => t.status === "pending").length}</p>
+            <p className={`text-xs font-medium ${filter === "pending" ? 'text-yellow-100' : 'text-muted-foreground'}`}>Pendientes</p>
+          </div>
+        </div>
+        <div 
+          onClick={() => setFilter("in-progress")}
+          className={`p-4 relative rounded-3xl shadow-2xl text-center cursor-pointer transition-all overflow-hidden ${filter === "in-progress" ? 'text-white' : 'bg-white/95 backdrop-blur-lg hover:shadow-lg'}`}
+          style={filter === "in-progress" ? { backgroundColor: "#1E3A8A" } : {}}
+        >
+          {filter === "in-progress" && (
+            <div className="absolute -top-16 -right-16 w-28 h-28 rounded-full" style={{ backgroundColor: "rgba(255, 255, 255, 0.2)" }} />
+          )}
+          <div className="relative z-10">
+            <p className={`text-6xl font-bold mb-1 ${filter === "in-progress" ? 'text-white' : 'text-blue-700'}`}>{tickets.filter((t) => t.status === "in-progress").length}</p>
+            <p className={`text-xs font-medium ${filter === "in-progress" ? 'text-blue-100' : 'text-muted-foreground'}`}>En Proceso</p>
+          </div>
+        </div>
+        <div 
+          onClick={() => setFilter("resolved")}
+          className={`p-4 relative rounded-3xl shadow-2xl text-center cursor-pointer transition-all overflow-hidden ${filter === "resolved" ? 'text-white' : 'bg-white/95 backdrop-blur-lg hover:shadow-lg'}`}
+          style={filter === "resolved" ? { backgroundColor: "#235E20" } : {}}
+        >
+          {filter === "resolved" && (
+            <div className="absolute -top-16 -right-16 w-28 h-28 rounded-full" style={{ backgroundColor: "rgba(255, 255, 255, 0.2)" }} />
+          )}
+          <div className="relative z-10">
+            <p className={`text-6xl font-bold mb-1 ${filter === "resolved" ? 'text-white' : ''}`} style={filter !== "resolved" ? { color: "#235E20" } : {}}>{tickets.filter((t) => t.status === "resolved").length}</p>
+            <p className={`text-xs font-medium ${filter === "resolved" ? 'text-green-100' : 'text-muted-foreground'}`}>Resueltos</p>
+          </div>
         </div>
       </div>
 
-      {/* Stats as Filters */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <Card
-          className={`p-4 cursor-pointer transition-all hover:shadow-md ${
-            filter === "all" ? "ring-2 ring-primary" : ""
-          }`}
-          onClick={() => setFilter("all")}
-        >
-          <div className="flex items-center gap-3">
-            <div className="p-2 bg-blue-500/10 rounded-lg">
-              <AlertCircle className="w-5 h-5 text-blue-600" />
-            </div>
-            <div>
-              <p className="text-sm text-muted-foreground">Todos</p>
-              <p className="text-2xl font-bold">{tickets.length}</p>
-            </div>
-          </div>
-        </Card>
-        <Card
-          className={`p-4 cursor-pointer transition-all hover:shadow-md ${
-            filter === "pending" ? "ring-2 ring-primary" : ""
-          }`}
-          onClick={() => setFilter("pending")}
-        >
-          <div className="flex items-center gap-3">
-            <div className="p-2 bg-yellow-500/10 rounded-lg">
-              <Clock className="w-5 h-5 text-yellow-600" />
-            </div>
-            <div>
-              <p className="text-sm text-muted-foreground">Pendientes</p>
-              <p className="text-2xl font-bold">{tickets.filter((t) => t.status === "pending").length}</p>
-            </div>
-          </div>
-        </Card>
-        <Card
-          className={`p-4 cursor-pointer transition-all hover:shadow-md ${
-            filter === "in-progress" ? "ring-2 ring-primary" : ""
-          }`}
-          onClick={() => setFilter("in-progress")}
-        >
-          <div className="flex items-center gap-3">
-            <div className="p-2 bg-blue-500/10 rounded-lg">
-              <AlertCircle className="w-5 h-5 text-blue-600" />
-            </div>
-            <div>
-              <p className="text-sm text-muted-foreground">En Proceso</p>
-              <p className="text-2xl font-bold">{tickets.filter((t) => t.status === "in-progress").length}</p>
-            </div>
-          </div>
-        </Card>
-        <Card
-          className={`p-4 cursor-pointer transition-all hover:shadow-md ${
-            filter === "resolved" ? "ring-2 ring-primary" : ""
-          }`}
-          onClick={() => setFilter("resolved")}
-        >
-          <div className="flex items-center gap-3">
-            <div className="p-2 bg-green-500/10 rounded-lg">
-              <CheckCircle2 className="w-5 h-5 text-green-600" />
-            </div>
-            <div>
-              <p className="text-sm text-muted-foreground">Resueltos</p>
-              <p className="text-2xl font-bold">{tickets.filter((t) => t.status === "resolved").length}</p>
-            </div>
-          </div>
-        </Card>
-      </div>
-
       {/* Tickets Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         {filteredTickets.map((ticket) => {
           const statusBadge = getStatusBadge(ticket.status)
           const priorityBadge = getPriorityBadge(ticket.priority)
 
           return (
-            <Card key={ticket.id} className="p-6 flex flex-col">
+            <Card 
+              key={ticket.id} 
+              className="p-6 flex flex-col cursor-pointer hover:shadow-lg transition-shadow"
+              onClick={() => handleEditTicket(ticket)}
+            >
               <div className="mb-4">
                 <div className="flex items-start justify-between mb-3">
                   <h3 className="text-lg font-semibold flex-1">{ticket.title}</h3>
@@ -234,7 +304,6 @@ export default function TicketsPage() {
                     {priorityBadge.label}
                   </Badge>
                   <Badge variant="secondary">{ticket.category}</Badge>
-                  <Badge variant="outline">{ticket.subcategory}</Badge>
                 </div>
                 <p className="text-sm text-muted-foreground mb-4">{ticket.description}</p>
               </div>
@@ -257,10 +326,15 @@ export default function TicketsPage() {
                 </div>
                 <div className="flex items-start gap-2 pt-2 border-t border-border">
                   <User className="w-4 h-4 text-primary flex-shrink-0 mt-0.5" />
-                  <div>
+                  <div className="flex-1">
                     <span className="text-muted-foreground">Asignado a:</span>
                     {ticket.assignedTo ? (
-                      <p className="font-semibold text-primary">{ticket.assignedTo}</p>
+                      <div>
+                        <p className="font-semibold text-primary">{ticket.assignedTo}</p>
+                        {ticket.scheduledTime && (
+                          <p className="text-xs text-muted-foreground mt-1">Programado: {ticket.scheduledTime}</p>
+                        )}
+                      </div>
                     ) : (
                       <p className="font-semibold text-muted-foreground italic">Sin asignar</p>
                     )}
@@ -269,86 +343,170 @@ export default function TicketsPage() {
               </div>
 
               <div className="flex gap-2">
+                {ticket.assignedTo && ticket.status !== "resolved" && (
+                  <Dialog open={showAssignDialog && selectedTicketId === ticket.id} onOpenChange={setShowAssignDialog}>
+                    <DialogTrigger asChild>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        className="flex-1 bg-transparent"
+                        onClick={() => setSelectedTicketId(ticket.id)}
+                      >
+                        Reasignar
+                      </Button>
+                    </DialogTrigger>
+                    <DialogContent className="max-w-2xl">
+                      <DialogHeader>
+                        <DialogTitle>Reasignar Ticket</DialogTitle>
+                        <DialogDescription>
+                          {!selectedTime ? "Selecciona el horario para la tarea" : `Selecciona el empleado para las ${selectedTime}`}
+                        </DialogDescription>
+                      </DialogHeader>
+                      
+                      {!selectedTime ? (
+                        // Step 1: Select Time - Grid of hours
+                        <div className="grid grid-cols-4 gap-2">
+                          {availableHours.map((hour) => (
+                            <Button
+                              key={hour}
+                              variant={selectedTime === hour ? "default" : "outline"}
+                              className="h-12 text-sm"
+                              onClick={() => setSelectedTime(hour)}
+                            >
+                              {hour}
+                            </Button>
+                          ))}
+                        </div>
+                      ) : (
+                        // Step 2: Select Staff - Show only available for selected time
+                        <div className="space-y-3">
+                          {getAvailableStaffForTime(selectedTime).length > 0 ? (
+                            <>
+                              <div className="space-y-2">
+                                {getAvailableStaffForTime(selectedTime).map((staff) => (
+                                  <Button
+                                    key={staff.id}
+                                    variant="outline"
+                                    className="w-full justify-start h-auto py-3 flex-col items-start bg-transparent hover:bg-muted"
+                                    onClick={() => handleAssignTicket(staff.name, staff.department)}
+                                  >
+                                    <span className="font-semibold">{staff.name}</span>
+                                    <span className="text-xs text-muted-foreground">{staff.department}</span>
+                                  </Button>
+                                ))}
+                              </div>
+                              <Button
+                                variant="outline"
+                                className="w-full bg-transparent"
+                                onClick={() => setSelectedTime(null)}
+                              >
+                                Cambiar Horario
+                              </Button>
+                            </>
+                          ) : (
+                            <div className="text-center py-8">
+                              <p className="text-muted-foreground mb-4">No hay empleados disponibles para las {selectedTime}</p>
+                              <Button
+                                variant="outline"
+                                onClick={() => setSelectedTime(null)}
+                              >
+                                Seleccionar otro horario
+                              </Button>
+                            </div>
+                          )}
+                        </div>
+                      )}
+                    </DialogContent>
+                  </Dialog>
+                )}
                 {ticket.status === "pending" && (
                   <Dialog open={showAssignDialog && selectedTicketId === ticket.id} onOpenChange={setShowAssignDialog}>
                     <DialogTrigger asChild>
                       <Button
                         size="sm"
-                        variant="default"
-                        className="flex-1"
+                        className="flex-1 bg-primary hover:bg-primary/90 text-white"
                         onClick={() => setSelectedTicketId(ticket.id)}
                       >
                         Asignar
                       </Button>
                     </DialogTrigger>
-                    <DialogContent className="max-w-md">
+                    <DialogContent className="max-w-2xl">
                       <DialogHeader>
                         <DialogTitle>Asignar Ticket</DialogTitle>
                         <DialogDescription>
-                          Selecciona el personal al que deseas asignar este ticket
+                          {!selectedTime ? "Selecciona el horario para la tarea" : `Selecciona el empleado para las ${selectedTime}`}
                         </DialogDescription>
                       </DialogHeader>
-                      <ScrollArea className="h-80 w-full rounded-md border p-4">
-                        <div className="space-y-2">
-                          {staffMembers.map((staff) => (
+                      
+                      {!selectedTime ? (
+                        // Step 1: Select Time - Grid of hours
+                        <div className="grid grid-cols-4 gap-2">
+                          {availableHours.map((hour) => (
                             <Button
-                              key={staff.id}
-                              variant="outline"
-                              className="w-full justify-start h-auto py-3 flex-col items-start bg-transparent"
-                              onClick={() => handleAssignTicket(staff.name, staff.department)}
+                              key={hour}
+                              variant={selectedTime === hour ? "default" : "outline"}
+                              className="h-12 text-sm"
+                              onClick={() => setSelectedTime(hour)}
                             >
-                              <span className="font-semibold">{staff.name}</span>
-                              <span className="text-xs text-muted-foreground">{staff.department}</span>
+                              {hour}
                             </Button>
                           ))}
                         </div>
-                      </ScrollArea>
+                      ) : (
+                        // Step 2: Select Staff - Show only available for selected time
+                        <div className="space-y-3">
+                          {getAvailableStaffForTime(selectedTime).length > 0 ? (
+                            <>
+                              <div className="space-y-2">
+                                {getAvailableStaffForTime(selectedTime).map((staff) => (
+                                  <Button
+                                    key={staff.id}
+                                    variant="outline"
+                                    className="w-full justify-start h-auto py-3 flex-col items-start bg-transparent hover:bg-muted"
+                                    onClick={() => handleAssignTicket(staff.name, staff.department)}
+                                  >
+                                    <span className="font-semibold">{staff.name}</span>
+                                    <span className="text-xs text-muted-foreground">{staff.department}</span>
+                                  </Button>
+                                ))}
+                              </div>
+                              <Button
+                                variant="outline"
+                                className="w-full bg-transparent"
+                                onClick={() => setSelectedTime(null)}
+                              >
+                                Cambiar Horario
+                              </Button>
+                            </>
+                          ) : (
+                            <div className="text-center py-8">
+                              <p className="text-muted-foreground mb-4">No hay empleados disponibles para las {selectedTime}</p>
+                              <Button
+                                variant="outline"
+                                onClick={() => setSelectedTime(null)}
+                              >
+                                Seleccionar otro horario
+                              </Button>
+                            </div>
+                          )}
+                        </div>
+                      )}
                     </DialogContent>
                   </Dialog>
                 )}
-                {ticket.status === "in-progress" && (
-                  <Dialog open={showCompleteDialog && selectedTicketId === ticket.id} onOpenChange={setShowCompleteDialog}>
-                    <DialogTrigger asChild>
-                      <Button
-                        size="sm"
-                        variant="default"
-                        className="flex-1"
-                        onClick={() => setSelectedTicketId(ticket.id)}
-                      >
-                        Completar
-                      </Button>
-                    </DialogTrigger>
-                    <DialogContent className="max-w-sm">
-                      <DialogHeader>
-                        <DialogTitle>Completar Ticket</DialogTitle>
-                        <DialogDescription>
-                          ¿Estás seguro de que deseas cerrar este ticket? Esta acción no se puede deshacer.
-                        </DialogDescription>
-                      </DialogHeader>
-                      <div className="space-y-4">
-                        <Card className="p-4 bg-muted">
-                          <p className="font-semibold text-sm">{ticket.title}</p>
-                          <p className="text-xs text-muted-foreground mt-2">Habitación {ticket.room}</p>
-                        </Card>
-                        <div className="flex gap-3">
-                          <Button
-                            variant="outline"
-                            className="flex-1 bg-transparent"
-                            onClick={() => setShowCompleteDialog(false)}
-                          >
-                            Cancelar
-                          </Button>
-                          <Button
-                            variant="default"
-                            className="flex-1 bg-green-600 hover:bg-green-700"
-                            onClick={handleCompleteTicket}
-                          >
-                            Confirmar
-                          </Button>
-                        </div>
-                      </div>
-                    </DialogContent>
-                  </Dialog>
+                {ticket.status !== "pending" && ticket.status !== "resolved" && (
+                  <Button
+                    size="sm"
+                    className="flex-1 text-white hover:opacity-90 border-0"
+                    style={{ backgroundColor: "#235E20" }}
+                    onClick={() => {
+                      setSelectedTicketId(ticket.id)
+                      setShowCompleteDialog(true)
+                    }}
+                  >
+                    <CheckCircle className="w-4 h-4 mr-1" />
+                    Completar
+                  </Button>
                 )}
                 {ticket.status === "resolved" && (
                   <Button size="sm" variant="outline" disabled className="flex-1 bg-transparent">
@@ -360,6 +518,142 @@ export default function TicketsPage() {
           )
         })}
       </div>
+      </div>
+
+      {/* Edit Ticket Modal */}
+      {showEditModal && selectedTicket && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
+          <div className="bg-white rounded-2xl shadow-2xl p-6 w-full max-w-2xl mx-4 max-h-[90vh] overflow-y-auto">
+            <h2 className="text-2xl font-bold text-foreground mb-6">Editar Ticket #{selectedTicket.id}</h2>
+
+            <div className="space-y-6">
+              {/* Title and Description */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Título</label>
+                <input
+                  type="text"
+                  value={selectedTicket.title}
+                  onChange={(e) => setSelectedTicket({ ...selectedTicket, title: e.target.value })}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Descripción</label>
+                <textarea
+                  value={selectedTicket.description}
+                  onChange={(e) => setSelectedTicket({ ...selectedTicket, description: e.target.value })}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 min-h-24"
+                />
+              </div>
+
+              {/* Guest and Room */}
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Huésped</label>
+                  <input
+                    type="text"
+                    value={selectedTicket.guest}
+                    onChange={(e) => setSelectedTicket({ ...selectedTicket, guest: e.target.value })}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Habitación</label>
+                  <input
+                    type="text"
+                    value={selectedTicket.room}
+                    onChange={(e) => setSelectedTicket({ ...selectedTicket, room: e.target.value })}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+                </div>
+              </div>
+
+              {/* Category and Priority */}
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Categoría</label>
+                  <input
+                    type="text"
+                    value={selectedTicket.category}
+                    onChange={(e) => setSelectedTicket({ ...selectedTicket, category: e.target.value })}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Prioridad</label>
+                  <select
+                    value={selectedTicket.priority}
+                    onChange={(e) => setSelectedTicket({ ...selectedTicket, priority: e.target.value })}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  >
+                    <option value="low">Baja</option>
+                    <option value="medium">Media</option>
+                    <option value="high">Alta</option>
+                  </select>
+                </div>
+              </div>
+
+              {/* Status and Assigned To */}
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Estado</label>
+                  <select
+                    value={selectedTicket.status}
+                    onChange={(e) => setSelectedTicket({ ...selectedTicket, status: e.target.value })}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  >
+                    <option value="pending">Pendiente</option>
+                    <option value="in-progress">En Proceso</option>
+                    <option value="resolved">Resuelto</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Asignado a</label>
+                  <input
+                    type="text"
+                    value={selectedTicket.assignedTo || ""}
+                    onChange={(e) => setSelectedTicket({ ...selectedTicket, assignedTo: e.target.value || null })}
+                    placeholder="Nombre - Departamento"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+                </div>
+              </div>
+
+              {/* Scheduled Time */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Hora Programada</label>
+                <input
+                  type="text"
+                  value={selectedTicket.scheduledTime || ""}
+                  onChange={(e) => setSelectedTicket({ ...selectedTicket, scheduledTime: e.target.value || null })}
+                  placeholder="HH:MM"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+              </div>
+            </div>
+
+            {/* Action buttons */}
+            <div className="flex gap-3 mt-8">
+              <button
+                onClick={() => {
+                  setShowEditModal(false)
+                  setSelectedTicket(null)
+                }}
+                className="px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition-colors font-medium flex-1"
+              >
+                Cancelar
+              </button>
+              <button
+                onClick={handleSaveTicket}
+                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium flex-1"
+              >
+                Guardar Cambios
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

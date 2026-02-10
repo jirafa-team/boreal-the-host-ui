@@ -138,10 +138,82 @@ const clientEvents = [
   },
 ]
 
+// Mock data for pool occupancy by time slot
+const poolOccupancy = {
+  "9:00 AM": { reserved: 15, capacity: 50 },
+  "10:00 AM": { reserved: 8, capacity: 50 },
+  "11:00 AM": { reserved: 32, capacity: 50 },
+  "12:00 PM": { reserved: 42, capacity: 50 },
+  "3:00 PM": { reserved: 12, capacity: 50 },
+  "4:00 PM": { reserved: 28, capacity: 50 },
+  "5:00 PM": { reserved: 38, capacity: 50 },
+  "6:00 PM": { reserved: 45, capacity: 50 },
+}
+
+// Mock data for gym occupancy by time slot
+const gymOccupancy = {
+  "6:00 AM": { reserved: 20, capacity: 40 },
+  "7:00 AM": { reserved: 35, capacity: 40 },
+  "8:00 AM": { reserved: 38, capacity: 40 },
+  "9:00 AM": { reserved: 10, capacity: 40 },
+  "5:00 PM": { reserved: 32, capacity: 40 },
+  "6:00 PM": { reserved: 39, capacity: 40 },
+  "7:00 PM": { reserved: 25, capacity: 40 },
+  "8:00 PM": { reserved: 12, capacity: 40 },
+}
+
+// Mock data for breakfast occupancy by time slot
+const breakfastOccupancy = {
+  "6:30 AM": { reserved: 25, capacity: 60 },
+  "7:00 AM": { reserved: 42, capacity: 60 },
+  "7:30 AM": { reserved: 56, capacity: 60 },
+  "8:00 AM": { reserved: 48, capacity: 60 },
+  "8:30 AM": { reserved: 35, capacity: 60 },
+  "9:00 AM": { reserved: 18, capacity: 60 },
+  "9:30 AM": { reserved: 8, capacity: 60 },
+  "10:00 AM": { reserved: 5, capacity: 60 },
+}
+
 export default function ClientPage({ searchParams }: { searchParams: { type?: string } }) {
   const searchParamsHook = useSearchParams()
   const clientType = searchParams.type || "normal"
   const router = useRouter()
+
+  // Calculate occupancy percentage and get color
+  const getPoolOccupancyInfo = (time: string) => {
+    const occupancy = poolOccupancy[time as keyof typeof poolOccupancy]
+    if (!occupancy) return { percent: 0, color: "text-green-600", bgColor: "bg-green-100" }
+    
+    const percent = Math.round((occupancy.reserved / occupancy.capacity) * 100)
+    
+    if (percent <= 33) return { percent, color: "text-green-600", bgColor: "bg-green-100" }
+    if (percent <= 66) return { percent, color: "text-amber-600", bgColor: "bg-amber-100" }
+    return { percent, color: "text-red-600", bgColor: "bg-red-100" }
+  }
+
+  // Calculate occupancy percentage for gym and get color
+  const getGymOccupancyInfo = (time: string) => {
+    const occupancy = gymOccupancy[time as keyof typeof gymOccupancy]
+    if (!occupancy) return { percent: 0, color: "text-green-600", bgColor: "bg-green-100" }
+    
+    const percent = Math.round((occupancy.reserved / occupancy.capacity) * 100)
+    
+    if (percent <= 33) return { percent, color: "text-green-600", bgColor: "bg-green-100" }
+    if (percent <= 66) return { percent, color: "text-amber-600", bgColor: "bg-amber-100" }
+    return { percent, color: "text-red-600", bgColor: "bg-red-100" }
+  }
+
+  // Calculate occupancy percentage for breakfast and get color
+  const getBreakfastOccupancyInfo = (time: string) => {
+    const occupancy = breakfastOccupancy[time as keyof typeof breakfastOccupancy]
+    if (!occupancy) return { percent: 0, color: "text-green-600", bgColor: "bg-green-100" }
+    
+    const percent = Math.round((occupancy.reserved / occupancy.capacity) * 100)
+    
+    if (percent <= 33) return { percent, color: "text-green-600", bgColor: "bg-green-100" }
+    if (percent <= 66) return { percent, color: "text-amber-600", bgColor: "bg-amber-100" }
+    return { percent, color: "text-red-600", bgColor: "bg-red-100" }
+  }
 
   const futureUserData = {
     name: "Ana",
@@ -321,9 +393,15 @@ export default function ClientPage({ searchParams }: { searchParams: { type?: st
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">
-      <div className="p-4 text-white sticky top-0 z-10" style={{ backgroundColor: "#11AFBE" }}>
-        <div className="flex items-center justify-between mb-4">
-          <div>
+      <div className="p-4 text-white sticky top-0 z-10 relative overflow-hidden" style={{ background: "linear-gradient(135deg, #0f172a 0%, #1e3a8a 50%, #581c87 100%)" }}>
+        {/* Radial gradient overlays for subtle effects */}
+        <div className="absolute inset-0 opacity-20 pointer-events-none">
+          <div className="absolute top-0 right-0 w-96 h-96 bg-blue-400 rounded-full mix-blend-screen filter blur-3xl"></div>
+          <div className="absolute bottom-0 left-0 w-96 h-96 bg-purple-400 rounded-full mix-blend-screen filter blur-3xl"></div>
+        </div>
+        
+        <div className="flex items-center justify-between gap-4 flex-wrap relative z-10">
+          <div className="flex-1 relative z-10">
             <h1 className="text-3xl font-bold">Hola, {userData.name}</h1>
             {!isFutureReservation && (
               <p className="text-sm opacity-90 mt-2 flex items-center gap-2">
@@ -332,9 +410,36 @@ export default function ClientPage({ searchParams }: { searchParams: { type?: st
               </p>
             )}
           </div>
+          
+          {/* Tu Estancia Chip */}
+          {!isFutureReservation && (
+            <div className="flex items-center gap-4 bg-white/15 backdrop-blur-sm rounded-full px-4 py-2.5 border border-white/20 relative z-10">
+              <div className="flex items-center gap-2">
+                <Calendar className="w-4 h-4 text-white" />
+                <div className="text-center">
+                  <p className="text-xs opacity-80 font-medium">Check-out</p>
+                  <p className="text-sm font-bold text-white">{userData.checkOut}</p>
+                </div>
+              </div>
+              <div className="w-px h-8 bg-white/20"></div>
+              <div className="flex items-center gap-3">
+                <div className="text-center">
+                  <p className="text-2xl font-bold text-white">{userData.nights}</p>
+                  <p className="text-xs opacity-80 font-medium">noches</p>
+                </div>
+                <Button
+                  size="sm"
+                  className="bg-violet-800 text-white hover:bg-violet-900 font-semibold px-3 h-8 rounded-full"
+                >
+                  Extender
+                </Button>
+              </div>
+            </div>
+          )}
+          
           <div
             style={{ background: "linear-gradient(135deg, #6f65d0 0%, #67f1d0 100%)" }}
-            className="w-14 h-14 rounded-full flex items-center justify-center shadow-lg p-[2px]"
+            className="w-14 h-14 rounded-full flex items-center justify-center shadow-lg p-[2px] relative z-10"
           >
             <div className="w-full h-full bg-[#233b64] rounded-full flex items-center justify-center">
               <span className="text-2xl font-bold text-white">{userData.initials}</span>
@@ -395,24 +500,32 @@ export default function ClientPage({ searchParams }: { searchParams: { type?: st
             {activeTab === "inicio" && (
               <div className="space-y-6">
                 <div className="px-4 pt-4">
-                  <div className="bg-gradient-to-r from-[#773CCA] to-[#11AFBE] rounded-xl p-4 text-white">
-                    <div className="flex items-center gap-2 mb-2">
-                      <Clock className="h-5 w-5" />
-                      <p className="text-sm font-medium">Próxima Actividad</p>
+                  <div className="relative overflow-hidden rounded-xl p-4 text-white" style={{ background: "linear-gradient(135deg, #581c87 0%, #6d28d9 50%, #0369a1 100%)" }}>
+                    {/* Radial gradient overlays for subtle metallic effects */}
+                    <div className="absolute inset-0 opacity-20 pointer-events-none">
+                      <div className="absolute top-0 right-0 w-96 h-96 bg-violet-300 rounded-full mix-blend-screen filter blur-3xl"></div>
+                      <div className="absolute bottom-0 left-0 w-96 h-96 bg-cyan-300 rounded-full mix-blend-screen filter blur-3xl"></div>
                     </div>
-                    <p className="text-lg font-semibold mb-3">Desayuno - 8:00 AM</p>
-                    <div className="flex gap-3 justify-center">
-                      <div className="bg-white/20 backdrop-blur-sm rounded-lg px-4 py-2 text-center min-w-[70px]">
-                        <p className="text-2xl font-bold">{String(timeRemaining.hours).padStart(2, "0")}</p>
-                        <p className="text-xs opacity-90">Horas</p>
+                    
+                    <div className="relative z-10">
+                      <div className="flex items-center gap-2 mb-2">
+                        <Clock className="h-5 w-5" />
+                        <p className="text-sm font-medium">Próxima Actividad</p>
                       </div>
-                      <div className="bg-white/20 backdrop-blur-sm rounded-lg px-4 py-2 text-center min-w-[70px]">
-                        <p className="text-2xl font-bold">{String(timeRemaining.minutes).padStart(2, "0")}</p>
-                        <p className="text-xs opacity-90">Minutos</p>
-                      </div>
-                      <div className="bg-white/20 backdrop-blur-sm rounded-lg px-4 py-2 text-center min-w-[70px]">
-                        <p className="text-2xl font-bold">{String(timeRemaining.seconds).padStart(2, "0")}</p>
-                        <p className="text-xs opacity-90">Segundos</p>
+                      <p className="text-lg font-semibold mb-3">Desayuno - 8:00 AM</p>
+                      <div className="flex gap-3 justify-center">
+                        <div className="bg-white/20 backdrop-blur-sm rounded-lg px-4 py-2 text-center min-w-[70px]">
+                          <p className="text-2xl font-bold">{String(timeRemaining.hours).padStart(2, "0")}</p>
+                          <p className="text-xs opacity-90">Horas</p>
+                        </div>
+                        <div className="bg-white/20 backdrop-blur-sm rounded-lg px-4 py-2 text-center min-w-[70px]">
+                          <p className="text-2xl font-bold">{String(timeRemaining.minutes).padStart(2, "0")}</p>
+                          <p className="text-xs opacity-90">Minutos</p>
+                        </div>
+                        <div className="bg-white/20 backdrop-blur-sm rounded-lg px-4 py-2 text-center min-w-[70px]">
+                          <p className="text-2xl font-bold">{String(timeRemaining.seconds).padStart(2, "0")}</p>
+                          <p className="text-xs opacity-90">Segundos</p>
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -443,35 +556,10 @@ export default function ClientPage({ searchParams }: { searchParams: { type?: st
                   </div>
                 </div>
 
-                <div className="mx-4 px-4 py-3 bg-gradient-to-r from-[#11AFBE] to-[#773CCA] rounded-lg">
-                  <div className="flex items-center justify-between gap-4">
-                    <div className="flex-1">
-                      <h3 className="text-2xl font-bold text-white mb-2">Tu Estancia</h3>
-                      <div className="inline-flex items-center gap-1.5 bg-white text-[#773CCA] text-sm px-3 py-1.5 rounded-full font-semibold">
-                        <Calendar className="w-4 h-4" />
-                        Check-out: {userData.checkOut}
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-3">
-                      <div className="text-center">
-                        <p className="text-3xl font-bold text-white">{userData.nights}</p>
-                        <p className="text-xs text-white/70">Noches</p>
-                      </div>
-                      <Button
-                        size="sm"
-                        style={{ backgroundColor: "#11AFBF" }}
-                        className="text-white border-0 hover:opacity-90"
-                      >
-                        Extender
-                      </Button>
-                    </div>
-                  </div>
-                </div>
-
                 <div className="px-4 pt-4 pb-4 bg-white">
                   <Card
                     className="relative overflow-hidden cursor-pointer hover:shadow-lg transition-all h-32"
-                    onClick={() => router.push("/client/room-service-menu")}
+                    onClick={() => {}} // DISABLED - Room Service functionality temporarily hidden
                   >
                     <Image src="/club-sandwich.jpg" alt="Room Service" fill className="object-cover" />
                     <div className="absolute inset-0 bg-gradient-to-r from-black/70 to-black/40" />
@@ -493,6 +581,7 @@ export default function ClientPage({ searchParams }: { searchParams: { type?: st
                   </Card>
                 </div>
 
+                {/* HIDDEN - Room service order Pizza Margherita temporarily disabled
                 <div className="mx-4 bg-white rounded-lg shadow-sm border border-orange-300 p-4">
                   <div className="mb-3">
                     <div className="flex items-center justify-between mb-1">
@@ -511,6 +600,7 @@ export default function ClientPage({ searchParams }: { searchParams: { type?: st
                     </div>
                   </div>
                 </div>
+                */}
 
                 <div className="px-4 pt-4 pb-2 bg-white">
                   <h2 className="text-2xl font-bold text-black">Reserva</h2>
@@ -566,6 +656,7 @@ export default function ClientPage({ searchParams }: { searchParams: { type?: st
                         </DialogHeader>
                         <div className="grid grid-cols-2 gap-3 py-4">
                           {[
+                            "6:30 AM",
                             "7:00 AM",
                             "7:30 AM",
                             "8:00 AM",
@@ -573,20 +664,34 @@ export default function ClientPage({ searchParams }: { searchParams: { type?: st
                             "9:00 AM",
                             "9:30 AM",
                             "10:00 AM",
-                            "10:30 AM",
-                          ].map((time) => (
-                            <Button
-                              key={time}
-                              variant={breakfastTime === time ? "default" : "outline"}
-                              onClick={() => {
-                                setBreakfastTime(time)
-                                setShowBreakfastDialog(false)
-                              }}
-                              className="h-12"
-                            >
-                              {time}
-                            </Button>
-                          ))}
+                          ].map((time) => {
+                            const { percent, color, bgColor } = getBreakfastOccupancyInfo(time)
+                            return (
+                              <div
+                                key={time}
+                                className="flex items-center justify-between space-x-3 p-3 rounded-lg hover:bg-accent cursor-pointer border border-transparent hover:border-gray-300"
+                                onClick={() => {
+                                  setBreakfastTime(time)
+                                  setShowBreakfastDialog(false)
+                                }}
+                              >
+                                <div className="flex items-center space-x-3 flex-1">
+                                  <input
+                                    type="radio"
+                                    name="breakfast-time"
+                                    checked={breakfastTime === time}
+                                    onChange={() => {}}
+                                    className="cursor-pointer"
+                                  />
+                                  <span className="font-medium">{time}</span>
+                                </div>
+                                <div className={`flex items-center gap-2 px-2 py-1 rounded ${bgColor}`}>
+                                  <Users className={`w-3.5 h-3.5 ${color}`} />
+                                  <span className={`text-xs font-semibold ${color}`}>{percent}%</span>
+                                </div>
+                              </div>
+                            )
+                          })}
                         </div>
                       </DialogContent>
                     </Dialog>
@@ -727,20 +832,26 @@ export default function ClientPage({ searchParams }: { searchParams: { type?: st
                               "6:00 PM",
                               "7:00 PM",
                               "8:00 PM",
-                            ].map((time) => (
-                              <div
-                                key={time}
-                                className="flex items-center space-x-3 p-3 rounded-lg hover:bg-accent cursor-pointer"
-                              >
-                                <RadioGroupItem value={time} id={`gym-${time}`} />
-                                <Label htmlFor={`gym-${time}`} className="flex-1 cursor-pointer font-medium">
-                                  {time}
-                                </Label>
-                                <Badge variant="secondary" className="text-xs">
-                                  Disponible
-                                </Badge>
-                              </div>
-                            ))}
+                            ].map((time) => {
+                              const { percent, color, bgColor } = getGymOccupancyInfo(time)
+                              return (
+                                <div
+                                  key={time}
+                                  className="flex items-center justify-between space-x-3 p-3 rounded-lg hover:bg-accent cursor-pointer"
+                                >
+                                  <div className="flex items-center space-x-3 flex-1">
+                                    <RadioGroupItem value={time} id={`gym-${time}`} />
+                                    <Label htmlFor={`gym-${time}`} className="flex-1 cursor-pointer font-medium">
+                                      {time}
+                                    </Label>
+                                  </div>
+                                  <div className={`flex items-center gap-2 px-2 py-1 rounded ${bgColor}`}>
+                                    <Users className={`w-3.5 h-3.5 ${color}`} />
+                                    <span className={`text-xs font-semibold ${color}`}>{percent}%</span>
+                                  </div>
+                                </div>
+                              )
+                            })}
                           </RadioGroup>
                         </div>
                         <Button className="w-full" size="lg" onClick={() => setShowGymDialog(false)}>
@@ -803,20 +914,26 @@ export default function ClientPage({ searchParams }: { searchParams: { type?: st
                               "4:00 PM",
                               "5:00 PM",
                               "6:00 PM",
-                            ].map((time) => (
-                              <div
-                                key={time}
-                                className="flex items-center space-x-3 p-3 rounded-lg hover:bg-accent cursor-pointer"
-                              >
-                                <RadioGroupItem value={time} id={`pool-${time}`} />
-                                <Label htmlFor={`pool-${time}`} className="flex-1 cursor-pointer font-medium">
-                                  {time}
-                                </Label>
-                                <Badge variant="secondary" className="text-xs">
-                                  Disponible
-                                </Badge>
-                              </div>
-                            ))}
+                            ].map((time) => {
+                              const { percent, color, bgColor } = getPoolOccupancyInfo(time)
+                              return (
+                                <div
+                                  key={time}
+                                  className="flex items-center justify-between space-x-3 p-3 rounded-lg hover:bg-accent cursor-pointer"
+                                >
+                                  <div className="flex items-center space-x-3 flex-1">
+                                    <RadioGroupItem value={time} id={`pool-${time}`} />
+                                    <Label htmlFor={`pool-${time}`} className="flex-1 cursor-pointer font-medium">
+                                      {time}
+                                    </Label>
+                                  </div>
+                                  <div className={`flex items-center gap-2 px-2 py-1 rounded ${bgColor}`}>
+                                    <Users className={`w-3.5 h-3.5 ${color}`} />
+                                    <span className={`text-xs font-semibold ${color}`}>{percent}%</span>
+                                  </div>
+                                </div>
+                              )
+                            })}
                           </RadioGroup>
                         </div>
                         <Button className="w-full" size="lg" onClick={() => setPoolDialogOpen(false)}>
@@ -833,7 +950,7 @@ export default function ClientPage({ searchParams }: { searchParams: { type?: st
                     onClick={() => router.push("/client/help-form")}
                   >
                     <Image src="/hotel-concierge-help-desk.jpg" alt="Asistencia" fill className="object-cover" />
-                    <div className="absolute inset-0 bg-gradient-to-r from-[#11AFBF]/95 to-[#11AFBF]/80" />
+                    <div className="absolute inset-0 bg-gradient-to-r from-red-900/70 to-red-700/50" />
                     <div className="relative h-full flex items-center justify-between p-5">
                       <div className="flex items-center gap-4">
                         <div className="bg-white/20 backdrop-blur-sm p-3 rounded-full">
@@ -851,24 +968,25 @@ export default function ClientPage({ searchParams }: { searchParams: { type?: st
                   </Card>
                 </div>
 
+                {/* HIDDEN - Second Necesitas Ayuda section temporarily disabled
                 <div className="px-4 pt-4 pb-4 bg-white">
                   <Card
                     className="relative overflow-hidden cursor-pointer hover:shadow-lg transition-all h-32"
                     onClick={() => {
-                      router.push("/client/support")
+                      router.push("/client/help-form")
                     }}
                   >
-                    <Image src="/hotel-concierge-help-desk.jpg" alt="Ayuda y Soporte" fill className="object-cover" />
+                    <Image src="/hotel-concierge-help-desk.jpg" alt="Ayuda" fill className="object-cover" />
                     <div className="absolute inset-0 bg-gradient-to-r from-red-900/70 to-red-700/50" />
                     <div className="absolute inset-0 flex items-center justify-between px-6">
                       <div className="flex items-center gap-4">
                         <div className="bg-white/20 backdrop-blur-sm p-3 rounded-full">
-                          <AlertCircle className="w-8 h-8 text-white" />
+                          <MessageCircle className="w-8 h-8 text-white" />
                         </div>
                         <div>
-                          <h3 className="text-xl font-bold text-white mb-2">Reportar Inconveniente</h3>
+                          <h3 className="text-xl font-bold text-white mb-2">¿Necesitas Ayuda?</h3>
                           <div className="inline-flex items-center gap-1.5 bg-white/20 backdrop-blur-sm text-white text-xs px-3 py-1 rounded-full">
-                            <span>Solicitar ayuda directa</span>
+                            <span>Estamos aquí para ti</span>
                           </div>
                         </div>
                       </div>
@@ -876,7 +994,9 @@ export default function ClientPage({ searchParams }: { searchParams: { type?: st
                     </div>
                   </Card>
                 </div>
+                */}
 
+                {/* HIDDEN - Ciudad y Recomendaciones section temporarily disabled
                 <div className="px-4 pt-4 pb-2 bg-white">
                   <h2 className="text-2xl font-bold text-black">Ciudad</h2>
                 </div>
@@ -959,6 +1079,7 @@ export default function ClientPage({ searchParams }: { searchParams: { type?: st
                     </Link>
                   </div>
                 </div>
+                */}
               </div>
             )}
 
@@ -1067,7 +1188,7 @@ export default function ClientPage({ searchParams }: { searchParams: { type?: st
                       time: "Hace 2 horas",
                       read: false,
                     },
-                    { title: "Room service", message: "Tu pedido está en camino", time: "Hace 30 min", read: false },
+                    // { title: "Room service", message: "Tu pedido está en camino", time: "Hace 30 min", read: false }, // HIDDEN - Room service notifications temporarily disabled
                   ].map((notif, idx) => (
                     <Card key={idx} className={`p-4 ${!notif.read ? "bg-primary/5 border-primary/20" : ""}`}>
                       <div className="flex items-start justify-between">
@@ -1134,7 +1255,7 @@ export default function ClientPage({ searchParams }: { searchParams: { type?: st
 
                 <Card
                   className="relative overflow-hidden cursor-pointer hover:shadow-lg transition-all h-32"
-                  onClick={() => router.push("/client/room-service-menu")}
+                  onClick={() => {}} // DISABLED - Room Service functionality temporarily hidden
                 >
                   <Image src="/club-sandwich.jpg" alt="Room Service" fill className="object-cover" />
                   <div className="absolute inset-0 bg-gradient-to-r from-black/70 to-black/40" />
@@ -1506,6 +1627,7 @@ export default function ClientPage({ searchParams }: { searchParams: { type?: st
             <Home className="w-5 h-5" />
             <span className="text-xs font-medium">Inicio</span>
           </button>
+          {/* HIDDEN - Órdenes, Eventos, and Avisos menu items temporarily disabled
           <button
             onClick={() => setActiveTab("ordenes")}
             className={`flex flex-col items-center gap-1 px-4 py-2 rounded-xl transition-all ${
@@ -1534,6 +1656,7 @@ export default function ClientPage({ searchParams }: { searchParams: { type?: st
             <span className="text-xs font-medium">Avisos</span>
             <div className="absolute top-1 right-3 w-2 h-2 bg-destructive rounded-full animate-pulse" />
           </button>
+          */}
           <button
             onClick={() => setActiveTab("perfil")}
             className={`flex flex-col items-center gap-1 px-4 py-2 rounded-xl transition-all ${

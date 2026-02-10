@@ -4,11 +4,17 @@ import { useState } from "react"
 import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { Clock, CheckCircle2, User, MapPin, ChefHat, Utensils, AlertTriangle, AlertCircle, Grid3x3, Table } from "lucide-react"
+import { Clock, CheckCircle2, User, MapPin, ChefHat, Utensils, AlertTriangle, AlertCircle, Grid3x3, Table, ShoppingCart } from "lucide-react"
 
 export default function PedidosPage() {
   const [filter, setFilter] = useState<"all" | "pending" | "preparing" | "delivered">("all")
-  const [viewMode, setViewMode] = useState<"cards" | "table">("cards")
+  const [viewMode, setViewMode] = useState<"kanban" | "list">("kanban")
+  const [showNewOrderModal, setShowNewOrderModal] = useState(false)
+  const [showEditModal, setShowEditModal] = useState(false)
+  const [selectedOrder, setSelectedOrder] = useState<any>(null)
+  const [searchDate, setSearchDate] = useState("2024-01-13")
+  const [searchGuest, setSearchGuest] = useState("")
+  const [searchRoom, setSearchRoom] = useState("")
 
   const orders = [
     {
@@ -86,6 +92,28 @@ export default function PedidosPage() {
 
   const filteredOrders = filter === "all" ? orders : orders.filter((o) => o.status === filter)
 
+  const searchFilteredOrders = filteredOrders.filter((order) => {
+    const orderDate = order.orderedAt.split(" ")[0]
+    const dateMatch = !searchDate || orderDate === searchDate
+    const guestMatch = !searchGuest || order.guest.toLowerCase().includes(searchGuest.toLowerCase())
+    const roomMatch = !searchRoom || order.room.includes(searchRoom)
+    return dateMatch && guestMatch && roomMatch
+  })
+
+  const handleEditOrder = (order: any) => {
+    setSelectedOrder(JSON.parse(JSON.stringify(order)))
+    setShowEditModal(true)
+  }
+
+  const handleSaveOrder = () => {
+    if (selectedOrder) {
+      // Aquí iría la lógica para actualizar el pedido
+      console.log("Pedido actualizado:", selectedOrder)
+      setShowEditModal(false)
+      setSelectedOrder(null)
+    }
+  }
+
   const getStatusBadge = (status: string) => {
     const statusConfig = {
       pending: { label: "Pendiente", badgeClass: "bg-gray-600 text-white", bgColor: "bg-yellow-50" },
@@ -118,245 +146,512 @@ export default function PedidosPage() {
   }
 
   return (
-    <div className="p-8 space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold">Pedidos de Room Service</h1>
-          <p className="text-muted-foreground">Gestiona las órdenes de comida a las habitaciones</p>
+    <>
+      {/* Header */}
+      <header className="bg-card border-b border-border sticky top-0 z-10">
+        <div className="px-8 py-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-2xl font-bold text-foreground">Pedidos de Room Service</h1>
+              <p className="text-sm text-muted-foreground">Gestiona las órdenes de comida a las habitaciones</p>
+            </div>
+            <div className="flex gap-4 items-center ml-auto">
+              {/* View Mode Toggle */}
+              <div className="inline-flex h-10 items-center rounded-lg bg-gray-100 p-1 border border-gray-200">
+                <button
+                  onClick={() => setViewMode("list")}
+                  className={`px-5 py-2 rounded-md font-medium text-sm transition-all ${
+                    viewMode === "list"
+                      ? "text-white shadow-md"
+                      : "text-gray-700 hover:text-gray-900"
+                  }`}
+                  style={viewMode === "list" ? { backgroundColor: "#394a63" } : {}}
+                >
+                  Lista
+                </button>
+                <button
+                  onClick={() => setViewMode("kanban")}
+                  className={`px-5 py-2 rounded-md font-medium text-sm transition-all ${
+                    viewMode === "kanban"
+                      ? "text-white shadow-md"
+                      : "text-gray-700 hover:text-gray-900"
+                  }`}
+                  style={viewMode === "kanban" ? { backgroundColor: "#394a63" } : {}}
+                >
+                  Kanban
+                </button>
+              </div>
+              <button 
+                onClick={() => setShowNewOrderModal(true)}
+                className="flex items-center justify-center w-10 h-10 rounded-full bg-gradient-to-br from-orange-600 to-orange-700 text-white shadow-md hover:shadow-lg transition-all duration-300 hover:scale-110 group relative"
+                title="Nuevo pedido"
+              >
+                <div className="relative flex items-center justify-center">
+                  <ShoppingCart className="w-5 h-5" />
+                  <span className="absolute text-base font-bold -bottom-0.5 -right-0.5 text-white drop-shadow-lg">+</span>
+                </div>
+                <span className="absolute top-full mt-2 px-2 py-1 bg-gray-900 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap">
+                  Nuevo Pedido
+                </span>
+              </button>
+            </div>
+          </div>
         </div>
-      </div>
+      </header>
 
-      {/* Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <Card
-          className="p-4 cursor-pointer hover:shadow-lg transition-shadow"
-          onClick={() => setFilter("pending")}
+      <div className="p-8 space-y-6">
+
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <div
+          className="relative overflow-hidden rounded-lg p-4 shadow-md hover:shadow-lg transition-all duration-300 hover:scale-105 cursor-pointer group"
+          style={{
+            background: filter === "all" ? "linear-gradient(135deg, rgb(124, 58, 255), rgb(109, 40, 217))" : "white",
+            color: filter === "all" ? "white" : "black"
+          }}
+          onClick={() => setFilter("all")}
         >
-          <div className="flex items-center gap-3">
-            <div className="p-2 bg-yellow-500/10 rounded-lg">
-              <Clock className="w-5 h-5 text-yellow-600" />
+          {filter === "all" && (
+            <div className="absolute inset-0 opacity-10">
+              <div className="absolute top-0 right-0 w-20 h-20 bg-white rounded-full -mr-8 -mt-8"></div>
+            </div>
+          )}
+          <div className="relative flex items-center gap-3">
+            <div className={`p-2 rounded-lg ${filter === "all" ? "bg-white/20" : "bg-violet-100"}`}>
+              <ShoppingCart className={`w-5 h-5 ${filter === "all" ? "text-white" : "text-violet-600"}`} />
             </div>
             <div>
-              <p className="text-sm text-muted-foreground">Pendientes</p>
+              <p className={`text-sm ${filter === "all" ? "opacity-90" : "text-muted-foreground"}`}>Todos</p>
+              <p className="text-2xl font-bold">{orders.length}</p>
+            </div>
+          </div>
+        </div>
+        <div
+          className="relative overflow-hidden rounded-lg p-4 shadow-md hover:shadow-lg transition-all duration-300 hover:scale-105 cursor-pointer group"
+          style={{
+            background: filter === "pending" ? "linear-gradient(135deg, rgb(234, 179, 8), rgb(202, 138, 4))" : "white",
+            color: filter === "pending" ? "white" : "black"
+          }}
+          onClick={() => setFilter("pending")}
+        >
+          {filter === "pending" && (
+            <div className="absolute inset-0 opacity-10">
+              <div className="absolute top-0 right-0 w-20 h-20 bg-white rounded-full -mr-8 -mt-8"></div>
+            </div>
+          )}
+          <div className="relative flex items-center gap-3">
+            <div className={`p-2 rounded-lg ${filter === "pending" ? "bg-white/20" : "bg-yellow-100"}`}>
+              <Clock className={`w-5 h-5 ${filter === "pending" ? "text-white" : "text-yellow-600"}`} />
+            </div>
+            <div>
+              <p className={`text-sm ${filter === "pending" ? "opacity-90" : "text-muted-foreground"}`}>Pendientes</p>
               <p className="text-2xl font-bold">{orders.filter((o) => o.status === "pending").length}</p>
             </div>
           </div>
-        </Card>
-        <Card
-          className="p-4 cursor-pointer hover:shadow-lg transition-shadow"
+        </div>
+        <div
+          className="relative overflow-hidden rounded-lg p-4 shadow-md hover:shadow-lg transition-all duration-300 hover:scale-105 cursor-pointer group"
+          style={{
+            background: filter === "preparing" ? "linear-gradient(135deg, rgb(37, 99, 235), rgb(29, 78, 216))" : "white",
+            color: filter === "preparing" ? "white" : "black"
+          }}
           onClick={() => setFilter("preparing")}
         >
-          <div className="flex items-center gap-3">
-            <div className="p-2 bg-blue-500/10 rounded-lg">
-              <ChefHat className="w-5 h-5 text-blue-600" />
+          {filter === "preparing" && (
+            <div className="absolute inset-0 opacity-10">
+              <div className="absolute top-0 right-0 w-20 h-20 bg-white rounded-full -mr-8 -mt-8"></div>
+            </div>
+          )}
+          <div className="relative flex items-center gap-3">
+            <div className={`p-2 rounded-lg ${filter === "preparing" ? "bg-white/20" : "bg-blue-100"}`}>
+              <ChefHat className={`w-5 h-5 ${filter === "preparing" ? "text-white" : "text-blue-600"}`} />
             </div>
             <div>
-              <p className="text-sm text-muted-foreground">En Preparación</p>
+              <p className={`text-sm ${filter === "preparing" ? "opacity-90" : "text-muted-foreground"}`}>En Preparación</p>
               <p className="text-2xl font-bold">{orders.filter((o) => o.status === "preparing").length}</p>
             </div>
           </div>
-        </Card>
-        <Card
-          className="p-4 cursor-pointer hover:shadow-lg transition-shadow"
+        </div>
+        <div
+          className="relative overflow-hidden rounded-lg p-4 shadow-md hover:shadow-lg transition-all duration-300 hover:scale-105 cursor-pointer group"
+          style={{
+            background: filter === "delivered" ? "linear-gradient(135deg, rgb(34, 197, 94), rgb(22, 163, 74))" : "white",
+            color: filter === "delivered" ? "white" : "black"
+          }}
           onClick={() => setFilter("delivered")}
         >
-          <div className="flex items-center gap-3">
-            <div className="p-2 bg-green-500/10 rounded-lg">
-              <CheckCircle2 className="w-5 h-5 text-green-600" />
+          {filter === "delivered" && (
+            <div className="absolute inset-0 opacity-10">
+              <div className="absolute top-0 right-0 w-20 h-20 bg-white rounded-full -mr-8 -mt-8"></div>
+            </div>
+          )}
+          <div className="relative flex items-center gap-3">
+            <div className={`p-2 rounded-lg ${filter === "delivered" ? "bg-white/20" : "bg-green-100"}`}>
+              <CheckCircle2 className={`w-5 h-5 ${filter === "delivered" ? "text-white" : "text-green-600"}`} />
             </div>
             <div>
-              <p className="text-sm text-muted-foreground">Entregados Hoy</p>
+              <p className={`text-sm ${filter === "delivered" ? "opacity-90" : "text-muted-foreground"}`}>Entregados</p>
               <p className="text-2xl font-bold">{orders.filter((o) => o.status === "delivered").length}</p>
             </div>
           </div>
-        </Card>
-        <Card
-          className="p-4 cursor-pointer hover:shadow-lg transition-shadow"
-          onClick={() => setFilter("all")}
-        >
-          <div className="flex items-center gap-3">
-            <div className="p-2 bg-purple-500/10 rounded-lg">
-              <Utensils className="w-5 h-5 text-purple-600" />
-            </div>
-            <div>
-              <p className="text-sm text-muted-foreground">Ingresos Hoy</p>
-              <p className="text-2xl font-bold">€{orders.reduce((sum, o) => sum + o.total, 0).toFixed(2)}</p>
-            </div>
+        </div>
+      </div>
+
+      {/* Search Section */}
+      <div className="mb-6 p-4 bg-white rounded-lg border border-gray-200 shadow-sm">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Fecha</label>
+            <input
+              type="date"
+              value={searchDate}
+              onChange={(e) => setSearchDate(e.target.value)}
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
           </div>
-        </Card>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Huésped</label>
+            <input
+              type="text"
+              placeholder="Buscar por nombre..."
+              value={searchGuest}
+              onChange={(e) => setSearchGuest(e.target.value)}
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Nro Habitación</label>
+            <input
+              type="text"
+              placeholder="Ej: 204"
+              value={searchRoom}
+              onChange={(e) => setSearchRoom(e.target.value)}
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+          </div>
+        </div>
       </div>
 
-      {/* View Mode Switcher */}
-      <div className="flex gap-2">
-        <Button variant={filter === "all" ? "default" : "outline"} onClick={() => setFilter("all")}>
-          Todos
-        </Button>
-        <Button variant={filter === "pending" ? "default" : "outline"} onClick={() => setFilter("pending")}>
-          Pendientes
-        </Button>
-        <Button variant={filter === "preparing" ? "default" : "outline"} onClick={() => setFilter("preparing")}>
-          En Preparación
-        </Button>
-        <Button variant={filter === "delivered" ? "default" : "outline"} onClick={() => setFilter("delivered")}>
-          Entregados
-        </Button>
-      </div>
+        {/* Orders View - Kanban or List */}
+        {viewMode === "kanban" ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {filteredOrders.map((order) => {
+              const statusBadge = getStatusBadge(order.status)
+              const delayIndicator = getDelayIndicator(order.delayStatus)
+              const DelayIcon = delayIndicator?.icon
 
-      {/* Orders View - Cards or Table */}
-      {viewMode === "cards" ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {filteredOrders.map((order) => {
-            const statusBadge = getStatusBadge(order.status)
-            const delayIndicator = getDelayIndicator(order.delayStatus)
-            const DelayIcon = delayIndicator?.icon
-
-            return (
-              <Card
-                key={order.id}
-                className={`p-6 border-0 ${statusBadge.bgColor}`}
-              >
-                <div className="space-y-4">
-                  {/* Header with status top-right and estimated time below */}
-                  <div className="flex items-start justify-between gap-3">
-                    <h3 className="text-lg font-semibold">Pedido #{order.id}</h3>
-                    <div className="flex flex-col items-end gap-2">
-                      <Badge className={statusBadge.badgeClass}>
-                        {statusBadge.label}
-                      </Badge>
-                      {order.status !== "delivered" && (
-                        <Badge className="bg-purple-800 text-white text-xs gap-1.5">
-                          <Clock className="w-3.5 h-3.5" />
-                          {order.estimatedDelivery}
+              return (
+                <Card
+                  key={order.id}
+                  className="p-6 border cursor-pointer hover:shadow-lg transition-shadow flex flex-col h-full"
+                  onClick={() => handleEditOrder(order)}
+                >
+                  <div className="space-y-4 flex-1">
+                    {/* Header with status top-right and estimated time below */}
+                    <div className="flex items-start justify-between gap-3">
+                      <h3 className="text-lg font-semibold">Pedido #{order.id}</h3>
+                      <div className="flex flex-col items-end gap-2">
+                        <Badge className={statusBadge.badgeClass}>
+                          {statusBadge.label}
                         </Badge>
-                      )}
+                        {order.status !== "delivered" && (
+                          <Badge className="bg-purple-800 text-white text-xs gap-1.5">
+                            <Clock className="w-3.5 h-3.5" />
+                            {order.estimatedDelivery}
+                          </Badge>
+                        )}
+                      </div>
                     </div>
+
+                    {/* Order info */}
+                    <div className="space-y-2 text-sm">
+                      <div className="flex items-center gap-2">
+                        <User className="w-4 h-4 text-muted-foreground" />
+                        <span>{order.guest}</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <MapPin className="w-4 h-4 text-muted-foreground" />
+                        <span>Habitación {order.room}</span>
+                      </div>
+                    </div>
+
+                    {/* Items */}
+                    <div className="bg-white/50 rounded-lg p-3 text-sm">
+                      <h4 className="font-semibold mb-2">Items:</h4>
+                      <div className="space-y-1">
+                        {order.items.map((item, idx) => (
+                          <div key={idx} className="flex justify-between">
+                            <span>
+                              {item.quantity}x {item.name}
+                            </span>
+                            <span className="font-medium">€{(item.quantity * item.price).toFixed(2)}</span>
+                          </div>
+                        ))}
+                      </div>
+                      <div className="border-t pt-2 mt-2 flex justify-between font-semibold">
+                        <span>Total</span>
+                        <span>€{order.total.toFixed(2)}</span>
+                      </div>
+                    </div>
+
+                    {/* Delay indicator if needed */}
+                    {delayIndicator && DelayIcon && (
+                      <div className={`p-2 rounded-lg flex items-center gap-2 ${delayIndicator.bgColor} border ${delayIndicator.borderColor}`}>
+                        <DelayIcon className={`w-4 h-4 ${delayIndicator.color}`} />
+                        <span className={`text-sm font-medium ${delayIndicator.color}`}>{delayIndicator.label}</span>
+                      </div>
+                    )}
+
+                    {/* Delivered info */}
+                    {order.status === "delivered" && (
+                      <div className="text-sm text-green-600 flex items-center gap-1">
+                        <CheckCircle2 className="w-4 h-4" />
+                        Entregado a las {order.deliveredAt}
+                      </div>
+                    )}
                   </div>
-
-                  {/* Delay indicator if needed */}
-                  {delayIndicator && DelayIcon && (
-                    <div className={`p-2 rounded-lg flex items-center gap-2 ${delayIndicator.bgColor} border ${delayIndicator.borderColor}`}>
-                      <DelayIcon className={`w-4 h-4 ${delayIndicator.color}`} />
-                      <span className={`text-sm font-medium ${delayIndicator.color}`}>{delayIndicator.label}</span>
-                    </div>
-                  )}
-
-                  {/* Order info */}
-                  <div className="space-y-2 text-sm">
-                    <div className="flex items-center gap-2">
-                      <User className="w-4 h-4 text-muted-foreground" />
-                      <span>{order.guest}</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <MapPin className="w-4 h-4 text-muted-foreground" />
-                      <span>Habitación {order.room}</span>
-                    </div>
-                  </div>
-
-                  {/* Items */}
-                  <div className="bg-white/50 rounded-lg p-3 text-sm">
-                    <h4 className="font-semibold mb-2">Items:</h4>
-                    <div className="space-y-1">
-                      {order.items.map((item, idx) => (
-                        <div key={idx} className="flex justify-between">
-                          <span>
-                            {item.quantity}x {item.name}
-                          </span>
-                          <span className="font-medium">€{(item.quantity * item.price).toFixed(2)}</span>
-                        </div>
-                      ))}
-                    </div>
-                    <div className="border-t pt-2 mt-2 flex justify-between font-semibold">
-                      <span>Total</span>
-                      <span>€{order.total.toFixed(2)}</span>
-                    </div>
-                  </div>
-
-                  {/* Delivered info */}
-                  {order.status === "delivered" && (
-                    <div className="text-sm text-green-600 flex items-center gap-1">
-                      <CheckCircle2 className="w-4 h-4" />
-                      Entregado a las {order.deliveredAt}
-                    </div>
-                  )}
 
                   {/* Action buttons */}
-                  <div className="flex gap-2">
+                  <div className="flex gap-2 pt-4 mt-4 border-t">
                     {order.status === "pending" && (
                       <Button size="sm" variant="default" className="flex-1">
                         Iniciar Preparación
                       </Button>
                     )}
                     {order.status === "preparing" && (
-                      <Button size="sm" variant="default" className="flex-1">
+                      <Button size="sm" className="flex-1 text-white hover:opacity-90 border-0" style={{ backgroundColor: "#235E20" }}>
                         Marcar Entregado
                       </Button>
                     )}
                   </div>
-                </div>
-              </Card>
-            )
-          })}
-        </div>
-      ) : (
-        /* Table View */
-        <div className="border rounded-lg overflow-hidden">
-          <table className="w-full">
-            <thead className="bg-muted border-b">
-              <tr>
-                <th className="px-4 py-3 text-left text-sm font-semibold">Pedido</th>
-                <th className="px-4 py-3 text-left text-sm font-semibold">Cliente</th>
-                <th className="px-4 py-3 text-left text-sm font-semibold">Habitación</th>
-                <th className="px-4 py-3 text-left text-sm font-semibold">Estado</th>
-                <th className="px-4 py-3 text-left text-sm font-semibold">Entrega</th>
-                <th className="px-4 py-3 text-left text-sm font-semibold">Total</th>
-                <th className="px-4 py-3 text-left text-sm font-semibold">Acciones</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y">
-              {filteredOrders.map((order) => {
-                const statusBadge = getStatusBadge(order.status)
-                const delayIndicator = getDelayIndicator(order.delayStatus)
+                </Card>
+              )
+            })}
+          </div>
+        ) : (
+          /* Table View */
+          <div className="border rounded-lg overflow-hidden">
+            <table className="w-full">
+              <thead className="bg-muted border-b">
+                <tr>
+                  <th className="px-4 py-3 text-left text-sm font-semibold">Pedido</th>
+                  <th className="px-4 py-3 text-left text-sm font-semibold">Cliente</th>
+                  <th className="px-4 py-3 text-left text-sm font-semibold">Habitación</th>
+                  <th className="px-4 py-3 text-left text-sm font-semibold">Estado</th>
+                  <th className="px-4 py-3 text-left text-sm font-semibold">Entrega</th>
+                  <th className="px-4 py-3 text-left text-sm font-semibold">Total</th>
+                  <th className="px-4 py-3 text-left text-sm font-semibold">Acciones</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y">
+            {searchFilteredOrders.map((order) => {
+                  const statusBadge = getStatusBadge(order.status)
+                  const delayIndicator = getDelayIndicator(order.delayStatus)
 
-                return (
-                  <tr key={order.id} className="hover:bg-muted/50">
-                    <td className="px-4 py-3 text-sm font-medium">{order.id}</td>
-                    <td className="px-4 py-3 text-sm">{order.guest}</td>
-                    <td className="px-4 py-3 text-sm">{order.room}</td>
-                    <td className="px-4 py-3">
-                      <div className="flex items-center gap-2">
-                        <Badge className={statusBadge.badgeClass}>
-                          {statusBadge.label}
-                        </Badge>
-                        {delayIndicator && (
-                          <span className={`text-xs font-medium ${delayIndicator.color}`}>
-                            {delayIndicator.icon === AlertTriangle ? "⚠️" : "🔴"} {delayIndicator.label}
-                          </span>
+                  return (
+                    <tr key={order.id} className="hover:bg-muted/50 cursor-pointer" onClick={() => handleEditOrder(order)}>
+                      <td className="px-4 py-3 text-sm font-medium">{order.id}</td>
+                      <td className="px-4 py-3 text-sm">{order.guest}</td>
+                      <td className="px-4 py-3 text-sm">{order.room}</td>
+                      <td className="px-4 py-3">
+                        <div className="flex items-center gap-2">
+                          <Badge className={statusBadge.badgeClass}>
+                            {statusBadge.label}
+                          </Badge>
+                          {delayIndicator && (
+                            <span className={`text-xs font-medium ${delayIndicator.color}`}>
+                              {delayIndicator.icon === AlertTriangle ? "⚠️" : "🔴"} {delayIndicator.label}
+                            </span>
+                          )}
+                        </div>
+                      </td>
+                      <td className="px-4 py-3 text-sm">
+                        {order.status !== "delivered" ? order.estimatedDelivery : `Entregado ${order.deliveredAt}`}
+                      </td>
+                      <td className="px-4 py-3 text-sm font-medium">€{order.total.toFixed(2)}</td>
+                      <td className="px-4 py-3">
+                        {order.status === "pending" && (
+                          <Button size="sm" variant="outline">
+                            Preparar
+                          </Button>
                         )}
+                        {order.status === "preparing" && (
+                          <Button size="sm" variant="outline">
+                            Entregar
+                          </Button>
+                        )}
+                      </td>
+                    </tr>
+                  )
+                })}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </div>
+
+      {/* Edit Order Modal */}
+      {showEditModal && selectedOrder && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
+          <div className="bg-white rounded-2xl shadow-2xl p-6 w-full max-w-2xl mx-4 max-h-[90vh] overflow-y-auto">
+            <h2 className="text-2xl font-bold text-foreground mb-6">Editar Pedido #{selectedOrder.id}</h2>
+
+            <div className="space-y-6">
+              {/* Guest and Room Info */}
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Huésped</label>
+                  <input
+                    type="text"
+                    value={selectedOrder.guest}
+                    onChange={(e) => setSelectedOrder({ ...selectedOrder, guest: e.target.value })}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Habitación</label>
+                  <input
+                    type="text"
+                    value={selectedOrder.room}
+                    onChange={(e) => setSelectedOrder({ ...selectedOrder, room: e.target.value })}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+                </div>
+              </div>
+
+              {/* Status and Timing */}
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Estado</label>
+                  <select
+                    value={selectedOrder.status}
+                    onChange={(e) => setSelectedOrder({ ...selectedOrder, status: e.target.value })}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  >
+                    <option value="pending">Pendiente</option>
+                    <option value="preparing">En Preparación</option>
+                    <option value="delivered">Entregado</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Entrega Estimada</label>
+                  <input
+                    type="text"
+                    value={selectedOrder.estimatedDelivery}
+                    onChange={(e) => setSelectedOrder({ ...selectedOrder, estimatedDelivery: e.target.value })}
+                    placeholder="HH:MM - HH:MM"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+                </div>
+              </div>
+
+              {/* Items */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Ítems</label>
+                <div className="space-y-3 bg-gray-50 p-4 rounded-lg">
+                  {selectedOrder.items.map((item: any, idx: number) => (
+                    <div key={idx} className="flex gap-3 items-end">
+                      <div className="flex-1">
+                        <input
+                          type="text"
+                          value={item.name}
+                          onChange={(e) => {
+                            const newItems = [...selectedOrder.items]
+                            newItems[idx].name = e.target.value
+                            setSelectedOrder({ ...selectedOrder, items: newItems })
+                          }}
+                          className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                          placeholder="Nombre del ítem"
+                        />
                       </div>
-                    </td>
-                    <td className="px-4 py-3 text-sm">
-                      {order.status !== "delivered" ? order.estimatedDelivery : `Entregado ${order.deliveredAt}`}
-                    </td>
-                    <td className="px-4 py-3 text-sm font-medium">€{order.total.toFixed(2)}</td>
-                    <td className="px-4 py-3">
-                      {order.status === "pending" && (
-                        <Button size="sm" variant="outline">
-                          Preparar
-                        </Button>
-                      )}
-                      {order.status === "preparing" && (
-                        <Button size="sm" variant="outline">
-                          Entregar
-                        </Button>
-                      )}
-                    </td>
-                  </tr>
-                )
-              })}
-            </tbody>
-          </table>
+                      <div className="w-20">
+                        <input
+                          type="number"
+                          value={item.quantity}
+                          onChange={(e) => {
+                            const newItems = [...selectedOrder.items]
+                            newItems[idx].quantity = parseInt(e.target.value) || 0
+                            setSelectedOrder({ ...selectedOrder, items: newItems })
+                          }}
+                          className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                          placeholder="Qty"
+                          min="1"
+                        />
+                      </div>
+                      <div className="w-24">
+                        <input
+                          type="number"
+                          value={item.price}
+                          onChange={(e) => {
+                            const newItems = [...selectedOrder.items]
+                            newItems[idx].price = parseFloat(e.target.value) || 0
+                            setSelectedOrder({ ...selectedOrder, items: newItems })
+                          }}
+                          className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                          placeholder="Precio"
+                          step="0.01"
+                          min="0"
+                        />
+                      </div>
+                      <button
+                        onClick={() => {
+                          const newItems = selectedOrder.items.filter((_: any, i: number) => i !== idx)
+                          setSelectedOrder({ ...selectedOrder, items: newItems })
+                        }}
+                        className="px-3 py-2 bg-red-100 text-red-600 hover:bg-red-200 rounded-lg transition-colors"
+                      >
+                        ✕
+                      </button>
+                    </div>
+                  ))}
+                  <button
+                    onClick={() => {
+                      setSelectedOrder({
+                        ...selectedOrder,
+                        items: [...selectedOrder.items, { name: "", quantity: 1, price: 0 }]
+                      })
+                    }}
+                    className="w-full py-2 text-sm text-blue-600 hover:text-blue-700 font-medium"
+                  >
+                    + Agregar ítem
+                  </button>
+                </div>
+              </div>
+
+              {/* Total */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Total</label>
+                <input
+                  type="number"
+                  value={selectedOrder.total}
+                  onChange={(e) => setSelectedOrder({ ...selectedOrder, total: parseFloat(e.target.value) || 0 })}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  step="0.01"
+                  min="0"
+                />
+              </div>
+            </div>
+
+            {/* Action buttons */}
+            <div className="flex gap-3 mt-8">
+              <button
+                onClick={() => {
+                  setShowEditModal(false)
+                  setSelectedOrder(null)
+                }}
+                className="px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition-colors font-medium flex-1"
+              >
+                Cancelar
+              </button>
+              <button
+                onClick={handleSaveOrder}
+                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium flex-1"
+              >
+                Guardar Cambios
+              </button>
+            </div>
+          </div>
         </div>
       )}
-    </div>
+    </>
   )
 }
