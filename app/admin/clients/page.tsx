@@ -586,19 +586,13 @@ export default function ClientsPage() {
                             <div className="flex items-center gap-2 text-sm">
                               <Calendar className="w-3 h-3 text-muted-foreground" />
                               <span className="text-foreground">
-                                {new Date(client.checkIn).toLocaleDateString("es-ES", {
-                                  day: "2-digit",
-                                  month: "short",
-                                })}
+                                {client.checkIn.split('-').slice(2).reverse().join('/')}
                               </span>
                             </div>
                             <div className="flex items-center gap-2 text-sm">
                               <Calendar className="w-3 h-3 text-muted-foreground" />
                               <span className="text-foreground">
-                                {new Date(client.checkOut).toLocaleDateString("es-ES", {
-                                  day: "2-digit",
-                                  month: "short",
-                                })}
+                                {client.checkOut.split('-').slice(2).reverse().join('/')}
                               </span>
                             </div>
                           </div>
