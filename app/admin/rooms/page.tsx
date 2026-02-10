@@ -31,7 +31,6 @@ export default function RoomsManagement() {
   const [timelineMode, setTimelineMode] = useState<"week" | "month">("week")
   const [currentDate, setCurrentDate] = useState(new Date())
   const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0])
-  const [selectedMonth, setSelectedMonth] = useState(new Date().toISOString().slice(0, 7))
   const [searchTerm, setSearchTerm] = useState("")
   const [statusFilter, setStatusFilter] = useState<RoomStatus | null>(null)
   const [showCreateModal, setShowCreateModal] = useState(false)
@@ -485,51 +484,25 @@ export default function RoomsManagement() {
               />
             </div>
 
-            {/* Date/Month Filter - Only for Grid View */}
+            {/* Date Filter - Only for Grid View */}
             {layoutMode === "grid" && (
               <div className="flex items-center gap-2">
-                {timelineMode === "month" ? (
-                  <>
-                    <label className="text-sm font-medium text-foreground">
-                      {language === 'es' ? 'Mes:' : language === 'pt' ? 'Mês:' : 'Month:'}
-                    </label>
-                    <div className="relative">
-                      <input
-                        type="month"
-                        value={selectedMonth}
-                        onChange={(e) => setSelectedMonth(e.target.value)}
-                        className="absolute inset-0 opacity-0 cursor-pointer w-full h-full"
-                      />
-                      <div className="pointer-events-none flex items-center gap-2 px-3 py-2 border border-gray-300 rounded-lg bg-white w-40">
-                        <Calendar className="w-4 h-4 text-muted-foreground" />
-                        <span className="text-sm">
-                          {new Date(selectedMonth + '-01').toLocaleDateString(language === 'es' ? 'es-ES' : language === 'pt' ? 'pt-BR' : 'en-US', { 
-                            month: 'long', 
-                            year: 'numeric' 
-                          })}
-                        </span>
-                      </div>
-                    </div>
-                  </>
-                ) : (
-                  <>
-                    <label className="text-sm font-medium text-foreground">
-                      {language === 'es' || language === 'pt' ? 'Fecha:' : 'Date:'}
-                    </label>
-                    <div className="relative">
-                      <input
-                        type="date"
-                        value={selectedDate}
-                        onChange={(e) => setSelectedDate(e.target.value)}
-                        className="absolute inset-0 opacity-0 cursor-pointer w-full h-full"
-                      />
-                      <div className="pointer-events-none flex items-center gap-2 px-3 py-2 border border-gray-300 rounded-lg bg-white w-40">
-                        <Calendar className="w-4 h-4 text-muted-foreground" />
-                        <span className="text-sm">{convertISOToLocaleFormat(selectedDate)}</span>
-                      </div>
-                    </div>
-                  </>
-                )}
+                <label className="text-sm font-medium text-foreground">
+                  {language === 'es' || language === 'pt' ? 'Fecha:' : 'Date:'}
+                </label>
+                <div className="relative">
+                  <input
+                    type="date"
+                    value={selectedDate}
+                    onChange={(e) => setSelectedDate(e.target.value)}
+                    className="absolute inset-0 opacity-0 cursor-pointer w-full h-full"
+                  />
+                  <div className="pointer-events-none flex items-center gap-2 px-3 py-2 border border-gray-300 rounded-lg bg-white w-40">
+                    <Calendar className="w-4 h-4 text-muted-foreground" />
+                    <span className="text-sm">{convertISOToLocaleFormat(selectedDate)}</span>
+                  </div>
+                </div>
+              </div>
             )}
           </div>
         </Card>
