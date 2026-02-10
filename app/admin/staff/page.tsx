@@ -16,7 +16,7 @@ import {
 } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Users, Clock, CheckCircle2, AlertCircle, User, Plus, Calendar, LayoutGrid, Book as Broom, Wrench, Shield, ReceiptText, UtensilsCrossed, UserPlus, Activity } from "lucide-react"
+import { Users, Clock, CheckCircle2, AlertCircle, User, Plus, Calendar, LayoutGrid, Book as Broom, Wrench, Shield, ReceiptText, UtensilsCrossed, UserPlus } from "lucide-react"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { useLanguage } from "@/lib/i18n-context"
 import { Search } from "lucide-react" // Import the Search component
@@ -596,25 +596,24 @@ export default function StaffManagement() {
                 </button>
               </div>
               
-              <div className="flex gap-3">
-                <Dialog>
-                  <DialogTrigger asChild>
-                    <button 
-                      className="flex items-center justify-center w-10 h-10 rounded-full bg-gradient-to-br from-primary to-primary/80 text-white shadow-md hover:shadow-lg transition-all duration-300 hover:scale-110 group relative"
-                      title="Agregar personal"
-                    >
-                      <UserPlus className="w-5 h-5" />
-                      <span className="absolute top-full mt-2 px-2 py-1 bg-gray-900 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap">
-                        Agregar personal
-                      </span>
-                    </button>
-                  </DialogTrigger>
-                  <DialogContent>
-                    <DialogHeader>
-                      <DialogTitle>Añadir Nuevo Personal</DialogTitle>
-                      <DialogDescription>Registra un nuevo miembro del equipo de staff</DialogDescription>
-                    </DialogHeader>
-                    <div className="space-y-4 py-4">
+              <Dialog>
+                <DialogTrigger asChild>
+                  <button 
+                    className="flex items-center justify-center w-10 h-10 rounded-full bg-gradient-to-br from-primary to-primary/80 text-white shadow-md hover:shadow-lg transition-all duration-300 hover:scale-110 group relative"
+                    title="Agregar personal"
+                  >
+                    <UserPlus className="w-5 h-5" />
+                    <span className="absolute top-full mt-2 px-2 py-1 bg-gray-900 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap">
+                      Agregar personal
+                    </span>
+                  </button>
+                </DialogTrigger>
+                <DialogContent>
+                  <DialogHeader>
+                    <DialogTitle>Añadir Nuevo Personal</DialogTitle>
+                    <DialogDescription>Registra un nuevo miembro del equipo de staff</DialogDescription>
+                  </DialogHeader>
+                  <div className="space-y-4 py-4">
                     <div>
                       <Label htmlFor="name">Nombre Completo</Label>
                       <Input id="name" placeholder="Ej: María González" />
@@ -655,71 +654,6 @@ export default function StaffManagement() {
                   <Button className="w-full">Registrar Personal</Button>
                 </DialogContent>
               </Dialog>
-
-              <Dialog>
-                <DialogTrigger asChild>
-                  <button 
-                    className="flex items-center justify-center w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-blue-600 text-white shadow-md hover:shadow-lg transition-all duration-300 hover:scale-110 group relative"
-                    title="Agregar actividad"
-                  >
-                    <Activity className="w-5 h-5" />
-                    <span className="absolute top-full mt-2 px-2 py-1 bg-gray-900 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap">
-                      Agregar actividad
-                    </span>
-                  </button>
-                </DialogTrigger>
-                <DialogContent>
-                  <DialogHeader>
-                    <DialogTitle>Crear Nueva Actividad</DialogTitle>
-                    <DialogDescription>Define una nueva actividad para el personal del hotel</DialogDescription>
-                  </DialogHeader>
-                  <div className="space-y-4 py-4">
-                    <div>
-                      <Label htmlFor="activity-name">Nombre de la Actividad</Label>
-                      <Input id="activity-name" placeholder="Ej: Tour guiado, clase de yoga" />
-                    </div>
-                    <div>
-                      <Label htmlFor="activity-type">Tipo de Actividad</Label>
-                      <Select>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Seleccionar tipo" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="tour">Tour</SelectItem>
-                          <SelectItem value="class">Clase</SelectItem>
-                          <SelectItem value="event">Evento</SelectItem>
-                          <SelectItem value="workshop">Taller</SelectItem>
-                          <SelectItem value="other">Otro</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    <div>
-                      <Label htmlFor="activity-time">Hora de Inicio</Label>
-                      <Input id="activity-time" type="time" />
-                    </div>
-                    <div>
-                      <Label htmlFor="activity-duration">Duración (minutos)</Label>
-                      <Input id="activity-duration" type="number" placeholder="60" defaultValue="60" />
-                    </div>
-                    <div>
-                      <Label htmlFor="activity-instructor">Instructor Responsable</Label>
-                      <Select>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Seleccionar personal" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {staff.map((member) => (
-                            <SelectItem key={member.id} value={member.name}>
-                              {member.name}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </div>
-                  </div>
-                  <Button className="w-full">Crear Actividad</Button>
-                </DialogContent>
-              </Dialog>
             </div>
           </div>
         </div>
@@ -727,6 +661,8 @@ export default function StaffManagement() {
 
       {/* Main Content */}
       <div className="p-6 space-y-6">
+
+      {/* Stats Cards by Department - Only show in overview */}
       {viewMode === "overview" && (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
           {[
