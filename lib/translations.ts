@@ -37,7 +37,7 @@ export const translations = {
       spaces: "Espacios",
       rooms: "Habitaciones",
       spaceDesign: "Diseño de Espacios",
-      amenities: "Amenities",
+      amenities: "Servicios",
       services: "Servicios",
       facilities: "Instalaciones",
       staff: "Staff",
@@ -50,6 +50,7 @@ export const translations = {
       recommendations: "Recomendaciones",
       management: "Gestión",
       users: "Usuarios",
+      settings: "Configuración",
       logout: "Cerrar Sesión",
 
       // Dashboard
@@ -418,6 +419,7 @@ export const translations = {
       spaces: "Spaces",
       rooms: "Rooms",
       spaceDesign: "Space Design",
+      amenities: "Amenities",
       services: "Services",
       facilities: "Facilities",
       staff: "Staff",
@@ -430,6 +432,8 @@ export const translations = {
       recommendations: "Recommendations",
       management: "Management",
       users: "Users",
+      settings: "Settings",
+      accommodations: "Accommodations",
       logout: "Logout",
 
       controlPanel: "Control Panel",
@@ -793,6 +797,7 @@ export const translations = {
       spaces: "Espaços",
       rooms: "Quartos",
       spaceDesign: "Design de Espaços",
+      amenities: "Serviços",
       services: "Serviços",
       facilities: "Instalações",
       staff: "Staff",
@@ -805,6 +810,8 @@ export const translations = {
       recommendations: "Recomendações",
       management: "Gestão",
       users: "Usuários",
+      settings: "Configurações",
+      accommodations: "Acomodações",
       logout: "Sair",
 
       controlPanel: "Painel de Controle",
