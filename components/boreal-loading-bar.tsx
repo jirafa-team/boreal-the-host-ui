@@ -4,8 +4,15 @@ import { useEffect, useState } from 'react'
 
 export function BorealLoadingBar() {
   const [progress, setProgress] = useState(0)
+  const [mounted, setMounted] = useState(false)
 
   useEffect(() => {
+    setMounted(true)
+  }, [])
+
+  useEffect(() => {
+    if (!mounted) return
+
     const interval = setInterval(() => {
       setProgress((prev) => {
         if (prev >= 100) return 100
@@ -15,7 +22,7 @@ export function BorealLoadingBar() {
     }, 1000)
 
     return () => clearInterval(interval)
-  }, [])
+  }, [mounted])
 
   return (
     <div className="flex flex-col items-center justify-center gap-12 w-full max-w-md">
