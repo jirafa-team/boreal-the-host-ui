@@ -80,7 +80,6 @@ export default function FacilitiesPage() {
     duration: 60,
     people: 1,
   })
-  })
   const [dialogOpen, setDialogOpen] = React.useState(false)
   const [addFacilityOpen, setAddFacilityOpen] = React.useState(false)
   const [editingFacility, setEditingFacility] = React.useState<Facility | null>(null)
