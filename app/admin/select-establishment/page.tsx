@@ -166,19 +166,27 @@ export default function SelectEstablishmentPage() {
 
                   {/* Circular Action Button */}
                   <div className={`flex transition-all duration-[2500ms] ease-out ${clickedId === establishment.id ? 'justify-end' : 'justify-start'}`}>
-                    <button 
+                    <div 
+                      role="button"
+                      tabIndex={0}
                       onClick={(e) => {
                         e.stopPropagation()
                         handleSelectEstablishment(establishment.id)
                       }}
-                      className={`w-8 h-8 rounded-full bg-white/20 hover:bg-white/30 flex items-center justify-center transition-all duration-[2500ms] ease-out group/btn hover:scale-110 ${clickedId === establishment.id ? '[transform:rotate(1080deg)]' : ''}`}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter' || e.key === ' ') {
+                          e.stopPropagation()
+                          handleSelectEstablishment(establishment.id)
+                        }
+                      }}
+                      className={`w-8 h-8 rounded-full bg-white/20 hover:bg-white/30 flex items-center justify-center transition-all duration-[2500ms] ease-out group/btn hover:scale-110 cursor-pointer ${clickedId === establishment.id ? '[transform:rotate(1080deg)]' : ''}`}
                     >
                       {clickedId === establishment.id ? (
                         <Home className="w-4 h-4 text-white transition-all duration-[2500ms]" />
                       ) : (
                         <ArrowRight className="w-4 h-4 text-white group-hover/btn:translate-x-0.5 transition-transform duration-300" />
                       )}
-                    </button>
+                    </div>
                   </div>
                 </div>
               </button>
