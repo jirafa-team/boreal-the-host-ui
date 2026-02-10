@@ -150,6 +150,7 @@ export default function HomePage() {
                   width={260}
                   height={130}
                   className="h-32 w-auto"
+                  loading="eager"
                 />
               </div>
               <p className="text-blue-100 text-lg">{t("login.welcome")}</p>
