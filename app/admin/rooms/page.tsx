@@ -723,7 +723,7 @@ export default function RoomsManagement() {
                           return (
                             <div
                               key={idx}
-                              className={`${viewMode === "day" ? "w-16" : viewMode === "week" ? "w-24" : "w-12"} h-12 rounded flex-shrink-0 ${
+                              className={`${timelineMode === "week" ? "w-24" : "w-12"} h-12 rounded flex-shrink-0 ${
                                 status === "available"
                                   ? "bg-green-100 border border-green-200"
                                   : status === "occupied"
