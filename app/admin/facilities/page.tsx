@@ -305,22 +305,21 @@ export default function FacilitiesPage() {
                     </span>
                   </button>
                 </DialogTrigger>
-                <DialogContent>
+                <DialogContent className="max-w-md">
                   <DialogHeader>
-                    <DialogTitle>Agregar Nuevo Amenity</DialogTitle>
+                    <DialogTitle className="text-xl">Agregar Nuevo Amenity</DialogTitle>
                     <DialogDescription>Configure un nuevo amenity o espacio para el hotel</DialogDescription>
                   </DialogHeader>
-                  <form onSubmit={handleAddFacility} className="space-y-4">
-                    <div className="relative">
-                      <Input id="name" name="name" className="peer pt-6 pb-2" required />
-                      <Label htmlFor="name" className="absolute left-3 top-2.5 text-sm text-muted-foreground transition-all peer-focus:top-1.5 peer-focus:text-xs peer-focus:text-primary pointer-events-none peer-not-placeholder-shown:top-1.5 peer-not-placeholder-shown:text-xs">
-                        Nombre
-                      </Label>
+                  <form onSubmit={handleAddFacility} className="space-y-5">
+                    <div className="space-y-2">
+                      <Label htmlFor="name" className="text-sm font-medium">Nombre del Amenity</Label>
+                      <Input id="name" name="name" placeholder="ej: Gimnasio Premium" className="h-10 px-3" required />
                     </div>
-                    <div className="relative">
+                    <div className="space-y-2">
+                      <Label className="text-sm font-medium">Tipo de Amenity</Label>
                       <Select name="type" required>
-                        <SelectTrigger className="peer pt-6 pb-2 relative">
-                          <SelectValue />
+                        <SelectTrigger className="h-10">
+                          <SelectValue placeholder="Seleccionar tipo" />
                         </SelectTrigger>
                         <SelectContent>
                           <SelectItem value="fitness">Fitness</SelectItem>
@@ -330,32 +329,23 @@ export default function FacilitiesPage() {
                           <SelectItem value="dining">Gastronomía</SelectItem>
                         </SelectContent>
                       </Select>
-                      <Label className="absolute left-3 top-2.5 text-sm text-muted-foreground transition-all pointer-events-none text-primary">
-                        Tipo
-                      </Label>
                     </div>
-                    <div className="relative">
-                      <Input id="capacity" name="capacity" type="number" className="peer pt-6 pb-2" required />
-                      <Label htmlFor="capacity" className="absolute left-3 top-2.5 text-sm text-muted-foreground transition-all peer-focus:top-1.5 peer-focus:text-xs peer-focus:text-primary pointer-events-none peer-not-placeholder-shown:top-1.5 peer-not-placeholder-shown:text-xs">
-                        Capacidad
-                      </Label>
+                    <div className="space-y-2">
+                      <Label htmlFor="capacity" className="text-sm font-medium">Capacidad Máxima</Label>
+                      <Input id="capacity" name="capacity" type="number" placeholder="ej: 20" className="h-10 px-3" required />
                     </div>
-                    <div className="grid grid-cols-2 gap-4">
-                      <div className="relative">
-                        <Input id="startTime" name="startTime" type="time" className="peer pt-6 pb-2" required />
-                        <Label htmlFor="startTime" className="absolute left-3 top-1.5 text-xs text-muted-foreground transition-all peer-focus:top-1.5 peer-focus:text-xs peer-focus:text-primary pointer-events-none">
-                          Apertura
-                        </Label>
+                    <div className="grid grid-cols-2 gap-3">
+                      <div className="space-y-2">
+                        <Label htmlFor="startTime" className="text-sm font-medium">Hora de Apertura</Label>
+                        <Input id="startTime" name="startTime" type="time" className="h-10 px-3" required />
                       </div>
-                      <div className="relative">
-                        <Input id="endTime" name="endTime" type="time" className="peer pt-6 pb-2" required />
-                        <Label htmlFor="endTime" className="absolute left-3 top-1.5 text-xs text-muted-foreground transition-all peer-focus:top-1.5 peer-focus:text-xs peer-focus:text-primary pointer-events-none">
-                          Cierre
-                        </Label>
+                      <div className="space-y-2">
+                        <Label htmlFor="endTime" className="text-sm font-medium">Hora de Cierre</Label>
+                        <Input id="endTime" name="endTime" type="time" className="h-10 px-3" required />
                       </div>
                     </div>
-                    <Button type="submit" className="w-full">
-                      Agregar Facility
+                    <Button type="submit" className="w-full h-10 font-medium">
+                      Agregar Amenity
                     </Button>
                   </form>
                 </DialogContent>
@@ -616,28 +606,6 @@ export default function FacilitiesPage() {
                         {facility.capacity}
                       </span>
                     </div>
-                  </div>
-
-                  {/* Current Occupancy Progress Bar */}
-                  <div className="mt-4 mb-2">
-                    {(() => {
-                      const { occupancyPercent } = getCurrentOccupancy(facility.id)
-                      const barColor = occupancyPercent === 0 ? "bg-gray-300" : occupancyPercent <= 33 ? "bg-green-500" : occupancyPercent <= 66 ? "bg-amber-500" : "bg-red-500"
-                      return (
-                        <div className="space-y-1">
-                          <div className="flex items-center justify-between text-xs">
-                            <span className="text-muted-foreground">Ocupación</span>
-                            <span className="font-medium text-foreground">{occupancyPercent}%</span>
-                          </div>
-                          <div className="w-full h-1.5 bg-gray-200 rounded-full overflow-hidden">
-                            <div
-                              className={`h-full ${barColor} transition-all duration-300`}
-                              style={{ width: `${occupancyPercent}%` }}
-                            />
-                          </div>
-                        </div>
-                      )
-                    })()}
                   </div>
 
                   <Button
