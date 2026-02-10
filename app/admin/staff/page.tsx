@@ -728,133 +728,135 @@ export default function StaffManagement() {
       {/* Main Content */}
       <div className="p-6 space-y-6">
         {viewMode === "overview" && (
-          <>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
-              {[
-                { dept: "Limpieza", icon: Broom, color: "from-green-400 to-green-600", iconBg: "bg-green-600", textColor: "text-white" },
-                { dept: "Mantenimiento", icon: Wrench, color: "from-yellow-500 to-yellow-600", iconBg: "bg-yellow-600", textColor: "text-white" },
-                { dept: "Seguridad", icon: Shield, color: "from-red-600 to-red-700", iconBg: "bg-red-700", textColor: "text-white" },
-                { dept: "Recepción", icon: ReceiptText, color: "from-pink-600 to-pink-700", iconBg: "bg-pink-700", textColor: "text-white" },
-                { dept: "Servicio", icon: UtensilsCrossed, color: "from-violet-500 to-violet-700", iconBg: "bg-violet-700", textColor: "text-white" },
-              ].map((deptInfo) => {
-                const deptStaff = staff.filter((s) => s.department === deptInfo.dept)
-                const availableCount = deptStaff.filter((s) => s.status === "available").length
-                const busyCount = deptStaff.filter((s) => s.status === "busy").length
-                const offCount = deptStaff.filter((s) => s.status === "off").length
-                const capacityPercentage = Math.round((busyCount / deptStaff.length) * 100) || 0
-                return (
-                  <Card key={deptInfo.dept} className="relative overflow-hidden bg-background hover:shadow-md transition-shadow border border-border p-0">
-                    {/* Title Header */}
-                    <div className={`bg-gradient-to-br ${deptInfo.color} p-3 relative overflow-hidden`}>
-                      {/* Background circle decoration */}
-                      <div className="absolute inset-0 opacity-20">
-                        <div className="absolute top-0 right-0 w-16 h-16 bg-white rounded-full -mr-4 -mt-4"></div>
-                      </div>
-                      
-                      {/* Content */}
-                      <div className="relative flex items-center justify-between">
-                        <h3 className={`font-semibold text-sm ${deptInfo.textColor}`}>{deptInfo.dept}</h3>
-                        <deptInfo.icon className="w-5 h-5 text-white" />
-                      </div>
-                    </div>
-                    
-                    {/* Content */}
-                    <div className="px-3 py-2 space-y-2">
-                      {/* Status breakdown - Horizontal */}
-                      <div className="flex items-center justify-between gap-2 border-b border-border pb-2">
-                        <div className="flex-1 text-center">
-                          <span className="font-semibold text-xs text-foreground block">{availableCount}</span>
-                          <span className="text-muted-foreground text-xs block">Disponible</span>
-                        </div>
-                        <div className="w-px h-6 bg-border"></div>
-                        <div className="flex-1 text-center">
-                          <span className="font-semibold text-xs text-foreground block">{busyCount}</span>
-                          <span className="text-muted-foreground text-xs block">Ocupado</span>
-                        </div>
-                        <div className="w-px h-6 bg-border"></div>
-                        <div className="flex-1 text-center">
-                          <span className="font-semibold text-xs text-foreground block">{offCount}</span>
-                          <span className="text-muted-foreground text-xs block">Descanso</span>
-                        </div>
-                      </div>
-                      
-                      {/* Capacity bar - Refined */}
-                      <div className="pt-1">
-                        <div className="flex items-center justify-between mb-1">
-                          <span className="text-muted-foreground text-xs">Ocupación</span>
-                          <span className="font-semibold text-xs text-foreground">{capacityPercentage}%</span>
-                        </div>
-                        <div className="w-full bg-border rounded-full h-0.5 overflow-hidden shadow-inner">
-                          <div
-                            className={`bg-gradient-to-r ${deptInfo.color} rounded-full h-0.5 transition-all duration-500`}
-                            style={{ width: `${capacityPercentage}%` }}
-                          />
-                        </div>
-                      </div>
-                    </div>
-                  </Card>
-                )
-              })}
-            </div>
-
-            {/* Staff List - Grid Layout */}
-            <Card className="p-6">
-              <div className="flex-1 max-w-xs mb-4">
-                <div className="relative">
-                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                  <Input
-                    placeholder="Ej: María, Roberto..."
-                    value={searchName}
-                    onChange={(e) => setSearchName(e.target.value)}
-                    className="pl-10"
-                  />
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+          {[
+            { dept: "Limpieza", icon: Broom, color: "from-green-400 to-green-600", iconBg: "bg-green-600", textColor: "text-white" },
+            { dept: "Mantenimiento", icon: Wrench, color: "from-yellow-500 to-yellow-600", iconBg: "bg-yellow-600", textColor: "text-white" },
+            { dept: "Seguridad", icon: Shield, color: "from-red-600 to-red-700", iconBg: "bg-red-700", textColor: "text-white" },
+            { dept: "Recepción", icon: ReceiptText, color: "from-pink-600 to-pink-700", iconBg: "bg-pink-700", textColor: "text-white" },
+            { dept: "Servicio", icon: UtensilsCrossed, color: "from-violet-500 to-violet-700", iconBg: "bg-violet-700", textColor: "text-white" },
+          ].map((deptInfo) => {
+            const deptStaff = staff.filter((s) => s.department === deptInfo.dept)
+            const availableCount = deptStaff.filter((s) => s.status === "available").length
+            const busyCount = deptStaff.filter((s) => s.status === "busy").length
+            const offCount = deptStaff.filter((s) => s.status === "off").length
+            const capacityPercentage = Math.round((busyCount / deptStaff.length) * 100) || 0
+            return (
+              <Card key={deptInfo.dept} className="relative overflow-hidden bg-background hover:shadow-md transition-shadow border border-border p-0">
+                {/* Title Header */}
+                <div className={`bg-gradient-to-br ${deptInfo.color} p-3 relative overflow-hidden`}>
+                  {/* Background circle decoration */}
+                  <div className="absolute inset-0 opacity-20">
+                    <div className="absolute top-0 right-0 w-16 h-16 bg-white rounded-full -mr-4 -mt-4"></div>
+                  </div>
+                  
+                  {/* Content */}
+                  <div className="relative flex items-center justify-between">
+                    <h3 className={`font-semibold text-sm ${deptInfo.textColor}`}>{deptInfo.dept}</h3>
+                    <deptInfo.icon className="w-5 h-5 text-white" />
+                  </div>
                 </div>
-              </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                {staff
-                  .filter((member) => member.name.toLowerCase().includes(searchName.toLowerCase()))
-                  .map((member) => (
-                  <Card
-                    key={member.id}
-                    className={`p-4 cursor-pointer hover:shadow-md transition-shadow ${
-                      member.status === "available" ? "border-green-200" : ""
-                    }`}
-                    onClick={() => setSelectedStaff(member)}
-                  >
-                    <div className="flex flex-col items-center text-center">
-                      <div className="w-12 h-12 bg-gradient-to-br from-primary to-primary/80 rounded-full flex items-center justify-center text-white font-bold shadow-md mb-3">
-                        {member.avatar}
-                      </div>
-                      <h3 className="font-semibold text-foreground text-sm">{member.name}</h3>
-                      <p className="text-xs text-muted-foreground">{member.department}</p>
-                      <p className="text-xs text-muted-foreground mt-1">{member.shift}</p>
-                      <Badge className={`${getStatusColor(member.status)} text-white mt-3`}>
-                        {getStatusText(member.status)}
-                      </Badge>
-                      {member.currentRoom && (
-                        <p className="text-xs text-muted-foreground mt-2">Hab. {member.currentRoom}</p>
-                      )}
+                
+                {/* Content */}
+                <div className="px-3 py-2 space-y-2">
+                  {/* Status breakdown - Horizontal */}
+                  <div className="flex items-center justify-between gap-2 border-b border-border pb-2">
+                    <div className="flex-1 text-center">
+                      <span className="font-semibold text-xs text-foreground block">{availableCount}</span>
+                      <span className="text-muted-foreground text-xs block">Disponible</span>
                     </div>
-                    <div className="mt-4 pt-4 border-t border-border">
-                      <div className="flex items-center justify-between text-sm mb-2">
-                        <span className="text-muted-foreground">{t("admin.tasksToday")}</span>
-                        <span className="font-semibold text-foreground">
-                          {member.tasksToday} / {member.maxCapacity}
-                        </span>
-                      </div>
-                      <div className="w-full bg-muted rounded-full h-2">
-                        <div
-                          className="bg-primary rounded-full h-2 transition-all"
-                          style={{ width: `${(member.tasksToday / member.maxCapacity) * 100}%` }}
-                        />
-                      </div>
+                    <div className="w-px h-6 bg-border"></div>
+                    <div className="flex-1 text-center">
+                      <span className="font-semibold text-xs text-foreground block">{busyCount}</span>
+                      <span className="text-muted-foreground text-xs block">Ocupado</span>
                     </div>
-                  </Card>
-                ))}
+                    <div className="w-px h-6 bg-border"></div>
+                    <div className="flex-1 text-center">
+                      <span className="font-semibold text-xs text-foreground block">{offCount}</span>
+                      <span className="text-muted-foreground text-xs block">Descanso</span>
+                    </div>
+                  </div>
+                  
+                  {/* Capacity bar - Refined */}
+                  <div className="pt-1">
+                    <div className="flex items-center justify-between mb-1">
+                      <span className="text-muted-foreground text-xs">Ocupación</span>
+                      <span className="font-semibold text-xs text-foreground">{capacityPercentage}%</span>
+                    </div>
+                    <div className="w-full bg-border rounded-full h-0.5 overflow-hidden shadow-inner">
+                      <div
+                        className={`bg-gradient-to-r ${deptInfo.color} rounded-full h-0.5 transition-all duration-500`}
+                        style={{ width: `${capacityPercentage}%` }}
+                      />
+                    </div>
+                  </div>
+                </div>
+              </Card>
+            )
+          })}
+        </div>
+      )}
+
+      {viewMode === "overview" && (
+        <div>
+          {/* Staff List - Grid Layout */}
+          <Card className="p-6">
+            <div className="flex-1 max-w-xs mb-4">
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                <Input
+                  placeholder="Ej: María, Roberto..."
+                  value={searchName}
+                  onChange={(e) => setSearchName(e.target.value)}
+                  className="pl-10"
+                />
               </div>
-            </Card>
-          </>
-        )}
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+              {staff
+                .filter((member) => member.name.toLowerCase().includes(searchName.toLowerCase()))
+                .map((member) => (
+                <Card
+                  key={member.id}
+                  className={`p-4 cursor-pointer hover:shadow-md transition-shadow ${
+                    member.status === "available" ? "border-green-200" : ""
+                  }`}
+                  onClick={() => setSelectedStaff(member)}
+                >
+                  <div className="flex flex-col items-center text-center">
+                    <div className="w-12 h-12 bg-gradient-to-br from-primary to-primary/80 rounded-full flex items-center justify-center text-white font-bold shadow-md mb-3">
+                      {member.avatar}
+                    </div>
+                    <h3 className="font-semibold text-foreground text-sm">{member.name}</h3>
+                    <p className="text-xs text-muted-foreground">{member.department}</p>
+                    <p className="text-xs text-muted-foreground mt-1">{member.shift}</p>
+                    <Badge className={`${getStatusColor(member.status)} text-white mt-3`}>
+                      {getStatusText(member.status)}
+                    </Badge>
+                    {member.currentRoom && (
+                      <p className="text-xs text-muted-foreground mt-2">Hab. {member.currentRoom}</p>
+                    )}
+                  </div>
+                  <div className="mt-4 pt-4 border-t border-border">
+                    <div className="flex items-center justify-between text-sm mb-2">
+                      <span className="text-muted-foreground">{t("admin.tasksToday")}</span>
+                      <span className="font-semibold text-foreground">
+                        {member.tasksToday} / {member.maxCapacity}
+                      </span>
+                    </div>
+                    <div className="w-full bg-muted rounded-full h-2">
+                      <div
+                        className="bg-primary rounded-full h-2 transition-all"
+                        style={{ width: `${(member.tasksToday / member.maxCapacity) * 100}%` }}
+                      />
+                    </div>
+                  </div>
+                </Card>
+              ))}
+            </div>
+          </Card>
+        </div>
+      )}
 
       {viewMode === "kanban" && (
         <div className="space-y-4">
