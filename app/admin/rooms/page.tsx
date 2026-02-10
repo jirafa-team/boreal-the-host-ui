@@ -401,69 +401,69 @@ export default function RoomsManagement() {
 
       <div className="p-8">
         {layoutMode === "grid" && (
-          <div className="grid grid-cols-2 md:grid-cols-5 gap-3 mb-6">
+          <div className="grid grid-cols-2 md:grid-cols-5 gap-2 mb-4">
             <div 
               onClick={() => setStatusFilter(null)}
-              className={`p-4 relative rounded-3xl shadow-2xl text-center cursor-pointer transition-all overflow-hidden ${statusFilter === null ? 'text-white' : 'bg-white/95 backdrop-blur-lg hover:shadow-lg'}`}
+              className={`p-3 relative rounded-2xl shadow-lg text-center cursor-pointer transition-all overflow-hidden ${statusFilter === null ? 'text-white' : 'bg-white/95 backdrop-blur-lg hover:shadow-lg'}`}
               style={statusFilter === null ? { backgroundColor: "#1E40AF" } : {}}
             >
               {statusFilter === null && (
-                <div className="absolute -top-16 -right-16 w-28 h-28 rounded-full" style={{ backgroundColor: "rgba(255, 255, 255, 0.2)" }} />
+                <div className="absolute -top-12 -right-12 w-20 h-20 rounded-full" style={{ backgroundColor: "rgba(255, 255, 255, 0.2)" }} />
               )}
               <div className="relative z-10">
-                <p className={`text-6xl font-bold mb-1 ${statusFilter === null ? 'text-white' : 'text-blue-600'}`}>{stats.total}</p>
+                <p className={`text-4xl font-bold mb-0.5 ${statusFilter === null ? 'text-white' : 'text-blue-600'}`}>{stats.total}</p>
                 <p className={`text-xs font-medium ${statusFilter === null ? 'text-blue-100' : 'text-muted-foreground'}`}>{t("admin.totalRooms")}</p>
               </div>
             </div>
             <div 
               onClick={() => setStatusFilter("available")}
-              className={`p-4 relative rounded-3xl shadow-2xl text-center cursor-pointer transition-all overflow-hidden ${statusFilter === "available" ? 'text-white' : 'bg-white/95 backdrop-blur-lg hover:shadow-lg'}`}
+              className={`p-3 relative rounded-2xl shadow-lg text-center cursor-pointer transition-all overflow-hidden ${statusFilter === "available" ? 'text-white' : 'bg-white/95 backdrop-blur-lg hover:shadow-lg'}`}
               style={statusFilter === "available" ? { backgroundColor: "#235E20" } : {}}
             >
               {statusFilter === "available" && (
-                <div className="absolute -top-16 -right-16 w-28 h-28 rounded-full" style={{ backgroundColor: "rgba(255, 255, 255, 0.2)" }} />
+                <div className="absolute -top-12 -right-12 w-20 h-20 rounded-full" style={{ backgroundColor: "rgba(255, 255, 255, 0.2)" }} />
               )}
               <div className="relative z-10">
-                <p className={`text-6xl font-bold mb-1 ${statusFilter === "available" ? 'text-white' : ''}`} style={statusFilter !== "available" ? { color: "#235E20" } : {}}>{stats.available}</p>
+                <p className={`text-4xl font-bold mb-0.5 ${statusFilter === "available" ? 'text-white' : ''}`} style={statusFilter !== "available" ? { color: "#235E20" } : {}}>{stats.available}</p>
                 <p className={`text-xs font-medium ${statusFilter === "available" ? 'text-green-100' : 'text-muted-foreground'}`}>{t("admin.availableRooms")}</p>
               </div>
             </div>
             <div 
               onClick={() => setStatusFilter("occupied")}
-              className={`p-4 relative rounded-3xl shadow-2xl text-center cursor-pointer transition-all overflow-hidden ${statusFilter === "occupied" ? 'text-white' : 'bg-white/95 backdrop-blur-lg hover:shadow-lg'}`}
+              className={`p-3 relative rounded-2xl shadow-lg text-center cursor-pointer transition-all overflow-hidden ${statusFilter === "occupied" ? 'text-white' : 'bg-white/95 backdrop-blur-lg hover:shadow-lg'}`}
               style={statusFilter === "occupied" ? { backgroundColor: "#AA2C2C" } : {}}
             >
               {statusFilter === "occupied" && (
-                <div className="absolute -top-16 -right-16 w-28 h-28 rounded-full" style={{ backgroundColor: "rgba(255, 255, 255, 0.2)" }} />
+                <div className="absolute -top-12 -right-12 w-20 h-20 rounded-full" style={{ backgroundColor: "rgba(255, 255, 255, 0.2)" }} />
               )}
               <div className="relative z-10">
-                <p className={`text-6xl font-bold mb-1 ${statusFilter === "occupied" ? 'text-white' : ''}`} style={statusFilter !== "occupied" ? { color: "#AA2C2C" } : {}}>{stats.occupied}</p>
+                <p className={`text-4xl font-bold mb-0.5 ${statusFilter === "occupied" ? 'text-white' : ''}`} style={statusFilter !== "occupied" ? { color: "#AA2C2C" } : {}}>{stats.occupied}</p>
                 <p className={`text-xs font-medium ${statusFilter === "occupied" ? 'text-red-100' : 'text-muted-foreground'}`}>{t("admin.occupiedRooms")}</p>
               </div>
             </div>
             <div 
               onClick={() => setStatusFilter("reserved")}
-              className={`p-4 relative rounded-3xl shadow-2xl text-center cursor-pointer transition-all overflow-hidden ${statusFilter === "reserved" ? 'text-white' : 'bg-white/95 backdrop-blur-lg hover:shadow-lg'}`}
+              className={`p-3 relative rounded-2xl shadow-lg text-center cursor-pointer transition-all overflow-hidden ${statusFilter === "reserved" ? 'text-white' : 'bg-white/95 backdrop-blur-lg hover:shadow-lg'}`}
               style={statusFilter === "reserved" ? { backgroundColor: "#1E3A8A" } : {}}
             >
               {statusFilter === "reserved" && (
-                <div className="absolute -top-16 -right-16 w-28 h-28 rounded-full" style={{ backgroundColor: "rgba(255, 255, 255, 0.2)" }} />
+                <div className="absolute -top-12 -right-12 w-20 h-20 rounded-full" style={{ backgroundColor: "rgba(255, 255, 255, 0.2)" }} />
               )}
               <div className="relative z-10">
-                <p className={`text-6xl font-bold mb-1 ${statusFilter === "reserved" ? 'text-white' : 'text-blue-700'}`}>{stats.reserved}</p>
+                <p className={`text-4xl font-bold mb-0.5 ${statusFilter === "reserved" ? 'text-white' : 'text-blue-700'}`}>{stats.reserved}</p>
                 <p className={`text-xs font-medium ${statusFilter === "reserved" ? 'text-blue-100' : 'text-muted-foreground'}`}>{t("admin.reservedRooms")}</p>
               </div>
             </div>
             <div 
               onClick={() => setStatusFilter("maintenance")}
-              className={`p-4 relative rounded-3xl shadow-2xl text-center cursor-pointer transition-all overflow-hidden ${statusFilter === "maintenance" ? 'text-white' : 'bg-white/95 backdrop-blur-lg hover:shadow-lg'}`}
+              className={`p-3 relative rounded-2xl shadow-lg text-center cursor-pointer transition-all overflow-hidden ${statusFilter === "maintenance" ? 'text-white' : 'bg-white/95 backdrop-blur-lg hover:shadow-lg'}`}
               style={statusFilter === "maintenance" ? { backgroundColor: "#CA8A04" } : {}}
             >
               {statusFilter === "maintenance" && (
-                <div className="absolute -top-16 -right-16 w-28 h-28 rounded-full" style={{ backgroundColor: "rgba(255, 255, 255, 0.2)" }} />
+                <div className="absolute -top-12 -right-12 w-20 h-20 rounded-full" style={{ backgroundColor: "rgba(255, 255, 255, 0.2)" }} />
               )}
               <div className="relative z-10">
-                <p className={`text-6xl font-bold mb-1 ${statusFilter === "maintenance" ? 'text-white' : 'text-yellow-600'}`}>{stats.maintenance}</p>
+                <p className={`text-4xl font-bold mb-0.5 ${statusFilter === "maintenance" ? 'text-white' : 'text-yellow-600'}`}>{stats.maintenance}</p>
                 <p className={`text-xs font-medium ${statusFilter === "maintenance" ? 'text-yellow-100' : 'text-muted-foreground'}`}>{t("admin.maintenanceRooms")}</p>
               </div>
             </div>
