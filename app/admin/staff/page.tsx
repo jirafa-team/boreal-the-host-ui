@@ -727,7 +727,7 @@ export default function StaffManagement() {
 
       {/* Main Content */}
       <div className="p-6 space-y-6">
-        {viewMode === "overview" && (
+      {viewMode === "overview" && (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
           {[
             { dept: "Limpieza", icon: Broom, color: "from-green-400 to-green-600", iconBg: "bg-green-600", textColor: "text-white" },
