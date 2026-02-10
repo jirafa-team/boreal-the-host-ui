@@ -279,6 +279,9 @@ export default function ClientPage({ searchParams }: { searchParams: { type?: st
   const [showBreakfastDialog, setShowBreakfastDialog] = useState(false)
   const [cleaningDialogOpen, setCleaningDialogOpen] = useState(false)
   const [selectedEvent, setSelectedEvent] = useState<number | null>(null)
+  const [breakfastPeople, setBreakfastPeople] = useState(1)
+  const [gymPeople, setGymPeople] = useState(1)
+  const [poolPeople, setPoolPeople] = useState(1)
 
   const [timeRemaining, setTimeRemaining] = useState({
     hours: 0,
@@ -654,6 +657,29 @@ export default function ClientPage({ searchParams }: { searchParams: { type?: st
                           <DialogTitle>Selecciona tu horario de desayuno</DialogTitle>
                           <DialogDescription>Elige el horario que más te convenga</DialogDescription>
                         </DialogHeader>
+                        
+                        {/* Quantity Selector */}
+                        <div className="bg-gray-100 rounded-lg p-4 mb-4">
+                          <div className="flex items-center justify-between">
+                            <span className="font-medium text-gray-700">Personas</span>
+                            <div className="flex items-center gap-4">
+                              <button
+                                onClick={() => setBreakfastPeople(Math.max(1, breakfastPeople - 1))}
+                                className="w-10 h-10 rounded-full bg-white border border-gray-300 flex items-center justify-center font-bold text-lg hover:bg-gray-50"
+                              >
+                                −
+                              </button>
+                              <span className="text-2xl font-bold w-8 text-center">{breakfastPeople}</span>
+                              <button
+                                onClick={() => setBreakfastPeople(breakfastPeople + 1)}
+                                className="w-10 h-10 rounded-full bg-white border border-gray-300 flex items-center justify-center font-bold text-lg hover:bg-gray-50"
+                              >
+                                +
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+
                         <div className="grid grid-cols-2 gap-3 py-4">
                           {[
                             "6:30 AM",
@@ -821,6 +847,29 @@ export default function ClientPage({ searchParams }: { searchParams: { type?: st
                           <DialogTitle>Reservar Gimnasio</DialogTitle>
                           <DialogDescription>Selecciona el horario para tu sesión de entrenamiento</DialogDescription>
                         </DialogHeader>
+
+                        {/* Quantity Selector */}
+                        <div className="bg-gray-100 rounded-lg p-4 mb-4">
+                          <div className="flex items-center justify-between">
+                            <span className="font-medium text-gray-700">Personas</span>
+                            <div className="flex items-center gap-4">
+                              <button
+                                onClick={() => setGymPeople(Math.max(1, gymPeople - 1))}
+                                className="w-10 h-10 rounded-full bg-white border border-gray-300 flex items-center justify-center font-bold text-lg hover:bg-gray-50"
+                              >
+                                −
+                              </button>
+                              <span className="text-2xl font-bold w-8 text-center">{gymPeople}</span>
+                              <button
+                                onClick={() => setGymPeople(gymPeople + 1)}
+                                className="w-10 h-10 rounded-full bg-white border border-gray-300 flex items-center justify-center font-bold text-lg hover:bg-gray-50"
+                              >
+                                +
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+
                         <div className="space-y-4 py-4">
                           <RadioGroup value={gymTime} onValueChange={setGymTime}>
                             {[
@@ -903,6 +952,29 @@ export default function ClientPage({ searchParams }: { searchParams: { type?: st
                           <DialogTitle>Reservar Piscina</DialogTitle>
                           <DialogDescription>Selecciona el horario para disfrutar de la piscina</DialogDescription>
                         </DialogHeader>
+
+                        {/* Quantity Selector */}
+                        <div className="bg-gray-100 rounded-lg p-4 mb-4">
+                          <div className="flex items-center justify-between">
+                            <span className="font-medium text-gray-700">Personas</span>
+                            <div className="flex items-center gap-4">
+                              <button
+                                onClick={() => setPoolPeople(Math.max(1, poolPeople - 1))}
+                                className="w-10 h-10 rounded-full bg-white border border-gray-300 flex items-center justify-center font-bold text-lg hover:bg-gray-50"
+                              >
+                                −
+                              </button>
+                              <span className="text-2xl font-bold w-8 text-center">{poolPeople}</span>
+                              <button
+                                onClick={() => setPoolPeople(poolPeople + 1)}
+                                className="w-10 h-10 rounded-full bg-white border border-gray-300 flex items-center justify-center font-bold text-lg hover:bg-gray-50"
+                              >
+                                +
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+
                         <div className="space-y-4 py-4">
                           <RadioGroup value={poolTime} onValueChange={setPoolTime}>
                             {[
