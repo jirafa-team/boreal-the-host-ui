@@ -369,7 +369,7 @@ export default function ClientsPage() {
                   <span className="absolute text-base font-bold -bottom-0.5 -right-0.5 text-white drop-shadow-lg">+</span>
                 </div>
                 <span className="absolute top-full mt-2 px-2 py-1 bg-gray-900 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap">
-                  Agregar Cliente
+                  {t("admin.newClient")}
                 </span>
               </button>
             </div>
@@ -387,7 +387,7 @@ export default function ClientsPage() {
             >
               <div className="absolute top-0 right-0 w-12 h-12 bg-white opacity-10 rounded-full -mr-6 -mt-6"></div>
               <Users className="w-4 h-4 inline mr-2 relative z-10" />
-              <span className="relative z-10">Huéspedes Actuales</span>
+              <span className="relative z-10">{t("admin.currentGuests")}</span>
             </button>
             <button
               onClick={() => setActiveTab("historical")}
@@ -399,7 +399,7 @@ export default function ClientsPage() {
             >
               <div className="absolute top-0 right-0 w-12 h-12 bg-white opacity-10 rounded-full -mr-6 -mt-6"></div>
               <History className="w-4 h-4 inline mr-2 relative z-10" />
-              <span className="relative z-10">Clientes Históricos</span>
+              <span className="relative z-10">{t("admin.historicalClients")}</span>
             </button>
           </div>
         </div>
