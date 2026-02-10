@@ -471,6 +471,13 @@ export default function StaffManagement() {
   const [searchName, setSearchName] = useState("")
   const [filterDepartment, setFilterDepartment] = useState("all")
   const [filterDate, setFilterDate] = useState("")
+  const [activityDialogOpen, setActivityDialogOpen] = useState(false)
+  const [newActivity, setNewActivity] = useState({
+    assignedTo: "",
+    description: "",
+    priority: "normal" as const,
+    dueTime: "",
+  })
 
   const availableStaff = staff.filter((s) => s.status === "available")
   const busyStaff = staff.filter((s) => s.status === "busy")
@@ -595,6 +602,86 @@ export default function StaffManagement() {
                   Kanban
                 </button>
               </div>
+              
+              {/* Create Activity Button */}
+              <Dialog open={activityDialogOpen} onOpenChange={setActivityDialogOpen}>
+                <button 
+                  onClick={() => setActivityDialogOpen(true)}
+                  className="flex items-center justify-center w-10 h-10 rounded-full bg-gradient-to-br from-amber-500 to-amber-600 text-white shadow-md hover:shadow-lg transition-all duration-300 hover:scale-110 group relative"
+                  title="Crear actividad"
+                >
+                  <Calendar className="w-5 h-5" />
+                  <span className="absolute top-full mt-2 px-2 py-1 bg-gray-900 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap">
+                    Crear actividad
+                  </span>
+                </button>
+                <DialogContent className="max-w-md">
+                  <DialogHeader>
+                    <DialogTitle>Crear Nueva Actividad</DialogTitle>
+                    <DialogDescription>Asigna una actividad a un miembro del staff</DialogDescription>
+                  </DialogHeader>
+                  <div className="space-y-5 py-4">
+                    <div>
+                      <Label htmlFor="assignedTo" className="text-sm font-medium mb-2 block">Asignar a</Label>
+                      <Select value={newActivity.assignedTo} onValueChange={(value) => setNewActivity({ ...newActivity, assignedTo: value })}>
+                        <SelectTrigger className="h-10">
+                          <SelectValue placeholder="Seleccionar personal" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {staff.map((member) => (
+                            <SelectItem key={member.id} value={member.name}>
+                              {member.name} ({member.department})
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div>
+                      <Label htmlFor="description" className="text-sm font-medium mb-2 block">Descripción de la Actividad</Label>
+                      <Input
+                        id="description"
+                        placeholder="Ej: Revisar sistema de aire acondicionado..."
+                        value={newActivity.description}
+                        onChange={(e) => setNewActivity({ ...newActivity, description: e.target.value })}
+                        className="h-10"
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="priority" className="text-sm font-medium mb-2 block">Prioridad</Label>
+                      <Select value={newActivity.priority} onValueChange={(value: any) => setNewActivity({ ...newActivity, priority: value })}>
+                        <SelectTrigger className="h-10">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="normal">Normal</SelectItem>
+                          <SelectItem value="urgent">Urgente</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div>
+                      <Label htmlFor="dueTime" className="text-sm font-medium mb-2 block">Hora de Entrega</Label>
+                      <Input
+                        id="dueTime"
+                        type="time"
+                        value={newActivity.dueTime}
+                        onChange={(e) => setNewActivity({ ...newActivity, dueTime: e.target.value })}
+                        className="h-10"
+                      />
+                    </div>
+                    <Button 
+                      onClick={() => {
+                        if (newActivity.assignedTo && newActivity.description) {
+                          setActivityDialogOpen(false)
+                          setNewActivity({ assignedTo: "", description: "", priority: "normal", dueTime: "" })
+                        }
+                      }}
+                      className="w-full h-10"
+                    >
+                      Crear Actividad
+                    </Button>
+                  </div>
+                </DialogContent>
+              </Dialog>
               
               <Dialog>
                 <DialogTrigger asChild>
