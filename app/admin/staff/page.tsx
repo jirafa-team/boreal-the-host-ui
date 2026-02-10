@@ -797,64 +797,62 @@ export default function StaffManagement() {
               })}
             </div>
 
-            <div>
-          {/* Staff List - Grid Layout */}
-          <Card className="p-6">
-            <div className="flex-1 max-w-xs mb-4">
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                <Input
-                  placeholder="Ej: María, Roberto..."
-                  value={searchName}
-                  onChange={(e) => setSearchName(e.target.value)}
-                  className="pl-10"
-                />
+            {/* Staff List - Grid Layout */}
+            <Card className="p-6">
+              <div className="flex-1 max-w-xs mb-4">
+                <div className="relative">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                  <Input
+                    placeholder="Ej: María, Roberto..."
+                    value={searchName}
+                    onChange={(e) => setSearchName(e.target.value)}
+                    className="pl-10"
+                  />
+                </div>
               </div>
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-              {staff
-                .filter((member) => member.name.toLowerCase().includes(searchName.toLowerCase()))
-                .map((member) => (
-                <Card
-                  key={member.id}
-                  className={`p-4 cursor-pointer hover:shadow-md transition-shadow ${
-                    member.status === "available" ? "border-green-200" : ""
-                  }`}
-                  onClick={() => setSelectedStaff(member)}
-                >
-                  <div className="flex flex-col items-center text-center">
-                    <div className="w-12 h-12 bg-gradient-to-br from-primary to-primary/80 rounded-full flex items-center justify-center text-white font-bold shadow-md mb-3">
-                      {member.avatar}
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                {staff
+                  .filter((member) => member.name.toLowerCase().includes(searchName.toLowerCase()))
+                  .map((member) => (
+                  <Card
+                    key={member.id}
+                    className={`p-4 cursor-pointer hover:shadow-md transition-shadow ${
+                      member.status === "available" ? "border-green-200" : ""
+                    }`}
+                    onClick={() => setSelectedStaff(member)}
+                  >
+                    <div className="flex flex-col items-center text-center">
+                      <div className="w-12 h-12 bg-gradient-to-br from-primary to-primary/80 rounded-full flex items-center justify-center text-white font-bold shadow-md mb-3">
+                        {member.avatar}
+                      </div>
+                      <h3 className="font-semibold text-foreground text-sm">{member.name}</h3>
+                      <p className="text-xs text-muted-foreground">{member.department}</p>
+                      <p className="text-xs text-muted-foreground mt-1">{member.shift}</p>
+                      <Badge className={`${getStatusColor(member.status)} text-white mt-3`}>
+                        {getStatusText(member.status)}
+                      </Badge>
+                      {member.currentRoom && (
+                        <p className="text-xs text-muted-foreground mt-2">Hab. {member.currentRoom}</p>
+                      )}
                     </div>
-                    <h3 className="font-semibold text-foreground text-sm">{member.name}</h3>
-                    <p className="text-xs text-muted-foreground">{member.department}</p>
-                    <p className="text-xs text-muted-foreground mt-1">{member.shift}</p>
-                    <Badge className={`${getStatusColor(member.status)} text-white mt-3`}>
-                      {getStatusText(member.status)}
-                    </Badge>
-                    {member.currentRoom && (
-                      <p className="text-xs text-muted-foreground mt-2">Hab. {member.currentRoom}</p>
-                    )}
-                  </div>
-                  <div className="mt-4 pt-4 border-t border-border">
-                    <div className="flex items-center justify-between text-sm mb-2">
-                      <span className="text-muted-foreground">{t("admin.tasksToday")}</span>
-                      <span className="font-semibold text-foreground">
-                        {member.tasksToday} / {member.maxCapacity}
-                      </span>
+                    <div className="mt-4 pt-4 border-t border-border">
+                      <div className="flex items-center justify-between text-sm mb-2">
+                        <span className="text-muted-foreground">{t("admin.tasksToday")}</span>
+                        <span className="font-semibold text-foreground">
+                          {member.tasksToday} / {member.maxCapacity}
+                        </span>
+                      </div>
+                      <div className="w-full bg-muted rounded-full h-2">
+                        <div
+                          className="bg-primary rounded-full h-2 transition-all"
+                          style={{ width: `${(member.tasksToday / member.maxCapacity) * 100}%` }}
+                        />
+                      </div>
                     </div>
-                    <div className="w-full bg-muted rounded-full h-2">
-                      <div
-                        className="bg-primary rounded-full h-2 transition-all"
-                        style={{ width: `${(member.tasksToday / member.maxCapacity) * 100}%` }}
-                      />
-                    </div>
-                  </div>
-                </Card>
-              ))}
-            </div>
-          </Card>
-        </div>
+                  </Card>
+                ))}
+              </div>
+            </Card>
           </>
         )}
 
