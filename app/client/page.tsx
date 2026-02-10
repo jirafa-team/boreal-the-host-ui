@@ -1317,7 +1317,7 @@ export default function ClientPage({ searchParams }: { searchParams: { type?: st
                     <Button variant="outline" className="w-full mt-6 bg-transparent">
                       Editar Perfil
                     </Button>
-                    <Button variant="destructive" className="w-full mt-3">
+                    <Button variant="destructive" className="w-full mt-3" onClick={() => router.push("/")}>
                       Cerrar Sesión
                     </Button>
                   </Card>
