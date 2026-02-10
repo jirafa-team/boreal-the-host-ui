@@ -119,8 +119,8 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       id: "management",
       title: t("admin.management"),
       items: [
-        { href: "/admin/users", label: "Usuarios", icon: UserCog },
-        { href: "/admin/settings", label: "Configuración", icon: Settings },
+        { href: "/admin/users", label: t("admin.users"), icon: UserCog },
+        { href: "/admin/settings", label: t("admin.settings"), icon: Settings },
       ],
     },
   ]
@@ -233,21 +233,21 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
               <Link
                 href="/admin/select-establishment"
                 className="relative group w-10 h-10 rounded-full bg-white/20 hover:bg-white/30 text-white flex items-center justify-center transition-all shrink-0"
-                title="Hospedajes"
+                title={t("admin.accommodations")}
               >
                 <Hotel className="w-5 h-5" />
                 <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-1.5 bg-gray-900 text-white text-xs rounded pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
-                  Hospedajes
+                  {t("admin.accommodations")}
                 </div>
               </Link>
               <Link
                 href="/"
                 className="relative group w-10 h-10 rounded-full bg-white/20 hover:bg-white/30 text-white flex items-center justify-center transition-all shrink-0"
-                title="Cerrar sesión"
+                title={t("admin.logout")}
               >
                 <LogOut className="w-5 h-5" />
                 <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-1.5 bg-gray-900 text-white text-xs rounded pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
-                  Cerrar sesión
+                  {t("admin.logout")}
                 </div>
               </Link>
             </div>
