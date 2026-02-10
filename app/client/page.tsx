@@ -1019,7 +1019,7 @@ export default function ClientPage({ searchParams }: { searchParams: { type?: st
                 <div className="px-4 pb-4">
                   <Card
                     className="relative overflow-hidden cursor-pointer hover:shadow-lg transition-shadow"
-                    onClick={() => router.push("/client/help-form")}
+                    // onClick={() => router.push("/client/help-form")}
                   >
                     <Image src="/hotel-concierge-help-desk.jpg" alt="Asistencia" fill className="object-cover" />
                     <div className="absolute inset-0 bg-gradient-to-r from-red-900/70 to-red-700/50" />
@@ -1317,6 +1317,9 @@ export default function ClientPage({ searchParams }: { searchParams: { type?: st
                     <Button variant="outline" className="w-full mt-6 bg-transparent">
                       Editar Perfil
                     </Button>
+                    <Button variant="destructive" className="w-full mt-3">
+                      Cerrar Sesión
+                    </Button>
                   </Card>
                 </div>
               </div>
@@ -1543,7 +1546,7 @@ export default function ClientPage({ searchParams }: { searchParams: { type?: st
                               <Sparkles className="w-5 h-5 text-[#773CCA]" />
                               <h4 className="font-semibold">Servicio de Limpieza</h4>
                             </div>
-                            <p className="text-sm text-muted-foreground">Habitación 305</p>
+                            <p className="text-sm text-muted-foreground">Habitaci��n 305</p>
                             <span className="inline-block mt-2 px-3 py-1 text-xs font-medium bg-[#11AFBF] text-white rounded-full">
                               Programado
                             </span>
