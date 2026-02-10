@@ -228,7 +228,25 @@ export default function ClientsPage() {
       client.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
       client.room.includes(searchTerm)
     const matchesStatus = statusFilter === "all" || client.status === statusFilter
-    return matchesSearch && matchesStatus
+    
+    // Add KPI filter logic
+    let matchesKPIFilter = true
+    const today = new Date().toISOString().split('T')[0]
+    
+    if (clientsFilter === "all") {
+      matchesKPIFilter = true
+    } else if (clientsFilter === "active") {
+      // Huéspedes Activos - checked-in status
+      matchesKPIFilter = client.status === "checked-in"
+    } else if (clientsFilter === "checkout") {
+      // Check-out Hoy
+      matchesKPIFilter = client.checkOut === today
+    } else if (clientsFilter === "vip") {
+      // Clientes VIP
+      matchesKPIFilter = client.vip === true
+    }
+    
+    return matchesSearch && matchesStatus && matchesKPIFilter
   })
 
   const toggleExpanded = (clientId: string) => {
