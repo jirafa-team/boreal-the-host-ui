@@ -727,8 +727,6 @@ export default function StaffManagement() {
 
       {/* Main Content */}
       <div className="p-6 space-y-6">
-
-      {/* Stats Cards by Department - Only show in overview */}
       {viewMode === "overview" && (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
           {[
