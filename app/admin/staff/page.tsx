@@ -722,7 +722,6 @@ export default function StaffManagement() {
               </Dialog>
             </div>
           </div>
-        </div>
       </header>
 
       {/* Main Content */}
