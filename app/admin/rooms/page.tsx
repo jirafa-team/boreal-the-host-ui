@@ -30,6 +30,7 @@ export default function RoomsManagement() {
   const [layoutMode, setLayoutMode] = useState<LayoutMode>("grid")
   const [timelineMode, setTimelineMode] = useState<"week" | "month">("week")
   const [currentDate, setCurrentDate] = useState(new Date())
+  const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0])
   const [searchTerm, setSearchTerm] = useState("")
   const [statusFilter, setStatusFilter] = useState<RoomStatus | null>(null)
   const [showCreateModal, setShowCreateModal] = useState(false)
@@ -170,11 +171,37 @@ export default function RoomsManagement() {
   }
 
   const filteredRooms = rooms.filter(
-    (room) =>
-      (statusFilter === null || room.status === statusFilter) &&
-      (room.number.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      room.type.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      room.guest?.toLowerCase().includes(searchTerm.toLowerCase())),
+    (room) => {
+      const matchesStatus = statusFilter === null || room.status === statusFilter
+      const matchesSearch = room.number.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                           room.type.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                           room.guest?.toLowerCase().includes(searchTerm.toLowerCase())
+      
+      // Filter by selected date for grid view
+      if (layoutMode === "grid") {
+        const selectedDateObj = new Date(selectedDate)
+        selectedDateObj.setHours(0, 0, 0, 0)
+        
+        if (room.status === "maintenance") return matchesStatus && matchesSearch
+        if (room.checkIn && room.checkOut) {
+          const checkIn = new Date(room.checkIn)
+          const checkOut = new Date(room.checkOut)
+          checkIn.setHours(0, 0, 0, 0)
+          checkOut.setHours(0, 0, 0, 0)
+          
+          if (selectedDateObj >= checkIn && selectedDateObj <= checkOut) {
+            return matchesStatus && matchesSearch
+          }
+        }
+        // If no reservation, check if it's available
+        if (!room.checkIn || !room.checkOut) {
+          return matchesStatus && matchesSearch
+        }
+        return false
+      }
+      
+      return matchesStatus && matchesSearch
+    },
   )
 
   const getStatusColor = (status: RoomStatus) => {
@@ -215,6 +242,33 @@ export default function RoomsManagement() {
   const formatDate = (date: Date) => {
     return date.toLocaleDateString("es-ES", { weekday: "long", year: "numeric", month: "long", day: "numeric" })
   }
+
+  // Convert between ISO date format (yyyy-MM-dd) and locale-specific format
+  const convertISOToLocaleFormat = (isoDate: string): string => {
+    const [year, month, day] = isoDate.split('-')
+    if (useLanguage().language === 'es' || useLanguage().language === 'pt') {
+      return `${day}/${month}/${year}` // dd/mm/yyyy
+    }
+    return `${month}/${day}/${year}` // mm/dd/yyyy
+  }
+
+  const convertLocaleToISO = (localeDate: string): string => {
+    const parts = localeDate.split('/')
+    if (useLanguage().language === 'es' || useLanguage().language === 'pt') {
+      // Input is dd/mm/yyyy
+      if (parts.length === 3) {
+        return `${parts[2]}-${parts[1]}-${parts[0]}`
+      }
+    } else {
+      // Input is mm/dd/yyyy
+      if (parts.length === 3) {
+        return `${parts[2]}-${parts[0]}-${parts[1]}`
+      }
+    }
+    return localeDate
+  }
+
+  const { language } = useLanguage()
 
   const navigateDate = (direction: "prev" | "next") => {
     const newDate = new Date(currentDate)
@@ -418,9 +472,9 @@ export default function RoomsManagement() {
 
         {/* Controls */}
         <Card className="p-6 mb-6">
-          <div className="flex gap-4 items-center">
+          <div className="flex gap-4 items-center flex-wrap">
             {/* Search */}
-            <div className="relative flex-1 max-w-md w-full">
+            <div className="relative flex-1 min-w-xs max-w-md w-full">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
               <Input
                 placeholder={t("admin.searchRoomsPlaceholder")}
@@ -429,6 +483,27 @@ export default function RoomsManagement() {
                 className="pl-10"
               />
             </div>
+
+            {/* Date Filter - Only for Grid View */}
+            {layoutMode === "grid" && (
+              <div className="flex items-center gap-2">
+                <label className="text-sm font-medium text-foreground">
+                  {language === 'es' || language === 'pt' ? 'Fecha:' : 'Date:'}
+                </label>
+                <div className="relative">
+                  <input
+                    type="date"
+                    value={selectedDate}
+                    onChange={(e) => setSelectedDate(e.target.value)}
+                    className="absolute inset-0 opacity-0 cursor-pointer w-full h-full"
+                  />
+                  <div className="pointer-events-none flex items-center gap-2 px-3 py-2 border border-gray-300 rounded-lg bg-white w-40">
+                    <Calendar className="w-4 h-4 text-muted-foreground" />
+                    <span className="text-sm">{convertISOToLocaleFormat(selectedDate)}</span>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
         </Card>
 
@@ -548,22 +623,60 @@ export default function RoomsManagement() {
         ) : (
           /* Kanban Timeline View */
           <div className="space-y-4">
-            {/* Timeline Mode Toggle */}
-            <div className="flex gap-2">
-              <Button
-                variant={timelineMode === "week" ? "default" : "outline"}
-                size="sm"
-                onClick={() => setTimelineMode("week")}
-              >
-                {t("admin.weekView")}
-              </Button>
-              <Button
-                variant={timelineMode === "month" ? "default" : "outline"}
-                size="sm"
-                onClick={() => setTimelineMode("month")}
-              >
-                {t("admin.monthView")}
-              </Button>
+            {/* Timeline Mode Toggle & Date Navigation */}
+            <div className="flex gap-2 justify-between items-center flex-wrap">
+              <div className="flex items-center gap-3">
+                <span className={`text-sm font-medium ${timelineMode === "week" ? "text-foreground" : "text-muted-foreground"}`}>
+                  {language === 'es' || language === 'pt' ? 'Semana' : 'Week'}
+                </span>
+                <button
+                  onClick={() => setTimelineMode(timelineMode === "week" ? "month" : "week")}
+                  className={`relative inline-flex h-8 w-14 items-center rounded-full transition-colors ${
+                    timelineMode === "month"
+                      ? "bg-lime-600"
+                      : "bg-gray-300"
+                  }`}
+                >
+                  <span
+                    className={`inline-block h-6 w-6 transform rounded-full bg-white transition-transform ${
+                      timelineMode === "month" ? "translate-x-7" : "translate-x-1"
+                    }`}
+                  />
+                </button>
+                <span className={`text-sm font-medium ${timelineMode === "month" ? "text-foreground" : "text-muted-foreground"}`}>
+                  {language === 'es' || language === 'pt' ? 'Mes' : 'Month'}
+                </span>
+              </div>
+              
+              {/* Date Navigation for Timeline */}
+              <div className="flex items-center gap-3">
+                <button
+                  onClick={() => navigateDate("prev")}
+                  className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                  title={language === 'es' || language === 'pt' ? "Fecha anterior" : "Previous date"}
+                >
+                  <ChevronLeft className="w-5 h-5" />
+                </button>
+                <div className="relative">
+                  <input
+                    type="date"
+                    value={currentDate.toISOString().split('T')[0]}
+                    onChange={(e) => setCurrentDate(new Date(e.target.value))}
+                    className="absolute inset-0 opacity-0 cursor-pointer w-full h-full"
+                  />
+                  <div className="pointer-events-none flex items-center gap-2 px-3 py-2 border border-gray-300 rounded-lg bg-white w-40">
+                    <Calendar className="w-4 h-4 text-muted-foreground" />
+                    <span className="text-sm">{convertISOToLocaleFormat(currentDate.toISOString().split('T')[0])}</span>
+                  </div>
+                </div>
+                <button
+                  onClick={() => navigateDate("next")}
+                  className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                  title={language === 'es' || language === 'pt' ? "Fecha siguiente" : "Next date"}
+                >
+                  <ChevronRight className="w-5 h-5" />
+                </button>
+              </div>
             </div>
 
             {/* Timeline Table */}

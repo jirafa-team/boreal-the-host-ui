@@ -1,11 +1,15 @@
 "use client"
 
+import { useEffect } from "react"
+import { useRouter } from "next/navigation"
 import { useState } from "react"
 import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { ArrowLeft, ShoppingCart, Plus, Minus } from "lucide-react"
 import Link from "next/link"
-import { useRouter } from "next/navigation"
+
+// HIDDEN PAGE - Redirect to client dashboard
+const HIDE_PAGE = true
 
 interface MenuItem {
   id: string
@@ -109,6 +113,19 @@ const menuItems: MenuItem[] = [
 
 export default function RoomServiceMenu() {
   const router = useRouter()
+  
+  // HIDDEN PAGE - Redirect immediately if page is hidden
+  useEffect(() => {
+    if (HIDE_PAGE) {
+      router.push("/client")
+    }
+  }, [router])
+  
+  // Return null while redirecting
+  if (HIDE_PAGE) {
+    return null
+  }
+  
   const [cart, setCart] = useState<{ [key: string]: number }>({})
   const [selectedCategory, setSelectedCategory] = useState<string>("Todos")
 

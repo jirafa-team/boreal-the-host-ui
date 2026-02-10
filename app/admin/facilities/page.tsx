@@ -14,8 +14,8 @@ import {
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Plus, Dumbbell, Waves, Sparkles, Video, Coffee, UtensilsCrossed, LayoutGrid, Clock, Users, Building2, Calendar as CalendarIcon } from "lucide-react"
-
+import { Plus, Dumbbell, Waves, Sparkles, Video, Coffee, UtensilsCrossed, LayoutGrid, Clock, Users, Building2, Calendar as CalendarIcon, ChevronLeft, ChevronRight, Calendar } from "lucide-react"
+import { useLanguage } from "@/lib/i18n-context"
 import React from "react"
 
 type Facility = {
@@ -65,9 +65,13 @@ const mockBookings: Booking[] = [
 ]
 
 export default function FacilitiesPage() {
+  const { t, language } = useLanguage()
   const [facilities, setFacilities] = React.useState<Facility[]>(mockFacilities)
   const [bookings, setBookings] = React.useState<Booking[]>(mockBookings)
   const [viewMode, setViewMode] = React.useState<"list" | "timeline">("list")
+  const [selectedDate, setSelectedDate] = React.useState(new Date().toISOString().split('T')[0])
+  const [currentDate, setCurrentDate] = React.useState(new Date())
+  const [timelineMode, setTimelineMode] = React.useState<"week" | "month">("week")
   const [newBooking, setNewBooking] = React.useState({
     facilityId: "",
     clientName: "",
@@ -190,9 +194,64 @@ export default function FacilitiesPage() {
     setBookingsDetailOpen(true)
   }
 
+  // Get current occupancy percentage for a facility (based on current time)
+  const getCurrentOccupancy = (facilityId: string): { occupancyPercent: number; currentBookings: Booking[] } => {
+    const now = new Date()
+    const currentHour = now.getHours()
+    const currentMinute = now.getMinutes()
+    const currentTimeInHours = currentHour + currentMinute / 60
+    
+    const facility = facilities.find((f) => f.id === facilityId)
+    if (!facility) return { occupancyPercent: 0, currentBookings: [] }
+    
+    const currentBookings = bookings.filter((b) => {
+      if (b.facilityId !== facilityId) return false
+      const bookingStart = parseInt(b.time.split(":")[0]) + parseInt(b.time.split(":")[1] || "0") / 60
+      const bookingEnd = bookingStart + b.duration / 60
+      return currentTimeInHours >= bookingStart && currentTimeInHours < bookingEnd
+    })
+    
+    const occupancyPercent = Math.round((currentBookings.length / facility.capacity) * 100)
+    return { occupancyPercent, currentBookings }
+  }
+
+  // Determine occupancy color
+  const getOccupancyColor = (percent: number): string => {
+    if (percent === 0) return "text-gray-500"
+    if (percent <= 33) return "text-green-600"
+    if (percent <= 66) return "text-amber-600"
+    return "text-red-600"
+  }
+
+  const getOccupancyBgColor = (percent: number): string => {
+    if (percent === 0) return "bg-gray-100"
+    if (percent <= 33) return "bg-green-100"
+    if (percent <= 66) return "bg-amber-100"
+    return "bg-red-100"
+  }
+
   // Determine if facility is multi-party (gym, pool, spa) or single-party (conference room)
   const isMultiPartyFacility = (facilityType: string): boolean => {
     return ["fitness", "recreation", "wellness", "dining"].includes(facilityType)
+  }
+
+  // Convert between ISO date format (yyyy-MM-dd) and locale-specific format
+  const convertISOToLocaleFormat = (isoDate: string): string => {
+    const [year, month, day] = isoDate.split('-')
+    if (language === 'es' || language === 'pt') {
+      return `${day}/${month}/${year}` // dd/mm/yyyy
+    }
+    return `${month}/${day}/${year}` // mm/dd/yyyy
+  }
+
+  const navigateDate = (direction: "prev" | "next") => {
+    const newDate = new Date(currentDate)
+    if (timelineMode === "week") {
+      newDate.setDate(newDate.getDate() + (direction === "next" ? 7 : -7))
+    } else {
+      newDate.setMonth(newDate.getMonth() + (direction === "next" ? 1 : -1))
+    }
+    setCurrentDate(newDate)
   }
 
   return (
@@ -504,7 +563,29 @@ export default function FacilitiesPage() {
           </DialogContent>
         </Dialog>
         {viewMode === "list" && (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <>
+            {/* Date Filter for List View */}
+            <div className="mb-6 p-4 bg-white rounded-lg border border-gray-200">
+              <div className="flex items-center gap-2">
+                <label className="text-sm font-medium text-foreground">
+                  {language === 'es' || language === 'pt' ? 'Fecha:' : 'Date:'}
+                </label>
+                <div className="relative">
+                  <input
+                    type="date"
+                    value={selectedDate}
+                    onChange={(e) => setSelectedDate(e.target.value)}
+                    className="absolute inset-0 opacity-0 cursor-pointer w-full h-full"
+                  />
+                  <div className="pointer-events-none flex items-center gap-2 px-3 py-2 border border-gray-300 rounded-lg bg-white w-40">
+                    <Calendar className="w-4 h-4 text-muted-foreground" />
+                    <span className="text-sm">{convertISOToLocaleFormat(selectedDate)}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {facilities.map((facility) => {
               const Icon = facility.icon
               const facilityBookings = bookings.filter((b) => b.facilityId === facility.id)
@@ -537,6 +618,28 @@ export default function FacilitiesPage() {
                     </div>
                   </div>
 
+                  {/* Current Occupancy Progress Bar */}
+                  <div className="mt-4 mb-2">
+                    {(() => {
+                      const { occupancyPercent } = getCurrentOccupancy(facility.id)
+                      const barColor = occupancyPercent === 0 ? "bg-gray-300" : occupancyPercent <= 33 ? "bg-green-500" : occupancyPercent <= 66 ? "bg-amber-500" : "bg-red-500"
+                      return (
+                        <div className="space-y-1">
+                          <div className="flex items-center justify-between text-xs">
+                            <span className="text-muted-foreground">Ocupación</span>
+                            <span className="font-medium text-foreground">{occupancyPercent}%</span>
+                          </div>
+                          <div className="w-full h-1.5 bg-gray-200 rounded-full overflow-hidden">
+                            <div
+                              className={`h-full ${barColor} transition-all duration-300`}
+                              style={{ width: `${occupancyPercent}%` }}
+                            />
+                          </div>
+                        </div>
+                      )
+                    })()}
+                  </div>
+
                   <Button
                     onClick={() => handleEditFacility(facility)}
                     className="w-full px-3 py-2 text-sm font-medium rounded-lg bg-primary/10 text-primary hover:bg-primary/20 transition-colors"
@@ -547,11 +650,69 @@ export default function FacilitiesPage() {
               )
             })}
           </div>
+          </>
         )}
 
         {/* Timeline View */}
         {viewMode === "timeline" && (
-          <div className="bg-card rounded-lg border border-border overflow-hidden">
+          <>
+            {/* Timeline Mode Toggle & Date Navigation */}
+            <div className="mb-6 flex gap-2 justify-between items-center flex-wrap">
+              <div className="flex items-center gap-3">
+                <span className={`text-sm font-medium ${timelineMode === "week" ? "text-foreground" : "text-muted-foreground"}`}>
+                  Semana
+                </span>
+                <button
+                  onClick={() => setTimelineMode(timelineMode === "week" ? "month" : "week")}
+                  className={`relative inline-flex h-8 w-14 items-center rounded-full transition-colors ${
+                    timelineMode === "month"
+                      ? "bg-lime-600"
+                      : "bg-gray-300"
+                  }`}
+                >
+                  <span
+                    className={`inline-block h-6 w-6 transform rounded-full bg-white transition-transform ${
+                      timelineMode === "month" ? "translate-x-7" : "translate-x-1"
+                    }`}
+                  />
+                </button>
+                <span className={`text-sm font-medium ${timelineMode === "month" ? "text-foreground" : "text-muted-foreground"}`}>
+                  Mes
+                </span>
+              </div>
+
+              {/* Date Navigation for Timeline */}
+              <div className="flex items-center gap-3">
+                <button
+                  onClick={() => navigateDate("prev")}
+                  className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                  title={language === 'es' || language === 'pt' ? "Fecha anterior" : "Previous date"}
+                >
+                  <ChevronLeft className="w-5 h-5" />
+                </button>
+                <div className="relative">
+                  <input
+                    type="date"
+                    value={currentDate.toISOString().split('T')[0]}
+                    onChange={(e) => setCurrentDate(new Date(e.target.value))}
+                    className="absolute inset-0 opacity-0 cursor-pointer w-full h-full"
+                  />
+                  <div className="pointer-events-none flex items-center gap-2 px-3 py-2 border border-gray-300 rounded-lg bg-white w-40">
+                    <Calendar className="w-4 h-4 text-muted-foreground" />
+                    <span className="text-sm">{convertISOToLocaleFormat(currentDate.toISOString().split('T')[0])}</span>
+                  </div>
+                </div>
+                <button
+                  onClick={() => navigateDate("next")}
+                  className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                  title={language === 'es' || language === 'pt' ? "Fecha siguiente" : "Next date"}
+                >
+                  <ChevronRight className="w-5 h-5" />
+                </button>
+              </div>
+            </div>
+
+            <div className="bg-card rounded-lg border border-border overflow-hidden">
             <div className="overflow-x-auto">
               <div style={{ width: "fit-content", minWidth: "100%" }}>
                 {/* Header con horas */}
@@ -750,6 +911,7 @@ export default function FacilitiesPage() {
               </div>
             </div>
           </div>
+          </>
         )}
       </div>
     </>

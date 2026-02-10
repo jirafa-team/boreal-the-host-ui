@@ -82,8 +82,8 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       items: [
         { href: "/admin/home", label: t("admin.home"), icon: Home },
         { href: "/admin/dashboard", label: t("admin.controlDashboard"), icon: BarChart3 },
-        { href: "/admin", label: t("admin.dashboard"), icon: BarChart3 },
-        { href: "/admin/sales-assistant", label: t("admin.salesAssistant"), icon: TrendingUp },
+        // { href: "/admin", label: t("admin.dashboard"), icon: BarChart3 },
+        // { href: "/admin/sales-assistant", label: t("admin.salesAssistant"), icon: TrendingUp },
       ],
     },
     {
@@ -91,7 +91,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       title: t("admin.spaces"),
       items: [
         { href: "/admin/rooms", label: t("admin.rooms"), icon: Hotel },
-        { href: "/admin/space-builder", label: t("admin.spaceDesign"), icon: LayoutGrid },
+        // { href: "/admin/space-builder", label: t("admin.spaceDesign"), icon: LayoutGrid },
         { href: "/admin/facilities", label: t("admin.amenities"), icon: Building2 },
       ],
     },
@@ -100,9 +100,9 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       title: t("admin.services"),
       items: [
         { href: "/admin/staff", label: t("admin.staff"), icon: Sparkles },
-        { href: "/admin/events", label: t("admin.events"), icon: Calendar },
-        { href: "/admin/tickets", label: t("admin.tickets"), icon: Ticket },
-        { href: "/admin/pedidos", label: t("admin.orders"), icon: ShoppingBag },
+        // { href: "/admin/events", label: t("admin.events"), icon: Calendar },
+        // { href: "/admin/tickets", label: t("admin.tickets"), icon: Ticket },
+        // { href: "/admin/pedidos", label: t("admin.orders"), icon: ShoppingBag },
       ],
     },
     {
@@ -110,8 +110,8 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       title: t("admin.communication"),
       items: [
         { href: "/admin/clients", label: t("admin.clients"), icon: Users },
-        { href: "/admin/notifications", label: t("admin.notifications"), icon: Bell },
-        { href: "/admin/recommendations", label: t("admin.recommendations"), icon: Compass },
+        // { href: "/admin/notifications", label: t("admin.notifications"), icon: Bell },
+        // { href: "/admin/recommendations", label: t("admin.recommendations"), icon: Compass },
       ],
     },
     {
@@ -155,18 +155,14 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             </Button>
           </div>
 
-          <nav className="flex-1 p-2 space-y-4 overflow-y-auto">
+          <nav className="flex-1 p-2 space-y-2 overflow-y-auto">
             {navSections.map((section) => (
               <div key={section.id}>
                 {sidebarOpen ? (
                   <>
                     <button
                       onClick={() => toggleSection(section.id)}
-                      className={`w-full px-3 mb-2 text-[10px] font-semibold uppercase tracking-wider flex items-center justify-between transition-colors ${
-                        isAgenticoMode
-                          ? "text-pink-200/70 hover:text-pink-100"
-                          : "text-white/70 hover:text-white/90"
-                      }`}
+                      className="w-full px-3 mb-2 text-[10px] font-semibold text-white/70 uppercase tracking-wider hover:text-white/90 flex items-center justify-between transition-colors hidden"
                     >
                       <span>{section.title}</span>
                       <ChevronDown
@@ -175,32 +171,24 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                         }`}
                       />
                     </button>
-                    {expandedSections.has(section.id) && (
-                      <div className="space-y-1">
-                        {section.items.map((item) => {
-                          const Icon = item.icon
-                          const isActive = pathname === item.href
-                          return (
-                            <Link
-                              key={item.href}
-                              href={item.href}
-                              className={`flex items-center gap-3 px-3 py-1.5 text-xs rounded-lg transition-colors ${
-                                isActive 
-                                  ? isAgenticoMode 
-                                    ? "bg-gradient-to-r from-pink-500/30 to-purple-500/30 text-pink-100 font-medium border border-pink-400/50"
-                                    : "bg-white/20 text-white font-medium"
-                                  : isAgenticoMode
-                                    ? "text-slate-200/70 hover:text-pink-200 hover:bg-pink-500/10"
-                                    : "text-white/90 hover:bg-white/10"
-                              }`}
-                            >
-                              <Icon className="w-5 h-5 shrink-0" />
-                              <span>{item.label}</span>
-                            </Link>
-                          )
-                        })}
-                      </div>
-                    )}
+                    <div className="space-y-1 mb-2">
+                      {section.items.map((item) => {
+                        const Icon = item.icon
+                        const isActive = pathname === item.href
+                        return (
+                          <Link
+                            key={item.href}
+                            href={item.href}
+                            className={`flex items-center gap-3 px-3 py-1.5 text-xs rounded-lg transition-colors ${
+                              isActive ? "bg-white/20 text-white font-medium" : "text-white/90 hover:bg-white/10"
+                            }`}
+                          >
+                            <Icon className="w-5 h-5 shrink-0" />
+                            <span>{item.label}</span>
+                          </Link>
+                        )
+                      })}
+                    </div>
                   </>
                 ) : (
                   <div className="space-y-1">
