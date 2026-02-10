@@ -31,6 +31,10 @@ export default function RoomsManagement() {
   const [timelineMode, setTimelineMode] = useState<"week" | "month">("week")
   const [currentDate, setCurrentDate] = useState(new Date())
   const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0])
+  const [selectedMonth, setSelectedMonth] = useState<{ year: number; month: number }>({
+    year: new Date().getFullYear(),
+    month: new Date().getMonth(),
+  })
   const [searchTerm, setSearchTerm] = useState("")
   const [statusFilter, setStatusFilter] = useState<RoomStatus | null>(null)
   const [showCreateModal, setShowCreateModal] = useState(false)
@@ -312,8 +316,8 @@ export default function RoomsManagement() {
         })
       }
     } else {
-      const year = startDate.getFullYear()
-      const month = startDate.getMonth()
+      const year = selectedMonth.year
+      const month = selectedMonth.month
       const daysInMonth = new Date(year, month + 1, 0).getDate()
       for (let i = 1; i <= daysInMonth; i++) {
         const date = new Date(year, month, i)
@@ -648,35 +652,90 @@ export default function RoomsManagement() {
                 </span>
               </div>
               
-              {/* Date Navigation for Timeline */}
-              <div className="flex items-center gap-3">
-                <button
-                  onClick={() => navigateDate("prev")}
-                  className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
-                  title={language === 'es' || language === 'pt' ? "Fecha anterior" : "Previous date"}
-                >
-                  <ChevronLeft className="w-5 h-5" />
-                </button>
-                <div className="relative">
-                  <input
-                    type="date"
-                    value={currentDate.toISOString().split('T')[0]}
-                    onChange={(e) => setCurrentDate(new Date(e.target.value))}
-                    className="absolute inset-0 opacity-0 cursor-pointer w-full h-full"
-                  />
-                  <div className="pointer-events-none flex items-center gap-2 px-3 py-2 border border-gray-300 rounded-lg bg-white w-40">
-                    <Calendar className="w-4 h-4 text-muted-foreground" />
-                    <span className="text-sm">{convertISOToLocaleFormat(currentDate.toISOString().split('T')[0])}</span>
+              {/* Date/Month Navigation for Timeline */}
+              {timelineMode === "week" ? (
+                <div className="flex items-center gap-3">
+                  <button
+                    onClick={() => navigateDate("prev")}
+                    className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                    title={language === 'es' || language === 'pt' ? "Fecha anterior" : "Previous date"}
+                  >
+                    <ChevronLeft className="w-5 h-5" />
+                  </button>
+                  <div className="relative">
+                    <input
+                      type="date"
+                      value={currentDate.toISOString().split('T')[0]}
+                      onChange={(e) => setCurrentDate(new Date(e.target.value))}
+                      className="absolute inset-0 opacity-0 cursor-pointer w-full h-full"
+                    />
+                    <div className="pointer-events-none flex items-center gap-2 px-3 py-2 border border-gray-300 rounded-lg bg-white w-40">
+                      <Calendar className="w-4 h-4 text-muted-foreground" />
+                      <span className="text-sm">{convertISOToLocaleFormat(currentDate.toISOString().split('T')[0])}</span>
+                    </div>
                   </div>
+                  <button
+                    onClick={() => navigateDate("next")}
+                    className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                    title={language === 'es' || language === 'pt' ? "Fecha siguiente" : "Next date"}
+                  >
+                    <ChevronRight className="w-5 h-5" />
+                  </button>
                 </div>
-                <button
-                  onClick={() => navigateDate("next")}
-                  className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
-                  title={language === 'es' || language === 'pt' ? "Fecha siguiente" : "Next date"}
-                >
-                  <ChevronRight className="w-5 h-5" />
-                </button>
-              </div>
+              ) : (
+                <div className="flex items-center gap-3">
+                  <button
+                    onClick={() => {
+                      const newMonth = selectedMonth.month - 1
+                      if (newMonth < 0) {
+                        setSelectedMonth({ year: selectedMonth.year - 1, month: 11 })
+                      } else {
+                        setSelectedMonth({ ...selectedMonth, month: newMonth })
+                      }
+                    }}
+                    className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                    title={language === 'es' || language === 'pt' ? "Mes anterior" : "Previous month"}
+                  >
+                    <ChevronLeft className="w-5 h-5" />
+                  </button>
+                  <select
+                    value={`${selectedMonth.year}-${selectedMonth.month}`}
+                    onChange={(e) => {
+                      const [year, month] = e.target.value.split('-')
+                      setSelectedMonth({ year: parseInt(year), month: parseInt(month) })
+                    }}
+                    className="px-3 py-2 border border-gray-300 rounded-lg bg-white text-sm font-medium cursor-pointer"
+                  >
+                    {Array.from({ length: 12 }, (_, i) => {
+                      const year = selectedMonth.year
+                      const month = i
+                      const monthName = new Date(year, month, 1).toLocaleDateString(
+                        language === 'es' ? 'es-ES' : language === 'pt' ? 'pt-BR' : 'en-US',
+                        { month: 'long', year: 'numeric' }
+                      )
+                      return (
+                        <option key={`${year}-${month}`} value={`${year}-${month}`}>
+                          {monthName}
+                        </option>
+                      )
+                    })}
+                  </select>
+                  <button
+                    onClick={() => {
+                      const newMonth = selectedMonth.month + 1
+                      if (newMonth > 11) {
+                        setSelectedMonth({ year: selectedMonth.year + 1, month: 0 })
+                      } else {
+                        setSelectedMonth({ ...selectedMonth, month: newMonth })
+                      }
+                    }}
+                    className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                    title={language === 'es' || language === 'pt' ? "Mes siguiente" : "Next month"}
+                  >
+                    <ChevronRight className="w-5 h-5" />
+                  </button>
+                </div>
+              )}
             </div>
 
             {/* Timeline Table */}
