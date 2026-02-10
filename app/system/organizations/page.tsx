@@ -285,7 +285,7 @@ export default function SystemOrganizationsPage() {
                     >
                       {org.logo ? (
                         <div className="w-14 h-14 rounded-xl bg-gray-100 flex items-center justify-center overflow-hidden">
-                          <Image src={org.logo || "/placeholder.svg"} alt={org.name} width={56} height={56} className="object-cover" />
+                          <Image src={org.logo || "/placeholder.svg"} alt={org.name} width={56} height={56} className="object-cover" loading="eager" />
                         </div>
                       ) : (
                         <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center">

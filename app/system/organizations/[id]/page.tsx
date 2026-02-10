@@ -244,7 +244,7 @@ export default function OrganizationDetailPage() {
             <div className="flex items-center gap-3">
               {organization.logo ? (
                 <div className="w-12 h-12 rounded-xl bg-gray-100 flex items-center justify-center overflow-hidden">
-                  <Image src={organization.logo || "/placeholder.svg"} alt={organization.name} width={48} height={48} className="object-cover" />
+                  <Image src={organization.logo || "/placeholder.svg"} alt={organization.name} width={48} height={48} className="object-cover" loading="eager" />
                 </div>
               ) : (
                 <div className="w-12 h-12 bg-gradient-to-br from-blue-600 to-purple-600 rounded-xl flex items-center justify-center shadow-lg">
