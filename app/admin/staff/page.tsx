@@ -16,7 +16,7 @@ import {
 } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Users, Clock, CheckCircle2, AlertCircle, User, Plus, Calendar, LayoutGrid, Book as Broom, Wrench, Shield, ReceiptText, UtensilsCrossed, UserPlus } from "lucide-react"
+import { Users, Clock, CheckCircle2, AlertCircle, User, Plus, Calendar, LayoutGrid, Book as Broom, Wrench, Shield, ReceiptText, UtensilsCrossed, UserPlus, Zap } from "lucide-react"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { useLanguage } from "@/lib/i18n-context"
 import { Search } from "lucide-react" // Import the Search component
@@ -471,6 +471,7 @@ export default function StaffManagement() {
   const [searchName, setSearchName] = useState("")
   const [filterDepartment, setFilterDepartment] = useState("all")
   const [filterDate, setFilterDate] = useState("")
+  const [activityDialogOpen, setActivityDialogOpen] = useState(false)
 
   const availableStaff = staff.filter((s) => s.status === "available")
   const busyStaff = staff.filter((s) => s.status === "busy")
@@ -596,18 +597,19 @@ export default function StaffManagement() {
                 </button>
               </div>
               
-              <Dialog>
-                <DialogTrigger asChild>
-                  <button 
-                    className="flex items-center justify-center w-10 h-10 rounded-full bg-gradient-to-br from-primary to-primary/80 text-white shadow-md hover:shadow-lg transition-all duration-300 hover:scale-110 group relative"
-                    title="Agregar personal"
-                  >
-                    <UserPlus className="w-5 h-5" />
-                    <span className="absolute top-full mt-2 px-2 py-1 bg-gray-900 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap">
-                      Agregar personal
-                    </span>
-                  </button>
-                </DialogTrigger>
+              <div className="flex gap-2">
+                <Dialog>
+                  <DialogTrigger asChild>
+                    <button 
+                      className="flex items-center justify-center w-10 h-10 rounded-full bg-gradient-to-br from-primary to-primary/80 text-white shadow-md hover:shadow-lg transition-all duration-300 hover:scale-110 group relative"
+                      title="Agregar personal"
+                    >
+                      <UserPlus className="w-5 h-5" />
+                      <span className="absolute top-full mt-2 px-2 py-1 bg-gray-900 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap">
+                        Agregar personal
+                      </span>
+                    </button>
+                  </DialogTrigger>
                 <DialogContent>
                   <DialogHeader>
                     <DialogTitle>Añadir Nuevo Personal</DialogTitle>
@@ -652,6 +654,64 @@ export default function StaffManagement() {
                     </div>
                   </div>
                   <Button className="w-full">Registrar Personal</Button>
+                </DialogContent>
+              </Dialog>
+
+              <Dialog open={activityDialogOpen} onOpenChange={setActivityDialogOpen}>
+                <DialogTrigger asChild>
+                  <button 
+                    className="flex items-center justify-center w-10 h-10 rounded-full bg-gradient-to-br from-amber-500 to-amber-600 text-white shadow-md hover:shadow-lg transition-all duration-300 hover:scale-110 group relative"
+                    title="Añadir actividad"
+                  >
+                    <Zap className="w-5 h-5" />
+                    <span className="absolute top-full mt-2 px-2 py-1 bg-gray-900 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap">
+                      Añadir actividad
+                    </span>
+                  </button>
+                </DialogTrigger>
+                <DialogContent>
+                  <DialogHeader>
+                    <DialogTitle>Añadir Nueva Actividad</DialogTitle>
+                    <DialogDescription>Crea una nueva actividad para el equipo de staff</DialogDescription>
+                  </DialogHeader>
+                  <div className="space-y-4 py-4">
+                    <div>
+                      <Label htmlFor="activity-name">Nombre de la Actividad</Label>
+                      <Input id="activity-name" placeholder="Ej: Limpieza de habitación 301" />
+                    </div>
+                    <div>
+                      <Label htmlFor="activity-assigned">Asignar a</Label>
+                      <Select>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Seleccionar personal" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {staff.map((member) => (
+                            <SelectItem key={member.id} value={member.id.toString()}>
+                              {member.name}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div>
+                      <Label htmlFor="activity-priority">Prioridad</Label>
+                      <Select>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Seleccionar prioridad" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="normal">Normal</SelectItem>
+                          <SelectItem value="urgent">Urgente</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div>
+                      <Label htmlFor="activity-time">Hora de Inicio</Label>
+                      <Input id="activity-time" type="time" />
+                    </div>
+                  </div>
+                  <Button className="w-full">Crear Actividad</Button>
                 </DialogContent>
               </Dialog>
             </div>
