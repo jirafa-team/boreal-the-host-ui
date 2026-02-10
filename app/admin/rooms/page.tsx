@@ -31,6 +31,10 @@ export default function RoomsManagement() {
   const [timelineMode, setTimelineMode] = useState<"week" | "month">("week")
   const [currentDate, setCurrentDate] = useState(new Date())
   const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0])
+  const [selectedMonth, setSelectedMonth] = useState<{ year: number; month: number }>({
+    year: new Date().getFullYear(),
+    month: new Date().getMonth(),
+  })
   const [searchTerm, setSearchTerm] = useState("")
   const [statusFilter, setStatusFilter] = useState<RoomStatus | null>(null)
   const [showCreateModal, setShowCreateModal] = useState(false)
@@ -312,8 +316,8 @@ export default function RoomsManagement() {
         })
       }
     } else {
-      const year = startDate.getFullYear()
-      const month = startDate.getMonth()
+      const year = selectedMonth.year
+      const month = selectedMonth.month
       const daysInMonth = new Date(year, month + 1, 0).getDate()
       for (let i = 1; i <= daysInMonth; i++) {
         const date = new Date(year, month, i)
@@ -401,69 +405,69 @@ export default function RoomsManagement() {
 
       <div className="p-8">
         {layoutMode === "grid" && (
-          <div className="grid grid-cols-2 md:grid-cols-5 gap-3 mb-6">
+          <div className="grid grid-cols-2 md:grid-cols-5 gap-2 mb-4">
             <div 
               onClick={() => setStatusFilter(null)}
-              className={`p-4 relative rounded-3xl shadow-2xl text-center cursor-pointer transition-all overflow-hidden ${statusFilter === null ? 'text-white' : 'bg-white/95 backdrop-blur-lg hover:shadow-lg'}`}
+              className={`p-3 relative rounded-2xl shadow-lg text-center cursor-pointer transition-all overflow-hidden ${statusFilter === null ? 'text-white' : 'bg-white/95 backdrop-blur-lg hover:shadow-lg'}`}
               style={statusFilter === null ? { backgroundColor: "#1E40AF" } : {}}
             >
               {statusFilter === null && (
-                <div className="absolute -top-16 -right-16 w-28 h-28 rounded-full" style={{ backgroundColor: "rgba(255, 255, 255, 0.2)" }} />
+                <div className="absolute -top-12 -right-12 w-20 h-20 rounded-full" style={{ backgroundColor: "rgba(255, 255, 255, 0.2)" }} />
               )}
               <div className="relative z-10">
-                <p className={`text-6xl font-bold mb-1 ${statusFilter === null ? 'text-white' : 'text-blue-600'}`}>{stats.total}</p>
+                <p className={`text-4xl font-bold mb-0.5 ${statusFilter === null ? 'text-white' : 'text-blue-600'}`}>{stats.total}</p>
                 <p className={`text-xs font-medium ${statusFilter === null ? 'text-blue-100' : 'text-muted-foreground'}`}>{t("admin.totalRooms")}</p>
               </div>
             </div>
             <div 
               onClick={() => setStatusFilter("available")}
-              className={`p-4 relative rounded-3xl shadow-2xl text-center cursor-pointer transition-all overflow-hidden ${statusFilter === "available" ? 'text-white' : 'bg-white/95 backdrop-blur-lg hover:shadow-lg'}`}
+              className={`p-3 relative rounded-2xl shadow-lg text-center cursor-pointer transition-all overflow-hidden ${statusFilter === "available" ? 'text-white' : 'bg-white/95 backdrop-blur-lg hover:shadow-lg'}`}
               style={statusFilter === "available" ? { backgroundColor: "#235E20" } : {}}
             >
               {statusFilter === "available" && (
-                <div className="absolute -top-16 -right-16 w-28 h-28 rounded-full" style={{ backgroundColor: "rgba(255, 255, 255, 0.2)" }} />
+                <div className="absolute -top-12 -right-12 w-20 h-20 rounded-full" style={{ backgroundColor: "rgba(255, 255, 255, 0.2)" }} />
               )}
               <div className="relative z-10">
-                <p className={`text-6xl font-bold mb-1 ${statusFilter === "available" ? 'text-white' : ''}`} style={statusFilter !== "available" ? { color: "#235E20" } : {}}>{stats.available}</p>
+                <p className={`text-4xl font-bold mb-0.5 ${statusFilter === "available" ? 'text-white' : ''}`} style={statusFilter !== "available" ? { color: "#235E20" } : {}}>{stats.available}</p>
                 <p className={`text-xs font-medium ${statusFilter === "available" ? 'text-green-100' : 'text-muted-foreground'}`}>{t("admin.availableRooms")}</p>
               </div>
             </div>
             <div 
               onClick={() => setStatusFilter("occupied")}
-              className={`p-4 relative rounded-3xl shadow-2xl text-center cursor-pointer transition-all overflow-hidden ${statusFilter === "occupied" ? 'text-white' : 'bg-white/95 backdrop-blur-lg hover:shadow-lg'}`}
+              className={`p-3 relative rounded-2xl shadow-lg text-center cursor-pointer transition-all overflow-hidden ${statusFilter === "occupied" ? 'text-white' : 'bg-white/95 backdrop-blur-lg hover:shadow-lg'}`}
               style={statusFilter === "occupied" ? { backgroundColor: "#AA2C2C" } : {}}
             >
               {statusFilter === "occupied" && (
-                <div className="absolute -top-16 -right-16 w-28 h-28 rounded-full" style={{ backgroundColor: "rgba(255, 255, 255, 0.2)" }} />
+                <div className="absolute -top-12 -right-12 w-20 h-20 rounded-full" style={{ backgroundColor: "rgba(255, 255, 255, 0.2)" }} />
               )}
               <div className="relative z-10">
-                <p className={`text-6xl font-bold mb-1 ${statusFilter === "occupied" ? 'text-white' : ''}`} style={statusFilter !== "occupied" ? { color: "#AA2C2C" } : {}}>{stats.occupied}</p>
+                <p className={`text-4xl font-bold mb-0.5 ${statusFilter === "occupied" ? 'text-white' : ''}`} style={statusFilter !== "occupied" ? { color: "#AA2C2C" } : {}}>{stats.occupied}</p>
                 <p className={`text-xs font-medium ${statusFilter === "occupied" ? 'text-red-100' : 'text-muted-foreground'}`}>{t("admin.occupiedRooms")}</p>
               </div>
             </div>
             <div 
               onClick={() => setStatusFilter("reserved")}
-              className={`p-4 relative rounded-3xl shadow-2xl text-center cursor-pointer transition-all overflow-hidden ${statusFilter === "reserved" ? 'text-white' : 'bg-white/95 backdrop-blur-lg hover:shadow-lg'}`}
+              className={`p-3 relative rounded-2xl shadow-lg text-center cursor-pointer transition-all overflow-hidden ${statusFilter === "reserved" ? 'text-white' : 'bg-white/95 backdrop-blur-lg hover:shadow-lg'}`}
               style={statusFilter === "reserved" ? { backgroundColor: "#1E3A8A" } : {}}
             >
               {statusFilter === "reserved" && (
-                <div className="absolute -top-16 -right-16 w-28 h-28 rounded-full" style={{ backgroundColor: "rgba(255, 255, 255, 0.2)" }} />
+                <div className="absolute -top-12 -right-12 w-20 h-20 rounded-full" style={{ backgroundColor: "rgba(255, 255, 255, 0.2)" }} />
               )}
               <div className="relative z-10">
-                <p className={`text-6xl font-bold mb-1 ${statusFilter === "reserved" ? 'text-white' : 'text-blue-700'}`}>{stats.reserved}</p>
+                <p className={`text-4xl font-bold mb-0.5 ${statusFilter === "reserved" ? 'text-white' : 'text-blue-700'}`}>{stats.reserved}</p>
                 <p className={`text-xs font-medium ${statusFilter === "reserved" ? 'text-blue-100' : 'text-muted-foreground'}`}>{t("admin.reservedRooms")}</p>
               </div>
             </div>
             <div 
               onClick={() => setStatusFilter("maintenance")}
-              className={`p-4 relative rounded-3xl shadow-2xl text-center cursor-pointer transition-all overflow-hidden ${statusFilter === "maintenance" ? 'text-white' : 'bg-white/95 backdrop-blur-lg hover:shadow-lg'}`}
+              className={`p-3 relative rounded-2xl shadow-lg text-center cursor-pointer transition-all overflow-hidden ${statusFilter === "maintenance" ? 'text-white' : 'bg-white/95 backdrop-blur-lg hover:shadow-lg'}`}
               style={statusFilter === "maintenance" ? { backgroundColor: "#CA8A04" } : {}}
             >
               {statusFilter === "maintenance" && (
-                <div className="absolute -top-16 -right-16 w-28 h-28 rounded-full" style={{ backgroundColor: "rgba(255, 255, 255, 0.2)" }} />
+                <div className="absolute -top-12 -right-12 w-20 h-20 rounded-full" style={{ backgroundColor: "rgba(255, 255, 255, 0.2)" }} />
               )}
               <div className="relative z-10">
-                <p className={`text-6xl font-bold mb-1 ${statusFilter === "maintenance" ? 'text-white' : 'text-yellow-600'}`}>{stats.maintenance}</p>
+                <p className={`text-4xl font-bold mb-0.5 ${statusFilter === "maintenance" ? 'text-white' : 'text-yellow-600'}`}>{stats.maintenance}</p>
                 <p className={`text-xs font-medium ${statusFilter === "maintenance" ? 'text-yellow-100' : 'text-muted-foreground'}`}>{t("admin.maintenanceRooms")}</p>
               </div>
             </div>
@@ -648,35 +652,90 @@ export default function RoomsManagement() {
                 </span>
               </div>
               
-              {/* Date Navigation for Timeline */}
-              <div className="flex items-center gap-3">
-                <button
-                  onClick={() => navigateDate("prev")}
-                  className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
-                  title={language === 'es' || language === 'pt' ? "Fecha anterior" : "Previous date"}
-                >
-                  <ChevronLeft className="w-5 h-5" />
-                </button>
-                <div className="relative">
-                  <input
-                    type="date"
-                    value={currentDate.toISOString().split('T')[0]}
-                    onChange={(e) => setCurrentDate(new Date(e.target.value))}
-                    className="absolute inset-0 opacity-0 cursor-pointer w-full h-full"
-                  />
-                  <div className="pointer-events-none flex items-center gap-2 px-3 py-2 border border-gray-300 rounded-lg bg-white w-40">
-                    <Calendar className="w-4 h-4 text-muted-foreground" />
-                    <span className="text-sm">{convertISOToLocaleFormat(currentDate.toISOString().split('T')[0])}</span>
+              {/* Date/Month Navigation for Timeline */}
+              {timelineMode === "week" ? (
+                <div className="flex items-center gap-3">
+                  <button
+                    onClick={() => navigateDate("prev")}
+                    className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                    title={language === 'es' || language === 'pt' ? "Fecha anterior" : "Previous date"}
+                  >
+                    <ChevronLeft className="w-5 h-5" />
+                  </button>
+                  <div className="relative">
+                    <input
+                      type="date"
+                      value={currentDate.toISOString().split('T')[0]}
+                      onChange={(e) => setCurrentDate(new Date(e.target.value))}
+                      className="absolute inset-0 opacity-0 cursor-pointer w-full h-full"
+                    />
+                    <div className="pointer-events-none flex items-center gap-2 px-3 py-2 border border-gray-300 rounded-lg bg-white w-40">
+                      <Calendar className="w-4 h-4 text-muted-foreground" />
+                      <span className="text-sm">{convertISOToLocaleFormat(currentDate.toISOString().split('T')[0])}</span>
+                    </div>
                   </div>
+                  <button
+                    onClick={() => navigateDate("next")}
+                    className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                    title={language === 'es' || language === 'pt' ? "Fecha siguiente" : "Next date"}
+                  >
+                    <ChevronRight className="w-5 h-5" />
+                  </button>
                 </div>
-                <button
-                  onClick={() => navigateDate("next")}
-                  className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
-                  title={language === 'es' || language === 'pt' ? "Fecha siguiente" : "Next date"}
-                >
-                  <ChevronRight className="w-5 h-5" />
-                </button>
-              </div>
+              ) : (
+                <div className="flex items-center gap-3">
+                  <button
+                    onClick={() => {
+                      const newMonth = selectedMonth.month - 1
+                      if (newMonth < 0) {
+                        setSelectedMonth({ year: selectedMonth.year - 1, month: 11 })
+                      } else {
+                        setSelectedMonth({ ...selectedMonth, month: newMonth })
+                      }
+                    }}
+                    className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                    title={language === 'es' || language === 'pt' ? "Mes anterior" : "Previous month"}
+                  >
+                    <ChevronLeft className="w-5 h-5" />
+                  </button>
+                  <select
+                    value={`${selectedMonth.year}-${selectedMonth.month}`}
+                    onChange={(e) => {
+                      const [year, month] = e.target.value.split('-')
+                      setSelectedMonth({ year: parseInt(year), month: parseInt(month) })
+                    }}
+                    className="px-3 py-2 border border-gray-300 rounded-lg bg-white text-sm font-medium cursor-pointer"
+                  >
+                    {Array.from({ length: 12 }, (_, i) => {
+                      const year = selectedMonth.year
+                      const month = i
+                      const monthName = new Date(year, month, 1).toLocaleDateString(
+                        language === 'es' ? 'es-ES' : language === 'pt' ? 'pt-BR' : 'en-US',
+                        { month: 'long', year: 'numeric' }
+                      )
+                      return (
+                        <option key={`${year}-${month}`} value={`${year}-${month}`}>
+                          {monthName}
+                        </option>
+                      )
+                    })}
+                  </select>
+                  <button
+                    onClick={() => {
+                      const newMonth = selectedMonth.month + 1
+                      if (newMonth > 11) {
+                        setSelectedMonth({ year: selectedMonth.year + 1, month: 0 })
+                      } else {
+                        setSelectedMonth({ ...selectedMonth, month: newMonth })
+                      }
+                    }}
+                    className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                    title={language === 'es' || language === 'pt' ? "Mes siguiente" : "Next month"}
+                  >
+                    <ChevronRight className="w-5 h-5" />
+                  </button>
+                </div>
+              )}
             </div>
 
             {/* Timeline Table */}
@@ -723,7 +782,7 @@ export default function RoomsManagement() {
                           return (
                             <div
                               key={idx}
-                              className={`${viewMode === "day" ? "w-16" : viewMode === "week" ? "w-24" : "w-12"} h-12 rounded flex-shrink-0 ${
+                              className={`${timelineMode === "week" ? "w-24" : "w-12"} h-12 rounded flex-shrink-0 ${
                                 status === "available"
                                   ? "bg-green-100 border border-green-200"
                                   : status === "occupied"

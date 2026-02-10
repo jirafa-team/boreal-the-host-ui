@@ -78,11 +78,14 @@ export default function FacilitiesPage() {
     clientRoom: "",
     time: "",
     duration: 60,
+    people: 1,
   })
   const [dialogOpen, setDialogOpen] = React.useState(false)
   const [addFacilityOpen, setAddFacilityOpen] = React.useState(false)
   const [editingFacility, setEditingFacility] = React.useState<Facility | null>(null)
   const [editDialogOpen, setEditDialogOpen] = React.useState(false)
+  const [clientSuggestions, setClientSuggestions] = React.useState<string[]>([])
+  const [showClientSuggestions, setShowClientSuggestions] = React.useState(false)
   const [selectedSlotBookings, setSelectedSlotBookings] = React.useState<Booking[]>([])
   const [bookingsDetailOpen, setBookingsDetailOpen] = React.useState(false)
 
@@ -116,6 +119,30 @@ export default function FacilitiesPage() {
     return booking
   }
 
+  const handleClientNameChange = (value: string) => {
+    setNewBooking({ ...newBooking, clientName: value })
+    if (value.length > 0) {
+      const uniqueClients = Array.from(new Set(bookings.map((b) => b.clientName)))
+      const filtered = uniqueClients.filter((client) =>
+        client.toLowerCase().includes(value.toLowerCase())
+      )
+      setClientSuggestions(filtered)
+      setShowClientSuggestions(true)
+    } else {
+      setShowClientSuggestions(false)
+    }
+  }
+
+  const handleSelectClient = (clientName: string) => {
+    setNewBooking({ ...newBooking, clientName })
+    setShowClientSuggestions(false)
+    // Auto-fill room based on client
+    const clientBooking = bookings.find((b) => b.clientName === clientName)
+    if (clientBooking) {
+      setNewBooking((prev) => ({ ...prev, clientRoom: clientBooking.clientRoom }))
+    }
+  }
+
   const handleAddBooking = () => {
     if (newBooking.facilityId && newBooking.clientName && newBooking.time) {
       setBookings([
@@ -125,7 +152,7 @@ export default function FacilitiesPage() {
           status: "confirmed",
         },
       ])
-      setNewBooking({ facilityId: "", clientName: "", clientRoom: "", time: "", duration: 60 })
+      setNewBooking({ facilityId: "", clientName: "", clientRoom: "", time: "", duration: 60, people: 1 })
       setDialogOpen(false)
     }
   }
@@ -305,22 +332,21 @@ export default function FacilitiesPage() {
                     </span>
                   </button>
                 </DialogTrigger>
-                <DialogContent>
+                <DialogContent className="max-w-md">
                   <DialogHeader>
-                    <DialogTitle>Agregar Nuevo Amenity</DialogTitle>
+                    <DialogTitle className="text-xl">Agregar Nuevo Amenity</DialogTitle>
                     <DialogDescription>Configure un nuevo amenity o espacio para el hotel</DialogDescription>
                   </DialogHeader>
-                  <form onSubmit={handleAddFacility} className="space-y-4">
-                    <div className="relative">
-                      <Input id="name" name="name" className="peer pt-6 pb-2" required />
-                      <Label htmlFor="name" className="absolute left-3 top-2.5 text-sm text-muted-foreground transition-all peer-focus:top-1.5 peer-focus:text-xs peer-focus:text-primary pointer-events-none peer-not-placeholder-shown:top-1.5 peer-not-placeholder-shown:text-xs">
-                        Nombre
-                      </Label>
+                  <form onSubmit={handleAddFacility} className="space-y-5">
+                    <div className="space-y-2">
+                      <Label htmlFor="name" className="text-sm font-medium">Nombre del Amenity</Label>
+                      <Input id="name" name="name" placeholder="ej: Gimnasio Premium" className="h-10 px-3" required />
                     </div>
-                    <div className="relative">
+                    <div className="space-y-2">
+                      <Label className="text-sm font-medium">Tipo de Amenity</Label>
                       <Select name="type" required>
-                        <SelectTrigger className="peer pt-6 pb-2 relative">
-                          <SelectValue />
+                        <SelectTrigger className="h-10">
+                          <SelectValue placeholder="Seleccionar tipo" />
                         </SelectTrigger>
                         <SelectContent>
                           <SelectItem value="fitness">Fitness</SelectItem>
@@ -330,32 +356,23 @@ export default function FacilitiesPage() {
                           <SelectItem value="dining">Gastronomía</SelectItem>
                         </SelectContent>
                       </Select>
-                      <Label className="absolute left-3 top-2.5 text-sm text-muted-foreground transition-all pointer-events-none text-primary">
-                        Tipo
-                      </Label>
                     </div>
-                    <div className="relative">
-                      <Input id="capacity" name="capacity" type="number" className="peer pt-6 pb-2" required />
-                      <Label htmlFor="capacity" className="absolute left-3 top-2.5 text-sm text-muted-foreground transition-all peer-focus:top-1.5 peer-focus:text-xs peer-focus:text-primary pointer-events-none peer-not-placeholder-shown:top-1.5 peer-not-placeholder-shown:text-xs">
-                        Capacidad
-                      </Label>
+                    <div className="space-y-2">
+                      <Label htmlFor="capacity" className="text-sm font-medium">Capacidad Máxima</Label>
+                      <Input id="capacity" name="capacity" type="number" placeholder="ej: 20" className="h-10 px-3" required />
                     </div>
-                    <div className="grid grid-cols-2 gap-4">
-                      <div className="relative">
-                        <Input id="startTime" name="startTime" type="time" className="peer pt-6 pb-2" required />
-                        <Label htmlFor="startTime" className="absolute left-3 top-1.5 text-xs text-muted-foreground transition-all peer-focus:top-1.5 peer-focus:text-xs peer-focus:text-primary pointer-events-none">
-                          Apertura
-                        </Label>
+                    <div className="grid grid-cols-2 gap-3">
+                      <div className="space-y-2">
+                        <Label htmlFor="startTime" className="text-sm font-medium">Hora de Apertura</Label>
+                        <Input id="startTime" name="startTime" type="time" className="h-10 px-3" required />
                       </div>
-                      <div className="relative">
-                        <Input id="endTime" name="endTime" type="time" className="peer pt-6 pb-2" required />
-                        <Label htmlFor="endTime" className="absolute left-3 top-1.5 text-xs text-muted-foreground transition-all peer-focus:top-1.5 peer-focus:text-xs peer-focus:text-primary pointer-events-none">
-                          Cierre
-                        </Label>
+                      <div className="space-y-2">
+                        <Label htmlFor="endTime" className="text-sm font-medium">Hora de Cierre</Label>
+                        <Input id="endTime" name="endTime" type="time" className="h-10 px-3" required />
                       </div>
                     </div>
-                    <Button type="submit" className="w-full">
-                      Agregar Facility
+                    <Button type="submit" className="w-full h-10 font-medium">
+                      Agregar Amenity
                     </Button>
                   </form>
                 </DialogContent>
@@ -375,19 +392,20 @@ export default function FacilitiesPage() {
                     </div>
                   </button>
                 </DialogTrigger>
-                <DialogContent>
+                <DialogContent className="max-w-lg">
                   <DialogHeader>
-                    <DialogTitle>Nueva Reserva Manual</DialogTitle>
+                    <DialogTitle className="text-lg">Nueva Reserva Manual</DialogTitle>
                     <DialogDescription>Crea una reserva de facility para un cliente</DialogDescription>
                   </DialogHeader>
-                  <div className="space-y-4">
+                  <div className="space-y-5">
+                    {/* Facility Selection */}
                     <div>
-                      <Label htmlFor="facility">Facility</Label>
+                      <Label htmlFor="facility" className="text-sm font-medium mb-2 block">Facility</Label>
                       <Select
                         value={newBooking.facilityId}
                         onValueChange={(value) => setNewBooking({ ...newBooking, facilityId: value })}
                       >
-                        <SelectTrigger>
+                        <SelectTrigger className="h-11">
                           <SelectValue placeholder="Seleccionar facility" />
                         </SelectTrigger>
                         <SelectContent>
@@ -399,31 +417,74 @@ export default function FacilitiesPage() {
                         </SelectContent>
                       </Select>
                     </div>
+
+                    {/* Client Name with Autocomplete */}
                     <div>
-                      <Label htmlFor="clientName">Nombre del Cliente</Label>
-                      <Input
-                        id="clientName"
-                        value={newBooking.clientName}
-                        onChange={(e) => setNewBooking({ ...newBooking, clientName: e.target.value })}
-                        placeholder="Juan Pérez"
-                      />
+                      <Label htmlFor="clientName" className="text-sm font-medium mb-2 block">Nombre del Cliente</Label>
+                      <div className="relative">
+                        <Input
+                          id="clientName"
+                          value={newBooking.clientName}
+                          onChange={(e) => handleClientNameChange(e.target.value)}
+                          placeholder="Comenzar a escribir nombre..."
+                          className="h-11"
+                        />
+                        {showClientSuggestions && clientSuggestions.length > 0 && (
+                          <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-300 rounded-lg shadow-lg z-50">
+                            {clientSuggestions.map((client) => (
+                              <button
+                                key={client}
+                                onClick={() => handleSelectClient(client)}
+                                className="w-full text-left px-3 py-2 hover:bg-gray-100 border-b last:border-b-0 text-sm"
+                              >
+                                {client}
+                              </button>
+                            ))}
+                          </div>
+                        )}
+                      </div>
                     </div>
+
+                    {/* Room (Auto-filled) */}
                     <div>
-                      <Label htmlFor="clientRoom">Habitación</Label>
+                      <Label htmlFor="clientRoom" className="text-sm font-medium mb-2 block">Habitación</Label>
                       <Input
                         id="clientRoom"
                         value={newBooking.clientRoom}
                         onChange={(e) => setNewBooking({ ...newBooking, clientRoom: e.target.value })}
-                        placeholder="301"
+                        placeholder="Auto-rellenada según cliente"
+                        className="h-11 bg-gray-50"
                       />
                     </div>
+
+                    {/* Number of People */}
                     <div>
-                      <Label htmlFor="time">Hora de Inicio</Label>
+                      <Label className="text-sm font-medium mb-2 block">Cantidad de Personas</Label>
+                      <div className="flex items-center gap-3 bg-gray-50 p-3 rounded-lg">
+                        <button
+                          onClick={() => setNewBooking({ ...newBooking, people: Math.max(1, newBooking.people - 1) })}
+                          className="w-9 h-9 rounded-lg bg-white border border-gray-300 flex items-center justify-center hover:bg-gray-100 font-semibold"
+                        >
+                          −
+                        </button>
+                        <span className="text-lg font-bold w-12 text-center">{newBooking.people}</span>
+                        <button
+                          onClick={() => setNewBooking({ ...newBooking, people: newBooking.people + 1 })}
+                          className="w-9 h-9 rounded-lg bg-white border border-gray-300 flex items-center justify-center hover:bg-gray-100 font-semibold"
+                        >
+                          +
+                        </button>
+                      </div>
+                    </div>
+
+                    {/* Start Time */}
+                    <div>
+                      <Label htmlFor="time" className="text-sm font-medium mb-2 block">Hora de Inicio</Label>
                       <Select
                         value={newBooking.time}
                         onValueChange={(value) => setNewBooking({ ...newBooking, time: value })}
                       >
-                        <SelectTrigger>
+                        <SelectTrigger className="h-11">
                           <SelectValue placeholder="Seleccionar hora" />
                         </SelectTrigger>
                         <SelectContent>
@@ -435,13 +496,15 @@ export default function FacilitiesPage() {
                         </SelectContent>
                       </Select>
                     </div>
+
+                    {/* Duration */}
                     <div>
-                      <Label htmlFor="duration">Duración (minutos)</Label>
+                      <Label htmlFor="duration" className="text-sm font-medium mb-2 block">Duración</Label>
                       <Select
                         value={newBooking.duration.toString()}
                         onValueChange={(value) => setNewBooking({ ...newBooking, duration: Number.parseInt(value) })}
                       >
-                        <SelectTrigger>
+                        <SelectTrigger className="h-11">
                           <SelectValue />
                         </SelectTrigger>
                         <SelectContent>
@@ -452,7 +515,8 @@ export default function FacilitiesPage() {
                         </SelectContent>
                       </Select>
                     </div>
-                    <Button onClick={handleAddBooking} className="w-full">
+
+                    <Button onClick={handleAddBooking} className="w-full h-11 font-medium">
                       Crear Reserva
                     </Button>
                   </div>
@@ -616,28 +680,6 @@ export default function FacilitiesPage() {
                         {facility.capacity}
                       </span>
                     </div>
-                  </div>
-
-                  {/* Current Occupancy Progress Bar */}
-                  <div className="mt-4 mb-2">
-                    {(() => {
-                      const { occupancyPercent } = getCurrentOccupancy(facility.id)
-                      const barColor = occupancyPercent === 0 ? "bg-gray-300" : occupancyPercent <= 33 ? "bg-green-500" : occupancyPercent <= 66 ? "bg-amber-500" : "bg-red-500"
-                      return (
-                        <div className="space-y-1">
-                          <div className="flex items-center justify-between text-xs">
-                            <span className="text-muted-foreground">Ocupación</span>
-                            <span className="font-medium text-foreground">{occupancyPercent}%</span>
-                          </div>
-                          <div className="w-full h-1.5 bg-gray-200 rounded-full overflow-hidden">
-                            <div
-                              className={`h-full ${barColor} transition-all duration-300`}
-                              style={{ width: `${occupancyPercent}%` }}
-                            />
-                          </div>
-                        </div>
-                      )
-                    })()}
                   </div>
 
                   <Button

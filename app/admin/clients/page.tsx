@@ -22,6 +22,7 @@ import {
   UserPlus,
   Users,
   History,
+  LogOut,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -198,7 +199,7 @@ export default function ClientsPage() {
   const [searchTerm, setSearchTerm] = useState("")
   const [statusFilter, setStatusFilter] = useState("all")
   const [activeTab, setActiveTab] = useState<"current" | "historical">("current")
-  const [clientsFilter, setClientsFilter] = useState<"all" | "active" | "reserved" | "vip">("all")
+  const [clientsFilter, setClientsFilter] = useState<"all" | "active" | "checkout" | "vip">("all")
   const [expandedClient, setExpandedClient] = useState<string | null>(null)
   const [showNewClientModal, setShowNewClientModal] = useState(false)
   const [newClient, setNewClient] = useState({
@@ -440,23 +441,23 @@ export default function ClientsPage() {
           <div
             className="relative overflow-hidden rounded-lg p-4 shadow-md hover:shadow-lg transition-all duration-300 hover:scale-105 cursor-pointer group"
             style={{
-              background: clientsFilter === "reserved" ? "linear-gradient(135deg, rgb(37, 99, 235), rgb(29, 78, 216))" : "white",
-              color: clientsFilter === "reserved" ? "white" : "black"
+              background: clientsFilter === "checkout" ? "linear-gradient(135deg, rgb(234, 88, 12), rgb(194, 65, 12))" : "white",
+              color: clientsFilter === "checkout" ? "white" : "black"
             }}
-            onClick={() => setClientsFilter("reserved")}
+            onClick={() => setClientsFilter("checkout")}
           >
-            {clientsFilter === "reserved" && (
+            {clientsFilter === "checkout" && (
               <div className="absolute inset-0 opacity-10">
                 <div className="absolute top-0 right-0 w-20 h-20 bg-white rounded-full -mr-8 -mt-8"></div>
               </div>
             )}
             <div className="relative flex items-center gap-3">
-              <div className={`p-2 rounded-lg ${clientsFilter === "reserved" ? "bg-white/20" : "bg-blue-100"}`}>
-                <Calendar className={`w-5 h-5 ${clientsFilter === "reserved" ? "text-white" : "text-blue-600"}`} />
+              <div className={`p-2 rounded-lg ${clientsFilter === "checkout" ? "bg-white/20" : "bg-orange-100"}`}>
+                <LogOut className={`w-5 h-5 ${clientsFilter === "checkout" ? "text-white" : "text-orange-600"}`} />
               </div>
               <div>
-                <p className={`text-sm ${clientsFilter === "reserved" ? "opacity-90" : "text-muted-foreground"}`}>{t("admin.futureReservations")}</p>
-                <p className="text-2xl font-bold">12</p>
+                <p className={`text-sm ${clientsFilter === "checkout" ? "opacity-90" : "text-muted-foreground"}`}>{t("admin.checkOutToday")}</p>
+                <p className="text-2xl font-bold">{clients.filter(c => c.checkOut === new Date().toISOString().split('T')[0]).length}</p>
               </div>
             </div>
           </div>
@@ -586,19 +587,13 @@ export default function ClientsPage() {
                             <div className="flex items-center gap-2 text-sm">
                               <Calendar className="w-3 h-3 text-muted-foreground" />
                               <span className="text-foreground">
-                                {new Date(client.checkIn).toLocaleDateString("es-ES", {
-                                  day: "2-digit",
-                                  month: "short",
-                                })}
+                                {client.checkIn.split('-').slice(2).reverse().join('/')}
                               </span>
                             </div>
                             <div className="flex items-center gap-2 text-sm">
                               <Calendar className="w-3 h-3 text-muted-foreground" />
                               <span className="text-foreground">
-                                {new Date(client.checkOut).toLocaleDateString("es-ES", {
-                                  day: "2-digit",
-                                  month: "short",
-                                })}
+                                {client.checkOut.split('-').slice(2).reverse().join('/')}
                               </span>
                             </div>
                           </div>
