@@ -59,6 +59,14 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
   // Ocultar sidebar en la página de selección de establecimiento
   const hideSidebar = pathname === '/admin/select-establishment'
+  
+  // Detectar si estamos en modo agentico
+  const isAgenticoMode = pathname === '/admin/agentico'
+  
+  // Clase de fondo dinámico del sidebar
+  const sidebarBgClass = isAgenticoMode 
+    ? "bg-gradient-to-br from-purple-950 via-slate-950 to-slate-950"
+    : "bg-gradient-to-b from-gray-900 to-black"
 
   const languages = [
     { code: "es", name: "Español", label: "ES" },
@@ -131,7 +139,9 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       {!hideSidebar && (
         <aside
           className={`${sidebarOpen ? "w-64" : "w-20"} border-r transition-all duration-300 flex flex-col`}
-          style={{ backgroundColor: "#034AAE" }}
+          style={isAgenticoMode ? {
+            background: "linear-gradient(135deg, rgb(88, 28, 135) 0%, rgb(15, 23, 42) 50%, rgb(6, 18, 32) 100%)"
+          } : { backgroundColor: "#034AAE" }}
         >
           <div className="p-4 border-b border-white/10 flex items-center justify-between">
             {sidebarOpen && <h2 className="font-bold text-lg text-white">{t("admin.adminPanel")}</h2>}
