@@ -256,8 +256,10 @@ export const translations = {
 
       // Rooms
       roomsTitle: "Gestión de Habitaciones",
-      roomNumber: "Habitación",
-      roomType: "Tipo",
+      roomNumber: "Número de Habitación",
+      createRoom: "Crear Habitación",
+      createNewRoom: "Crear Nueva Habitación",
+      roomType: "Tipo de Habitación",
       floor: "Piso",
       roomStatus: "Estado",
       available: "Disponible",
@@ -634,8 +636,10 @@ export const translations = {
 
       // Rooms
       roomsTitle: "Room Management",
-      roomNumber: "Room",
-      roomType: "Type",
+      roomNumber: "Room Number",
+      createRoom: "Create Room",
+      createNewRoom: "Create New Room",
+      roomType: "Room Type",
       floor: "Floor",
       roomStatus: "Status",
       available: "Available",
@@ -1012,8 +1016,10 @@ export const translations = {
 
       // Rooms
       roomsTitle: "Gestão de Quartos",
-      roomNumber: "Quarto",
-      roomType: "Tipo",
+      roomNumber: "Número do Quarto",
+      createRoom: "Criar Quarto",
+      createNewRoom: "Criar Novo Quarto",
+      roomType: "Tipo de Quarto",
       floor: "Andar",
       roomStatus: "Status",
       available: "Disponível",
