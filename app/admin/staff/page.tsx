@@ -478,6 +478,16 @@ export default function StaffManagement() {
     priority: "normal" as const,
     dueTime: "",
   })
+  
+  const [addStaffDialogOpen, setAddStaffDialogOpen] = useState(false)
+  const [newStaff, setNewStaff] = useState({
+    name: "",
+    email: "",
+    phone: "",
+    department: "Limpieza" as const,
+    shift: "morning",
+    capacity: 8,
+  })
 
   const availableStaff = staff.filter((s) => s.status === "available")
   const busyStaff = staff.filter((s) => s.status === "busy")
@@ -549,6 +559,43 @@ export default function StaffManagement() {
       const taskTime = r.requestedTime
       return taskTime === timeSlot || taskTime.startsWith(timeSlot.split(":")[0])
     })
+  }
+
+  const handleAddStaff = () => {
+    if (newStaff.name && newStaff.email) {
+      const initials = newStaff.name
+        .split(" ")
+        .map((n) => n[0])
+        .join("")
+        .toUpperCase()
+
+      const newStaffMember: StaffMember = {
+        id: Math.max(...staff.map((s) => s.id), 0) + 1,
+        name: newStaff.name,
+        status: "available",
+        tasksToday: 0,
+        maxCapacity: newStaff.capacity,
+        shift:
+          newStaff.shift === "morning"
+            ? "7:00 AM - 3:00 PM"
+            : newStaff.shift === "afternoon"
+              ? "11:00 AM - 7:00 PM"
+              : "3:00 PM - 11:00 PM",
+        avatar: initials,
+        department: newStaff.department,
+      }
+
+      setStaff([...staff, newStaffMember])
+      setAddStaffDialogOpen(false)
+      setNewStaff({
+        name: "",
+        email: "",
+        phone: "",
+        department: "Limpieza",
+        shift: "morning",
+        capacity: 8,
+      })
+    }
   }
 
   return (
@@ -671,7 +718,7 @@ export default function StaffManagement() {
                 </DialogContent>
               </Dialog>
               
-              <Dialog>
+              <Dialog open={addStaffDialogOpen} onOpenChange={setAddStaffDialogOpen}>
                 <DialogTrigger asChild>
                   <button className="relative group w-10 h-10 rounded-full bg-gradient-to-br from-emerald-500 to-emerald-600 text-white shadow-md hover:shadow-lg transition-all duration-300 hover:scale-110 flex items-center justify-center">
                     <UserPlus className="w-5 h-5" />
@@ -758,7 +805,7 @@ export default function StaffManagement() {
                         onChange={(e) => setNewStaff({ ...newStaff, capacity: parseInt(e.target.value) || 8 })}
                       />
                     </div>
-                    <Button className="w-full h-11 font-medium mt-2">
+                    <Button onClick={handleAddStaff} className="w-full h-11 font-medium mt-2">
                       {t("admin.registerStaff")}
                     </Button>
                   </div>
