@@ -605,15 +605,15 @@ export default function StaffManagement() {
                 </button>
                 <DialogContent className="max-w-md">
                   <DialogHeader>
-                    <DialogTitle>Crear Nueva Actividad</DialogTitle>
-                    <DialogDescription>Asigna una actividad a un miembro del staff</DialogDescription>
+                    <DialogTitle>{t("admin.createNewActivity")}</DialogTitle>
+                    <DialogDescription>{t("admin.assignActivityToStaff")}</DialogDescription>
                   </DialogHeader>
                   <div className="space-y-5 py-4">
                     <div>
-                      <Label htmlFor="assignedTo" className="text-sm font-medium mb-2 block">Asignar a</Label>
+                      <Label htmlFor="assignedTo" className="text-sm font-medium mb-2 block">{t("admin.assignTo")}</Label>
                       <Select value={newActivity.assignedTo} onValueChange={(value) => setNewActivity({ ...newActivity, assignedTo: value })}>
                         <SelectTrigger className="h-10">
-                          <SelectValue placeholder="Seleccionar personal" />
+                          <SelectValue placeholder={t("admin.selectStaff")} />
                         </SelectTrigger>
                         <SelectContent>
                           {staff.map((member) => (
@@ -625,29 +625,29 @@ export default function StaffManagement() {
                       </Select>
                     </div>
                     <div>
-                      <Label htmlFor="description" className="text-sm font-medium mb-2 block">Descripción de la Actividad</Label>
+                      <Label htmlFor="description" className="text-sm font-medium mb-2 block">{t("admin.activityDescription")}</Label>
                       <Input
                         id="description"
-                        placeholder="Ej: Revisar sistema de aire acondicionado..."
+                        placeholder={t("admin.exampleActivityDescription")}
                         value={newActivity.description}
                         onChange={(e) => setNewActivity({ ...newActivity, description: e.target.value })}
                         className="h-10"
                       />
                     </div>
                     <div>
-                      <Label htmlFor="priority" className="text-sm font-medium mb-2 block">Prioridad</Label>
+                      <Label htmlFor="priority" className="text-sm font-medium mb-2 block">{t("admin.priority")}</Label>
                       <Select value={newActivity.priority} onValueChange={(value: any) => setNewActivity({ ...newActivity, priority: value })}>
                         <SelectTrigger className="h-10">
                           <SelectValue />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="normal">Normal</SelectItem>
-                          <SelectItem value="urgent">Urgente</SelectItem>
+                          <SelectItem value="normal">{t("admin.normal")}</SelectItem>
+                          <SelectItem value="urgent">{t("admin.urgent")}</SelectItem>
                         </SelectContent>
                       </Select>
                     </div>
                     <div>
-                      <Label htmlFor="dueTime" className="text-sm font-medium mb-2 block">Hora de Entrega</Label>
+                      <Label htmlFor="dueTime" className="text-sm font-medium mb-2 block">{t("admin.deliveryTime")}</Label>
                       <Input
                         id="dueTime"
                         type="time"
@@ -665,7 +665,7 @@ export default function StaffManagement() {
                       }}
                       className="w-full h-10"
                     >
-                      Crear Actividad
+                      {t("admin.createActivity")}
                     </Button>
                   </div>
                 </DialogContent>

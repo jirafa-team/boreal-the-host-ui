@@ -174,6 +174,12 @@ export const translations = {
       assigned: "Asignada",
       inProgress: "En Progreso",
       completed: "Completada",
+      createNewActivity: "Crear Nueva Actividad",
+      assignActivityToStaff: "Asigna una actividad a un miembro del staff",
+      assignTo: "Asignar a",
+      selectStaff: "Seleccionar personal",
+      activityDescription: "Descripción de la Actividad",
+      exampleActivityDescription: "Ej: Revisar sistema de aire acondicionado...",
 
       // Rooms page
       roomsManagement: "Gestión de Habitaciones",
@@ -617,6 +623,12 @@ export const translations = {
       assigned: "Assigned",
       inProgress: "In Progress",
       completed: "Completed",
+      createNewActivity: "Create New Activity",
+      assignActivityToStaff: "Assign an activity to a staff member",
+      assignTo: "Assign to",
+      selectStaff: "Select staff",
+      activityDescription: "Activity Description",
+      exampleActivityDescription: "Ex: Review air conditioning system...",
 
       roomsManagement: "Rooms Management",
       searchRooms: "Search rooms...",
@@ -1057,6 +1069,12 @@ export const translations = {
       assigned: "Atribuído",
       inProgress: "Em Progresso",
       completed: "Concluído",
+      createNewActivity: "Criar Nova Atividade",
+      assignActivityToStaff: "Atribuir uma atividade a um membro da equipe",
+      assignTo: "Atribuir a",
+      selectStaff: "Selecionar pessoal",
+      activityDescription: "Descrição da Atividade",
+      exampleActivityDescription: "Ex: Revisar sistema de ar condicionado...",
 
       housekeepingManagement: "Gestão de Staff",
       staffOverview: "Visão Geral da Equipe",
