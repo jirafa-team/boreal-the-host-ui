@@ -500,41 +500,26 @@ export default function StaffManagement() {
   const getStatusText = (status: string) => {
     switch (status) {
       case "available":
-        return "Disponible"
+        return t("admin.available")
       case "busy":
-        return "Ocupada"
+        return t("admin.busy")
       case "off":
-        return "Libre"
+        return t("admin.off")
       default:
         return status
-    }
-  }
-
-  const getRequestStatusColor = (status: string) => {
-    switch (status) {
-      case "pending":
-        return "bg-yellow-100 text-yellow-800 border-yellow-300"
-      case "assigned":
-        return "bg-blue-100 text-blue-800 border-blue-300"
-      case "in-progress":
-        return "bg-purple-100 text-purple-800 border-purple-300"
-      case "completed":
-        return "bg-green-100 text-green-800 border-green-300"
-      default:
-        return "bg-gray-100 text-gray-800"
     }
   }
 
   const getRequestStatusText = (status: string) => {
     switch (status) {
       case "pending":
-        return "Pendiente"
+        return t("admin.pending")
       case "assigned":
-        return "Asignada"
+        return t("admin.assigned")
       case "in-progress":
-        return "En Progreso"
+        return t("admin.inProgress")
       case "completed":
-        return "Completada"
+        return t("admin.completed")
       default:
         return status
     }
@@ -608,12 +593,15 @@ export default function StaffManagement() {
                 <button 
                   onClick={() => setActivityDialogOpen(true)}
                   className="flex items-center justify-center w-10 h-10 rounded-full bg-gradient-to-br from-amber-500 to-amber-600 text-white shadow-md hover:shadow-lg transition-all duration-300 hover:scale-110 group relative"
-                  title="Crear actividad"
-                >
+                title={t("admin.createActivity")}
+              >
+                <div className="relative flex items-center justify-center">
                   <Calendar className="w-5 h-5" />
-                  <span className="absolute top-full mt-2 px-2 py-1 bg-gray-900 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap">
-                    Crear actividad
-                  </span>
+                  <span className="absolute text-base font-bold -bottom-0.5 -right-0.5 text-white drop-shadow-lg">+</span>
+                </div>
+                <span className="absolute top-full mt-2 px-2 py-1 bg-gray-900 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap">
+                  {t("admin.createActivity")}
+                </span>
                 </button>
                 <DialogContent className="max-w-md">
                   <DialogHeader>
@@ -706,7 +694,7 @@ export default function StaffManagement() {
                       <Input id="name" placeholder="Ej: María González" />
                     </div>
                     <div>
-                      <Label htmlFor="department">Departamento</Label>
+                      <Label htmlFor="department" className="text-sm font-medium">{t("admin.department")}</Label>
                       <Select>
                         <SelectTrigger>
                           <SelectValue placeholder="Seleccionar departamento" />
@@ -1040,7 +1028,7 @@ export default function StaffManagement() {
         }}>
           <DialogContent className="max-w-md">
             <DialogHeader>
-              <DialogTitle>{editingStaff ? "Editar Personal" : "Detalles del Personal"}</DialogTitle>
+                  <DialogTitle>{editingStaff ? t("admin.editStaff") : t("admin.staffDetails")}</DialogTitle>
             </DialogHeader>
             
             {!editingStaff ? (
@@ -1099,7 +1087,7 @@ export default function StaffManagement() {
                   />
                 </div>
                 <div>
-                  <Label htmlFor="edit-dept" className="text-sm font-medium">Departamento</Label>
+                      <Label htmlFor="edit-dept" className="text-sm font-medium">{t("admin.department")}</Label>
                   <Select 
                     value={editingStaff.department}
                     onValueChange={(value) => setEditingStaff({...editingStaff, department: value as any})}
