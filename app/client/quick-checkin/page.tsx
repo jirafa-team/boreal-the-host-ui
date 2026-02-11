@@ -4,7 +4,7 @@ import { useRouter, useSearchParams } from "next/navigation"
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Hotel, Check, Loader2 } from "lucide-react"
-import { useLanguage } from "@/lib/language-context"
+import { useLanguage } from "@/lib/i18n-context"
 
 export default function QuickCheckinPage() {
   const router = useRouter()
