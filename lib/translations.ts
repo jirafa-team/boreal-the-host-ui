@@ -252,6 +252,18 @@ export const translations = {
       confirmed: "Confirmado",
       pending: "Pendiente",
 
+      // Quick Check-in page
+      processingCheckin: "Procesando Check-In",
+      pleaseWait: "Por favor espera un momento...",
+      checkinCompleted: "¡Check-In Realizado!",
+      roomReadyRedirecting: "Tu habitación está lista. Redirigiendo...",
+      reservationConfirmed: "¡Tu reserva está confirmada!",
+      welcome: "¡Bienvenido!",
+      confirmEarlyCheckin: "Confirma tu check-in anticipado",
+      roomReady: "Tu habitación está lista",
+      doCheckin: "HACER CHECK-IN",
+      tapButtonToEnter: "Toca el botón para acceder a tu habitación",
+
       // Housekeeping page
       staffManagement: "Gestión de Staff",
       staffOverview: "Vista General del Personal",
@@ -718,6 +730,18 @@ export const translations = {
       confirmed: "Confirmed",
       pending: "Pending",
 
+      // Quick Check-in page
+      processingCheckin: "Processing Check-In",
+      pleaseWait: "Please wait a moment...",
+      checkinCompleted: "Check-In Complete!",
+      roomReadyRedirecting: "Your room is ready. Redirecting...",
+      reservationConfirmed: "Your reservation is confirmed!",
+      welcome: "Welcome!",
+      confirmEarlyCheckin: "Confirm your early check-in",
+      roomReady: "Your room is ready",
+      doCheckin: "DO CHECK-IN",
+      tapButtonToEnter: "Tap the button to enter your room",
+
       housekeepingManagement: "Staff Management",
       staffOverview: "Staff Overview",
       cleaningRequests: "Cleaning Requests",
@@ -1132,6 +1156,18 @@ export const translations = {
       evening: "Noite (3:00 PM - 11:00 PM)",
       dailyCapacity: "Capacidade Diária (tarefas)",
       registerStaff: "Registrar Pessoal",
+
+      // Quick Check-in page
+      processingCheckin: "Processando Check-In",
+      pleaseWait: "Por favor, aguarde um momento...",
+      checkinCompleted: "Check-In Concluído!",
+      roomReadyRedirecting: "Seu quarto está pronto. Redirecionando...",
+      reservationConfirmed: "Sua reserva está confirmada!",
+      welcome: "Bem-vindo!",
+      confirmEarlyCheckin: "Confirme seu check-in antecipado",
+      roomReady: "Seu quarto está pronto",
+      doCheckin: "FAZER CHECK-IN",
+      tapButtonToEnter: "Toque o botão para acessar seu quarto",
 
       housekeepingManagement: "Gestão de Staff",
       staffOverview: "Visão Geral da Equipe",
