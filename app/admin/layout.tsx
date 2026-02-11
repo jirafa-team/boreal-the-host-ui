@@ -161,7 +161,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           </div>
 
           <nav className="flex-1 p-2 space-y-2 overflow-y-auto">
-            {navSections.map((section) => (
+            {isLoaded && navSections.map((section) => (
               <div key={section.id}>
                 {sidebarOpen ? (
                   <>
