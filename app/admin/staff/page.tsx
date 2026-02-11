@@ -673,60 +673,95 @@ export default function StaffManagement() {
               
               <Dialog>
                 <DialogTrigger asChild>
-                  <button 
-                    className="flex items-center justify-center w-10 h-10 rounded-full bg-gradient-to-br from-primary to-primary/80 text-white shadow-md hover:shadow-lg transition-all duration-300 hover:scale-110 group relative"
-                    title="Agregar personal"
-                  >
+                  <button className="relative group w-10 h-10 rounded-full bg-gradient-to-br from-emerald-500 to-emerald-600 text-white shadow-md hover:shadow-lg transition-all duration-300 hover:scale-110 flex items-center justify-center">
                     <UserPlus className="w-5 h-5" />
                     <span className="absolute top-full mt-2 px-2 py-1 bg-gray-900 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap">
-                      Agregar personal
+                      {t("admin.addStaff")}
                     </span>
                   </button>
                 </DialogTrigger>
-                <DialogContent>
+                <DialogContent className="max-w-md">
                   <DialogHeader>
-                    <DialogTitle>Añadir Nuevo Personal</DialogTitle>
-                    <DialogDescription>Registra un nuevo miembro del equipo de staff</DialogDescription>
+                    <DialogTitle className="text-xl">{t("admin.addNewStaff")}</DialogTitle>
+                    <DialogDescription>{t("admin.registerNewTeamMember")}</DialogDescription>
                   </DialogHeader>
-                  <div className="space-y-4 py-4">
+                  <div className="space-y-5 py-4">
                     <div>
-                      <Label htmlFor="name">Nombre Completo</Label>
-                      <Input id="name" placeholder="Ej: María González" />
+                      <Label htmlFor="name" className="text-sm font-medium mb-2 block">{t("admin.fullName")}</Label>
+                      <Input 
+                        id="name" 
+                        placeholder="Ej: María González"
+                        className="h-10"
+                        value={newStaff.name}
+                        onChange={(e) => setNewStaff({ ...newStaff, name: e.target.value })}
+                      />
                     </div>
                     <div>
-                      <Label htmlFor="department" className="text-sm font-medium">{t("admin.department")}</Label>
-                      <Select>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Seleccionar departamento" />
+                      <Label htmlFor="email" className="text-sm font-medium mb-2 block">{t("admin.email")}</Label>
+                      <Input 
+                        id="email" 
+                        type="email"
+                        placeholder="correo@hotel.com"
+                        className="h-10"
+                        value={newStaff.email}
+                        onChange={(e) => setNewStaff({ ...newStaff, email: e.target.value })}
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="phone" className="text-sm font-medium mb-2 block">{t("admin.phone")}</Label>
+                      <Input 
+                        id="phone" 
+                        type="tel"
+                        placeholder="+1 (555) 123-4567"
+                        className="h-10"
+                        value={newStaff.phone}
+                        onChange={(e) => setNewStaff({ ...newStaff, phone: e.target.value })}
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="department" className="text-sm font-medium mb-2 block">{t("admin.department")}</Label>
+                      <Select value={newStaff.department} onValueChange={(value) => setNewStaff({ ...newStaff, department: value })}>
+                        <SelectTrigger className="h-10">
+                          <SelectValue placeholder={t("admin.selectDepartment")} />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="Limpieza">Limpieza</SelectItem>
-                          <SelectItem value="Mantenimiento">Mantenimiento</SelectItem>
-                          <SelectItem value="Seguridad">Seguridad</SelectItem>
-                          <SelectItem value="Recepción">Recepción</SelectItem>
-                          <SelectItem value="Servicio">Servicio</SelectItem>
+                          <SelectItem value="Limpieza">{t("admin.cleaning")}</SelectItem>
+                          <SelectItem value="Mantenimiento">{t("admin.maintenance")}</SelectItem>
+                          <SelectItem value="Seguridad">{t("admin.security")}</SelectItem>
+                          <SelectItem value="Recepción">{t("admin.reception")}</SelectItem>
+                          <SelectItem value="Servicio">{t("admin.service")}</SelectItem>
                         </SelectContent>
                       </Select>
                     </div>
                     <div>
-                      <Label htmlFor="shift">Turno</Label>
-                      <Select>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Seleccionar turno" />
+                      <Label htmlFor="shift" className="text-sm font-medium mb-2 block">{t("admin.shift")}</Label>
+                      <Select value={newStaff.shift} onValueChange={(value) => setNewStaff({ ...newStaff, shift: value })}>
+                        <SelectTrigger className="h-10">
+                          <SelectValue placeholder={t("admin.selectShift")} />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="morning">Mañana (7:00 AM - 3:00 PM)</SelectItem>
-                          <SelectItem value="afternoon">Tarde (11:00 AM - 7:00 PM)</SelectItem>
-                          <SelectItem value="evening">Noche (3:00 PM - 11:00 PM)</SelectItem>
+                          <SelectItem value="morning">{t("admin.morning")}</SelectItem>
+                          <SelectItem value="afternoon">{t("admin.afternoon")}</SelectItem>
+                          <SelectItem value="evening">{t("admin.evening")}</SelectItem>
                         </SelectContent>
                       </Select>
                     </div>
                     <div>
-                      <Label htmlFor="capacity">Capacidad Diaria (tareas)</Label>
-                      <Input id="capacity" type="number" placeholder="8" defaultValue="8" />
+                      <Label htmlFor="capacity" className="text-sm font-medium mb-2 block">{t("admin.dailyCapacity")}</Label>
+                      <Input 
+                        id="capacity" 
+                        type="number" 
+                        placeholder="8"
+                        className="h-10"
+                        defaultValue="8"
+                        value={newStaff.capacity}
+                        onChange={(e) => setNewStaff({ ...newStaff, capacity: parseInt(e.target.value) || 8 })}
+                      />
                     </div>
+                    <Button className="w-full h-11 font-medium mt-2">
+                      {t("admin.registerStaff")}
+                    </Button>
                   </div>
-                  <Button className="w-full">Registrar Personal</Button>
                 </DialogContent>
               </Dialog>
             </div>
