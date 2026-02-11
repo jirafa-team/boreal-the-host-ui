@@ -288,7 +288,7 @@ export default function FacilitiesPage() {
         <div className="px-8 py-4">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-2xl font-bold text-foreground">Gestión de Amenities</h1>
+              <h1 className="text-2xl font-bold text-foreground">{t("admin.amenitiesManagement")}</h1>
               <p className="text-sm text-muted-foreground">Administra los amenities y espacios del hotel</p>
             </div>
             <div className="flex gap-4 items-center ml-auto">
@@ -321,20 +321,20 @@ export default function FacilitiesPage() {
                 <DialogTrigger asChild>
                   <button 
                     className="flex items-center justify-center w-10 h-10 rounded-full bg-gradient-to-br from-primary to-primary/80 text-white shadow-md hover:shadow-lg transition-all duration-300 hover:scale-110 group relative"
-                    title="Agregar amenity"
-                  >
-                    <div className="relative flex items-center justify-center">
-                      <Building2 className="w-5 h-5" />
-                      <span className="absolute text-base font-bold -bottom-0.5 -right-0.5 text-white drop-shadow-lg">+</span>
-                    </div>
-                    <span className="absolute top-full mt-2 px-2 py-1 bg-gray-900 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap">
-                      Agregar Amenity
-                    </span>
+                title={t("admin.addAmenity")}
+              >
+                <div className="relative flex items-center justify-center">
+                  <Plus className="w-5 h-5" />
+                  <span className="absolute text-base font-bold -bottom-0.5 -right-0.5 text-white drop-shadow-lg">+</span>
+                </div>
+                <span className="absolute top-full mt-2 px-2 py-1 bg-gray-900 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap">
+                  {t("admin.addAmenity")}
+                </span>
                   </button>
                 </DialogTrigger>
                 <DialogContent className="max-w-md">
                   <DialogHeader>
-                    <DialogTitle className="text-xl">Agregar Nuevo Amenity</DialogTitle>
+                    <DialogTitle className="text-xl">{t("admin.addNewAmenity")}</DialogTitle>
                     <DialogDescription>Configure un nuevo amenity o espacio para el hotel</DialogDescription>
                   </DialogHeader>
                   <form onSubmit={handleAddFacility} className="space-y-5">
@@ -358,21 +358,21 @@ export default function FacilitiesPage() {
                       </Select>
                     </div>
                     <div className="space-y-2">
-                      <Label htmlFor="capacity" className="text-sm font-medium">Capacidad Máxima</Label>
+                      <Label htmlFor="capacity" className="text-sm font-medium">{t("admin.maxCapacity")}</Label>
                       <Input id="capacity" name="capacity" type="number" placeholder="ej: 20" className="h-10 px-3" required />
                     </div>
                     <div className="grid grid-cols-2 gap-3">
                       <div className="space-y-2">
-                        <Label htmlFor="startTime" className="text-sm font-medium">Hora de Apertura</Label>
+                        <Label htmlFor="startTime" className="text-sm font-medium">{t("admin.openingTime")}</Label>
                         <Input id="startTime" name="startTime" type="time" className="h-10 px-3" required />
                       </div>
                       <div className="space-y-2">
-                        <Label htmlFor="endTime" className="text-sm font-medium">Hora de Cierre</Label>
+                        <Label htmlFor="endTime" className="text-sm font-medium">{t("admin.closingTime")}</Label>
                         <Input id="endTime" name="endTime" type="time" className="h-10 px-3" required />
                       </div>
                     </div>
                     <Button type="submit" className="w-full h-10 font-medium">
-                      Agregar Amenity
+                      {t("admin.addAmenity")}
                     </Button>
                   </form>
                 </DialogContent>
@@ -381,7 +381,7 @@ export default function FacilitiesPage() {
                 <DialogTrigger asChild>
                   <button 
                     className="relative group w-10 h-10 rounded-full bg-primary hover:bg-primary/90 text-white flex items-center justify-center transition-all shadow-md hover:shadow-lg"
-                    title="Agregar reserva"
+                    title={t("admin.addReservation")}
                   >
                     <div className="relative">
                       <CalendarIcon className="w-5 h-5" />
@@ -532,7 +532,7 @@ export default function FacilitiesPage() {
         <Dialog open={editDialogOpen} onOpenChange={setEditDialogOpen}>
           <DialogContent>
             <DialogHeader>
-              <DialogTitle>Editar Facility</DialogTitle>
+                  <DialogTitle>{t("admin.editFacility")}</DialogTitle>
               <DialogDescription>Actualiza los detalles del servicio o espacio</DialogDescription>
             </DialogHeader>
             <form onSubmit={handleSaveEdit} className="space-y-4">
@@ -556,16 +556,16 @@ export default function FacilitiesPage() {
                 </Select>
               </div>
               <div>
-                <Label htmlFor="edit-capacity">Capacidad</Label>
+                    <Label htmlFor="edit-capacity">{t("admin.capacity")}</Label>
                 <Input id="edit-capacity" name="capacity" type="number" defaultValue={editingFacility?.capacity} required />
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <Label htmlFor="edit-startTime">Hora de Apertura</Label>
+                    <Label htmlFor="edit-startTime">{t("admin.openingTime")}</Label>
                   <Input id="edit-startTime" name="startTime" type="time" defaultValue={editingFacility?.startTime} required />
                 </div>
                 <div>
-                  <Label htmlFor="edit-endTime">Hora de Cierre</Label>
+                    <Label htmlFor="edit-endTime">{t("admin.closingTime")}</Label>
                   <Input id="edit-endTime" name="endTime" type="time" defaultValue={editingFacility?.endTime} required />
                 </div>
               </div>
@@ -686,7 +686,7 @@ export default function FacilitiesPage() {
                     onClick={() => handleEditFacility(facility)}
                     className="w-full px-3 py-2 text-sm font-medium rounded-lg bg-primary/10 text-primary hover:bg-primary/20 transition-colors"
                   >
-                    Editar
+                    {t("admin.edit")}
                   </Button>
                 </Card>
               )
@@ -702,7 +702,7 @@ export default function FacilitiesPage() {
             <div className="mb-6 flex gap-2 justify-between items-center flex-wrap">
               <div className="flex items-center gap-3">
                 <span className={`text-sm font-medium ${timelineMode === "week" ? "text-foreground" : "text-muted-foreground"}`}>
-                  Semana
+                  {t("admin.week")}
                 </span>
                 <button
                   onClick={() => setTimelineMode(timelineMode === "week" ? "month" : "week")}
@@ -719,7 +719,7 @@ export default function FacilitiesPage() {
                   />
                 </button>
                 <span className={`text-sm font-medium ${timelineMode === "month" ? "text-foreground" : "text-muted-foreground"}`}>
-                  Mes
+                  {t("admin.month")}
                 </span>
               </div>
 

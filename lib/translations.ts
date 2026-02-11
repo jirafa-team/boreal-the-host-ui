@@ -115,6 +115,18 @@ export const translations = {
       futureReservations: "Reservas Futuras",
       vipClients: "Clientes VIP",
 
+      // Facilities/Amenities page
+      amenitiesManagement: "Gestión de Amenities",
+      addAmenity: "Agregar Amenity",
+      addNewAmenity: "Agregar Nuevo Amenity",
+      maxCapacity: "Capacidad Máxima",
+      openingTime: "Hora de Apertura",
+      closingTime: "Hora de Cierre",
+      addReservation: "Agregar Reserva",
+      editFacility: "Editar Instalación",
+      capacity: "Capacidad",
+      occupation: "Ocupación",
+
       // Rooms page
       roomsManagement: "Gestión de Habitaciones",
       searchRooms: "Buscar habitaciones...",
@@ -498,6 +510,18 @@ export const translations = {
       futureReservations: "Future Reservations",
       vipClients: "VIP Clients",
 
+      // Facilities/Amenities page
+      amenitiesManagement: "Amenities Management",
+      addAmenity: "Add Amenity",
+      addNewAmenity: "Add New Amenity",
+      maxCapacity: "Maximum Capacity",
+      openingTime: "Opening Time",
+      closingTime: "Closing Time",
+      addReservation: "Add Reservation",
+      editFacility: "Edit Facility",
+      capacity: "Capacity",
+      occupation: "Occupation",
+
       roomsManagement: "Rooms Management",
       searchRooms: "Search rooms...",
       viewMode: "View mode",
@@ -877,6 +901,18 @@ export const translations = {
       activeGuests: "Hóspedes Ativos",
       futureReservations: "Reservas Futuras",
       vipClients: "Clientes VIP",
+
+      // Facilities/Amenities page
+      amenitiesManagement: "Gestão de Amenidades",
+      addAmenity: "Adicionar Amenidade",
+      addNewAmenity: "Adicionar Nova Amenidade",
+      maxCapacity: "Capacidade Máxima",
+      openingTime: "Horário de Abertura",
+      closingTime: "Horário de Fechamento",
+      addReservation: "Adicionar Reserva",
+      editFacility: "Editar Instalação",
+      capacity: "Capacidade",
+      occupation: "Ocupação",
 
       roomsManagement: "Gestão de Quartos",
       searchRooms: "Pesquisar quartos...",
