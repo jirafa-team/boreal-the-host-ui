@@ -39,6 +39,10 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   const pathname = usePathname()
   const { t, language, setLanguage } = useLanguage()
 
+  useEffect(() => {
+    setIsLoaded(true)
+  }, [])
+
   // Cargar estado del sidebar desde localStorage
   useEffect(() => {
     const savedSections = localStorage.getItem("adminSidebarSections")
@@ -145,7 +149,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           } : { backgroundColor: "#034AAE" }}
         >
           <div className="p-4 border-b border-white/10 flex items-center justify-between">
-            {sidebarOpen && <h2 className="font-bold text-lg text-white">{t("admin.adminPanel")}</h2>}
+            {sidebarOpen && isLoaded && <h2 className="font-bold text-lg text-white">{t("admin.adminPanel")}</h2>}
             <Button
               variant="ghost"
               size="icon"
