@@ -535,6 +535,21 @@ export default function StaffManagement() {
     }
   }
 
+  const getRequestStatusColor = (status: string) => {
+    switch (status) {
+      case "pending":
+        return "bg-yellow-100 text-yellow-800 border-yellow-300"
+      case "assigned":
+        return "bg-blue-100 text-blue-800 border-blue-300"
+      case "in-progress":
+        return "bg-purple-100 text-purple-800 border-purple-300"
+      case "completed":
+        return "bg-green-100 text-green-800 border-green-300"
+      default:
+        return "bg-gray-100 text-gray-800"
+    }
+  }
+
   const toggleCollapse = (staffId: number) => {
     setCollapsedStaff((prev) => {
       const newSet = new Set(prev)
