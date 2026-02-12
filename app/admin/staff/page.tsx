@@ -966,7 +966,7 @@ export default function StaffManagement() {
         </div>
       )}
 
-      {viewMode === "kanban" && (
+      {viewMode === "kanban" && isLoaded && (
         <div className="space-y-4">
           {/* Filters */}
           <Card className="p-4">
