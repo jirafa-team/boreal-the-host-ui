@@ -530,10 +530,10 @@ export default function FacilitiesPage() {
       <div className="p-8 max-w-[1600px] mx-auto">
         {/* Edit Facility Dialog */}
         <Dialog open={editDialogOpen} onOpenChange={setEditDialogOpen}>
-          <DialogContent>
+          <DialogContent className="max-w-md">
             <DialogHeader>
-                  <DialogTitle>{t("admin.editFacility")}</DialogTitle>
-              <DialogDescription>Actualiza los detalles del servicio o espacio</DialogDescription>
+              <DialogTitle>{t("admin.editFacility")}</DialogTitle>
+              <DialogDescription>{t("admin.updateFacilityDetails")}</DialogDescription>
             </DialogHeader>
             <form onSubmit={handleSaveEdit} className="space-y-4">
               <div>
