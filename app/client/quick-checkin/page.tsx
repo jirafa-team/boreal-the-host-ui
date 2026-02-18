@@ -4,10 +4,12 @@ import { useRouter, useSearchParams } from "next/navigation"
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Hotel, Check, Loader2 } from "lucide-react"
+import { useLanguage } from "@/lib/i18n-context"
 
 export default function QuickCheckinPage() {
   const router = useRouter()
   const searchParams = useSearchParams()
+  const { t } = useLanguage()
   const isFutureReservation = searchParams.get("type") === "future"
   const [isLoading, setIsLoading] = useState(false)
   const [isSuccess, setIsSuccess] = useState(false)
@@ -46,8 +48,8 @@ export default function QuickCheckinPage() {
             </div>
           </div>
           <div>
-            <h2 className="text-2xl font-bold text-white mb-2">Procesando Check-In</h2>
-            <p className="text-white/70">Por favor espera un momento...</p>
+            <h2 className="text-2xl font-bold text-white mb-2">{t("client.processingCheckin")}</h2>
+            <p className="text-white/70">{t("client.pleaseWait")}</p>
           </div>
           <div className="flex justify-center gap-2">
             <div className="w-2 h-2 bg-[#67f1d0] rounded-full animate-bounce" style={{ animationDelay: "0ms" }} />
@@ -72,8 +74,8 @@ export default function QuickCheckinPage() {
             </div>
           </div>
           <div>
-            <h2 className="text-3xl font-bold text-white mb-2">¡Check-In Realizado!</h2>
-            <p className="text-white/70">Tu habitación está lista. Redirigiendo...</p>
+            <h2 className="text-3xl font-bold text-white mb-2">{t("client.checkinCompleted")}</h2>
+            <p className="text-white/70">{t("client.roomReadyRedirecting")}</p>
           </div>
           <div className="h-1 w-32 mx-auto rounded-full bg-gradient-to-r from-green-400 to-emerald-400" />
         </div>
@@ -96,10 +98,10 @@ export default function QuickCheckinPage() {
 
           <div>
             <h1 className="text-3xl font-bold text-white mb-2">
-              {isFutureReservation ? "¡Tu reserva está confirmada!" : "¡Bienvenido!"}
+              {isFutureReservation ? t("client.reservationConfirmed") : t("client.welcome")}
             </h1>
             <p className="text-white/70">
-              {isFutureReservation ? "Confirma tu check-in anticipado" : "Tu habitación está lista"}
+              {isFutureReservation ? t("client.confirmEarlyCheckin") : t("client.roomReady")}
             </p>
           </div>
         </div>
@@ -111,10 +113,10 @@ export default function QuickCheckinPage() {
             onClick={handleCheckin}
             className="w-full py-8 text-xl font-bold bg-gradient-to-r from-[#6f65d0] to-[#67f1d0] hover:opacity-90 transition-opacity text-white shadow-xl"
           >
-            HACER CHECK-IN
+            {t("client.doCheckin")}
           </Button>
 
-          <p className="text-white/50 text-sm">Toca el botón para acceder a tu habitación</p>
+          <p className="text-white/50 text-sm">{t("client.tapButtonToEnter")}</p>
         </div>
 
         <div className="flex justify-center gap-2">

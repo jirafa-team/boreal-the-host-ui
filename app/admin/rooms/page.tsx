@@ -388,14 +388,14 @@ export default function RoomsManagement() {
               <button
                 onClick={() => setShowCreateModal(true)}
                 className="flex items-center justify-center w-10 h-10 rounded-full bg-gradient-to-br from-indigo-600 to-indigo-700 text-white shadow-md hover:shadow-lg transition-all duration-300 hover:scale-110 group relative"
-                title="Crear habitación"
+                title={t("admin.createRoom")}
               >
                 <div className="relative flex items-center justify-center">
                   <LayoutGrid className="w-5 h-5" />
                   <span className="absolute text-base font-bold -bottom-0.5 -right-0.5 text-white drop-shadow-lg">+</span>
                 </div>
                 <span className="absolute top-full mt-2 px-2 py-1 bg-gray-900 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap">
-                  Crear habitación
+                  {t("admin.createRoom")}
                 </span>
               </button>
             </div>
@@ -848,11 +848,11 @@ export default function RoomsManagement() {
       {showCreateModal && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
           <div className="bg-white rounded-lg shadow-lg p-6 max-w-md w-full mx-4">
-            <h3 className="text-xl font-bold text-gray-900 mb-4">Crear Nueva Habitación</h3>
+            <h3 className="text-xl font-bold text-gray-900 mb-4">{t("admin.createNewRoom")}</h3>
             
             <div className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Número de Habitación</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">{t("admin.roomNumber")}</label>
                 <Input
                   type="text"
                   placeholder="Ej: 105"
@@ -863,7 +863,7 @@ export default function RoomsManagement() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Tipo de Habitación</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">{t("admin.roomType")}</label>
                 <select
                   value={newRoom.type}
                   onChange={(e) => setNewRoom({ ...newRoom, type: e.target.value })}
@@ -878,7 +878,7 @@ export default function RoomsManagement() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Piso</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">{t("admin.floor")}</label>
                 <select
                   value={newRoom.floor}
                   onChange={(e) => setNewRoom({ ...newRoom, floor: parseInt(e.target.value) })}
@@ -898,13 +898,13 @@ export default function RoomsManagement() {
                 onClick={() => setShowCreateModal(false)}
                 className="px-4 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 transition-colors font-medium"
               >
-                Cancelar
+                {t("admin.cancel")}
               </button>
               <button
                 onClick={handleCreateRoom}
                 className="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors font-medium"
               >
-                Crear Habitación
+                {t("admin.createRoom")}
               </button>
             </div>
           </div>

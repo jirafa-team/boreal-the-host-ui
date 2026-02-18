@@ -471,6 +471,23 @@ export default function StaffManagement() {
   const [searchName, setSearchName] = useState("")
   const [filterDepartment, setFilterDepartment] = useState("all")
   const [filterDate, setFilterDate] = useState("")
+  const [activityDialogOpen, setActivityDialogOpen] = useState(false)
+  const [newActivity, setNewActivity] = useState({
+    assignedTo: "",
+    description: "",
+    priority: "normal" as const,
+    dueTime: "",
+  })
+  
+  const [addStaffDialogOpen, setAddStaffDialogOpen] = useState(false)
+  const [newStaff, setNewStaff] = useState({
+    name: "",
+    email: "",
+    phone: "",
+    department: "Limpieza" as const,
+    shift: "morning",
+    capacity: 8,
+  })
 
   const availableStaff = staff.filter((s) => s.status === "available")
   const busyStaff = staff.filter((s) => s.status === "busy")
@@ -493,11 +510,26 @@ export default function StaffManagement() {
   const getStatusText = (status: string) => {
     switch (status) {
       case "available":
-        return "Disponible"
+        return t("admin.available")
       case "busy":
-        return "Ocupada"
+        return t("admin.busy")
       case "off":
-        return "Libre"
+        return t("admin.off")
+      default:
+        return status
+    }
+  }
+
+  const getRequestStatusText = (status: string) => {
+    switch (status) {
+      case "pending":
+        return t("admin.pending")
+      case "assigned":
+        return t("admin.assigned")
+      case "in-progress":
+        return t("admin.inProgress")
+      case "completed":
+        return t("admin.completed")
       default:
         return status
     }
@@ -515,21 +547,6 @@ export default function StaffManagement() {
         return "bg-green-100 text-green-800 border-green-300"
       default:
         return "bg-gray-100 text-gray-800"
-    }
-  }
-
-  const getRequestStatusText = (status: string) => {
-    switch (status) {
-      case "pending":
-        return "Pendiente"
-      case "assigned":
-        return "Asignada"
-      case "in-progress":
-        return "En Progreso"
-      case "completed":
-        return "Completada"
-      default:
-        return status
     }
   }
 
@@ -557,6 +574,43 @@ export default function StaffManagement() {
       const taskTime = r.requestedTime
       return taskTime === timeSlot || taskTime.startsWith(timeSlot.split(":")[0])
     })
+  }
+
+  const handleAddStaff = () => {
+    if (newStaff.name && newStaff.email) {
+      const initials = newStaff.name
+        .split(" ")
+        .map((n) => n[0])
+        .join("")
+        .toUpperCase()
+
+      const newStaffMember: StaffMember = {
+        id: Math.max(...staff.map((s) => s.id), 0) + 1,
+        name: newStaff.name,
+        status: "available",
+        tasksToday: 0,
+        maxCapacity: newStaff.capacity,
+        shift:
+          newStaff.shift === "morning"
+            ? "7:00 AM - 3:00 PM"
+            : newStaff.shift === "afternoon"
+              ? "11:00 AM - 7:00 PM"
+              : "3:00 PM - 11:00 PM",
+        avatar: initials,
+        department: newStaff.department,
+      }
+
+      setStaff([...staff, newStaffMember])
+      setAddStaffDialogOpen(false)
+      setNewStaff({
+        name: "",
+        email: "",
+        phone: "",
+        department: "Limpieza",
+        shift: "morning",
+        capacity: 8,
+      })
+    }
   }
 
   return (
@@ -596,62 +650,180 @@ export default function StaffManagement() {
                 </button>
               </div>
               
-              <Dialog>
+              {/* Create Activity Button */}
+              <Dialog open={activityDialogOpen} onOpenChange={setActivityDialogOpen}>
+                <button 
+                  onClick={() => setActivityDialogOpen(true)}
+                  className="flex items-center justify-center w-10 h-10 rounded-full bg-gradient-to-br from-amber-500 to-amber-600 text-white shadow-md hover:shadow-lg transition-all duration-300 hover:scale-110 group relative"
+                title={t("admin.createActivity")}
+              >
+                <div className="relative flex items-center justify-center">
+                  <Calendar className="w-5 h-5" />
+                  <span className="absolute text-base font-bold -bottom-0.5 -right-0.5 text-white drop-shadow-lg">+</span>
+                </div>
+                <span className="absolute top-full mt-2 px-2 py-1 bg-gray-900 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap">
+                  {t("admin.createActivity")}
+                </span>
+                </button>
+                <DialogContent className="max-w-md">
+                  <DialogHeader>
+                    <DialogTitle>{t("admin.createNewActivity")}</DialogTitle>
+                    <DialogDescription>{t("admin.assignActivityToStaff")}</DialogDescription>
+                  </DialogHeader>
+                  <div className="space-y-5 py-4">
+                    <div>
+                      <Label htmlFor="assignedTo" className="text-sm font-medium mb-2 block">{t("admin.assignTo")}</Label>
+                      <Select value={newActivity.assignedTo} onValueChange={(value) => setNewActivity({ ...newActivity, assignedTo: value })}>
+                        <SelectTrigger className="h-10">
+                          <SelectValue placeholder={t("admin.selectStaff")} />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {staff.map((member) => (
+                            <SelectItem key={member.id} value={member.name}>
+                              {member.name} ({member.department})
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div>
+                      <Label htmlFor="description" className="text-sm font-medium mb-2 block">{t("admin.activityDescription")}</Label>
+                      <Input
+                        id="description"
+                        placeholder={t("admin.exampleActivityDescription")}
+                        value={newActivity.description}
+                        onChange={(e) => setNewActivity({ ...newActivity, description: e.target.value })}
+                        className="h-10"
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="priority" className="text-sm font-medium mb-2 block">{t("admin.priority")}</Label>
+                      <Select value={newActivity.priority} onValueChange={(value: any) => setNewActivity({ ...newActivity, priority: value })}>
+                        <SelectTrigger className="h-10">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="normal">{t("admin.normal")}</SelectItem>
+                          <SelectItem value="urgent">{t("admin.urgent")}</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div>
+                      <Label htmlFor="dueTime" className="text-sm font-medium mb-2 block">{t("admin.deliveryTime")}</Label>
+                      <Input
+                        id="dueTime"
+                        type="time"
+                        value={newActivity.dueTime}
+                        onChange={(e) => setNewActivity({ ...newActivity, dueTime: e.target.value })}
+                        className="h-10"
+                      />
+                    </div>
+                    <Button 
+                      onClick={() => {
+                        if (newActivity.assignedTo && newActivity.description) {
+                          setActivityDialogOpen(false)
+                          setNewActivity({ assignedTo: "", description: "", priority: "normal", dueTime: "" })
+                        }
+                      }}
+                      className="w-full h-10"
+                    >
+                      {t("admin.createActivity")}
+                    </Button>
+                  </div>
+                </DialogContent>
+              </Dialog>
+              
+              <Dialog open={addStaffDialogOpen} onOpenChange={setAddStaffDialogOpen}>
                 <DialogTrigger asChild>
-                  <button 
-                    className="flex items-center justify-center w-10 h-10 rounded-full bg-gradient-to-br from-primary to-primary/80 text-white shadow-md hover:shadow-lg transition-all duration-300 hover:scale-110 group relative"
-                    title="Agregar personal"
-                  >
+                  <button className="relative group w-10 h-10 rounded-full bg-gradient-to-br from-emerald-500 to-emerald-600 text-white shadow-md hover:shadow-lg transition-all duration-300 hover:scale-110 flex items-center justify-center">
                     <UserPlus className="w-5 h-5" />
                     <span className="absolute top-full mt-2 px-2 py-1 bg-gray-900 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap">
-                      Agregar personal
+                      {t("admin.addStaff")}
                     </span>
                   </button>
                 </DialogTrigger>
-                <DialogContent>
+                <DialogContent className="max-w-md">
                   <DialogHeader>
-                    <DialogTitle>Añadir Nuevo Personal</DialogTitle>
-                    <DialogDescription>Registra un nuevo miembro del equipo de staff</DialogDescription>
+                    <DialogTitle className="text-xl">{t("admin.addNewStaff")}</DialogTitle>
+                    <DialogDescription>{t("admin.registerNewTeamMember")}</DialogDescription>
                   </DialogHeader>
-                  <div className="space-y-4 py-4">
+                  <div className="space-y-5 py-4">
                     <div>
-                      <Label htmlFor="name">Nombre Completo</Label>
-                      <Input id="name" placeholder="Ej: María González" />
+                      <Label htmlFor="name" className="text-sm font-medium mb-2 block">{t("admin.fullName")}</Label>
+                      <Input 
+                        id="name" 
+                        placeholder="Ej: María González"
+                        className="h-10"
+                        value={newStaff.name}
+                        onChange={(e) => setNewStaff({ ...newStaff, name: e.target.value })}
+                      />
                     </div>
                     <div>
-                      <Label htmlFor="department">Departamento</Label>
-                      <Select>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Seleccionar departamento" />
+                      <Label htmlFor="email" className="text-sm font-medium mb-2 block">{t("admin.email")}</Label>
+                      <Input 
+                        id="email" 
+                        type="email"
+                        placeholder="correo@hotel.com"
+                        className="h-10"
+                        value={newStaff.email}
+                        onChange={(e) => setNewStaff({ ...newStaff, email: e.target.value })}
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="phone" className="text-sm font-medium mb-2 block">{t("admin.phone")}</Label>
+                      <Input 
+                        id="phone" 
+                        type="tel"
+                        placeholder="+1 (555) 123-4567"
+                        className="h-10"
+                        value={newStaff.phone}
+                        onChange={(e) => setNewStaff({ ...newStaff, phone: e.target.value })}
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="department" className="text-sm font-medium mb-2 block">{t("admin.department")}</Label>
+                      <Select value={newStaff.department} onValueChange={(value) => setNewStaff({ ...newStaff, department: value })}>
+                        <SelectTrigger className="h-10">
+                          <SelectValue placeholder={t("admin.selectDepartment")} />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="Limpieza">Limpieza</SelectItem>
-                          <SelectItem value="Mantenimiento">Mantenimiento</SelectItem>
-                          <SelectItem value="Seguridad">Seguridad</SelectItem>
-                          <SelectItem value="Recepción">Recepción</SelectItem>
-                          <SelectItem value="Servicio">Servicio</SelectItem>
+                          <SelectItem value="Limpieza">{t("admin.cleaning")}</SelectItem>
+                          <SelectItem value="Mantenimiento">{t("admin.maintenance")}</SelectItem>
+                          <SelectItem value="Seguridad">{t("admin.security")}</SelectItem>
+                          <SelectItem value="Recepción">{t("admin.reception")}</SelectItem>
+                          <SelectItem value="Servicio">{t("admin.service")}</SelectItem>
                         </SelectContent>
                       </Select>
                     </div>
                     <div>
-                      <Label htmlFor="shift">Turno</Label>
-                      <Select>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Seleccionar turno" />
+                      <Label htmlFor="shift" className="text-sm font-medium mb-2 block">{t("admin.shift")}</Label>
+                      <Select value={newStaff.shift} onValueChange={(value) => setNewStaff({ ...newStaff, shift: value })}>
+                        <SelectTrigger className="h-10">
+                          <SelectValue placeholder={t("admin.selectShift")} />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="morning">Mañana (7:00 AM - 3:00 PM)</SelectItem>
-                          <SelectItem value="afternoon">Tarde (11:00 AM - 7:00 PM)</SelectItem>
-                          <SelectItem value="evening">Noche (3:00 PM - 11:00 PM)</SelectItem>
+                          <SelectItem value="morning">{t("admin.morning")}</SelectItem>
+                          <SelectItem value="afternoon">{t("admin.afternoon")}</SelectItem>
+                          <SelectItem value="evening">{t("admin.evening")}</SelectItem>
                         </SelectContent>
                       </Select>
                     </div>
                     <div>
-                      <Label htmlFor="capacity">Capacidad Diaria (tareas)</Label>
-                      <Input id="capacity" type="number" placeholder="8" defaultValue="8" />
+                      <Label htmlFor="capacity" className="text-sm font-medium mb-2 block">{t("admin.dailyCapacity")}</Label>
+                      <Input 
+                        id="capacity" 
+                        type="number" 
+                        placeholder="8"
+                        className="h-10"
+                        defaultValue="8"
+                        value={newStaff.capacity}
+                        onChange={(e) => setNewStaff({ ...newStaff, capacity: parseInt(e.target.value) || 8 })}
+                      />
                     </div>
+                    <Button onClick={handleAddStaff} className="w-full h-11 font-medium mt-2">
+                      {t("admin.registerStaff")}
+                    </Button>
                   </div>
-                  <Button className="w-full">Registrar Personal</Button>
                 </DialogContent>
               </Dialog>
             </div>
@@ -794,7 +966,7 @@ export default function StaffManagement() {
         </div>
       )}
 
-      {viewMode === "kanban" && (
+      {viewMode === "kanban" && isLoaded && (
         <div className="space-y-4">
           {/* Filters */}
           <Card className="p-4">
@@ -953,7 +1125,7 @@ export default function StaffManagement() {
         }}>
           <DialogContent className="max-w-md">
             <DialogHeader>
-              <DialogTitle>{editingStaff ? "Editar Personal" : "Detalles del Personal"}</DialogTitle>
+                  <DialogTitle>{editingStaff ? t("admin.editStaff") : t("admin.staffDetails")}</DialogTitle>
             </DialogHeader>
             
             {!editingStaff ? (
@@ -1012,7 +1184,7 @@ export default function StaffManagement() {
                   />
                 </div>
                 <div>
-                  <Label htmlFor="edit-dept" className="text-sm font-medium">Departamento</Label>
+                      <Label htmlFor="edit-dept" className="text-sm font-medium">{t("admin.department")}</Label>
                   <Select 
                     value={editingStaff.department}
                     onValueChange={(value) => setEditingStaff({...editingStaff, department: value as any})}
