@@ -1,50 +1,24 @@
 "use client"
 
-import type React from "react"
-import { useState, useEffect } from "react"
-import {
-  Hotel,
-  Calendar,
-  Bell,
-  LayoutGrid,
-  Users,
-  BarChart3,
-  Menu,
-  Building2,
-  Sparkles,
-  Compass,
-  TrendingUp,
-  LogOut,
-  Ticket,
-  ShoppingBag,
-  UserCog,
-  Home,
-  Globe,
-  ChevronDown,
-  Plus,
-  Settings,
-} from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { Switch } from "@/components/ui/switch"
-import Link from "next/link"
+import { useState, useEffect, useRef } from "react"
 import { usePathname } from "next/navigation"
+import Link from "next/link"
+import { ChevronDown, Menu, X, Home, Hotel, BarChart3, Users, Building2, Sparkles, LogOut, User } from "lucide-react"
 import { useLanguage } from "@/lib/i18n-context"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Button } from "@/components/ui/button"
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const [sidebarOpen, setSidebarOpen] = useState(true)
-  const [expandedSections, setExpandedSections] = useState<Set<string>>(new Set())
-  const [isLoaded, setIsLoaded] = useState(false)
-  const [mockMode, setMockMode] = useState(false)
+  const [expandedSections, setExpandedSections] = useState<Set<string>>(new Set(["general", "spaces"]))
+  const isInitializedRef = useRef(false)
   const pathname = usePathname()
   const { t, language, setLanguage } = useLanguage()
 
+  // Cargar estado del sidebar desde localStorage - solo una vez al montar
   useEffect(() => {
-    setIsLoaded(true)
-  }, [])
+    if (isInitializedRef.current) return
+    isInitializedRef.current = true
 
-  // Cargar estado del sidebar desde localStorage - solo una vez
-  useEffect(() => {
     const savedSections = localStorage.getItem("adminSidebarSections")
     if (savedSections) {
       try {
@@ -52,21 +26,17 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       } catch {
         setExpandedSections(new Set(["general", "spaces"]))
       }
-    } else {
-      setExpandedSections(new Set(["general", "spaces"]))
     }
-    setIsLoaded(true)
   }, [])
 
   // Guardar estado cuando cambia - con debounce
   useEffect(() => {
-    if (isLoaded) {
-      const timer = setTimeout(() => {
-        localStorage.setItem("adminSidebarSections", JSON.stringify(Array.from(expandedSections)))
-      }, 300)
-      return () => clearTimeout(timer)
-    }
-  }, [expandedSections, isLoaded])
+    if (!isInitializedRef.current) return
+    const timer = setTimeout(() => {
+      localStorage.setItem("adminSidebarSections", JSON.stringify(Array.from(expandedSections)))
+    }, 300)
+    return () => clearTimeout(timer)
+  }, [expandedSections])
 
   // Ocultar sidebar en la página de selección de establecimiento
   const hideSidebar = pathname === '/admin/select-establishment'
@@ -155,7 +125,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           } : { backgroundColor: "#034AAE" }}
         >
           <div className="p-4 border-b border-white/10 flex items-center justify-between">
-            {sidebarOpen && isLoaded && <h2 className="font-bold text-lg text-white">{t("admin.adminPanel")}</h2>}
+            {sidebarOpen && <h2 className="font-bold text-lg text-white">{t("admin.adminPanel")}</h2>}
             <Button
               variant="ghost"
               size="icon"
@@ -167,7 +137,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           </div>
 
           <nav className="flex-1 p-2 space-y-2 overflow-y-auto">
-            {isLoaded && navSections.map((section) => (
+            {navSections.map((section) => (
               <div key={section.id}>
                 {sidebarOpen ? (
                   <>
@@ -242,30 +212,26 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
               </div>
               
               {/* Organization Circle */}
-              {isLoaded && (
-                <>
-                  <Link
-                    href="/admin/select-establishment"
-                    className="relative group w-10 h-10 rounded-full bg-white/20 hover:bg-white/30 text-white flex items-center justify-center transition-all shrink-0"
-                    title={t("admin.accommodations")}
-                  >
-                    <Hotel className="w-5 h-5" />
-                    <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-1.5 bg-gray-900 text-white text-xs rounded pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
-                      {t("admin.accommodations")}
-                    </div>
-                  </Link>
-                  <Link
-                    href="/"
-                    className="relative group w-10 h-10 rounded-full bg-white/20 hover:bg-white/30 text-white flex items-center justify-center transition-all shrink-0"
-                    title={t("admin.logout")}
-                  >
-                    <LogOut className="w-5 h-5" />
-                    <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-1.5 bg-gray-900 text-white text-xs rounded pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
-                      {t("admin.logout")}
-                    </div>
-                  </Link>
-                </>
-              )}
+              <Link
+                href="/admin/select-establishment"
+                className="relative group w-10 h-10 rounded-full bg-white/20 hover:bg-white/30 text-white flex items-center justify-center transition-all shrink-0"
+                title={t("admin.accommodations")}
+              >
+                <Hotel className="w-5 h-5" />
+                <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-1.5 bg-gray-900 text-white text-xs rounded pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
+                  {t("admin.accommodations")}
+                </div>
+              </Link>
+              <Link
+                href="/"
+                className="relative group w-10 h-10 rounded-full bg-white/20 hover:bg-white/30 text-white flex items-center justify-center transition-all shrink-0"
+                title={t("admin.logout")}
+              >
+                <LogOut className="w-5 h-5" />
+                <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-1.5 bg-gray-900 text-white text-xs rounded pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
+                  {t("admin.logout")}
+                </div>
+              </Link>
             </div>
           </div>
 
