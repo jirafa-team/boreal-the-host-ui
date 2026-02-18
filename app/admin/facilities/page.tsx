@@ -925,7 +925,6 @@ export default function FacilitiesPage() {
                 })}
               </div>
             </div>
-          </div>
           </>
         )}
       </div>
