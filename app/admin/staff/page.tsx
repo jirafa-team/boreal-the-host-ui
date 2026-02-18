@@ -621,6 +621,7 @@ export default function StaffManagement() {
   return (
     <>
       {/* Header */}
+      {isLoaded && (
       <header className="bg-card border-b border-border sticky top-0 z-10">
         <div className="px-8 py-4">
           <div className="flex items-center justify-between">
@@ -861,6 +862,7 @@ export default function StaffManagement() {
           </div>
         </div>
       </header>
+      )}
 
       {/* Main Content */}
       <div className="p-6 space-y-6">
