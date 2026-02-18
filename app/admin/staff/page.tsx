@@ -923,7 +923,7 @@ export default function StaffManagement() {
       )}
 
       {/* Staff Detail Dialog */}
-      {selectedStaff && (
+      {isLoaded && selectedStaff && (
         <Dialog open={!!selectedStaff} onOpenChange={() => {
           setSelectedStaff(null)
           setEditingStaff(null)
