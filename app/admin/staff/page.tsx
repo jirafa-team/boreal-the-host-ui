@@ -2,7 +2,7 @@
 
 import { CardContent } from "@/components/ui/card"
 import { CardHeader } from "@/components/ui/card"
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
@@ -45,6 +45,11 @@ type CleaningRequest = {
 
 export default function StaffManagement() {
   const { t } = useLanguage()
+  const [isLoaded, setIsLoaded] = useState(false)
+  
+  useEffect(() => {
+    setIsLoaded(true)
+  }, [])
   const [staff, setStaff] = useState<StaffMember[]>([
     {
       id: 1,
