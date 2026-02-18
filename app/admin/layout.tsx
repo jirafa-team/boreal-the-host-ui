@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from "react"
 import { usePathname } from "next/navigation"
 import Link from "next/link"
-import { ChevronDown, Menu, X, Home, Hotel, BarChart3, Users, Building2, Sparkles, LogOut, User, UserCog, Settings } from "lucide-react"
+import { ChevronDown, Menu, X, Home, Hotel, BarChart3, Users, Building2, Sparkles, LogOut, User, UserCog, Settings, Globe } from "lucide-react"
 import { useLanguage } from "@/lib/i18n-context"
 import { Button } from "@/components/ui/button"
 
