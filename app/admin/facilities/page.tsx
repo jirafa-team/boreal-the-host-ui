@@ -473,9 +473,9 @@ export default function FacilitiesPage() {
                           className="w-9 h-9 rounded-lg bg-white border border-gray-300 flex items-center justify-center hover:bg-gray-100 font-semibold"
                         >
                           +
-                        </button>
-                      </div>
-                    </div>
+                </button>
+              </div>
+            </div>
 
                     {/* Start Time */}
                     <div>
@@ -698,33 +698,8 @@ export default function FacilitiesPage() {
         {/* Timeline View */}
         {viewMode === "timeline" && (
           <>
-            {/* Timeline Mode Toggle & Date Navigation */}
-            <div className="mb-6 flex gap-2 justify-between items-center flex-wrap">
-              <div className="flex items-center gap-3">
-                <span className={`text-sm font-medium ${timelineMode === "week" ? "text-foreground" : "text-muted-foreground"}`}>
-                  {t("admin.week")}
-                </span>
-                <button
-                  onClick={() => setTimelineMode(timelineMode === "week" ? "month" : "week")}
-                  className={`relative inline-flex h-8 w-14 items-center rounded-full transition-colors ${
-                    timelineMode === "month"
-                      ? "bg-lime-600"
-                      : "bg-gray-300"
-                  }`}
-                >
-                  <span
-                    className={`inline-block h-6 w-6 transform rounded-full bg-white transition-transform ${
-                      timelineMode === "month" ? "translate-x-7" : "translate-x-1"
-                    }`}
-                  />
-                </button>
-                <span className={`text-sm font-medium ${timelineMode === "month" ? "text-foreground" : "text-muted-foreground"}`}>
-                  {t("admin.month")}
-                </span>
-              </div>
-
-              {/* Date Navigation for Timeline */}
-              <div className="flex items-center gap-3">
+            {/* Date Navigation for Timeline */}
+            <div className="mb-6 flex gap-2 justify-end items-center flex-wrap">
                 <button
                   onClick={() => navigateDate("prev")}
                   className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
