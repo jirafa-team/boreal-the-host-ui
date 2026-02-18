@@ -727,7 +727,6 @@ export default function FacilitiesPage() {
                   <ChevronRight className="w-5 h-5" />
                 </button>
               </div>
-            </div>
 
             <div className="bg-card rounded-lg border border-border overflow-hidden">
               <div className="overflow-x-auto">
