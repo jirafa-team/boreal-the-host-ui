@@ -714,16 +714,6 @@ export default function StaffManagement() {
                         </SelectContent>
                       </Select>
                     </div>
-                    <div>
-                      <Label htmlFor="search-name" className="text-sm font-medium">{t("admin.searchByName")}</Label>
-                      <Input
-                        id="search-name"
-                        placeholder={t("admin.exampleNames")}
-                        value={searchName}
-                        onChange={(e) => setSearchName(e.target.value)}
-                        className="mt-2"
-                      />
-                    </div>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
               {staff
@@ -770,8 +760,6 @@ export default function StaffManagement() {
           </Card>
         </div>
       )}
-
-      {viewMode === "kanban" && isLoaded && (
         <div className="space-y-4">
           {/* Filters */}
           <Card className="p-4">
