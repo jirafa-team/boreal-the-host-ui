@@ -200,6 +200,11 @@ export const translations = {
       evening: "Noche (3:00 PM - 11:00 PM)",
       dailyCapacity: "Capacidad Diaria (tareas)",
       registerStaff: "Registrar Personal",
+      searchByName: "Buscar por nombre",
+      exampleNames: "Ej: María, Roberto...",
+      filterByDepartment: "Filtrar por departamento",
+      allDepartments: "Todos los departamentos",
+      filterByDate: "Filtrar por fecha",
 
       // Rooms page
       roomsManagement: "Gestión de Habitaciones",
@@ -634,6 +639,11 @@ export const translations = {
       capacity: "Capacity",
       occupation: "Occupation",
       updateFacilityDetails: "Update the details of the service or space",
+      searchByName: "Search by name",
+      exampleNames: "Ex: Mary, Robert...",
+      filterByDepartment: "Filter by department",
+      allDepartments: "All departments",
+      filterByDate: "Filter by date",
 
       roomsManagement: "Rooms Management",
       searchRooms: "Search rooms...",
@@ -1065,6 +1075,11 @@ export const translations = {
       capacity: "Capacidade",
       occupation: "Ocupação",
       updateFacilityDetails: "Atualize os detalhes do serviço ou espaço",
+      searchByName: "Pesquisar por nome",
+      exampleNames: "Ex: Maria, Roberto...",
+      filterByDepartment: "Filtrar por departamento",
+      allDepartments: "Todos os departamentos",
+      filterByDate: "Filtrar por data",
 
       housekeepingManagement: "Gestão de Staff",
       staffOverview: "Visão Geral da Equipe",

@@ -713,16 +713,42 @@ export default function StaffManagement() {
                         </SelectContent>
                       </Select>
                     </div>
-                    <div>
-                      <Label htmlFor="dueTime" className="text-sm font-medium mb-2 block">{t("admin.deliveryTime")}</Label>
-                      <Input
-                        id="dueTime"
-                        type="time"
-                        value={newActivity.dueTime}
-                        onChange={(e) => setNewActivity({ ...newActivity, dueTime: e.target.value })}
-                        className="h-10"
-                      />
-                    </div>
+              <div>
+                <Label htmlFor="search-name" className="text-sm font-medium">{t("admin.searchByName")}</Label>
+                <Input
+                  id="search-name"
+                  placeholder={t("admin.exampleNames")}
+                  value={searchName}
+                  onChange={(e) => setSearchName(e.target.value)}
+                  className="mt-2"
+                />
+              </div>
+              <div className="w-48">
+                <Label htmlFor="filter-dept" className="text-sm font-medium">{t("admin.filterByDepartment")}</Label>
+                <Select value={filterDepartment} onValueChange={setFilterDepartment}>
+                  <SelectTrigger id="filter-dept" className="mt-2">
+                    <SelectValue placeholder={t("admin.allDepartments")} />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">{t("admin.allDepartments")}</SelectItem>
+                    <SelectItem value="Limpieza">{t("admin.cleaning")}</SelectItem>
+                    <SelectItem value="Mantenimiento">{t("admin.maintenance")}</SelectItem>
+                    <SelectItem value="Seguridad">{t("admin.security")}</SelectItem>
+                    <SelectItem value="Recepción">{t("admin.reception")}</SelectItem>
+                    <SelectItem value="Servicio">{t("admin.service")}</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="w-48">
+                <Label htmlFor="filter-date" className="text-sm font-medium">{t("admin.filterByDate")}</Label>
+                <Input
+                  id="filter-date"
+                  type="date"
+                  value={filterDate}
+                  onChange={(e) => setFilterDate(e.target.value)}
+                  className="mt-2"
+                />
+              </div>
                     <Button 
                       onClick={() => {
                         if (newActivity.assignedTo && newActivity.description) {
