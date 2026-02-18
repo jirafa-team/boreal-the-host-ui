@@ -269,7 +269,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             </div>
           </div>
 
-          {sidebarOpen && (
+          {sidebarOpen && isLoaded && (
             <div className="p-2 border-t border-white/10">
               <div className="flex items-center gap-2">
                 <Globe className="w-4 h-4 text-white/70 shrink-0" />
