@@ -727,9 +727,9 @@ export default function FacilitiesPage() {
                   <ChevronRight className="w-5 h-5" />
                 </button>
               </div>
-
             <div className="bg-card rounded-lg border border-border overflow-hidden">
-              <div className="overflow-x-auto">
+            <div className="overflow-x-auto">
+              <div style={{ width: "fit-content", minWidth: "100%" }}>
                 {/* Header con horas */}
                 <div className="flex border-b border-border bg-muted/50 sticky top-0 z-10">
                   <div className="w-64 p-4 font-semibold border-r border-border bg-muted/50 shrink-0">Facility</div>
@@ -925,7 +925,7 @@ export default function FacilitiesPage() {
                 })}
               </div>
             </div>
-            </div>
+          </div>
           </>
         )}
       </div>
