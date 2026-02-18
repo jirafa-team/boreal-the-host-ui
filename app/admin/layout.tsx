@@ -199,19 +199,6 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
           <div className="p-2 border-t border-white/10">
             <div className="flex items-center justify-between gap-2">
-              {/* Mock/API Toggle */}
-              <div className="flex items-center gap-2 px-2 py-1.5 bg-white/10 rounded-lg flex-1">
-                <span className="text-xs text-white/70 font-medium whitespace-nowrap">
-                  {mockMode ? "MOCK" : "API"}
-                </span>
-                <Switch
-                  checked={mockMode}
-                  onCheckedChange={setMockMode}
-                  className="scale-75"
-                />
-              </div>
-              
-              {/* Organization Circle */}
               <Link
                 href="/admin/select-establishment"
                 className="relative group w-10 h-10 rounded-full bg-white/20 hover:bg-white/30 text-white flex items-center justify-center transition-all shrink-0"
