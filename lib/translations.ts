@@ -205,6 +205,10 @@ export const translations = {
       filterByDepartment: "Filtrar por departamento",
       allDepartments: "Todos los departamentos",
       filterByDate: "Filtrar por fecha",
+      exampleFullName: "Ej: María González",
+      exampleEmail: "correo@hotel.com",
+      examplePhone: "+1 (555) 123-4567",
+      exampleCapacity: "8",
 
       // Rooms page
       roomsManagement: "Gestión de Habitaciones",
@@ -644,6 +648,10 @@ export const translations = {
       filterByDepartment: "Filter by department",
       allDepartments: "All departments",
       filterByDate: "Filter by date",
+      exampleFullName: "Ex: Mary González",
+      exampleEmail: "email@hotel.com",
+      examplePhone: "+1 (555) 123-4567",
+      exampleCapacity: "8",
 
       roomsManagement: "Rooms Management",
       searchRooms: "Search rooms...",
@@ -1080,6 +1088,10 @@ export const translations = {
       filterByDepartment: "Filtrar por departamento",
       allDepartments: "Todos os departamentos",
       filterByDate: "Filtrar por data",
+      exampleFullName: "Ex: Maria González",
+      exampleEmail: "email@hotel.com",
+      examplePhone: "+1 (555) 123-4567",
+      exampleCapacity: "8",
 
       housekeepingManagement: "Gestão de Staff",
       staffOverview: "Visão Geral da Equipe",
