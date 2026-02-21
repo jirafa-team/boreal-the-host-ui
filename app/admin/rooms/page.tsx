@@ -1,12 +1,16 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect, useMemo } from "react"
+import { useDispatch, useSelector } from "react-redux"
 import { ChevronLeft, ChevronRight, Search, LayoutGrid, Calendar, Plus, User } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { useLanguage } from "@/lib/i18n-context"
 import { useToast } from "@/hooks/use-toast"
+import type { RootState } from "@/store/store"
+import { loadMockRooms, setRooms, useGetRoomsQuery } from "@/features/room/slices/roomSlice"
+import type { Room as ApiRoom } from "@/interfaces/room/Room"
 
 type RoomStatus = "available" | "occupied" | "maintenance" | "reserved"
 
@@ -43,65 +47,26 @@ export default function RoomsManagement() {
   const [newRoom, setNewRoom] = useState({ number: "", type: "Individual", floor: 1 })
   const { t } = useLanguage()
 
-  const [rooms, setRooms] = useState<Room[]>([
-    { id: "1", number: "101", type: "Individual", floor: 1, status: "available" },
-    {
-      id: "2",
-      number: "102",
-      type: "Doble",
-      floor: 1,
-      status: "occupied",
-      guest: "Juan Pérez",
-      checkIn: "2025-01-10",
-      checkOut: "2025-01-15",
-    },
-    { id: "3", number: "103", type: "Suite", floor: 1, status: "maintenance" },
-    {
-      id: "4",
-      number: "104",
-      type: "Doble",
-      floor: 1,
-      status: "reserved",
-      guest: "María García",
-      checkIn: "2025-01-12",
-      checkOut: "2025-01-14",
-    },
-    { id: "5", number: "201", type: "Deluxe", floor: 2, status: "available" },
-    {
-      id: "6",
-      number: "202",
-      type: "Suite",
-      floor: 2,
-      status: "occupied",
-      guest: "Carlos López",
-      checkIn: "2025-01-09",
-      checkOut: "2025-01-16",
-    },
-    { id: "7", number: "203", type: "Individual", floor: 2, status: "available" },
-    {
-      id: "8",
-      number: "204",
-      type: "Presidencial",
-      floor: 2,
-      status: "occupied",
-      guest: "Ana Martínez",
-      checkIn: "2025-01-11",
-      checkOut: "2025-01-13",
-    },
-    { id: "9", number: "301", type: "Doble", floor: 3, status: "available" },
-    {
-      id: "10",
-      number: "302",
-      type: "Suite",
-      floor: 3,
-      status: "reserved",
-      guest: "Luis Rodríguez",
-      checkIn: "2025-01-13",
-      checkOut: "2025-01-18",
-    },
-    { id: "11", number: "303", type: "Individual", floor: 3, status: "available" },
-    { id: "12", number: "304", type: "Doble", floor: 3, status: "available" },
-  ])
+  const dispatch = useDispatch()
+  const dataSource = useSelector((state: RootState) => state.dataSource.dataSource)
+  const roomsFromSlice = useSelector((state: RootState) => state.room.rooms)
+  const { data: apiData } = useGetRoomsQuery(undefined, { skip: dataSource !== "api" })
+
+  useEffect(() => {
+    if (dataSource === "mock") dispatch(loadMockRooms())
+  }, [dataSource, dispatch])
+
+  const rooms: Room[] = useMemo(() => {
+    const list = dataSource === "api" ? (apiData?.data?.objects ?? []) : roomsFromSlice
+    return list as Room[]
+  }, [dataSource, apiData, roomsFromSlice])
+  console.log(rooms)
+
+  const setRoomsForMock = (next: Room[] | ((prev: Room[]) => Room[])) => {
+    if (dataSource !== "mock") return
+    const list = typeof next === "function" ? next(rooms) : next
+    dispatch(setRooms(list))
+  }
 
   const handleCreateRoom = () => {
     if (newRoom.number.trim()) {
@@ -115,10 +80,10 @@ export default function RoomsManagement() {
         })
         return
       }
-      
+
       const roomNumber = newRoom.number
       const newId = (Math.max(...rooms.map(r => parseInt(r.id) || 0), 0) + 1).toString()
-      setRooms([...rooms, {
+      setRoomsForMock([...rooms, {
         id: newId,
         number: roomNumber,
         type: newRoom.type,
@@ -152,7 +117,7 @@ export default function RoomsManagement() {
         return
       }
 
-      setRooms(rooms.map(r => r.id === selectedRoom.id ? selectedRoom : r))
+      setRoomsForMock(rooms.map(r => r.id === selectedRoom.id ? selectedRoom : r))
       setShowEditModal(false)
       setSelectedRoom(null)
       toast({
@@ -164,7 +129,7 @@ export default function RoomsManagement() {
 
   const handleDeleteRoom = () => {
     if (selectedRoom) {
-      setRooms(rooms.filter(r => r.id !== selectedRoom.id))
+      setRoomsForMock(rooms.filter(r => r.id !== selectedRoom.id))
       setShowEditModal(false)
       setSelectedRoom(null)
       toast({
@@ -178,21 +143,21 @@ export default function RoomsManagement() {
     (room) => {
       const matchesStatus = statusFilter === null || room.status === statusFilter
       const matchesSearch = room.number.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                           room.type.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                           room.guest?.toLowerCase().includes(searchTerm.toLowerCase())
-      
+        room.type.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        room.guest?.toLowerCase().includes(searchTerm.toLowerCase())
+
       // Filter by selected date for grid view
       if (layoutMode === "grid") {
         const selectedDateObj = new Date(selectedDate)
         selectedDateObj.setHours(0, 0, 0, 0)
-        
+
         if (room.status === "maintenance") return matchesStatus && matchesSearch
         if (room.checkIn && room.checkOut) {
           const checkIn = new Date(room.checkIn)
           const checkOut = new Date(room.checkOut)
           checkIn.setHours(0, 0, 0, 0)
           checkOut.setHours(0, 0, 0, 0)
-          
+
           if (selectedDateObj >= checkIn && selectedDateObj <= checkOut) {
             return matchesStatus && matchesSearch
           }
@@ -203,7 +168,7 @@ export default function RoomsManagement() {
         }
         return false
       }
-      
+
       return matchesStatus && matchesSearch
     },
   )
@@ -364,22 +329,20 @@ export default function RoomsManagement() {
               <div className="inline-flex h-10 items-center rounded-lg bg-gray-100 p-1 border border-gray-200">
                 <button
                   onClick={() => setLayoutMode("grid")}
-                  className={`px-5 py-2 rounded-md font-medium text-sm transition-all ${
-                    layoutMode === "grid"
-                      ? "text-white shadow-md"
-                      : "text-gray-700 hover:text-gray-900"
-                  }`}
+                  className={`px-5 py-2 rounded-md font-medium text-sm transition-all ${layoutMode === "grid"
+                    ? "text-white shadow-md"
+                    : "text-gray-700 hover:text-gray-900"
+                    }`}
                   style={layoutMode === "grid" ? { backgroundColor: "#394a63" } : {}}
                 >
                   Grid
                 </button>
                 <button
                   onClick={() => setLayoutMode("kanban")}
-                  className={`px-5 py-2 rounded-md font-medium text-sm transition-all ${
-                    layoutMode === "kanban"
-                      ? "text-white shadow-md"
-                      : "text-gray-700 hover:text-gray-900"
-                  }`}
+                  className={`px-5 py-2 rounded-md font-medium text-sm transition-all ${layoutMode === "kanban"
+                    ? "text-white shadow-md"
+                    : "text-gray-700 hover:text-gray-900"
+                    }`}
                   style={layoutMode === "kanban" ? { backgroundColor: "#394a63" } : {}}
                 >
                   Timeline
@@ -406,7 +369,7 @@ export default function RoomsManagement() {
       <div className="p-8">
         {layoutMode === "grid" && (
           <div className="grid grid-cols-2 md:grid-cols-5 gap-2 mb-4">
-            <div 
+            <div
               onClick={() => setStatusFilter(null)}
               className={`p-3 relative rounded-2xl shadow-lg text-center cursor-pointer transition-all overflow-hidden ${statusFilter === null ? 'text-white' : 'bg-white/95 backdrop-blur-lg hover:shadow-lg'}`}
               style={statusFilter === null ? { backgroundColor: "#1E40AF" } : {}}
@@ -419,7 +382,7 @@ export default function RoomsManagement() {
                 <p className={`text-xs font-medium ${statusFilter === null ? 'text-blue-100' : 'text-muted-foreground'}`}>{t("admin.totalRooms")}</p>
               </div>
             </div>
-            <div 
+            <div
               onClick={() => setStatusFilter("available")}
               className={`p-3 relative rounded-2xl shadow-lg text-center cursor-pointer transition-all overflow-hidden ${statusFilter === "available" ? 'text-white' : 'bg-white/95 backdrop-blur-lg hover:shadow-lg'}`}
               style={statusFilter === "available" ? { backgroundColor: "#235E20" } : {}}
@@ -432,7 +395,7 @@ export default function RoomsManagement() {
                 <p className={`text-xs font-medium ${statusFilter === "available" ? 'text-green-100' : 'text-muted-foreground'}`}>{t("admin.availableRooms")}</p>
               </div>
             </div>
-            <div 
+            <div
               onClick={() => setStatusFilter("occupied")}
               className={`p-3 relative rounded-2xl shadow-lg text-center cursor-pointer transition-all overflow-hidden ${statusFilter === "occupied" ? 'text-white' : 'bg-white/95 backdrop-blur-lg hover:shadow-lg'}`}
               style={statusFilter === "occupied" ? { backgroundColor: "#AA2C2C" } : {}}
@@ -445,7 +408,7 @@ export default function RoomsManagement() {
                 <p className={`text-xs font-medium ${statusFilter === "occupied" ? 'text-red-100' : 'text-muted-foreground'}`}>{t("admin.occupiedRooms")}</p>
               </div>
             </div>
-            <div 
+            <div
               onClick={() => setStatusFilter("reserved")}
               className={`p-3 relative rounded-2xl shadow-lg text-center cursor-pointer transition-all overflow-hidden ${statusFilter === "reserved" ? 'text-white' : 'bg-white/95 backdrop-blur-lg hover:shadow-lg'}`}
               style={statusFilter === "reserved" ? { backgroundColor: "#1E3A8A" } : {}}
@@ -458,7 +421,7 @@ export default function RoomsManagement() {
                 <p className={`text-xs font-medium ${statusFilter === "reserved" ? 'text-blue-100' : 'text-muted-foreground'}`}>{t("admin.reservedRooms")}</p>
               </div>
             </div>
-            <div 
+            <div
               onClick={() => setStatusFilter("maintenance")}
               className={`p-3 relative rounded-2xl shadow-lg text-center cursor-pointer transition-all overflow-hidden ${statusFilter === "maintenance" ? 'text-white' : 'bg-white/95 backdrop-blur-lg hover:shadow-lg'}`}
               style={statusFilter === "maintenance" ? { backgroundColor: "#CA8A04" } : {}}
@@ -515,8 +478,8 @@ export default function RoomsManagement() {
           /* Rooms Grid */
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
             {filteredRooms.map((room) => (
-              <Card 
-                key={room.id} 
+              <Card
+                key={room.id}
                 className="p-4 hover:shadow-lg transition-shadow cursor-pointer relative"
                 onClick={() => handleEditRoom(room)}
               >
@@ -528,15 +491,14 @@ export default function RoomsManagement() {
                   </div>
                   {/* Status Badge - Top Right */}
                   <div
-                    className={`px-3 py-1.5 rounded-lg text-xs font-medium text-white shrink-0 ${
-                      room.status === "available"
+                    className={`px-3 py-1.5 rounded-lg text-xs font-medium text-white shrink-0 ${room.status === "available"
+                      ? "bg-blue-600"
+                      : room.status === "occupied"
                         ? "bg-blue-600"
-                        : room.status === "occupied"
+                        : room.status === "reserved"
                           ? "bg-blue-600"
-                          : room.status === "reserved"
-                            ? "bg-blue-600"
-                            : "bg-yellow-600"
-                    }`}
+                          : "bg-yellow-600"
+                      }`}
                     style={
                       room.status === "available"
                         ? { backgroundColor: "#235E20" }
@@ -552,32 +514,32 @@ export default function RoomsManagement() {
                 <div className="space-y-2">
                   <div className="pt-2 border-t border-border">
                     <div className="flex items-center gap-2">
-                      <div 
+                      <div
                         className="w-6 h-6 rounded-full flex items-center justify-center"
-                        style={{ 
-                          backgroundColor: room.status === "available" 
-                            ? "rgba(35, 94, 32, 0.15)" 
-                            : room.status === "occupied" 
-                              ? "rgba(170, 44, 44, 0.15)" 
-                              : room.status === "reserved" 
-                                ? "rgba(30, 58, 138, 0.15)" 
-                                : "rgba(180, 83, 9, 0.15)" 
+                        style={{
+                          backgroundColor: room.status === "available"
+                            ? "rgba(35, 94, 32, 0.15)"
+                            : room.status === "occupied"
+                              ? "rgba(170, 44, 44, 0.15)"
+                              : room.status === "reserved"
+                                ? "rgba(30, 58, 138, 0.15)"
+                                : "rgba(180, 83, 9, 0.15)"
                         }}
                       >
-                        <User 
-                          className="w-3.5 h-3.5" 
-                          style={{ 
-                            color: room.status === "available" 
-                              ? "#235E20" 
-                              : room.status === "occupied" 
-                                ? "#AA2C2C" 
-                                : room.status === "reserved" 
-                                  ? "#1E3A8A" 
-                                  : "#B45309" 
-                          }} 
+                        <User
+                          className="w-3.5 h-3.5"
+                          style={{
+                            color: room.status === "available"
+                              ? "#235E20"
+                              : room.status === "occupied"
+                                ? "#AA2C2C"
+                                : room.status === "reserved"
+                                  ? "#1E3A8A"
+                                  : "#B45309"
+                          }}
                         />
                       </div>
-                      <button 
+                      <button
                         onClick={(e) => {
                           e.stopPropagation()
                           // TODO: Add guest detail modal or navigation here
@@ -589,29 +551,29 @@ export default function RoomsManagement() {
                     </div>
                     {room.checkIn && room.checkOut && (
                       <div className="flex items-center gap-2 mt-2 text-xs">
-                        <div 
+                        <div
                           className="w-6 h-6 rounded-full flex items-center justify-center"
-                          style={{ 
-                            backgroundColor: room.status === "available" 
-                              ? "rgba(35, 94, 32, 0.15)" 
-                              : room.status === "occupied" 
-                                ? "rgba(170, 44, 44, 0.15)" 
-                                : room.status === "reserved" 
-                                  ? "rgba(30, 58, 138, 0.15)" 
-                                  : "rgba(180, 83, 9, 0.15)" 
+                          style={{
+                            backgroundColor: room.status === "available"
+                              ? "rgba(35, 94, 32, 0.15)"
+                              : room.status === "occupied"
+                                ? "rgba(170, 44, 44, 0.15)"
+                                : room.status === "reserved"
+                                  ? "rgba(30, 58, 138, 0.15)"
+                                  : "rgba(180, 83, 9, 0.15)"
                           }}
                         >
-                          <Calendar 
-                            className="w-3.5 h-3.5" 
-                            style={{ 
-                              color: room.status === "available" 
-                                ? "#235E20" 
-                                : room.status === "occupied" 
-                                  ? "#AA2C2C" 
-                                  : room.status === "reserved" 
-                                    ? "#1E3A8A" 
-                                    : "#B45309" 
-                            }} 
+                          <Calendar
+                            className="w-3.5 h-3.5"
+                            style={{
+                              color: room.status === "available"
+                                ? "#235E20"
+                                : room.status === "occupied"
+                                  ? "#AA2C2C"
+                                  : room.status === "reserved"
+                                    ? "#1E3A8A"
+                                    : "#B45309"
+                            }}
                           />
                         </div>
                         <span className="text-muted-foreground">{new Date(room.checkIn).toLocaleDateString("es-ES")}</span>
@@ -635,23 +597,21 @@ export default function RoomsManagement() {
                 </span>
                 <button
                   onClick={() => setTimelineMode(timelineMode === "week" ? "month" : "week")}
-                  className={`relative inline-flex h-8 w-14 items-center rounded-full transition-colors ${
-                    timelineMode === "month"
-                      ? "bg-lime-600"
-                      : "bg-gray-300"
-                  }`}
+                  className={`relative inline-flex h-8 w-14 items-center rounded-full transition-colors ${timelineMode === "month"
+                    ? "bg-lime-600"
+                    : "bg-gray-300"
+                    }`}
                 >
                   <span
-                    className={`inline-block h-6 w-6 transform rounded-full bg-white transition-transform ${
-                      timelineMode === "month" ? "translate-x-7" : "translate-x-1"
-                    }`}
+                    className={`inline-block h-6 w-6 transform rounded-full bg-white transition-transform ${timelineMode === "month" ? "translate-x-7" : "translate-x-1"
+                      }`}
                   />
                 </button>
                 <span className={`text-sm font-medium ${timelineMode === "month" ? "text-foreground" : "text-muted-foreground"}`}>
                   {language === 'es' || language === 'pt' ? 'Mes' : 'Month'}
                 </span>
               </div>
-              
+
               {/* Date/Month Navigation for Timeline */}
               {timelineMode === "week" ? (
                 <div className="flex items-center gap-3">
@@ -782,15 +742,14 @@ export default function RoomsManagement() {
                           return (
                             <div
                               key={idx}
-                              className={`${timelineMode === "week" ? "w-24" : "w-12"} h-12 rounded flex-shrink-0 ${
-                                status === "available"
-                                  ? "bg-green-100 border border-green-200"
-                                  : status === "occupied"
-                                    ? "bg-red-100 border border-red-200"
-                                    : status === "reserved"
-                                      ? "bg-blue-100 border border-blue-200"
-                                      : "bg-yellow-100 border border-yellow-200"
-                              } flex items-center justify-center group relative cursor-pointer hover:shadow-md transition-shadow`}
+                              className={`${timelineMode === "week" ? "w-24" : "w-12"} h-12 rounded flex-shrink-0 ${status === "available"
+                                ? "bg-green-100 border border-green-200"
+                                : status === "occupied"
+                                  ? "bg-red-100 border border-red-200"
+                                  : status === "reserved"
+                                    ? "bg-blue-100 border border-blue-200"
+                                    : "bg-yellow-100 border border-yellow-200"
+                                } flex items-center justify-center group relative cursor-pointer hover:shadow-md transition-shadow`}
                             >
                               {status !== "available" && (
                                 <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
@@ -849,7 +808,7 @@ export default function RoomsManagement() {
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
           <div className="bg-white rounded-lg shadow-lg p-6 max-w-md w-full mx-4">
             <h3 className="text-xl font-bold text-gray-900 mb-4">{t("admin.createNewRoom")}</h3>
-            
+
             <div className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">{t("admin.roomNumber")}</label>
@@ -916,7 +875,7 @@ export default function RoomsManagement() {
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
           <div className="bg-white rounded-2xl shadow-2xl p-6 w-full max-w-md mx-4">
             <h2 className="text-xl font-bold text-foreground mb-4">Editar Habitación {selectedRoom.number}</h2>
-            
+
             <div className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-foreground mb-1">Número de Habitación</label>
@@ -926,7 +885,7 @@ export default function RoomsManagement() {
                   placeholder="Ej: 101"
                 />
               </div>
-              
+
               <div>
                 <label className="block text-sm font-medium text-foreground mb-1">Tipo</label>
                 <select
@@ -940,7 +899,7 @@ export default function RoomsManagement() {
                   <option value="Familiar">Familiar</option>
                 </select>
               </div>
-              
+
               <div>
                 <label className="block text-sm font-medium text-foreground mb-1">Piso</label>
                 <Input
@@ -950,7 +909,7 @@ export default function RoomsManagement() {
                   min={1}
                 />
               </div>
-              
+
               <div>
                 <label className="block text-sm font-medium text-foreground mb-1">Estado</label>
                 <select
@@ -996,7 +955,7 @@ export default function RoomsManagement() {
                 </>
               )}
             </div>
-            
+
             <div className="flex gap-3 mt-6">
               <button
                 onClick={handleDeleteRoom}

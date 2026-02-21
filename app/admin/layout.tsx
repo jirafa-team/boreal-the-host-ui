@@ -2,6 +2,9 @@
 
 import type React from "react"
 import { useState, useEffect } from "react"
+import { useDispatch, useSelector } from "react-redux"
+import { setDataSource } from "@/store/slices/dataSourceSlice"
+import type { RootState } from "@/store/store"
 import {
   Hotel,
   Calendar,
@@ -27,17 +30,60 @@ import {
 import { Button } from "@/components/ui/button"
 import { Switch } from "@/components/ui/switch"
 import Link from "next/link"
-import { usePathname } from "next/navigation"
+import { usePathname, useRouter } from "next/navigation"
 import { useLanguage } from "@/lib/i18n-context"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { ROUTES } from "@/shared/types/routes"
+
+const ADMIN_TO_MYHOST: Record<string, (orgId: string) => string> = {
+  "/admin/home": ROUTES.HOME,
+  "/admin/dashboard": ROUTES.DASHBOARD,
+  "/admin/rooms": ROUTES.ROOMS,
+  "/admin/facilities": ROUTES.FACILITIES,
+  "/admin/staff": ROUTES.STAFF,
+  "/admin/clients": ROUTES.CLIENTS,
+  "/admin/users": ROUTES.USERS,
+  "/admin/settings": ROUTES.SETTINGS,
+  "/admin/events": ROUTES.EVENTS,
+  "/admin/notifications": ROUTES.NOTIFICATIONS,
+  "/admin/agentico": ROUTES.AGENTICO,
+}
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const [sidebarOpen, setSidebarOpen] = useState(true)
   const [expandedSections, setExpandedSections] = useState<Set<string>>(new Set())
   const [isLoaded, setIsLoaded] = useState(false)
-  const [mockMode, setMockMode] = useState(false)
+  const dispatch = useDispatch()
+  const router = useRouter()
+  const dataSource = useSelector((state: RootState) => state.dataSource.dataSource)
+  const orgId = useSelector(
+    (state: RootState) => state.organization?.currentOrganizationId ?? state.auth?.currentOrganization?.id
+  )
+  const mockMode = dataSource === "mock"
   const pathname = usePathname()
   const { t, language, setLanguage } = useLanguage()
+
+  useEffect(() => {
+    if (!pathname || !orgId) return
+    if (ADMIN_TO_MYHOST[pathname]) {
+      router.replace(ADMIN_TO_MYHOST[pathname](orgId))
+      return
+    }
+    if (pathname === "/admin/notifications/log") {
+      router.replace(ROUTES.NOTIFICATIONS_LOG(orgId))
+      return
+    }
+    const eventsMatch = pathname.match(/^\/admin\/events\/(.+)$/)
+    if (eventsMatch) {
+      router.replace(ROUTES.EVENT_DETAIL(orgId, eventsMatch[1]))
+      return
+    }
+    const clientsMatch = pathname.match(/^\/admin\/clients\/(.+)$/)
+    if (clientsMatch) {
+      router.replace(ROUTES.CLIENT_DETAIL(orgId, clientsMatch[1]))
+      return
+    }
+  }, [pathname, orgId, router])
 
   useEffect(() => {
     setIsLoaded(true)
@@ -64,12 +110,12 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
   // Ocultar sidebar en la página de selección de establecimiento
   const hideSidebar = pathname === '/admin/select-establishment'
-  
+
   // Detectar si estamos en modo agentico
   const isAgenticoMode = pathname === '/admin/agentico'
-  
+
   // Clase de fondo dinámico del sidebar
-  const sidebarBgClass = isAgenticoMode 
+  const sidebarBgClass = isAgenticoMode
     ? "bg-gradient-to-br from-purple-950 via-slate-950 to-slate-950"
     : "bg-gradient-to-b from-gray-900 to-black"
 
@@ -171,9 +217,8 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                     >
                       <span>{section.title}</span>
                       <ChevronDown
-                        className={`w-4 h-4 transition-transform ${
-                          expandedSections.has(section.id) ? "rotate-0" : "-rotate-90"
-                        }`}
+                        className={`w-4 h-4 transition-transform ${expandedSections.has(section.id) ? "rotate-0" : "-rotate-90"
+                          }`}
                       />
                     </button>
                     <div className="space-y-1 mb-2">
@@ -184,9 +229,8 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                           <Link
                             key={item.href}
                             href={item.href}
-                            className={`flex items-center gap-3 px-3 py-1.5 text-xs rounded-lg transition-colors ${
-                              isActive ? "bg-white/20 text-white font-medium" : "text-white/90 hover:bg-white/10"
-                            }`}
+                            className={`flex items-center gap-3 px-3 py-1.5 text-xs rounded-lg transition-colors ${isActive ? "bg-white/20 text-white font-medium" : "text-white/90 hover:bg-white/10"
+                              }`}
                           >
                             <Icon className="w-5 h-5 shrink-0" />
                             <span>{item.label}</span>
@@ -205,9 +249,8 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                           key={item.href}
                           href={item.href}
                           title={item.label}
-                          className={`flex items-center justify-center gap-3 px-3 py-2 rounded-lg transition-colors ${
-                            isActive ? "bg-white/20 text-white font-medium" : "text-white/90 hover:bg-white/10"
-                          }`}
+                          className={`flex items-center justify-center gap-3 px-3 py-2 rounded-lg transition-colors ${isActive ? "bg-white/20 text-white font-medium" : "text-white/90 hover:bg-white/10"
+                            }`}
                         >
                           <Icon className="w-5 h-5 shrink-0" />
                         </Link>
@@ -228,11 +271,11 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                 </span>
                 <Switch
                   checked={mockMode}
-                  onCheckedChange={setMockMode}
+                  onCheckedChange={(checked) => dispatch(setDataSource(checked ? "mock" : "api"))}
                   className="scale-75"
                 />
               </div>
-              
+
               {/* Organization Circle */}
               {isLoaded && (
                 <>
@@ -270,9 +313,8 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                     <button
                       key={lang.code}
                       onClick={() => setLanguage(lang.code)}
-                      className={`flex-1 h-full font-medium text-xs transition-all ${
-                        language === lang.code ? "text-white shadow-md" : "text-white/60 hover:text-white/80"
-                      }`}
+                      className={`flex-1 h-full font-medium text-xs transition-all ${language === lang.code ? "text-white shadow-md" : "text-white/60 hover:text-white/80"
+                        }`}
                       style={language === lang.code ? { backgroundColor: "#0891B2" } : {}}
                     >
                       {lang.label}

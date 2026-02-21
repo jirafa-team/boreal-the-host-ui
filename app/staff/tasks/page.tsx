@@ -1,92 +1,74 @@
 "use client"
 
-import { useState, useMemo } from "react"
+import { useState, useEffect, useMemo } from "react"
+import { useDispatch, useSelector } from "react-redux"
 import { ChevronLeft, ChevronRight, CheckCircle2, Circle, AlertCircle, Clock, MapPin } from "lucide-react"
 import { useRouter } from "next/navigation"
+import type { RootState } from "@/store/store"
+import { loadMockStaffTasks, setTasks, useGetStaffTasksQuery } from "@/features/staff-task/slices/staffTaskSlice"
+import type { StaffTask } from "@/interfaces/staff-task/StaffTask"
+
+type UiTask = {
+  id: number | string
+  title: string
+  category: string
+  status: string
+  priority: string
+  time: string
+  location: string
+  description: string
+  date: "yesterday" | "today" | "tomorrow"
+}
+
+function mapApiTaskToUi(t: StaffTask, index: number): UiTask {
+  const d = t.scheduledStartAt ? new Date(t.scheduledStartAt) : new Date()
+  const timeStr = `${d.getHours().toString().padStart(2, "0")}:${d.getMinutes().toString().padStart(2, "0")} ${d.getHours() >= 12 ? "PM" : "AM"}`
+  const day = d.getDate()
+  const today = new Date().getDate()
+  let date: UiTask["date"] = "today"
+  if (day < today) date = "yesterday"
+  else if (day > today) date = "tomorrow"
+  return {
+    id: t.id,
+    title: t.description,
+    category: "General",
+    status: (t.status as string) ?? "pending",
+    priority: "medium",
+    time: timeStr,
+    location: "",
+    description: t.description,
+    date,
+  }
+}
 
 export default function StaffTasksPage() {
   const router = useRouter()
-  const [tasks, setTasks] = useState([
-    {
-      id: 1,
-      title: "Limpiar Habitación 204",
-      category: "Limpieza",
-      status: "pending",
-      priority: "high",
-      time: "09:00 AM",
-      location: "Piso 2",
-      description: "Suite Premium - Cambiar sábanas y limpiar baño",
-      date: "today",
-    },
-    {
-      id: 2,
-      title: "Preparar Sala de Conferencias",
-      category: "Mantenimiento",
-      status: "in-progress",
-      priority: "high",
-      time: "10:30 AM",
-      location: "Sala B",
-      description: "Configurar proyector y mesas para reunión",
-      date: "today",
-    },
-    {
-      id: 3,
-      title: "Reposición de Minibar - Piso 3",
-      category: "Servicio",
-      status: "pending",
-      priority: "medium",
-      time: "11:00 AM",
-      location: "Piso 3",
-      description: "Reabastecer bebidas frías",
-      date: "today",
-    },
-    {
-      id: 4,
-      title: "Inspección Piscina",
-      category: "Limpieza",
-      status: "completed",
-      priority: "medium",
-      time: "08:00 AM",
-      location: "Azotea",
-      description: "Revisar nivel de químicos y filtros",
-      date: "yesterday",
-    },
-    {
-      id: 5,
-      title: "Reparar Aire Acondicionado Habitación 305",
-      category: "Mantenimiento",
-      status: "pending",
-      priority: "high",
-      time: "14:00 PM",
-      location: "Piso 3",
-      description: "Cliente reportó que no enfría",
-      date: "tomorrow",
-    },
-    {
-      id: 6,
-      title: "Atender Solicitud Room Service",
-      category: "Servicio",
-      status: "in-progress",
-      priority: "high",
-      time: "14:30 PM",
-      location: "Habitación 204",
-      description: "Entregar pedido de desayuno",
-      date: "tomorrow",
-    },
-  ])
+  const dispatch = useDispatch()
+  const dataSource = useSelector((state: RootState) => state.dataSource.dataSource)
+  const tasksFromSlice = useSelector((state: RootState) => state.staffTask.tasks)
+  const { data: apiData } = useGetStaffTasksQuery(undefined, { skip: dataSource !== "api" })
+
+  useEffect(() => {
+    if (dataSource === "mock") dispatch(loadMockStaffTasks())
+  }, [dataSource, dispatch])
+
+  const tasks: UiTask[] = useMemo(() => {
+    const list = dataSource === "api"
+      ? (apiData?.data?.staffTasks ?? apiData?.data?.tasks ?? [])
+      : tasksFromSlice
+    return list.map((t, i) => mapApiTaskToUi(t, i))
+  }, [dataSource, apiData, tasksFromSlice])
+
   const [statusFilter, setStatusFilter] = useState<string | null>(null)
   const [dateFilter, setDateFilter] = useState<"yesterday" | "today" | "tomorrow">("today")
 
-  const toggleTaskStatus = (id: number) => {
-    setTasks(
-      tasks.map((task) => {
-        if (task.id === id) {
-          const statusMap = { pending: "in-progress", "in-progress": "completed", completed: "pending" }
-          return { ...task, status: statusMap[task.status as keyof typeof statusMap] }
-        }
-        return task
-      }),
+  const toggleTaskStatus = (id: number | string) => {
+    if (dataSource !== "mock") return
+    const statusMap = { pending: "in-progress", "in-progress": "completed", completed: "pending" } as const
+    const next = tasksFromSlice.map((t) =>
+      t.id === String(id) ? { ...t, status: statusMap[(t.status as keyof typeof statusMap) ?? "pending"] ?? "pending" } : t
     )
+    dispatch(setTasks(next))
   }
 
   const getStatusColor = (status: string) => {

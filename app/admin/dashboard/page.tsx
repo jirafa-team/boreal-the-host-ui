@@ -1,7 +1,9 @@
 "use client"
 
 import { useState } from "react"
-import { useRouter } from "next/navigation"
+import { useRouter, useParams } from "next/navigation"
+import { useSelector } from "react-redux"
+import { ROUTES } from "@/shared/types/routes"
 import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
@@ -10,6 +12,7 @@ import { useLanguage } from "@/lib/i18n-context"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import type { RootState } from "@/store/store"
 
 type RoomStatus = "available" | "occupied" | "maintenance" | "reserved"
 type FacilityStatus = "available" | "booked"
@@ -177,6 +180,8 @@ const handleShowBookingsDetail = (slotBookings: Booking[]) => {
 export default function DashboardControl() {
   const { t, language } = useLanguage()
   const router = useRouter()
+  const params = useParams()
+  const orgId = params?.orgId as string | undefined
   const [activeTab, setActiveTab] = useState<"rooms" | "staff" | "facilities" | "checkouts">("rooms")
   const [timelineMode, setTimelineMode] = useState<"week" | "month">("week")
   const [currentDate, setCurrentDate] = useState(new Date())
@@ -516,6 +521,17 @@ export default function DashboardControl() {
 
   const facilities: Facility[] = mockFacilities
   const facilityList: Facility[] = mockFacilities // Declare facilityList variable
+
+  const dataSource = useSelector((state: RootState) => state.dataSource.dataSource)
+  if (dataSource === "api") {
+    return (
+      <div className="p-8">
+        <Card className="p-6">
+          <p className="text-muted-foreground">Datos desde API: esta vista aún no está conectada.</p>
+        </Card>
+      </div>
+    )
+  }
 
   return (
     <div>
@@ -1187,7 +1203,7 @@ export default function DashboardControl() {
                       <td className="px-4 py-3 text-gray-900 font-semibold">#{checkout.room}</td>
                       <td className="px-4 py-3 text-gray-700">
                         <button
-                          onClick={() => router.push(`/admin/clients/${checkout.id}`)}
+                          onClick={() => router.push(orgId ? ROUTES.CLIENT_DETAIL(orgId, String(checkout.id)) : `/admin/clients/${checkout.id}`)}
                           className="text-blue-600 hover:text-blue-800 hover:underline transition-colors"
                         >
                           {checkout.guestName}

@@ -16,7 +16,11 @@ import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Plus, Dumbbell, Waves, Sparkles, Video, Coffee, UtensilsCrossed, LayoutGrid, Clock, Users, Building2, Calendar as CalendarIcon, ChevronLeft, ChevronRight, Calendar } from "lucide-react"
 import { useLanguage } from "@/lib/i18n-context"
-import React from "react"
+import React, { useEffect } from "react"
+import { useDispatch, useSelector } from "react-redux"
+import type { RootState } from "@/store/store"
+import { loadMockFacilities, setFacilities, useGetFacilitiesQuery } from "@/features/facility/slices/facilitySlice"
+import type { Facility as ApiFacility } from "@/interfaces/facility/Facility"
 
 type Facility = {
   id: string
@@ -38,15 +42,28 @@ type Booking = {
   status: "confirmed" | "pending"
 }
 
-const mockFacilities: Facility[] = [
-  { id: "1", name: "Gimnasio", type: "fitness", capacity: 15, icon: Dumbbell, color: "bg-orange-500", startTime: "06:00", endTime: "22:00" },
-  { id: "2", name: "Piscina", type: "recreation", capacity: 30, icon: Waves, color: "bg-blue-500", startTime: "08:00", endTime: "20:00" },
-  { id: "3", name: "Spa", type: "wellness", capacity: 8, icon: Sparkles, color: "bg-purple-500", startTime: "09:00", endTime: "21:00" },
-  { id: "4", name: "Sala de Conferencias A", type: "business", capacity: 50, icon: Video, color: "bg-teal-500", startTime: "07:00", endTime: "23:00" },
-  { id: "5", name: "Sala de Conferencias B", type: "business", capacity: 25, icon: Video, color: "bg-cyan-500", startTime: "07:00", endTime: "23:00" },
-  { id: "6", name: "Cafetería", type: "dining", capacity: 40, icon: Coffee, color: "bg-amber-500", startTime: "06:30", endTime: "23:00" },
-  { id: "7", name: "Restaurante Premium", type: "dining", capacity: 60, icon: UtensilsCrossed, color: "bg-rose-500", startTime: "12:00", endTime: "23:30" },
-]
+const typeToIconAndColor: Record<string, { icon: typeof Dumbbell; color: string }> = {
+  fitness: { icon: Dumbbell, color: "bg-orange-500" },
+  recreation: { icon: Waves, color: "bg-blue-500" },
+  wellness: { icon: Sparkles, color: "bg-purple-500" },
+  business: { icon: Video, color: "bg-teal-500" },
+  dining: { icon: Coffee, color: "bg-amber-500" },
+}
+
+function mapApiFacilityToUi(f: ApiFacility): Facility {
+  const type = f.type ?? "fitness"
+  const { icon, color } = typeToIconAndColor[type] ?? { icon: LayoutGrid, color: "bg-gray-500" }
+  return {
+    id: f.id,
+    name: f.name,
+    type,
+    capacity: f.capacity ?? 0,
+    icon,
+    color,
+    startTime: f.startTime ?? f.openTime ?? "08:00",
+    endTime: f.endTime ?? f.closeTime ?? "20:00",
+  }
+}
 
 const mockBookings: Booking[] = [
   { facilityId: "1", clientName: "Juan Pérez", clientRoom: "301", time: "08:00", duration: 60, status: "confirmed" },
@@ -66,7 +83,35 @@ const mockBookings: Booking[] = [
 
 export default function FacilitiesPage() {
   const { t, language } = useLanguage()
-  const [facilities, setFacilities] = React.useState<Facility[]>(mockFacilities)
+  const dispatch = useDispatch()
+  const dataSource = useSelector((state: RootState) => state.dataSource.dataSource)
+  const facilitiesFromSlice = useSelector((state: RootState) => state.facility.facilities)
+  const skip = dataSource !== "api"
+  const { data: apiData, isLoading, error } = useGetFacilitiesQuery(undefined, { skip })
+
+  const DEBUG_API = typeof process !== "undefined" && process.env.NODE_ENV === "development"
+  useEffect(() => {
+    if (DEBUG_API) console.log("[facilities] mount", { dataSource, skip })
+  }, [DEBUG_API, dataSource, skip])
+  useEffect(() => {
+    if (DEBUG_API && (apiData !== undefined || error)) console.log("[facilities] apiData", { apiData, apiDataData: apiData?.data, isLoading, error })
+  }, [DEBUG_API, apiData, isLoading, error])
+
+  useEffect(() => {
+    if (dataSource === "mock") dispatch(loadMockFacilities())
+  }, [dataSource, dispatch])
+
+  const facilities: Facility[] = React.useMemo(() => {
+    const list = dataSource === "api" ? (apiData?.data?.objects ?? []) : facilitiesFromSlice
+    return list.map(mapApiFacilityToUi)
+  }, [dataSource, apiData, facilitiesFromSlice])
+
+  const setFacilitiesForMock = (next: Facility[] | ((prev: Facility[]) => Facility[])) => {
+    if (dataSource !== "mock") return
+    const list = typeof next === "function" ? next(facilities) : next
+    dispatch(setFacilities(list.map(({ id, name, type, capacity, startTime, endTime }) => ({ id, name, type, capacity, startTime, endTime }))))
+  }
+
   const [bookings, setBookings] = React.useState<Booking[]>(mockBookings)
   const [viewMode, setViewMode] = React.useState<"list" | "timeline">("list")
   const [selectedDate, setSelectedDate] = React.useState(new Date().toISOString().split('T')[0])
@@ -170,7 +215,7 @@ export default function FacilitiesPage() {
       icon: Dumbbell,
       color: "bg-gray-500",
     }
-    setFacilities([...facilities, newFacility])
+    setFacilitiesForMock([...facilities, newFacility])
     setAddFacilityOpen(false)
   }
 
@@ -191,7 +236,7 @@ export default function FacilitiesPage() {
       startTime: formData.get("startTime") as string,
       endTime: formData.get("endTime") as string,
     }
-    setFacilities(facilities.map((f) => (f.id === editingFacility.id ? updatedFacility : f)))
+    setFacilitiesForMock(facilities.map((f) => (f.id === editingFacility.id ? updatedFacility : f)))
     setEditDialogOpen(false)
     setEditingFacility(null)
   }
@@ -227,17 +272,17 @@ export default function FacilitiesPage() {
     const currentHour = now.getHours()
     const currentMinute = now.getMinutes()
     const currentTimeInHours = currentHour + currentMinute / 60
-    
+
     const facility = facilities.find((f) => f.id === facilityId)
     if (!facility) return { occupancyPercent: 0, currentBookings: [] }
-    
+
     const currentBookings = bookings.filter((b) => {
       if (b.facilityId !== facilityId) return false
       const bookingStart = parseInt(b.time.split(":")[0]) + parseInt(b.time.split(":")[1] || "0") / 60
       const bookingEnd = bookingStart + b.duration / 60
       return currentTimeInHours >= bookingStart && currentTimeInHours < bookingEnd
     })
-    
+
     const occupancyPercent = Math.round((currentBookings.length / facility.capacity) * 100)
     return { occupancyPercent, currentBookings }
   }
@@ -296,22 +341,20 @@ export default function FacilitiesPage() {
               <div className="inline-flex h-10 items-center rounded-lg bg-gray-100 p-1 border border-gray-200">
                 <button
                   onClick={() => setViewMode("list")}
-                  className={`px-5 py-2 rounded-md font-medium text-sm transition-all ${
-                    viewMode === "list"
+                  className={`px-5 py-2 rounded-md font-medium text-sm transition-all ${viewMode === "list"
                       ? "text-white shadow-md"
                       : "text-gray-700 hover:text-gray-900"
-                  }`}
+                    }`}
                   style={viewMode === "list" ? { backgroundColor: "#394a63" } : {}}
                 >
                   Lista
                 </button>
                 <button
                   onClick={() => setViewMode("timeline")}
-                  className={`px-5 py-2 rounded-md font-medium text-sm transition-all ${
-                    viewMode === "timeline"
+                  className={`px-5 py-2 rounded-md font-medium text-sm transition-all ${viewMode === "timeline"
                       ? "text-white shadow-md"
                       : "text-gray-700 hover:text-gray-900"
-                  }`}
+                    }`}
                   style={viewMode === "timeline" ? { backgroundColor: "#394a63" } : {}}
                 >
                   Timeline
@@ -319,17 +362,17 @@ export default function FacilitiesPage() {
               </div>
               <Dialog open={addFacilityOpen} onOpenChange={setAddFacilityOpen}>
                 <DialogTrigger asChild>
-                  <button 
+                  <button
                     className="flex items-center justify-center w-10 h-10 rounded-full bg-gradient-to-br from-primary to-primary/80 text-white shadow-md hover:shadow-lg transition-all duration-300 hover:scale-110 group relative"
-                title={t("admin.addAmenity")}
-              >
-                <div className="relative flex items-center justify-center">
-                  <Plus className="w-5 h-5" />
-                  <span className="absolute text-base font-bold -bottom-0.5 -right-0.5 text-white drop-shadow-lg">+</span>
-                </div>
-                <span className="absolute top-full mt-2 px-2 py-1 bg-gray-900 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap">
-                  {t("admin.addAmenity")}
-                </span>
+                    title={t("admin.addAmenity")}
+                  >
+                    <div className="relative flex items-center justify-center">
+                      <Plus className="w-5 h-5" />
+                      <span className="absolute text-base font-bold -bottom-0.5 -right-0.5 text-white drop-shadow-lg">+</span>
+                    </div>
+                    <span className="absolute top-full mt-2 px-2 py-1 bg-gray-900 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap">
+                      {t("admin.addAmenity")}
+                    </span>
                   </button>
                 </DialogTrigger>
                 <DialogContent className="max-w-md">
@@ -379,13 +422,13 @@ export default function FacilitiesPage() {
               </Dialog>
               <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
                 <DialogTrigger asChild>
-                  <button 
+                  <button
                     className="relative group w-10 h-10 rounded-full bg-primary hover:bg-primary/90 text-white flex items-center justify-center transition-all shadow-md hover:shadow-lg"
                     title={t("admin.addReservation")}
                   >
                     <div className="relative">
                       <CalendarIcon className="w-5 h-5" />
-                      <span className="absolute -top-1 -right-1 bg-primary text-white text-xs font-bold w-4 h-4 rounded-full flex items-center justify-center" style={{fontSize: '10px'}}>+</span>
+                      <span className="absolute -top-1 -right-1 bg-primary text-white text-xs font-bold w-4 h-4 rounded-full flex items-center justify-center" style={{ fontSize: '10px' }}>+</span>
                     </div>
                     <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-1.5 bg-gray-900 text-white text-xs rounded pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
                       {t("admin.newReservation")}
@@ -532,7 +575,7 @@ export default function FacilitiesPage() {
         <Dialog open={editDialogOpen} onOpenChange={setEditDialogOpen}>
           <DialogContent>
             <DialogHeader>
-                  <DialogTitle>{t("admin.editFacility")}</DialogTitle>
+              <DialogTitle>{t("admin.editFacility")}</DialogTitle>
               <DialogDescription>Actualiza los detalles del servicio o espacio</DialogDescription>
             </DialogHeader>
             <form onSubmit={handleSaveEdit} className="space-y-4">
@@ -556,16 +599,16 @@ export default function FacilitiesPage() {
                 </Select>
               </div>
               <div>
-                    <Label htmlFor="edit-capacity">{t("admin.capacity")}</Label>
+                <Label htmlFor="edit-capacity">{t("admin.capacity")}</Label>
                 <Input id="edit-capacity" name="capacity" type="number" defaultValue={editingFacility?.capacity} required />
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                    <Label htmlFor="edit-startTime">{t("admin.openingTime")}</Label>
+                  <Label htmlFor="edit-startTime">{t("admin.openingTime")}</Label>
                   <Input id="edit-startTime" name="startTime" type="time" defaultValue={editingFacility?.startTime} required />
                 </div>
                 <div>
-                    <Label htmlFor="edit-endTime">{t("admin.closingTime")}</Label>
+                  <Label htmlFor="edit-endTime">{t("admin.closingTime")}</Label>
                   <Input id="edit-endTime" name="endTime" type="time" defaultValue={editingFacility?.endTime} required />
                 </div>
               </div>
@@ -592,13 +635,12 @@ export default function FacilitiesPage() {
                     </p>
                     <div className="w-full bg-background rounded-full h-2 mt-2">
                       <div
-                        className={`h-2 rounded-full transition-all ${
-                          (selectedSlotBookings.length / (facilities.find((f) => f.id === selectedSlotBookings[0]?.facilityId)?.capacity || 1)) * 100 > 80
+                        className={`h-2 rounded-full transition-all ${(selectedSlotBookings.length / (facilities.find((f) => f.id === selectedSlotBookings[0]?.facilityId)?.capacity || 1)) * 100 > 80
                             ? "bg-red-500"
                             : (selectedSlotBookings.length / (facilities.find((f) => f.id === selectedSlotBookings[0]?.facilityId)?.capacity || 1)) * 100 > 50
                               ? "bg-amber-500"
                               : "bg-green-500"
-                        }`}
+                          }`}
                         style={{
                           width: `${(selectedSlotBookings.length / (facilities.find((f) => f.id === selectedSlotBookings[0]?.facilityId)?.capacity || 1)) * 100}%`,
                         }}
@@ -648,50 +690,50 @@ export default function FacilitiesPage() {
                 </div>
               </div>
             </div>
-            
+
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {facilities.map((facility) => {
-              const Icon = facility.icon
-              const facilityBookings = bookings.filter((b) => b.facilityId === facility.id)
-              return (
-                <Card key={facility.id} className="p-6 hover:shadow-lg transition-shadow relative">
-                  <div className="flex items-start gap-4 mb-4">
-                    <div className={`${facility.color} p-3 rounded-lg shrink-0`}>
-                      <Icon className="w-6 h-6 text-white" />
+              {facilities.map((facility) => {
+                const Icon = facility.icon
+                const facilityBookings = bookings.filter((b) => b.facilityId === facility.id)
+                return (
+                  <Card key={facility.id} className="p-6 hover:shadow-lg transition-shadow relative">
+                    <div className="flex items-start gap-4 mb-4">
+                      <div className={`${facility.color} p-3 rounded-lg shrink-0`}>
+                        <Icon className="w-6 h-6 text-white" />
+                      </div>
+                      <div className="flex-1">
+                        <h3 className="font-semibold text-lg">{facility.name}</h3>
+                        <p className="text-sm text-muted-foreground capitalize">{facility.type}</p>
+                      </div>
                     </div>
-                    <div className="flex-1">
-                      <h3 className="font-semibold text-lg">{facility.name}</h3>
-                      <p className="text-sm text-muted-foreground capitalize">{facility.type}</p>
+
+                    {/* Top Right Corner - Time Slot and Capacity */}
+                    <div className="absolute top-6 right-6 space-y-2 flex flex-col items-end">
+                      {/* Time Slot - Elegant Dark Pink Chip */}
+                      <Badge className="bg-sky-100 hover:bg-sky-200 text-black text-xs font-bold px-3 py-1.5 shrink-0 border-sky-200">
+                        <Clock className="w-3 h-3 mr-1" />
+                        {facility.startTime} - {facility.endTime}
+                      </Badge>
+
+                      {/* Capacity with Person Icon */}
+                      <div className="flex items-center gap-2 text-sm">
+                        <Users className="w-4 h-4 text-muted-foreground" />
+                        <span className="font-medium text-foreground">
+                          {facility.capacity}
+                        </span>
+                      </div>
                     </div>
-                  </div>
 
-                  {/* Top Right Corner - Time Slot and Capacity */}
-                  <div className="absolute top-6 right-6 space-y-2 flex flex-col items-end">
-                    {/* Time Slot - Elegant Dark Pink Chip */}
-                    <Badge className="bg-sky-100 hover:bg-sky-200 text-black text-xs font-bold px-3 py-1.5 shrink-0 border-sky-200">
-                      <Clock className="w-3 h-3 mr-1" />
-                      {facility.startTime} - {facility.endTime}
-                    </Badge>
-
-                    {/* Capacity with Person Icon */}
-                    <div className="flex items-center gap-2 text-sm">
-                      <Users className="w-4 h-4 text-muted-foreground" />
-                      <span className="font-medium text-foreground">
-                        {facility.capacity}
-                      </span>
-                    </div>
-                  </div>
-
-                  <Button
-                    onClick={() => handleEditFacility(facility)}
-                    className="w-full px-3 py-2 text-sm font-medium rounded-lg bg-primary/10 text-primary hover:bg-primary/20 transition-colors"
-                  >
-                    {t("admin.edit")}
-                  </Button>
-                </Card>
-              )
-            })}
-          </div>
+                    <Button
+                      onClick={() => handleEditFacility(facility)}
+                      className="w-full px-3 py-2 text-sm font-medium rounded-lg bg-primary/10 text-primary hover:bg-primary/20 transition-colors"
+                    >
+                      {t("admin.edit")}
+                    </Button>
+                  </Card>
+                )
+              })}
+            </div>
           </>
         )}
 
@@ -706,16 +748,14 @@ export default function FacilitiesPage() {
                 </span>
                 <button
                   onClick={() => setTimelineMode(timelineMode === "week" ? "month" : "week")}
-                  className={`relative inline-flex h-8 w-14 items-center rounded-full transition-colors ${
-                    timelineMode === "month"
+                  className={`relative inline-flex h-8 w-14 items-center rounded-full transition-colors ${timelineMode === "month"
                       ? "bg-lime-600"
                       : "bg-gray-300"
-                  }`}
+                    }`}
                 >
                   <span
-                    className={`inline-block h-6 w-6 transform rounded-full bg-white transition-transform ${
-                      timelineMode === "month" ? "translate-x-7" : "translate-x-1"
-                    }`}
+                    className={`inline-block h-6 w-6 transform rounded-full bg-white transition-transform ${timelineMode === "month" ? "translate-x-7" : "translate-x-1"
+                      }`}
                   />
                 </button>
                 <span className={`text-sm font-medium ${timelineMode === "month" ? "text-foreground" : "text-muted-foreground"}`}>
@@ -755,204 +795,201 @@ export default function FacilitiesPage() {
             </div>
 
             <div className="bg-card rounded-lg border border-border overflow-hidden">
-            <div className="overflow-x-auto">
-              <div style={{ width: "fit-content", minWidth: "100%" }}>
-                {/* Header con horas */}
-                <div className="flex border-b border-border bg-muted/50 sticky top-0 z-10">
-                  <div className="w-64 p-4 font-semibold border-r border-border bg-muted/50 shrink-0">Facility</div>
-                  {timeSlots.map((slot) => (
-                    <div key={slot} className="w-32 p-3 text-center text-sm font-medium border-r border-border shrink-0">
-                      {slot}
-                    </div>
-                  ))}
-                </div>
-
-                {/* Filas de facilities */}
-                {facilities.map((facility, idx) => {
-                  const Icon = facility.icon
-                  return (
-                    <div key={facility.id} className={`flex ${idx % 2 === 0 ? "bg-background" : "bg-muted/30"}`}>
-                      {/* Info de facility */}
-                      <div className="w-64 p-4 border-r border-border flex items-center gap-3 shrink-0 group relative">
-                        <div className={`${facility.color} p-2 rounded-lg shrink-0`}>
-                          <Icon className="w-5 h-5 text-white" />
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <p className="font-semibold text-sm truncate">{facility.name}</p>
-                          <p className="text-xs text-muted-foreground capitalize">{facility.type}</p>
-                          <p className="text-xs text-muted-foreground mt-0.5">Cap. {facility.capacity}</p>
-                          <p className="text-xs text-muted-foreground mt-0.5">{facility.startTime} - {facility.endTime}</p>
-                        </div>
-                        <Button
-                          onClick={() => handleEditFacility(facility)}
-                          className="absolute right-2 top-2 opacity-0 group-hover:opacity-100 transition-opacity px-2 py-1 text-xs rounded bg-primary/10 text-primary hover:bg-primary/20"
-                        >
-                          Editar
-                        </Button>
+              <div className="overflow-x-auto">
+                <div style={{ width: "fit-content", minWidth: "100%" }}>
+                  {/* Header con horas */}
+                  <div className="flex border-b border-border bg-muted/50 sticky top-0 z-10">
+                    <div className="w-64 p-4 font-semibold border-r border-border bg-muted/50 shrink-0">Facility</div>
+                    {timeSlots.map((slot) => (
+                      <div key={slot} className="w-32 p-3 text-center text-sm font-medium border-r border-border shrink-0">
+                        {slot}
                       </div>
+                    ))}
+                  </div>
 
-                      <div className="flex">
-                        {timeSlots.map((slot) => {
-                          const bookingAtStart = isBookingStart(facility.id, slot)
-                          const booking = getBookingForSlot(facility.id, slot)
-                          const slotBookings = getBookingsAtSlot(facility.id, slot)
-                          const occupancy = getOccupancyPercentage(facility.id, slot)
+                  {/* Filas de facilities */}
+                  {facilities.map((facility, idx) => {
+                    const Icon = facility.icon
+                    return (
+                      <div key={facility.id} className={`flex ${idx % 2 === 0 ? "bg-background" : "bg-muted/30"}`}>
+                        {/* Info de facility */}
+                        <div className="w-64 p-4 border-r border-border flex items-center gap-3 shrink-0 group relative">
+                          <div className={`${facility.color} p-2 rounded-lg shrink-0`}>
+                            <Icon className="w-5 h-5 text-white" />
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <p className="font-semibold text-sm truncate">{facility.name}</p>
+                            <p className="text-xs text-muted-foreground capitalize">{facility.type}</p>
+                            <p className="text-xs text-muted-foreground mt-0.5">Cap. {facility.capacity}</p>
+                            <p className="text-xs text-muted-foreground mt-0.5">{facility.startTime} - {facility.endTime}</p>
+                          </div>
+                          <Button
+                            onClick={() => handleEditFacility(facility)}
+                            className="absolute right-2 top-2 opacity-0 group-hover:opacity-100 transition-opacity px-2 py-1 text-xs rounded bg-primary/10 text-primary hover:bg-primary/20"
+                          >
+                            Editar
+                          </Button>
+                        </div>
 
-                          // Si hay una reserva que empieza en este slot
-                          if (bookingAtStart) {
-                            const durationHours = bookingAtStart.duration / 60
-                            const widthInColumns = durationHours
+                        <div className="flex">
+                          {timeSlots.map((slot) => {
+                            const bookingAtStart = isBookingStart(facility.id, slot)
+                            const booking = getBookingForSlot(facility.id, slot)
+                            const slotBookings = getBookingsAtSlot(facility.id, slot)
+                            const occupancy = getOccupancyPercentage(facility.id, slot)
 
-                            return (
-                              <div
-                                key={slot}
-                                className="relative border-r border-border group shrink-0"
-                                style={{ width: `${widthInColumns * 128}px` }}
-                              >
-                                <div
-                                  className={`absolute inset-2 rounded-lg ${
-                                    bookingAtStart.status === "confirmed"
-                                      ? "bg-gradient-to-br from-green-500/30 to-green-600/20 border-2 border-green-500"
-                                      : "bg-gradient-to-br from-amber-500/30 to-amber-600/20 border-2 border-amber-500"
-                                  } p-3 flex flex-col justify-center hover:shadow-lg transition-all cursor-pointer hover:scale-[1.02] min-h-[72px]`}
-                                  onClick={() => slotBookings.length > 0 && handleShowBookingsDetail(slotBookings)}
-                                >
-                                  {/* Multi-party facilities show only capacity info */}
-                                  {isMultiPartyFacility(facility.type) ? (
-                                    <div className="flex flex-col items-center justify-center gap-2">
-                                      <p className="text-lg font-bold text-foreground">
-                                        {slotBookings.length}/{facility.capacity}
-                                      </p>
-                                      <p className="text-[10px] text-muted-foreground">
-                                        Ocupación: {occupancy}%
-                                      </p>
-                                    </div>
-                                  ) : (
-                                    <>
-                                      <p className="text-sm font-bold truncate text-foreground">
-                                        {slotBookings.length > 1 ? `${slotBookings.length} participantes` : bookingAtStart.clientName}
-                                      </p>
-                                      <p className="text-[10px] text-muted-foreground truncate">
-                                        {slotBookings.length > 1 ? `Ocupación: ${occupancy}%` : `Hab. ${bookingAtStart.clientRoom}`}
-                                      </p>
-                                      <div className="text-[10px] text-muted-foreground font-medium mt-0.5 flex items-center gap-2">
-                                        <span>{bookingAtStart.duration / 60}h</span>
-                                        {slotBookings.length > 0 && (
-                                          <span className="text-xs px-1.5 py-0.5 rounded bg-primary/20 text-primary">
-                                            {slotBookings.length}/{facility.capacity}
-                                          </span>
-                                        )}
-                                      </div>
-                                    </>
-                                  )}
-                                  
-                                  {/* Barra de ocupación */}
-                                  {slotBookings.length > 0 && (
-                                    <div className="mt-2 w-full bg-black/10 rounded-full h-1.5">
-                                      <div
-                                        className={`h-1.5 rounded-full transition-all ${
-                                          occupancy > 80
-                                            ? "bg-red-500"
-                                            : occupancy > 50
-                                              ? "bg-amber-500"
-                                              : "bg-green-500"
-                                        }`}
-                                        style={{ width: `${occupancy}%` }}
-                                      />
-                                    </div>
-                                  )}
-                                </div>
+                            // Si hay una reserva que empieza en este slot
+                            if (bookingAtStart) {
+                              const durationHours = bookingAtStart.duration / 60
+                              const widthInColumns = durationHours
 
-                                {/* Tooltip mejorado */}
-                                <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 hidden group-hover:block z-20">
-                                  <div className="bg-popover border border-border rounded-lg shadow-xl p-4 min-w-[280px]">
-                                    <p className="font-bold text-sm mb-3">Detalles del horario {slot}</p>
-                                    {slotBookings.length > 0 ? (
-                                      <div className="space-y-2">
-                                        <p className="text-xs text-muted-foreground">
-                                          <span className="font-medium">Ocupación:</span> {slotBookings.length}/{facility.capacity} ({occupancy}%)
-                                        </p>
-                                        {slotBookings.length <= 3 ? (
-                                          <div className="space-y-2">
-                                            {slotBookings.map((b, idx) => (
-                                              <div key={idx} className="text-xs text-muted-foreground border-t border-border pt-2">
-                                                <p className="font-medium text-foreground">{b.clientName}</p>
-                                                <p>Hab. {b.clientRoom}</p>
-                                              </div>
-                                            ))}
-                                          </div>
-                                        ) : (
-                                          <Button
-                                            onClick={() => handleShowBookingsDetail(slotBookings)}
-                                            className="mt-2 text-xs text-primary hover:underline font-medium"
-                                          >
-                                            Ver los {slotBookings.length} participantes →
-                                          </Button>
-                                        )}
-                                      </div>
-                                    ) : (
-                                      <p className="text-xs text-muted-foreground">Sin reservas</p>
-                                    )}
-                                  </div>
-                                </div>
-                              </div>
-                            )
-                          }
-                          // Si hay una reserva que cubre este slot pero no empieza aquí, mostrar barra de ocupación
-                          else if (booking) {
-                            const slotBookingsAtTime = getBookingsAtSlot(facility.id, slot)
-                            const occupancyAtTime = getOccupancyPercentage(facility.id, slot)
-                            
-                            if (slotBookingsAtTime.length > 0) {
                               return (
                                 <div
                                   key={slot}
-                                  className="w-32 border-r border-border p-2 shrink-0 min-h-[88px] flex items-center justify-center cursor-pointer hover:bg-primary/5 transition-colors"
-                                  onClick={() => handleShowBookingsDetail(slotBookingsAtTime)}
+                                  className="relative border-r border-border group shrink-0"
+                                  style={{ width: `${widthInColumns * 128}px` }}
                                 >
-                                  <div className="w-full space-y-2">
-                                    <p className="text-xs font-medium text-foreground text-center">
-                                      {slotBookingsAtTime.length}/{facility.capacity}
-                                    </p>
-                                    <div className="w-full bg-black/10 rounded-full h-2">
-                                      <div
-                                        className={`h-2 rounded-full transition-all ${
-                                          occupancyAtTime > 80
-                                            ? "bg-red-500"
-                                            : occupancyAtTime > 50
-                                              ? "bg-amber-500"
-                                              : "bg-green-500"
-                                        }`}
-                                        style={{ width: `${occupancyAtTime}%` }}
-                                      />
+                                  <div
+                                    className={`absolute inset-2 rounded-lg ${bookingAtStart.status === "confirmed"
+                                        ? "bg-gradient-to-br from-green-500/30 to-green-600/20 border-2 border-green-500"
+                                        : "bg-gradient-to-br from-amber-500/30 to-amber-600/20 border-2 border-amber-500"
+                                      } p-3 flex flex-col justify-center hover:shadow-lg transition-all cursor-pointer hover:scale-[1.02] min-h-[72px]`}
+                                    onClick={() => slotBookings.length > 0 && handleShowBookingsDetail(slotBookings)}
+                                  >
+                                    {/* Multi-party facilities show only capacity info */}
+                                    {isMultiPartyFacility(facility.type) ? (
+                                      <div className="flex flex-col items-center justify-center gap-2">
+                                        <p className="text-lg font-bold text-foreground">
+                                          {slotBookings.length}/{facility.capacity}
+                                        </p>
+                                        <p className="text-[10px] text-muted-foreground">
+                                          Ocupación: {occupancy}%
+                                        </p>
+                                      </div>
+                                    ) : (
+                                      <>
+                                        <p className="text-sm font-bold truncate text-foreground">
+                                          {slotBookings.length > 1 ? `${slotBookings.length} participantes` : bookingAtStart.clientName}
+                                        </p>
+                                        <p className="text-[10px] text-muted-foreground truncate">
+                                          {slotBookings.length > 1 ? `Ocupación: ${occupancy}%` : `Hab. ${bookingAtStart.clientRoom}`}
+                                        </p>
+                                        <div className="text-[10px] text-muted-foreground font-medium mt-0.5 flex items-center gap-2">
+                                          <span>{bookingAtStart.duration / 60}h</span>
+                                          {slotBookings.length > 0 && (
+                                            <span className="text-xs px-1.5 py-0.5 rounded bg-primary/20 text-primary">
+                                              {slotBookings.length}/{facility.capacity}
+                                            </span>
+                                          )}
+                                        </div>
+                                      </>
+                                    )}
+
+                                    {/* Barra de ocupación */}
+                                    {slotBookings.length > 0 && (
+                                      <div className="mt-2 w-full bg-black/10 rounded-full h-1.5">
+                                        <div
+                                          className={`h-1.5 rounded-full transition-all ${occupancy > 80
+                                              ? "bg-red-500"
+                                              : occupancy > 50
+                                                ? "bg-amber-500"
+                                                : "bg-green-500"
+                                            }`}
+                                          style={{ width: `${occupancy}%` }}
+                                        />
+                                      </div>
+                                    )}
+                                  </div>
+
+                                  {/* Tooltip mejorado */}
+                                  <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 hidden group-hover:block z-20">
+                                    <div className="bg-popover border border-border rounded-lg shadow-xl p-4 min-w-[280px]">
+                                      <p className="font-bold text-sm mb-3">Detalles del horario {slot}</p>
+                                      {slotBookings.length > 0 ? (
+                                        <div className="space-y-2">
+                                          <p className="text-xs text-muted-foreground">
+                                            <span className="font-medium">Ocupación:</span> {slotBookings.length}/{facility.capacity} ({occupancy}%)
+                                          </p>
+                                          {slotBookings.length <= 3 ? (
+                                            <div className="space-y-2">
+                                              {slotBookings.map((b, idx) => (
+                                                <div key={idx} className="text-xs text-muted-foreground border-t border-border pt-2">
+                                                  <p className="font-medium text-foreground">{b.clientName}</p>
+                                                  <p>Hab. {b.clientRoom}</p>
+                                                </div>
+                                              ))}
+                                            </div>
+                                          ) : (
+                                            <Button
+                                              onClick={() => handleShowBookingsDetail(slotBookings)}
+                                              className="mt-2 text-xs text-primary hover:underline font-medium"
+                                            >
+                                              Ver los {slotBookings.length} participantes →
+                                            </Button>
+                                          )}
+                                        </div>
+                                      ) : (
+                                        <p className="text-xs text-muted-foreground">Sin reservas</p>
+                                      )}
                                     </div>
                                   </div>
                                 </div>
                               )
                             }
-                            return null
-                          }
-                          // Slot libre
-                          else {
-                            return (
-                              <div
-                                key={slot}
-                                className="w-32 border-r border-border p-2 shrink-0 min-h-[88px] flex items-center"
-                              >
-                                <div className="w-full border-2 border-dashed border-muted-foreground/20 rounded-md h-16 flex items-center justify-center hover:border-primary/30 hover:bg-primary/5 transition-colors cursor-pointer">
-                                  <span className="text-xs text-muted-foreground/50 font-medium">Libre</span>
+                            // Si hay una reserva que cubre este slot pero no empieza aquí, mostrar barra de ocupación
+                            else if (booking) {
+                              const slotBookingsAtTime = getBookingsAtSlot(facility.id, slot)
+                              const occupancyAtTime = getOccupancyPercentage(facility.id, slot)
+
+                              if (slotBookingsAtTime.length > 0) {
+                                return (
+                                  <div
+                                    key={slot}
+                                    className="w-32 border-r border-border p-2 shrink-0 min-h-[88px] flex items-center justify-center cursor-pointer hover:bg-primary/5 transition-colors"
+                                    onClick={() => handleShowBookingsDetail(slotBookingsAtTime)}
+                                  >
+                                    <div className="w-full space-y-2">
+                                      <p className="text-xs font-medium text-foreground text-center">
+                                        {slotBookingsAtTime.length}/{facility.capacity}
+                                      </p>
+                                      <div className="w-full bg-black/10 rounded-full h-2">
+                                        <div
+                                          className={`h-2 rounded-full transition-all ${occupancyAtTime > 80
+                                              ? "bg-red-500"
+                                              : occupancyAtTime > 50
+                                                ? "bg-amber-500"
+                                                : "bg-green-500"
+                                            }`}
+                                          style={{ width: `${occupancyAtTime}%` }}
+                                        />
+                                      </div>
+                                    </div>
+                                  </div>
+                                )
+                              }
+                              return null
+                            }
+                            // Slot libre
+                            else {
+                              return (
+                                <div
+                                  key={slot}
+                                  className="w-32 border-r border-border p-2 shrink-0 min-h-[88px] flex items-center"
+                                >
+                                  <div className="w-full border-2 border-dashed border-muted-foreground/20 rounded-md h-16 flex items-center justify-center hover:border-primary/30 hover:bg-primary/5 transition-colors cursor-pointer">
+                                    <span className="text-xs text-muted-foreground/50 font-medium">Libre</span>
+                                  </div>
                                 </div>
-                              </div>
-                            )
-                          }
-                        })}
+                              )
+                            }
+                          })}
+                        </div>
                       </div>
-                    </div>
-                  )
-                })}
+                    )
+                  })}
+                </div>
               </div>
             </div>
-          </div>
           </>
         )}
       </div>

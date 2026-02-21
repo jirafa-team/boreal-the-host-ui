@@ -3,8 +3,11 @@
 import React from "react"
 import { useLanguage } from "@/lib/i18n-context"
 import { useState } from "react"
-import { useRouter } from "next/navigation"
+import { useRouter, useParams } from "next/navigation"
+import { useSelector } from "react-redux"
 import Link from "next/link"
+import type { RootState } from "@/store/store"
+import { ROUTES } from "@/shared/types/routes"
 import {
   Search,
   Filter,
@@ -195,6 +198,8 @@ const mockClients: Client[] = [
 export default function ClientsPage() {
   const { t } = useLanguage()
   const router = useRouter()
+  const params = useParams()
+  const orgId = params?.orgId as string | undefined
   const [clients, setClients] = useState<Client[]>(mockClients)
   const [searchTerm, setSearchTerm] = useState("")
   const [statusFilter, setStatusFilter] = useState("all")
@@ -346,6 +351,17 @@ export default function ClientsPage() {
         notes: ""
       })
     }
+  }
+
+  const dataSource = useSelector((state: RootState) => state.dataSource.dataSource)
+  if (dataSource === "api") {
+    return (
+      <div className="p-8">
+        <Card className="p-6">
+          <p className="text-muted-foreground">Datos desde API: esta vista aún no está conectada.</p>
+        </Card>
+      </div>
+    )
   }
 
   return (
@@ -577,7 +593,7 @@ export default function ClientsPage() {
                             <div>
                               <div className="flex items-center gap-2 flex-wrap">
                                 <Link
-                                  href={`/admin/clients/${client.id}`}
+                                  href={orgId ? ROUTES.CLIENT_DETAIL(orgId, client.id) : `/admin/clients/${client.id}`}
                                   className="font-medium text-foreground hover:text-primary hover:underline"
                                 >
                                   {client.name}

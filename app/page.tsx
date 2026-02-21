@@ -3,13 +3,20 @@
 import type React from "react"
 import { useState } from "react"
 import { useRouter } from "next/navigation"
+import { useDispatch, useSelector } from "react-redux"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
+import { Switch } from "@/components/ui/switch"
 import { User, Shield, X, Globe } from "lucide-react"
 import Image from "next/image"
 import { useLanguage } from "@/lib/i18n-context"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { BorealLoadingBar } from "@/components/boreal-loading-bar"
+import type { RootState } from "@/store/store"
+import { setDataSource } from "@/store/slices/dataSourceSlice"
+import { updateUser } from "@/features/auth/slices/authSlice"
+import { API_BASE_URL, ENDPOINTS } from "@/shared/types/api"
+import { jwtDecode } from "jwt-decode"
 
 export default function HomePage() {
   const [reservationCode, setReservationCode] = useState("")
@@ -18,7 +25,11 @@ export default function HomePage() {
   const [adminUser, setAdminUser] = useState("")
   const [adminPassword, setAdminPassword] = useState("")
   const [isLoading, setIsLoading] = useState(false)
+  const [loginError, setLoginError] = useState<string | null>(null)
   const router = useRouter()
+  const dispatch = useDispatch()
+  const dataSource = useSelector((state: RootState) => state.dataSource.dataSource)
+  const mockMode = dataSource === "mock"
 
   const { language, setLanguage, t } = useLanguage()
 
@@ -42,21 +53,70 @@ export default function HomePage() {
     }, 800)
   }
 
-  const handleAdminLogin = (e: React.FormEvent) => {
+  const handleAdminLogin = async (e: React.FormEvent) => {
     e.preventDefault()
+    setLoginError(null)
 
-    if (adminUser === "system" && adminPassword === "1234") {
-      setIsLoading(true)
-      setTimeout(() => router.push("/system/organizations"), 800)
-    } else if (adminUser === "admin" && adminPassword === "1234") {
-      setIsLoading(true)
-      setTimeout(() => router.push("/admin/select-establishment"), 800)
-    } else if (adminUser === "staff" && adminPassword === "1234") {
-      setIsLoading(true)
-      setTimeout(() => router.push("/staff/tasks"), 800)
-    } else {
-      alert(t("login.invalidCredentials"))
+    if (dataSource === "mock") {
+      if (adminUser === "system" && adminPassword === "1234") {
+        setIsLoading(true)
+        setTimeout(() => router.push("/system/organizations"), 800)
+      } else if (adminUser === "admin" && adminPassword === "1234") {
+        setIsLoading(true)
+        setTimeout(() => router.push("/admin/select-establishment"), 800)
+      } else if (adminUser === "staff" && adminPassword === "1234") {
+        setIsLoading(true)
+        setTimeout(() => router.push("/staff/tasks"), 800)
+      } else {
+        setLoginError(t("login.invalidCredentials"))
+        setAdminPassword("")
+      }
+      return
+    }
+
+    setIsLoading(true)
+    try {
+      const url = `${API_BASE_URL}/api${ENDPOINTS.AUTH.LOGIN}`
+      const res = await fetch(url, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: adminUser, password: adminPassword }),
+        credentials: "include",
+      })
+      console.log(res)
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}))
+        setLoginError((err as { message?: string })?.message ?? t("login.invalidCredentials"))
+        setAdminPassword("")
+        return
+      }
+      const data = (await res.json()) as { token?: string }
+      if (data?.token) {
+        try {
+          const decoded = jwtDecode<{ email?: string; uuid?: string; firstName?: string; lastName?: string }>(data.token)
+          dispatch(
+            updateUser({
+              user: {
+                email: decoded.email ?? adminUser,
+                uuid: decoded.uuid ?? "",
+                firstName: decoded.firstName ?? null,
+                lastName: decoded.lastName ?? null,
+              },
+              isLoggedIn: true,
+            })
+          )
+        } catch {
+          dispatch(updateUser({ user: { email: adminUser, uuid: "" }, isLoggedIn: true }))
+        }
+      } else {
+        dispatch(updateUser({ user: { email: adminUser, uuid: "" }, isLoggedIn: true }))
+      }
+      router.push("/admin/select-establishment")
+    } catch {
+      setLoginError(t("login.invalidCredentials"))
       setAdminPassword("")
+    } finally {
+      setIsLoading(false)
     }
   }
 
@@ -108,6 +168,20 @@ export default function HomePage() {
                 <X className="w-6 h-6" />
               </button>
             </div>
+
+            <div className="flex items-center justify-between gap-2 py-2 px-3 mb-2 rounded-lg bg-gray-100">
+              <span className="text-sm font-medium text-gray-700">
+                {mockMode ? "MOCK" : "API"}
+              </span>
+              <Switch
+                checked={mockMode}
+                onCheckedChange={(checked) => dispatch(setDataSource(checked ? "mock" : "api"))}
+              />
+            </div>
+
+            {loginError && (
+              <p className="text-sm text-red-600 bg-red-50 px-3 py-2 rounded-lg">{loginError}</p>
+            )}
 
             <form onSubmit={handleAdminLogin} className="space-y-4">
               <div className="space-y-2">
@@ -194,10 +268,10 @@ export default function HomePage() {
                   className="w-full h-12 bg-white border-2 border-gray-300 text-gray-700 px-6 py-3.5 rounded-xl font-semibold hover:bg-gray-50 transition-all shadow-md flex items-center justify-center gap-3"
                 >
                   <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
-                    <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
-                    <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/>
-                    <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
+                    <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4" />
+                    <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853" />
+                    <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05" />
+                    <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335" />
                   </svg>
                   Ingresar con Google
                 </Button>

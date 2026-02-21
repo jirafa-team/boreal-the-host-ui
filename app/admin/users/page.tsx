@@ -1,6 +1,10 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect, useMemo } from "react"
+import { useDispatch, useSelector } from "react-redux"
+import type { RootState } from "@/store/store"
+import { loadMockUsers, setUsers, useGetUsersQuery } from "@/features/user/slices/userSlice"
+import type { User as ApiUser } from "@/interfaces/user/User"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -46,97 +50,42 @@ interface User {
   }
 }
 
-const mockUsers: User[] = [
-  {
-    id: "1",
-    name: "Carlos García",
-    email: "carlos@hotel.com",
-    role: "admin",
-    status: "active",
-    lastLogin: "2024-01-15 10:30",
-    phone: "+34 600 123 456",
-    permissions: {
-      canManageRooms: true,
-      canManageClients: true,
-      canManageEvents: true,
-      canManageFacilities: true,
-      canViewReports: true,
-      canManageUsers: true,
-    },
-  },
-  {
-    id: "2",
-    name: "María López",
-    email: "maria@hotel.com",
-    role: "staff",
-    status: "active",
-    lastLogin: "2024-01-15 09:15",
-    phone: "+34 600 234 567",
-    permissions: {
-      canManageRooms: true,
-      canManageClients: true,
-      canManageEvents: false,
-      canManageFacilities: true,
-      canViewReports: true,
-      canManageUsers: false,
-    },
-  },
-  {
-    id: "3",
-    name: "Juan Rodríguez",
-    email: "juan@hotel.com",
-    role: "staff",
-    status: "active",
-    lastLogin: "2024-01-14 18:45",
-    phone: "+34 600 345 678",
-    permissions: {
-      canManageRooms: false,
-      canManageClients: true,
-      canManageEvents: true,
-      canManageFacilities: false,
-      canViewReports: true,
-      canManageUsers: false,
-    },
-  },
-  {
-    id: "4",
-    name: "Ana Martínez",
-    email: "ana@hotel.com",
-    role: "viewer",
-    status: "active",
-    lastLogin: "2024-01-15 08:00",
-    permissions: {
-      canManageRooms: false,
-      canManageClients: false,
-      canManageEvents: false,
-      canManageFacilities: false,
-      canViewReports: true,
-      canManageUsers: false,
-    },
-  },
-  {
-    id: "5",
-    name: "Pedro Sánchez",
-    email: "pedro@hotel.com",
-    role: "staff",
-    status: "inactive",
-    lastLogin: "2024-01-10 15:20",
-    phone: "+34 600 456 789",
-    permissions: {
-      canManageRooms: true,
-      canManageClients: false,
-      canManageEvents: false,
-      canManageFacilities: true,
-      canViewReports: false,
-      canManageUsers: false,
-    },
-  },
-]
+function mapApiUserToUi(u: ApiUser): User {
+  return {
+    id: u.id,
+    name: u.name ?? ([u.firstName, u.lastName].filter(Boolean).join(" ") || u.email),
+    email: u.email,
+    role: (u.role ?? u.roleName ?? "staff") as User["role"],
+    status: (u.status ?? "active") as User["status"],
+    lastLogin: u.lastLogin ?? "",
+    phone: u.phone,
+    permissions: (u.permissions as User["permissions"]) ?? {},
+  }
+}
 
 export default function UsersPage() {
   const { t } = useLanguage()
+  const dispatch = useDispatch()
+  const dataSource = useSelector((state: RootState) => state.dataSource.dataSource)
+  const usersFromSlice = useSelector((state: RootState) => state.user.users)
+  const { data: apiData } = useGetUsersQuery(undefined, { skip: dataSource !== "api" })
+
+  useEffect(() => {
+    if (dataSource === "mock") dispatch(loadMockUsers())
+  }, [dataSource, dispatch])
+
+  const users: User[] = useMemo(() => {
+    const list = dataSource === "api" ? (apiData?.data?.objects ?? []) : usersFromSlice
+    return list.map(mapApiUserToUi)
+  }, [dataSource, apiData, usersFromSlice])
+
+  const setUsersForMock = (next: User[] | ((prev: User[]) => User[])) => {
+    if (dataSource !== "mock") return
+    const list = typeof next === "function" ? next(users) : next
+    dispatch(setUsers(list.map((u) => ({ id: u.id, name: u.name, email: u.email, role: u.role, status: u.status, lastLogin: u.lastLogin, phone: u.phone, permissions: u.permissions }))))
+  }
+
   const searchParams = useSearchParams()
-  const [users, setUsers] = useState<User[]>(mockUsers)
   const [searchTerm, setSearchTerm] = useState("")
   const [roleFilter, setRoleFilter] = useState<string>("all")
   const [isDialogOpen, setIsDialogOpen] = useState(false)
@@ -226,21 +175,21 @@ export default function UsersPage() {
 
   const handleSave = () => {
     if (editingUser) {
-      setUsers(users.map((u) => (u.id === editingUser.id ? { ...editingUser, ...formData } : u)))
+      setUsersForMock(users.map((u) => (u.id === editingUser.id ? { ...editingUser, ...formData } : u)))
     } else {
       const newUser: User = {
         id: String(users.length + 1),
         ...formData,
         lastLogin: new Date().toISOString(),
       } as User
-      setUsers([...users, newUser])
+      setUsersForMock([...users, newUser])
     }
     setIsDialogOpen(false)
   }
 
   const handleDelete = (id: string) => {
     if (confirm(t("admin.confirmDelete"))) {
-      setUsers(users.filter((u) => u.id !== id))
+      setUsersForMock(users.filter((u) => u.id !== id))
     }
   }
 
