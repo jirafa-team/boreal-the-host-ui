@@ -22,6 +22,7 @@ export const translations = {
       accessClient: "Acceso Cliente",
       needHelpPrefix: "¿Necesitas ayuda?",
       contactUs: "Contacta a nuestro equipo",
+      continueWithGoogle: "Continuar con Google",
     },
     register: {
       register: "Registrarse",
@@ -542,6 +543,7 @@ export const translations = {
       accessClient: "Guest Access",
       needHelpPrefix: "Need help?",
       contactUs: "Contact our team",
+      continueWithGoogle: "Continue with Google",
     },
     register: {
       register: "Sign Up",
@@ -1010,6 +1012,7 @@ export const translations = {
       accessClient: "Acesso do Cliente",
       needHelpPrefix: "Precisa de ajuda?",
       contactUs: "Contacte nosso time",
+      continueWithGoogle: "Continuar com Google",
     },
     register: {
       register: "Registrar-se",
