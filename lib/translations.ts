@@ -23,6 +23,23 @@ export const translations = {
       needHelpPrefix: "¿Necesitas ayuda?",
       contactUs: "Contacta a nuestro equipo",
     },
+    register: {
+      register: "Registrarse",
+      registerTitle: "Crear Cuenta",
+      username: "Usuario",
+      enterUsername: "Elige un usuario",
+      password: "Contraseña",
+      enterPassword: "Mínimo 6 caracteres",
+      confirmPassword: "Confirmar Contraseña",
+      createAccount: "Crear Cuenta",
+      usernameMissing: "El usuario es requerido",
+      passwordMissing: "La contraseña es requerida",
+      passwordTooShort: "La contraseña debe tener al menos 6 caracteres",
+      passwordMismatch: "Las contraseñas no coinciden",
+      usernameExists: "Este usuario ya está registrado",
+      usernameReserved: "Este usuario está reservado",
+      registerSuccess: "¡Cuenta creada exitosamente! Ahora puedes iniciar sesión",
+    },
     client: {
       // Quick Check-in page
       processingCheckin: "Procesando Check-In",
@@ -504,6 +521,7 @@ export const translations = {
   en: {
     common: {
       continue: "Continue",
+      cancel: "Cancel",
     },
     login: {
       welcome: "Welcome to TheHost",
@@ -524,6 +542,23 @@ export const translations = {
       accessClient: "Guest Access",
       needHelpPrefix: "Need help?",
       contactUs: "Contact our team",
+    },
+    register: {
+      register: "Sign Up",
+      registerTitle: "Create Account",
+      username: "Username",
+      enterUsername: "Choose a username",
+      password: "Password",
+      enterPassword: "Minimum 6 characters",
+      confirmPassword: "Confirm Password",
+      createAccount: "Create Account",
+      usernameMissing: "Username is required",
+      passwordMissing: "Password is required",
+      passwordTooShort: "Password must be at least 6 characters",
+      passwordMismatch: "Passwords do not match",
+      usernameExists: "This username is already registered",
+      usernameReserved: "This username is reserved",
+      registerSuccess: "Account created successfully! Now you can log in",
     },
     client: {
       // Quick Check-in page
@@ -954,6 +989,7 @@ export const translations = {
   pt: {
     common: {
       continue: "Continuar",
+      cancel: "Cancelar",
     },
     login: {
       welcome: "Bem-vindo ao TheHost",
@@ -974,6 +1010,23 @@ export const translations = {
       accessClient: "Acesso do Cliente",
       needHelpPrefix: "Precisa de ajuda?",
       contactUs: "Contacte nosso time",
+    },
+    register: {
+      register: "Registrar-se",
+      registerTitle: "Criar Conta",
+      username: "Usuário",
+      enterUsername: "Escolha um usuário",
+      password: "Senha",
+      enterPassword: "Mínimo 6 caracteres",
+      confirmPassword: "Confirmar Senha",
+      createAccount: "Criar Conta",
+      usernameMissing: "O usuário é obrigatório",
+      passwordMissing: "A senha é obrigatória",
+      passwordTooShort: "A senha deve ter no mínimo 6 caracteres",
+      passwordMismatch: "As senhas não coincidem",
+      usernameExists: "Este usuário já está registrado",
+      usernameReserved: "Este usuário está reservado",
+      registerSuccess: "Conta criada com sucesso! Agora você pode fazer login",
     },
     client: {
       // Quick Check-in page
