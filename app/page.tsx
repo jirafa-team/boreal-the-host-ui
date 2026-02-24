@@ -130,7 +130,6 @@ export default function HomePage() {
     setRegisterPassword("")
     setRegisterConfirmPassword("")
   }
-  }
 
   const languages = [
     { code: "es", name: "Español", flag: "🇪🇸" },
