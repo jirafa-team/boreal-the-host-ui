@@ -43,7 +43,8 @@ export default function HomePage() {
         return
       }
 
-      // Usuario registrado válido - redirigir a acceso cliente normal
+      // Usuario registrado válido - guardar y redirigir
+      localStorage.setItem("currentUser", username)
       setIsLoading(true)
       setTimeout(() => {
         router.push("/client/checkin")
@@ -51,12 +52,8 @@ export default function HomePage() {
       return
     }
 
-    // Usuario predefinido
-    if (username !== "1" && username !== "2" && username !== "3") {
-      alert(t("login.invalidUsername"))
-      return
-    }
-
+    // Usuario predefinido - guardar y redirigir según el usuario
+    localStorage.setItem("currentUser", username)
     setIsLoading(true)
     setTimeout(() => {
       if (username === "1") {
@@ -124,11 +121,14 @@ export default function HomePage() {
     users.push({ username: registerUsername, password: registerPassword })
     localStorage.setItem("users", JSON.stringify(users))
 
-    alert(t("register.registerSuccess"))
-    setShowRegister(false)
-    setRegisterUsername("")
-    setRegisterPassword("")
-    setRegisterConfirmPassword("")
+    // Guardar usuario logueado
+    localStorage.setItem("currentUser", registerUsername)
+
+    // Redirigir a checkin
+    setIsLoading(true)
+    setTimeout(() => {
+      router.push("/client/checkin")
+    }, 800)
   }
 
   const languages = [
