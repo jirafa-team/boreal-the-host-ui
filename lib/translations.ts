@@ -20,7 +20,8 @@ export const translations = {
       orAccessAs: "O accede como",
       accessAdmin: "Acceso Administrador",
       accessClient: "Acceso Cliente",
-      needHelp: "¿Necesitas ayuda? Contacta a nuestro equipo",
+      needHelpPrefix: "¿Necesitas ayuda?",
+      contactUs: "Contacta a nuestro equipo",
     },
     client: {
       // Quick Check-in page
@@ -521,7 +522,8 @@ export const translations = {
       orAccessAs: "Or access as",
       accessAdmin: "Admin Access",
       accessClient: "Guest Access",
-      needHelp: "Need help? Contact our team",
+      needHelpPrefix: "Need help?",
+      contactUs: "Contact our team",
     },
     client: {
       // Quick Check-in page
@@ -970,7 +972,8 @@ export const translations = {
       orAccessAs: "Ou acesse como",
       accessAdmin: "Acesso de Administrador",
       accessClient: "Acesso do Cliente",
-      needHelp: "Precisa de ajuda? Contacte nosso time",
+      needHelpPrefix: "Precisa de ajuda?",
+      contactUs: "Contacte nosso time",
     },
     client: {
       // Quick Check-in page

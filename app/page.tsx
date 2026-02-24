@@ -220,19 +220,21 @@ export default function HomePage() {
                   <Shield className="w-5 h-5" />
                   {t("login.accessAdmin")}
                 </button>
-
-                <a
-                  href="/client/checkin"
-                  className="flex items-center justify-center gap-3 w-full bg-gradient-to-r from-cyan-500 to-teal-500 text-white px-6 py-3.5 rounded-xl font-semibold hover:from-cyan-600 hover:to-teal-600 transition-all shadow-md"
-                >
-                  <User className="w-5 h-5" />
-                  {t("login.accessClient")}
-                </a>
               </div>
             </div>
 
             {/* Footer text */}
-            <p className="text-center text-white/80 text-sm mt-6">{t("login.needHelp")}</p>
+            <p className="text-center text-white/80 text-sm mt-6">
+              <span>{t("login.needHelpPrefix")} </span>
+              <a
+                href="https://wa.me/5491122415153"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="underline text-white hover:text-blue-200 transition-colors"
+              >
+                {t("login.contactUs")}
+              </a>
+            </p>
           </>
         )}
       </div>
