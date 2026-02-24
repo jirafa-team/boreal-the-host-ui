@@ -22,6 +22,19 @@ export const translations = {
       accessClient: "Acceso Cliente",
       needHelp: "¿Necesitas ayuda? Contacta a nuestro equipo",
     },
+    client: {
+      // Quick Check-in page
+      processingCheckin: "Procesando Check-In",
+      pleaseWait: "Por favor espera un momento...",
+      checkinCompleted: "¡Check-In Realizado!",
+      roomReadyRedirecting: "Tu habitación está lista. Redirigiendo...",
+      reservationConfirmed: "¡Tu reserva está confirmada!",
+      welcome: "¡Bienvenido!",
+      confirmEarlyCheckin: "Confirma tu check-in anticipado",
+      roomReady: "Tu habitación está lista",
+      doCheckin: "HACER CHECK-IN",
+      tapButtonToEnter: "Toca el botón para acceder a tu habitación",
+    },
     admin: {
       // Sidebar
       adminPanel: "Panel Admin",
@@ -510,6 +523,19 @@ export const translations = {
       accessClient: "Guest Access",
       needHelp: "Need help? Contact our team",
     },
+    client: {
+      // Quick Check-in page
+      processingCheckin: "Processing Check-In",
+      pleaseWait: "Please wait a moment...",
+      checkinCompleted: "Check-In Complete!",
+      roomReadyRedirecting: "Your room is ready. Redirecting...",
+      reservationConfirmed: "Your reservation is confirmed!",
+      welcome: "Welcome!",
+      confirmEarlyCheckin: "Confirm your early check-in",
+      roomReady: "Your room is ready",
+      doCheckin: "DO CHECK-IN",
+      tapButtonToEnter: "Tap the button to enter your room",
+    },
     admin: {
       adminPanel: "Admin Panel",
       home: "Home",
@@ -945,6 +971,19 @@ export const translations = {
       accessAdmin: "Acesso de Administrador",
       accessClient: "Acesso do Cliente",
       needHelp: "Precisa de ajuda? Contacte nosso time",
+    },
+    client: {
+      // Quick Check-in page
+      processingCheckin: "Processando Check-In",
+      pleaseWait: "Por favor, aguarde um momento...",
+      checkinCompleted: "Check-In Concluído!",
+      roomReadyRedirecting: "Seu quarto está pronto. Redirecionando...",
+      reservationConfirmed: "Sua reserva está confirmada!",
+      welcome: "Bem-vindo!",
+      confirmEarlyCheckin: "Confirme seu check-in antecipado",
+      roomReady: "Seu quarto está pronto",
+      doCheckin: "FAZER CHECK-IN",
+      tapButtonToEnter: "Toque o botão para acessar seu quarto",
     },
     admin: {
       adminPanel: "Painel Admin",
