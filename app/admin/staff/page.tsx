@@ -2,7 +2,7 @@
 
 import { CardContent } from "@/components/ui/card"
 import { CardHeader } from "@/components/ui/card"
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
@@ -45,6 +45,11 @@ type CleaningRequest = {
 
 export default function StaffManagement() {
   const { t } = useLanguage()
+  const [isLoaded, setIsLoaded] = useState(false)
+  
+  useEffect(() => {
+    setIsLoaded(true)
+  }, [])
   const [staff, setStaff] = useState<StaffMember[]>([
     {
       id: 1,
@@ -616,6 +621,7 @@ export default function StaffManagement() {
   return (
     <>
       {/* Header */}
+      {isLoaded && (
       <header className="bg-card border-b border-border sticky top-0 z-10">
         <div className="px-8 py-4">
           <div className="flex items-center justify-between">
@@ -708,217 +714,6 @@ export default function StaffManagement() {
                         </SelectContent>
                       </Select>
                     </div>
-                    <div>
-                      <Label htmlFor="dueTime" className="text-sm font-medium mb-2 block">{t("admin.deliveryTime")}</Label>
-                      <Input
-                        id="dueTime"
-                        type="time"
-                        value={newActivity.dueTime}
-                        onChange={(e) => setNewActivity({ ...newActivity, dueTime: e.target.value })}
-                        className="h-10"
-                      />
-                    </div>
-                    <Button 
-                      onClick={() => {
-                        if (newActivity.assignedTo && newActivity.description) {
-                          setActivityDialogOpen(false)
-                          setNewActivity({ assignedTo: "", description: "", priority: "normal", dueTime: "" })
-                        }
-                      }}
-                      className="w-full h-10"
-                    >
-                      {t("admin.createActivity")}
-                    </Button>
-                  </div>
-                </DialogContent>
-              </Dialog>
-              
-              <Dialog open={addStaffDialogOpen} onOpenChange={setAddStaffDialogOpen}>
-                <DialogTrigger asChild>
-                  <button className="relative group w-10 h-10 rounded-full bg-gradient-to-br from-emerald-500 to-emerald-600 text-white shadow-md hover:shadow-lg transition-all duration-300 hover:scale-110 flex items-center justify-center">
-                    <UserPlus className="w-5 h-5" />
-                    <span className="absolute top-full mt-2 px-2 py-1 bg-gray-900 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap">
-                      {t("admin.addStaff")}
-                    </span>
-                  </button>
-                </DialogTrigger>
-                <DialogContent className="max-w-md">
-                  <DialogHeader>
-                    <DialogTitle className="text-xl">{t("admin.addNewStaff")}</DialogTitle>
-                    <DialogDescription>{t("admin.registerNewTeamMember")}</DialogDescription>
-                  </DialogHeader>
-                  <div className="space-y-5 py-4">
-                    <div>
-                      <Label htmlFor="name" className="text-sm font-medium mb-2 block">{t("admin.fullName")}</Label>
-                      <Input 
-                        id="name" 
-                        placeholder="Ej: María González"
-                        className="h-10"
-                        value={newStaff.name}
-                        onChange={(e) => setNewStaff({ ...newStaff, name: e.target.value })}
-                      />
-                    </div>
-                    <div>
-                      <Label htmlFor="email" className="text-sm font-medium mb-2 block">{t("admin.email")}</Label>
-                      <Input 
-                        id="email" 
-                        type="email"
-                        placeholder="correo@hotel.com"
-                        className="h-10"
-                        value={newStaff.email}
-                        onChange={(e) => setNewStaff({ ...newStaff, email: e.target.value })}
-                      />
-                    </div>
-                    <div>
-                      <Label htmlFor="phone" className="text-sm font-medium mb-2 block">{t("admin.phone")}</Label>
-                      <Input 
-                        id="phone" 
-                        type="tel"
-                        placeholder="+1 (555) 123-4567"
-                        className="h-10"
-                        value={newStaff.phone}
-                        onChange={(e) => setNewStaff({ ...newStaff, phone: e.target.value })}
-                      />
-                    </div>
-                    <div>
-                      <Label htmlFor="department" className="text-sm font-medium mb-2 block">{t("admin.department")}</Label>
-                      <Select value={newStaff.department} onValueChange={(value) => setNewStaff({ ...newStaff, department: value })}>
-                        <SelectTrigger className="h-10">
-                          <SelectValue placeholder={t("admin.selectDepartment")} />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="Limpieza">{t("admin.cleaning")}</SelectItem>
-                          <SelectItem value="Mantenimiento">{t("admin.maintenance")}</SelectItem>
-                          <SelectItem value="Seguridad">{t("admin.security")}</SelectItem>
-                          <SelectItem value="Recepción">{t("admin.reception")}</SelectItem>
-                          <SelectItem value="Servicio">{t("admin.service")}</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    <div>
-                      <Label htmlFor="shift" className="text-sm font-medium mb-2 block">{t("admin.shift")}</Label>
-                      <Select value={newStaff.shift} onValueChange={(value) => setNewStaff({ ...newStaff, shift: value })}>
-                        <SelectTrigger className="h-10">
-                          <SelectValue placeholder={t("admin.selectShift")} />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="morning">{t("admin.morning")}</SelectItem>
-                          <SelectItem value="afternoon">{t("admin.afternoon")}</SelectItem>
-                          <SelectItem value="evening">{t("admin.evening")}</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    <div>
-                      <Label htmlFor="capacity" className="text-sm font-medium mb-2 block">{t("admin.dailyCapacity")}</Label>
-                      <Input 
-                        id="capacity" 
-                        type="number" 
-                        placeholder="8"
-                        className="h-10"
-                        defaultValue="8"
-                        value={newStaff.capacity}
-                        onChange={(e) => setNewStaff({ ...newStaff, capacity: parseInt(e.target.value) || 8 })}
-                      />
-                    </div>
-                    <Button onClick={handleAddStaff} className="w-full h-11 font-medium mt-2">
-                      {t("admin.registerStaff")}
-                    </Button>
-                  </div>
-                </DialogContent>
-              </Dialog>
-            </div>
-          </div>
-        </div>
-      </header>
-
-      {/* Main Content */}
-      <div className="p-6 space-y-6">
-
-      {/* Stats Cards by Department - Only show in overview */}
-      {viewMode === "overview" && (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
-          {[
-            { dept: "Limpieza", icon: Broom, color: "from-green-400 to-green-600", iconBg: "bg-green-600", textColor: "text-white" },
-            { dept: "Mantenimiento", icon: Wrench, color: "from-yellow-500 to-yellow-600", iconBg: "bg-yellow-600", textColor: "text-white" },
-            { dept: "Seguridad", icon: Shield, color: "from-red-600 to-red-700", iconBg: "bg-red-700", textColor: "text-white" },
-            { dept: "Recepción", icon: ReceiptText, color: "from-pink-600 to-pink-700", iconBg: "bg-pink-700", textColor: "text-white" },
-            { dept: "Servicio", icon: UtensilsCrossed, color: "from-violet-500 to-violet-700", iconBg: "bg-violet-700", textColor: "text-white" },
-          ].map((deptInfo) => {
-            const deptStaff = staff.filter((s) => s.department === deptInfo.dept)
-            const availableCount = deptStaff.filter((s) => s.status === "available").length
-            const busyCount = deptStaff.filter((s) => s.status === "busy").length
-            const offCount = deptStaff.filter((s) => s.status === "off").length
-            const capacityPercentage = Math.round((busyCount / deptStaff.length) * 100) || 0
-            return (
-              <Card key={deptInfo.dept} className="relative overflow-hidden bg-background hover:shadow-md transition-shadow border border-border p-0">
-                {/* Title Header */}
-                <div className={`bg-gradient-to-br ${deptInfo.color} p-3 relative overflow-hidden`}>
-                  {/* Background circle decoration */}
-                  <div className="absolute inset-0 opacity-20">
-                    <div className="absolute top-0 right-0 w-16 h-16 bg-white rounded-full -mr-4 -mt-4"></div>
-                  </div>
-                  
-                  {/* Content */}
-                  <div className="relative flex items-center justify-between">
-                    <h3 className={`font-semibold text-sm ${deptInfo.textColor}`}>{deptInfo.dept}</h3>
-                    <deptInfo.icon className="w-5 h-5 text-white" />
-                  </div>
-                </div>
-                
-                {/* Content */}
-                <div className="px-3 py-2 space-y-2">
-                  {/* Status breakdown - Horizontal */}
-                  <div className="flex items-center justify-between gap-2 border-b border-border pb-2">
-                    <div className="flex-1 text-center">
-                      <span className="font-semibold text-xs text-foreground block">{availableCount}</span>
-                      <span className="text-muted-foreground text-xs block">Disponible</span>
-                    </div>
-                    <div className="w-px h-6 bg-border"></div>
-                    <div className="flex-1 text-center">
-                      <span className="font-semibold text-xs text-foreground block">{busyCount}</span>
-                      <span className="text-muted-foreground text-xs block">Ocupado</span>
-                    </div>
-                    <div className="w-px h-6 bg-border"></div>
-                    <div className="flex-1 text-center">
-                      <span className="font-semibold text-xs text-foreground block">{offCount}</span>
-                      <span className="text-muted-foreground text-xs block">Descanso</span>
-                    </div>
-                  </div>
-                  
-                  {/* Capacity bar - Refined */}
-                  <div className="pt-1">
-                    <div className="flex items-center justify-between mb-1">
-                      <span className="text-muted-foreground text-xs">Ocupación</span>
-                      <span className="font-semibold text-xs text-foreground">{capacityPercentage}%</span>
-                    </div>
-                    <div className="w-full bg-border rounded-full h-0.5 overflow-hidden shadow-inner">
-                      <div
-                        className={`bg-gradient-to-r ${deptInfo.color} rounded-full h-0.5 transition-all duration-500`}
-                        style={{ width: `${capacityPercentage}%` }}
-                      />
-                    </div>
-                  </div>
-                </div>
-              </Card>
-            )
-          })}
-        </div>
-      )}
-
-      {viewMode === "overview" && (
-        <div>
-          {/* Staff List - Grid Layout */}
-          <Card className="p-6">
-            <div className="flex-1 max-w-xs mb-4">
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                <Input
-                  placeholder="Ej: María, Roberto..."
-                  value={searchName}
-                  onChange={(e) => setSearchName(e.target.value)}
-                  className="pl-10"
-                />
-              </div>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
               {staff
@@ -965,8 +760,6 @@ export default function StaffManagement() {
           </Card>
         </div>
       )}
-
-      {viewMode === "kanban" && isLoaded && (
         <div className="space-y-4">
           {/* Filters */}
           <Card className="p-4">
@@ -1118,7 +911,7 @@ export default function StaffManagement() {
       )}
 
       {/* Staff Detail Dialog */}
-      {selectedStaff && (
+      {isLoaded && selectedStaff && (
         <Dialog open={!!selectedStaff} onOpenChange={() => {
           setSelectedStaff(null)
           setEditingStaff(null)

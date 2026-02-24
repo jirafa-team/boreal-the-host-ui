@@ -174,9 +174,9 @@ const breakfastOccupancy = {
   "10:00 AM": { reserved: 5, capacity: 60 },
 }
 
-export default function ClientPage({ searchParams }: { searchParams: { type?: string } }) {
+export default function ClientPage() {
   const searchParamsHook = useSearchParams()
-  const clientType = searchParams.type || "normal"
+  const clientType = searchParamsHook.get("type") || "normal"
   const router = useRouter()
 
   // Calculate occupancy percentage and get color

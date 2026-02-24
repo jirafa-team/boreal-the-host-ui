@@ -12,8 +12,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { BorealLoadingBar } from "@/components/boreal-loading-bar"
 
 export default function HomePage() {
-  const [reservationCode, setReservationCode] = useState("")
-  const [lastName, setLastName] = useState("")
+  const [username, setUsername] = useState("")
+  const [password, setPassword] = useState("")
   const [showAdminLogin, setShowAdminLogin] = useState(false)
   const [adminUser, setAdminUser] = useState("")
   const [adminPassword, setAdminPassword] = useState("")
@@ -22,21 +22,21 @@ export default function HomePage() {
 
   const { language, setLanguage, t } = useLanguage()
 
-  const handleReservationSubmit = (e: React.FormEvent) => {
+  const handleClientLogin = (e: React.FormEvent) => {
     e.preventDefault()
 
-    if (reservationCode !== "1" && reservationCode !== "2" && reservationCode !== "3") {
-      alert(t("login.invalidCode"))
+    if (username !== "1" && username !== "2" && username !== "3") {
+      alert(t("login.invalidUsername"))
       return
     }
 
     setIsLoading(true)
     setTimeout(() => {
-      if (reservationCode === "1") {
+      if (username === "1") {
         router.push("/client/checkin")
-      } else if (reservationCode === "2") {
+      } else if (username === "2") {
         router.push("/client/quick-checkin")
-      } else if (reservationCode === "3") {
+      } else if (username === "3") {
         router.push("/client/quick-checkin?type=future")
       }
     }, 800)
@@ -158,25 +158,25 @@ export default function HomePage() {
 
             {/* Main card */}
             <div className="bg-white/95 backdrop-blur-lg rounded-3xl shadow-2xl p-8 space-y-6">
-              <form onSubmit={handleReservationSubmit} className="space-y-4">
+              <form onSubmit={handleClientLogin} className="space-y-4">
                 <div className="space-y-2">
-                  <label className="text-sm font-medium text-gray-700">{t("login.reservationCode")}</label>
+                  <label className="text-sm font-medium text-gray-700">{t("login.username")}</label>
                   <Input
                     type="text"
-                    placeholder={t("login.enterReservationCode")}
-                    value={reservationCode}
-                    onChange={(e) => setReservationCode(e.target.value)}
+                    placeholder={t("login.enterUsername")}
+                    value={username}
+                    onChange={(e) => setUsername(e.target.value)}
                     className="w-full h-12 px-4 border-2 border-gray-200 focus:border-blue-500 rounded-xl"
                   />
                 </div>
 
                 <div className="space-y-2">
-                  <label className="text-sm font-medium text-gray-700">{t("login.lastName")}</label>
+                  <label className="text-sm font-medium text-gray-700">{t("login.password")}</label>
                   <Input
-                    type="text"
-                    placeholder={t("login.enterLastName")}
-                    value={lastName}
-                    onChange={(e) => setLastName(e.target.value)}
+                    type="password"
+                    placeholder={t("login.enterPassword")}
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
                     className="w-full h-12 px-4 border-2 border-gray-200 focus:border-blue-500 rounded-xl"
                   />
                 </div>
@@ -184,7 +184,7 @@ export default function HomePage() {
                 <Button
                   type="submit"
                   className="w-full h-12 bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 text-white px-6 py-3.5 rounded-xl font-semibold hover:from-blue-600 hover:to-cyan-600 transition-all shadow-md"
-                  disabled={!reservationCode}
+                  disabled={!username || !password}
                 >
                   {t("common.continue")}
                 </Button>
@@ -220,19 +220,21 @@ export default function HomePage() {
                   <Shield className="w-5 h-5" />
                   {t("login.accessAdmin")}
                 </button>
-
-                <a
-                  href="/client/checkin"
-                  className="flex items-center justify-center gap-3 w-full bg-gradient-to-r from-cyan-500 to-teal-500 text-white px-6 py-3.5 rounded-xl font-semibold hover:from-cyan-600 hover:to-teal-600 transition-all shadow-md"
-                >
-                  <User className="w-5 h-5" />
-                  {t("login.accessClient")}
-                </a>
               </div>
             </div>
 
             {/* Footer text */}
-            <p className="text-center text-white/80 text-sm mt-6">{t("login.needHelp")}</p>
+            <p className="text-center text-white/80 text-sm mt-6">
+              <span>{t("login.needHelpPrefix")} </span>
+              <a
+                href="https://wa.me/5491122415153"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="underline text-white hover:text-blue-200 transition-colors"
+              >
+                {t("login.contactUs")}
+              </a>
+            </p>
           </>
         )}
       </div>

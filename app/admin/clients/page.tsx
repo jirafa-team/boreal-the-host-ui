@@ -211,10 +211,7 @@ export default function ClientsPage() {
     checkOut: "",
     roomType: "standard" as const,
     status: "active" as const,
-    vip: false,
-    visitCount: 1,
-    notes: "",
-    category: "Basic" as const
+    nationality: ""
   })
 
   const activeClients = clients.filter((client) => client.status === "checked-in" || client.status === "reserved")
@@ -326,9 +323,11 @@ export default function ClientsPage() {
         checkOut: newClient.checkOut,
         roomType: newClient.roomType,
         status: newClient.status,
-        vip: newClient.vip,
-        visitCount: newClient.visitCount,
-        notes: newClient.notes
+        vip: false,
+        nationality: newClient.nationality,
+        guests: 1,
+        totalSpent: 0,
+        notes: ""
       }
       setClients([...clients, client])
       setShowNewClientModal(false)
@@ -341,9 +340,7 @@ export default function ClientsPage() {
         checkOut: "",
         roomType: "standard",
         status: "active",
-        vip: false,
-        visitCount: 1,
-        notes: ""
+        nationality: ""
       })
     }
   }
@@ -759,7 +756,7 @@ export default function ClientsPage() {
                 </div>
               </div>
 
-              {/* Room Type and Status */}
+              {/* Room Type and Nationality */}
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">Tipo de Habitación</label>
@@ -774,42 +771,28 @@ export default function ClientsPage() {
                   </select>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Estado</label>
-                  <select
-                    value={newClient.status}
-                    onChange={(e) => setNewClient({ ...newClient, status: e.target.value as "active" | "checkout" })}
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Nacionalidad</label>
+                  <input
+                    type="text"
+                    value={newClient.nationality}
+                    onChange={(e) => setNewClient({ ...newClient, nationality: e.target.value })}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  >
-                    <option value="active">Activo</option>
-                    <option value="checkout">Check-out</option>
-                  </select>
+                    placeholder="Ej: España"
+                  />
                 </div>
               </div>
 
-              {/* VIP and Visit Count */}
-              <div className="grid grid-cols-2 gap-4">
-                <div className="flex items-center">
-                  <input
-                    type="checkbox"
-                    id="vip"
-                    checked={newClient.vip}
-                    onChange={(e) => setNewClient({ ...newClient, vip: e.target.checked })}
-                    className="h-4 w-4 text-blue-600 rounded"
-                  />
-                  <label htmlFor="vip" className="ml-2 text-sm font-medium text-gray-700">
-                    Cliente VIP
-                  </label>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Número de Visitas</label>
-                  <input
-                    type="number"
-                    value={newClient.visitCount}
-                    onChange={(e) => setNewClient({ ...newClient, visitCount: parseInt(e.target.value) || 1 })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 min-h-20"
-                    min="1"
-                  />
-                </div>
+              {/* Status */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Estado</label>
+                <select
+                  value={newClient.status}
+                  onChange={(e) => setNewClient({ ...newClient, status: e.target.value as "active" | "checkout" })}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                >
+                  <option value="active">Activo</option>
+                  <option value="checkout">Check-out</option>
+                </select>
               </div>
 
               {/* Client Category */}
