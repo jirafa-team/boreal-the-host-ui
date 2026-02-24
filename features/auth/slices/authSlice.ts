@@ -38,6 +38,13 @@ export const authApi = createApi({
   baseQuery: authBaseQuery,
   tagTypes: ['UserContexts'],
   endpoints: (build) => ({
+    login: build.mutation<{ token: string }, { email: string; password: string }>({
+      query: (body) => ({
+        url: `/api${ENDPOINTS.AUTH.LOGIN}`,
+        method: 'POST',
+        body,
+      }),
+    }),
     getUserContexts: build.query<ContextDto[], void>({
       query: () => ({
         url: `/api${ENDPOINTS.AUTH.ORGANIZATION_ROLES}`,
@@ -57,5 +64,5 @@ export const authApi = createApi({
 });
 
 export const { updateUser, setCurrentOrganization, clearUser } = authSlice.actions;
-export const { useGetUserContextsQuery, useLogoutMutation } = authApi;
+export const { useLoginMutation, useGetUserContextsQuery, useLogoutMutation } = authApi;
 export default authSlice.reducer;

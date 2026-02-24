@@ -14,9 +14,9 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { BorealLoadingBar } from "@/components/boreal-loading-bar"
 import type { RootState } from "@/store/store"
 import { setDataSource } from "@/store/slices/dataSourceSlice"
-import { updateUser } from "@/features/auth/slices/authSlice"
-import { API_BASE_URL, ENDPOINTS } from "@/shared/types/api"
+import { updateUser, useLoginMutation } from "@/features/auth/slices/authSlice"
 import { jwtDecode } from "jwt-decode"
+import { JWTPayload } from "@/interfaces"
 
 export default function HomePage() {
   const [reservationCode, setReservationCode] = useState("")
@@ -28,6 +28,7 @@ export default function HomePage() {
   const [loginError, setLoginError] = useState<string | null>(null)
   const router = useRouter()
   const dispatch = useDispatch()
+  const [login, { isLoading: isLoginPending }] = useLoginMutation()
   const dataSource = useSelector((state: RootState) => state.dataSource.dataSource)
   const mockMode = dataSource === "mock"
 
@@ -74,49 +75,27 @@ export default function HomePage() {
       return
     }
 
-    setIsLoading(true)
     try {
-      const url = `${API_BASE_URL}/api${ENDPOINTS.AUTH.LOGIN}`
-      const res = await fetch(url, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: adminUser, password: adminPassword }),
-        credentials: "include",
-      })
-      console.log(res)
-      if (!res.ok) {
-        const err = await res.json().catch(() => ({}))
-        setLoginError((err as { message?: string })?.message ?? t("login.invalidCredentials"))
-        setAdminPassword("")
-        return
-      }
-      const data = (await res.json()) as { token?: string }
-      if (data?.token) {
-        try {
-          const decoded = jwtDecode<{ email?: string; uuid?: string; firstName?: string; lastName?: string }>(data.token)
-          dispatch(
-            updateUser({
-              user: {
-                email: decoded.email ?? adminUser,
-                uuid: decoded.uuid ?? "",
-                firstName: decoded.firstName ?? null,
-                lastName: decoded.lastName ?? null,
-              },
-              isLoggedIn: true,
-            })
-          )
-        } catch {
-          dispatch(updateUser({ user: { email: adminUser, uuid: "" }, isLoggedIn: true }))
-        }
-      } else {
-        dispatch(updateUser({ user: { email: adminUser, uuid: "" }, isLoggedIn: true }))
-      }
+      const { token } = await login({ email: adminUser, password: adminPassword }).unwrap()
+      const decoded = jwtDecode<JWTPayload>(token);
+
+      dispatch(
+        updateUser({
+          user: {
+            email: decoded.email,
+            uuid: decoded.uuid,
+            firstName: decoded.firstName,
+            lastName: decoded.lastName,
+          },
+          isLoggedIn: true,
+        })
+      )
+
       router.push("/admin/select-establishment")
-    } catch {
-      setLoginError(t("login.invalidCredentials"))
+    } catch (err) {
+      const error = err as { status?: number; data?: { message?: string } }
+      setLoginError(error?.data?.message ?? t("login.invalidCredentials"))
       setAdminPassword("")
-    } finally {
-      setIsLoading(false)
     }
   }
 
@@ -156,7 +135,7 @@ export default function HomePage() {
 
       {/* Content */}
       <div className="relative z-10 max-w-md w-full">
-        {isLoading ? (
+        {isLoading || isLoginPending ? (
           <div className="bg-white/95 backdrop-blur-lg rounded-3xl shadow-2xl p-12 flex flex-col items-center justify-center min-h-96">
             <BorealLoadingBar />
           </div>
