@@ -9,8 +9,7 @@ import { Label } from "@/components/ui/label"
 import { Button } from "@/components/ui/button"
 import { useRouter } from "next/navigation"
 import { Eraser, Sparkles, Hotel, Car, Award as IdCard, Crown, Upload, X } from "lucide-react"
-import { Checkbox } from "@/components/ui/checkbox"
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 
 export default function CheckInPage() {
   const router = useRouter()
@@ -20,12 +19,79 @@ export default function CheckInPage() {
   const [clientType, setClientType] = useState<"normal" | "vip">("normal")
   const [dniPhoto, setDniPhoto] = useState<string | null>(null)
   const [documentFile, setDocumentFile] = useState<File | null>(null)
+
+  const countries = [
+    "Argentina",
+    "Brasil",
+    "Chile",
+    "Colombia",
+    "Costa Rica",
+    "Cuba",
+    "Ecuador",
+    "El Salvador",
+    "Guatemala",
+    "Honduras",
+    "México",
+    "Nicaragua",
+    "Panamá",
+    "Paraguay",
+    "Perú",
+    "Puerto Rico",
+    "República Dominicana",
+    "Uruguay",
+    "Venezuela",
+    "Alemania",
+    "Austria",
+    "Bélgica",
+    "Dinamarca",
+    "España",
+    "Finlandia",
+    "Francia",
+    "Grecia",
+    "Hungría",
+    "Irlanda",
+    "Italia",
+    "Luxemburgo",
+    "Malta",
+    "Países Bajos",
+    "Polonia",
+    "Portugal",
+    "Reino Unido",
+    "República Checa",
+    "Rumania",
+    "Rusia",
+    "Suecia",
+    "Suiza",
+    "Australia",
+    "China",
+    "Corea del Sur",
+    "Emiratos Árabes Unidos",
+    "Filipinas",
+    "Hong Kong",
+    "India",
+    "Indonesia",
+    "Japón",
+    "Malasia",
+    "Nueva Zelanda",
+    "Singapur",
+    "Tailandia",
+    "Taiwán",
+    "Vietnam",
+    "Canadá",
+    "Estados Unidos",
+    "Marruecos",
+    "Sudáfrica",
+    "Túnez",
+  ].sort()
+
+  const documentTypes = ["DNI", "Pasaporte", "Cédula", "CUIL", "RUC", "Otro"]
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
     email: "",
     phone: "",
     nationality: "",
+    documentType: "DNI",
     idNumber: "",
     hasVehicle: false,
     vehiclePlate: "",
@@ -229,23 +295,40 @@ export default function CheckInPage() {
               className="border-gray-300"
             />
 
-            <Input
-              id="nationality"
-              type="text"
-              placeholder="Nacionalidad"
-              value={formData.nationality}
-              onChange={(e) => handleChange("nationality", e.target.value)}
-              className="border-gray-300"
-            />
+            <Select value={formData.nationality} onValueChange={(value) => handleChange("nationality", value)}>
+              <SelectTrigger className="border-gray-300">
+                <SelectValue placeholder="Selecciona tu nacionalidad" />
+              </SelectTrigger>
+              <SelectContent>
+                {countries.map((country) => (
+                  <SelectItem key={country} value={country}>
+                    {country}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
 
             <div className="pt-3 border-t-2 border-gray-200">
               <p className="text-sm font-semibold text-gray-700 mb-3">Información de Identidad</p>
 
               <div className="space-y-3">
+                <Select value={formData.documentType} onValueChange={(value) => handleChange("documentType", value)}>
+                  <SelectTrigger className="border-gray-300">
+                    <SelectValue placeholder="Tipo de documento" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {documentTypes.map((type) => (
+                      <SelectItem key={type} value={type}>
+                        {type}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+
                 <Input
                   id="idNumber"
                   type="text"
-                  placeholder="Número de Documento (DNI, Pasaporte, CUIL, etc.)"
+                  placeholder="Número de Documento"
                   value={formData.idNumber}
                   onChange={(e) => handleChange("idNumber", e.target.value)}
                   className="border-gray-300"

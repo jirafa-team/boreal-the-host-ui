@@ -124,10 +124,10 @@ export default function HomePage() {
     // Guardar usuario logueado
     localStorage.setItem("currentUser", registerUsername)
 
-    // Redirigir a checkin
+    // Redirigir a stays
     setIsLoading(true)
     setTimeout(() => {
-      router.push("/client/checkin")
+      router.push("/client/stays")
     }, 800)
   }
 
