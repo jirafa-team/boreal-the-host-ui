@@ -4,7 +4,7 @@ import authReducer, { authApi } from '@/features/auth/slices/authSlice';
 import organizationReducer, { organizationApi } from '@/features/organization/slices/organizationSlice';
 import facilityReducer, { facilityApi } from '@/app/admin/facilities/slice/facilitySlice';
 import userReducer, { userApi } from '@/features/user/slices/userSlice';
-import roomReducer, { roomApi } from '@/features/room/slices/roomSlice';
+import roomReducer, { roomApi } from '@/app/admin/rooms/slice/roomSlice';
 import roleReducer, { roleApi } from '@/features/role/slices/roleSlice';
 import staffTaskReducer, { staffTaskApi } from '@/features/staff-task/slices/staffTaskSlice';
 import reservationReducer, { reservationApi } from '@/features/reservation/slices/reservationSlice';
