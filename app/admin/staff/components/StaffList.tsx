@@ -15,7 +15,6 @@ export interface StaffListProps {
 }
 
 function getStatusBadge(status: string, t: (k: string) => string) {
-  console.log('status', status)
   if (status === 'active') {
     return <Badge className="bg-green-500/10 text-green-600 border-green-500/20">{t('admin.active')}</Badge>;
   }
@@ -59,10 +58,10 @@ export function StaffList({ staffList, onEdit, onDelete, isLoading }: StaffListP
                   <td className="py-4 px-4 font-semibold text-gray-900">{staff.name}</td>
                   <td className="py-4 px-4 text-gray-600">{staff.email}</td>
                   <td className="py-4 px-4">{getStatusBadge(staff.status, t)}</td>
-                  <td className="py-4 px-4 text-gray-600">{staff.departmentId ?? '—'}</td>
+                  <td className="py-4 px-4 text-gray-600">{staff.employee.departmentName ?? '—'}</td>
                   <td className="py-4 px-4 text-gray-600">
-                    {staff.workStartTime && staff.workEndTime
-                      ? `${staff.workStartTime} - ${staff.workEndTime}`
+                    {staff.employee.workStartTime && staff.employee.workEndTime
+                      ? `${staff.employee.workStartTime} - ${staff.employee.workEndTime}`
                       : '—'}
                   </td>
                   <td className="py-4 px-4">

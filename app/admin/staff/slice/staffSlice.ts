@@ -1,6 +1,10 @@
 import { createSlice, type PayloadAction, type AnyAction } from '@reduxjs/toolkit';
+import { createApi } from '@reduxjs/toolkit/query/react';
 import type { User } from '@/interfaces/user/User';
 import { STAFF_ROLE_NAME } from '@/app/admin/staff/constants';
+import { ENDPOINTS } from '@/shared/types/api';
+import { baseQueryWithOrg } from '@/store/baseQuery';
+import type { GetStaffResponse } from '@/interfaces/staff/GetStaffResponse';
 
 interface StaffState {
   staff: User[];
@@ -29,6 +33,60 @@ export const staffSlice = createSlice({
 });
 
 export const { setStaff } = staffSlice.actions;
+
+export const staffApi = createApi({
+  reducerPath: 'staffApi',
+  baseQuery: baseQueryWithOrg,
+  tagTypes: ['Staff'],
+  endpoints: (build) => ({
+    getStaff: build.query<
+      { data: GetStaffResponse },
+      { page?: number; limit?: number; sort?: string } | void
+    >({
+      query: (params) => ({
+        url: ENDPOINTS.STAFF,
+        method: 'GET',
+        params: params || {},
+        credentials: 'include',
+      }),
+      providesTags: ['Staff'],
+    }),
+    deleteStaff: build.mutation<void, string>({
+      query: (id) => ({
+        url: `${ENDPOINTS.STAFF}/${id}`,
+        method: 'DELETE',
+        credentials: 'include',
+      }),
+      invalidatesTags: ['Staff'],
+    }),
+    updateStaff: build.mutation<
+      void,
+      { id: string; payload: UpdateStaffPayload }
+    >({
+      query: ({ id, payload }) => ({
+        url: `${ENDPOINTS.STAFF}/${id}`,
+        method: 'PATCH',
+        body: payload,
+        credentials: 'include',
+      }),
+      invalidatesTags: ['Staff'],
+    }),
+  }),
+});
+
+export interface UpdateStaffPayload {
+  firstName?: string;
+  lastName?: string;
+  email?: string;
+  position?: string;
+  status?: string;
+  departmentId?: string | null;
+  workStartTime?: string | null;
+  workEndTime?: string | null;
+}
+
+export const { useGetStaffQuery, useDeleteStaffMutation, useUpdateStaffMutation } =
+  staffApi;
 
 export function loadMockStaff() {
   return (dispatch: (action: AnyAction) => void) => {

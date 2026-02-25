@@ -5,7 +5,7 @@ import organizationReducer, { organizationApi } from '@/features/organization/sl
 import facilityReducer, { facilityApi } from '@/app/admin/facilities/slice/facilitySlice';
 import userReducer, { userApi } from '@/features/user/slices/userSlice';
 import roomReducer, { roomApi } from '@/app/admin/rooms/slice/roomSlice';
-import staffReducer from '@/app/admin/staff/slice/staffSlice';
+import staffReducer, { staffApi } from '@/app/admin/staff/slice/staffSlice';
 import roleReducer, { roleApi } from '@/features/role/slices/roleSlice';
 import staffTaskReducer, { staffTaskApi } from '@/features/staff-task/slices/staffTaskSlice';
 import reservationReducer, { reservationApi } from '@/features/reservation/slices/reservationSlice';
@@ -36,6 +36,7 @@ export const store = configureStore({
     [organizationApi.reducerPath]: organizationApi.reducer,
     [facilityApi.reducerPath]: facilityApi.reducer,
     [userApi.reducerPath]: userApi.reducer,
+    [staffApi.reducerPath]: staffApi.reducer,
     [roomApi.reducerPath]: roomApi.reducer,
     [roleApi.reducerPath]: roleApi.reducer,
     [staffTaskApi.reducerPath]: staffTaskApi.reducer,
@@ -52,6 +53,7 @@ export const store = configureStore({
       organizationApi.middleware,
       facilityApi.middleware,
       userApi.middleware,
+      staffApi.middleware,
       roomApi.middleware,
       roleApi.middleware,
       staffTaskApi.middleware,

@@ -11,5 +11,4 @@ export interface User {
   phone?: string;
   avatar?: string;
   permissions?: Record<string, boolean>;
-  [key: string]: unknown;
 }

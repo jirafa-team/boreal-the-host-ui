@@ -19,7 +19,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { useUpdateUserMutation } from '@/features/user/slices/userSlice';
+import { useUpdateStaffMutation } from '@/app/admin/staff/slice/staffSlice';
 import { useLanguage } from '@/lib/i18n-context';
 import type { StaffMemberDisplay } from '@/interfaces/staff/StaffMemberDisplay';
 
@@ -39,7 +39,7 @@ export function EditStaffDialog({
   onMockUpdate,
 }: EditStaffDialogProps) {
   const { t } = useLanguage();
-  const [updateUser, { isLoading: isUpdating }] = useUpdateUserMutation();
+  const [updateStaff, { isLoading: isUpdating }] = useUpdateStaffMutation();
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
   const [email, setEmail] = useState('');
@@ -72,7 +72,7 @@ export function EditStaffDialog({
       if (onMockUpdate) {
         onMockUpdate(staff.id, payload);
       } else {
-        await updateUser({ id: staff.id, payload }).unwrap();
+        await updateStaff({ id: staff.id, payload }).unwrap();
       }
       onSuccess();
       onClose();

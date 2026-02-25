@@ -14,6 +14,7 @@ export const ENDPOINTS = {
   ORGANIZATION: '/organization',
   GLOBAL_USER: '/global/user',
   USER: '/user',
+  STAFF: '/staff',
   FACILITY: '/facility',
   ROOM: '/room',
   ROLE: '/role',

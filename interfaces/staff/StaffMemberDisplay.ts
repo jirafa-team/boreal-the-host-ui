@@ -11,4 +11,11 @@ export interface StaffMemberDisplay {
   workEndTime?: string | null;
   phone?: string;
   position?: string;
+  employee: {
+    workStatus?: string;
+    workStartTime?: string;
+    workEndTime?: string;
+    departmentId?: string;
+    departmentName?: string;
+  }
 }
