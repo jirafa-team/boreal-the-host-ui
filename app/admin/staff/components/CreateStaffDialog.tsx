@@ -22,7 +22,7 @@ import {
 import { useGetDepartmentsQuery } from '@/features/taxonomy-department/slices/taxonomyDepartmentSlice';
 import { useCreateUserMutation } from '@/features/user/slices/userSlice';
 import { useLanguage } from '@/lib/i18n-context';
-import { SHIFT_TO_SCHEDULE, STAFF_ROLE_NAME } from '../constants';
+import { SHIFT_TO_SCHEDULE, STAFF_ROLE_NAME } from '@/app/admin/staff/constants';
 
 export interface CreateStaffDialogProps {
   open: boolean;

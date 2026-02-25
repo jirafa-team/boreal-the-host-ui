@@ -15,8 +15,12 @@ export interface StaffListProps {
 }
 
 function getStatusBadge(status: string, t: (k: string) => string) {
+  console.log('status', status)
   if (status === 'active') {
     return <Badge className="bg-green-500/10 text-green-600 border-green-500/20">{t('admin.active')}</Badge>;
+  }
+  if (status === 'pending') {
+    return <Badge className="bg-red-500/10 text-orange-600 border-orange-500/20">{t('admin.pending')}</Badge>;
   }
   return <Badge className="bg-red-500/10 text-red-600 border-red-500/20">{t('admin.inactive')}</Badge>;
 }
