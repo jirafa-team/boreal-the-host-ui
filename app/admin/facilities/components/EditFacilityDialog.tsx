@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import type { Facility } from "./types"
+import { TaxonomyFacilityType } from "@/interfaces/taxonomy-facility-type/TaxonomyFacilityType"
 
 type TFunction = (key: string) => string
 
@@ -14,10 +15,11 @@ export type EditFacilityDialogProps = {
   onOpenChange: (open: boolean) => void
   facility: Facility | null
   onSubmit: (e: React.FormEvent<HTMLFormElement>) => void
+  facilitiesTypes: TaxonomyFacilityType[]
   t: TFunction
 }
 
-export function EditFacilityDialog({ open, onOpenChange, facility, onSubmit, t }: EditFacilityDialogProps) {
+export function EditFacilityDialog({ open, onOpenChange, facility, onSubmit, facilitiesTypes, t }: EditFacilityDialogProps) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
@@ -32,16 +34,28 @@ export function EditFacilityDialog({ open, onOpenChange, facility, onSubmit, t }
           </div>
           <div>
             <Label htmlFor="edit-type">Tipo</Label>
-            <Select name="type" defaultValue={facility?.type} required>
+            <Select name="type" defaultValue={facility?.facilityType?.id} required>
               <SelectTrigger>
                 <SelectValue placeholder="Seleccionar tipo" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="fitness">Fitness</SelectItem>
-                <SelectItem value="recreation">Recreación</SelectItem>
-                <SelectItem value="wellness">Bienestar</SelectItem>
-                <SelectItem value="business">Negocios</SelectItem>
-                <SelectItem value="dining">Gastronomía</SelectItem>
+                {facilitiesTypes ? (
+                  <>
+                    {facilitiesTypes.map((type) => (
+                      <SelectItem key={type.id} value={type.id}>
+                        {type.name}
+                      </SelectItem>
+                    ))}
+                  </>
+                ) : (
+                  <>
+                    <SelectItem value="fitness">Fitness</SelectItem>
+                    <SelectItem value="recreation">Recreación</SelectItem>
+                    <SelectItem value="wellness">Bienestar</SelectItem>
+                    <SelectItem value="business">Negocios</SelectItem>
+                    <SelectItem value="dining">Gastronomía</SelectItem>
+                  </>
+                )}
               </SelectContent>
             </Select>
           </div>

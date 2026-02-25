@@ -2,7 +2,12 @@ export interface Facility {
   id: string;
   name: string;
   type?: string;
-  facilityTypeId?: string;
+  facilityType?: {
+    id: string;
+    name: string;
+    description?: string;
+    active: boolean;
+  };
   capacity: number;
   openTime?: string;
   closeTime?: string;

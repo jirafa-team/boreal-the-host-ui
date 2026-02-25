@@ -215,6 +215,7 @@ export function FacilitiesView({
               onOpenChange={setEditDialogOpen}
               facility={editingFacility}
               onSubmit={onSaveEdit}
+              facilitiesTypes={facilitiesTypes}
               t={t}
             />
             <BookingsDetailDialog

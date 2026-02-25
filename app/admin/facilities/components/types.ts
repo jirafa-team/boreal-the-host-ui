@@ -1,11 +1,13 @@
 import type { LucideIcon } from "lucide-react"
 import { Dumbbell, Waves, Sparkles, Video, Coffee, LayoutGrid } from "lucide-react"
 import type { Facility as ApiFacility } from "@/interfaces/facility/Facility"
+import type { TaxonomyFacilityType } from "@/interfaces/taxonomy-facility-type/TaxonomyFacilityType"
 
 export type Facility = {
   id: string
   name: string
   type: string
+  facilityType?: TaxonomyFacilityType
   capacity: number
   icon: LucideIcon
   color: string
@@ -31,12 +33,15 @@ export const typeToIconAndColor: Record<string, { icon: LucideIcon; color: strin
 }
 
 export function mapApiFacilityToUi(f: ApiFacility): Facility {
-  const type = f.type ?? "fitness"
+  const type = f.facilityType?.name ?? "fitness"
   const { icon, color } = typeToIconAndColor[type] ?? { icon: LayoutGrid, color: "bg-gray-500" }
   return {
     id: f.id,
     name: f.name,
     type,
+    facilityType: f.facilityType
+      ? { id: f.facilityType.id, name: f.facilityType.name, active: f.facilityType.active ?? true }
+      : undefined,
     capacity: f.capacity ?? 0,
     icon,
     color,

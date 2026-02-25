@@ -39,7 +39,6 @@ export function FacilitiesApiContainer() {
 
   const { data } = useGetFacilityTypesQuery()
   const facilitiesTypes: TaxonomyFacilityType[] = data?.data ?? []
-  console.log(facilitiesTypes)
 
   const bookings: Booking[] = []
 
@@ -147,10 +146,10 @@ export function FacilitiesApiContainer() {
           id: editingFacility.id,
           payload: {
             name: formData.get("name") as string,
-            type: formData.get("type") as string,
+            facilityTypeId: formData.get("type") as string,
             capacity: Number(formData.get("capacity")),
-            startTime: formData.get("startTime") as string,
-            endTime: formData.get("endTime") as string,
+            openTime: formData.get("startTime") as string,
+            closeTime: formData.get("endTime") as string,
           },
         }).unwrap()
         setEditDialogOpen(false)

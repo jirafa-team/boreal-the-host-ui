@@ -49,11 +49,18 @@ export function AddFacilityDialog({ open, onOpenChange, onSubmit, facilitiesType
                 <SelectValue placeholder={t("admin.selectType")} />
               </SelectTrigger>
               <SelectContent>
-                {facilitiesTypes.map((type) => (
-                  <SelectItem key={type.id} value={type.id}>
-                    {type.name}
-                  </SelectItem>
-                ))}
+                {facilitiesTypes ? (
+                  <>
+                    {facilitiesTypes.map((type) => (
+                      <SelectItem key={type.id} value={type.id}>
+                        {type.name}
+                      </SelectItem>
+                    ))}
+                  </>
+                ) : (
+                  <SelectItem value="">{t("admin.noTypesAvailable")}</SelectItem>
+                )}
+
               </SelectContent>
             </Select>
           </div>
