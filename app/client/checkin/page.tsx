@@ -7,10 +7,10 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Button } from "@/components/ui/button"
+import { Checkbox } from "@/components/ui/checkbox"
 import { useRouter } from "next/navigation"
 import { Eraser, Sparkles, Hotel, Car, Award as IdCard, Crown, Upload, X } from "lucide-react"
-import { Checkbox } from "@/components/ui/checkbox"
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 
 export default function CheckInPage() {
   const router = useRouter()
@@ -19,13 +19,80 @@ export default function CheckInPage() {
   const [isDrawing, setIsDrawing] = useState(false)
   const [clientType, setClientType] = useState<"normal" | "vip">("normal")
   const [dniPhoto, setDniPhoto] = useState<string | null>(null)
+  const [documentFile, setDocumentFile] = useState<File | null>(null)
+
+  const countries = [
+    "Argentina",
+    "Brasil",
+    "Chile",
+    "Colombia",
+    "Costa Rica",
+    "Cuba",
+    "Ecuador",
+    "El Salvador",
+    "Guatemala",
+    "Honduras",
+    "México",
+    "Nicaragua",
+    "Panamá",
+    "Paraguay",
+    "Perú",
+    "Puerto Rico",
+    "República Dominicana",
+    "Uruguay",
+    "Venezuela",
+    "Alemania",
+    "Austria",
+    "Bélgica",
+    "Dinamarca",
+    "España",
+    "Finlandia",
+    "Francia",
+    "Grecia",
+    "Hungría",
+    "Irlanda",
+    "Italia",
+    "Luxemburgo",
+    "Malta",
+    "Países Bajos",
+    "Polonia",
+    "Portugal",
+    "Reino Unido",
+    "República Checa",
+    "Rumania",
+    "Rusia",
+    "Suecia",
+    "Suiza",
+    "Australia",
+    "China",
+    "Corea del Sur",
+    "Emiratos Árabes Unidos",
+    "Filipinas",
+    "Hong Kong",
+    "India",
+    "Indonesia",
+    "Japón",
+    "Malasia",
+    "Nueva Zelanda",
+    "Singapur",
+    "Tailandia",
+    "Taiwán",
+    "Vietnam",
+    "Canadá",
+    "Estados Unidos",
+    "Marruecos",
+    "Sudáfrica",
+    "Túnez",
+  ].sort()
+
+  const documentTypes = ["DNI", "Pasaporte", "Cédula", "CUIL", "RUC", "Otro"]
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
     email: "",
     phone: "",
-    reservationCode: "",
-    isTitular: false,
+    nationality: "",
+    documentType: "DNI",
     idNumber: "",
     hasVehicle: false,
     vehiclePlate: "",
@@ -125,6 +192,17 @@ export default function CheckInPage() {
     }
   }
 
+  const handleDocumentChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (file) {
+      setDocumentFile(file)
+    }
+  }
+
+  const removeDocument = () => {
+    setDocumentFile(null)
+  }
+
   const removeDniPhoto = () => {
     setDniPhoto(null)
     if (fileInputRef.current) {
@@ -182,25 +260,6 @@ export default function CheckInPage() {
 
         <CardContent className="pt-6">
           <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="pb-3 border-b-2 border-gray-200">
-              <p className="text-sm font-semibold text-gray-700 mb-3">Tipo de Cliente</p>
-              <RadioGroup value={clientType} onValueChange={(value) => setClientType(value as "normal" | "vip")}>
-                <div className="flex items-center space-x-2 mb-2">
-                  <RadioGroupItem value="normal" id="normal" />
-                  <Label htmlFor="normal" className="cursor-pointer font-medium">
-                    Normal
-                  </Label>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <RadioGroupItem value="vip" id="vip" />
-                  <Label htmlFor="vip" className="flex items-center gap-2 cursor-pointer font-medium">
-                    <Crown className="w-4 h-4 text-amber-500" />
-                    VIP
-                  </Label>
-                </div>
-              </RadioGroup>
-            </div>
-
             <Input
               id="firstName"
               type="text"
@@ -237,88 +296,85 @@ export default function CheckInPage() {
               className="border-gray-300"
             />
 
-            <Input
-              id="reservationCode"
-              type="text"
-              placeholder="Código de Reserva"
-              value={formData.reservationCode}
-              onChange={(e) => handleChange("reservationCode", e.target.value)}
-              className="border-gray-300"
-            />
+            <Select value={formData.nationality} onValueChange={(value) => handleChange("nationality", value)}>
+              <SelectTrigger className="border-gray-300">
+                <SelectValue placeholder="Selecciona tu nacionalidad" />
+              </SelectTrigger>
+              <SelectContent>
+                {countries.map((country) => (
+                  <SelectItem key={country} value={country}>
+                    {country}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
 
             <div className="pt-3 border-t-2 border-gray-200">
-              <p className="text-sm font-semibold text-gray-700 mb-3">Información Adicional</p>
+              <p className="text-sm font-semibold text-gray-700 mb-3">Información de Identidad</p>
 
               <div className="space-y-3">
-                <div className="flex items-center space-x-2">
-                  <Checkbox
-                    id="isTitular"
-                    checked={formData.isTitular}
-                    onCheckedChange={(checked) => handleChange("isTitular", checked as boolean)}
-                  />
-                  <Label htmlFor="isTitular" className="flex items-center gap-2 cursor-pointer font-medium">
-                    <IdCard className="w-4 h-4 text-primary" />
-                    Soy el titular de la reserva
+                <Select value={formData.documentType} onValueChange={(value) => handleChange("documentType", value)}>
+                  <SelectTrigger className="border-gray-300">
+                    <SelectValue placeholder="Tipo de documento" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {documentTypes.map((type) => (
+                      <SelectItem key={type} value={type}>
+                        {type}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+
+                <Input
+                  id="idNumber"
+                  type="text"
+                  placeholder="Número de Documento"
+                  value={formData.idNumber}
+                  onChange={(e) => handleChange("idNumber", e.target.value)}
+                  className="border-gray-300"
+                />
+
+                <div className="space-y-2">
+                  <Label htmlFor="document" className="text-sm font-medium text-gray-700">
+                    Adjuntar Documento
                   </Label>
-                </div>
 
-                {formData.isTitular && (
-                  <div className="pl-6 space-y-3">
-                    <Input
-                      id="idNumber"
-                      type="text"
-                      placeholder="Número de Documento (DNI, Pasaporte, etc.)"
-                      value={formData.idNumber}
-                      onChange={(e) => handleChange("idNumber", e.target.value)}
-                      className="border-gray-300"
-                    />
-
-                    <div className="space-y-2">
-                      <Label htmlFor="dniPhoto" className="text-sm font-medium text-gray-700">
-                        Foto del DNI
-                      </Label>
-
-                      {!dniPhoto ? (
-                        <div className="relative">
-                          <input
-                            ref={fileInputRef}
-                            id="dniPhoto"
-                            type="file"
-                            accept="image/*"
-                            onChange={handleDniPhotoChange}
-                            className="hidden"
-                          />
-                          <Button
-                            type="button"
-                            variant="outline"
-                            onClick={() => fileInputRef.current?.click()}
-                            className="w-full border-2 border-dashed"
-                            style={{ borderColor: "#88fdda" }}
-                          >
-                            <Upload className="w-4 h-4 mr-2" />
-                            Subir foto del DNI
-                          </Button>
-                        </div>
-                      ) : (
-                        <div
-                          className="relative border-2 rounded-lg overflow-hidden"
-                          style={{ borderColor: "#88fdda" }}
-                        >
-                          <img src={dniPhoto || "/placeholder.svg"} alt="DNI" className="w-full h-40 object-cover" />
-                          <Button
-                            type="button"
-                            variant="destructive"
-                            size="icon"
-                            onClick={removeDniPhoto}
-                            className="absolute top-2 right-2 h-8 w-8"
-                          >
-                            <X className="w-4 h-4" />
-                          </Button>
-                        </div>
-                      )}
+                  {!documentFile ? (
+                    <div className="relative">
+                      <input
+                        id="document"
+                        type="file"
+                        accept=".pdf,.doc,.docx,.jpg,.jpeg,.png"
+                        onChange={handleDocumentChange}
+                        className="hidden"
+                      />
+                      <Button
+                        type="button"
+                        variant="outline"
+                        onClick={() => document.getElementById("document")?.click()}
+                        className="w-full border-2 border-dashed"
+                        style={{ borderColor: "#88fdda" }}
+                      >
+                        <Upload className="w-4 h-4 mr-2" />
+                        Subir Documento
+                      </Button>
                     </div>
-                  </div>
-                )}
+                  ) : (
+                    <div className="flex items-center justify-between p-3 border-2 rounded-lg" style={{ borderColor: "#88fdda" }}>
+                      <span className="text-sm font-medium text-gray-700">{documentFile.name}</span>
+                      <Button
+                        type="button"
+                        variant="destructive"
+                        size="icon"
+                        onClick={removeDocument}
+                        className="h-6 w-6"
+                      >
+                        <X className="w-3 h-3" />
+                      </Button>
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
 
