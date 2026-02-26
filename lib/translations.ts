@@ -1431,4 +1431,3 @@ export const translations = {
     },
   },
 }
-}
