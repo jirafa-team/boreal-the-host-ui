@@ -1,7 +1,7 @@
 "use client"
 
 import type React from "react"
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -22,7 +22,12 @@ export default function HomePage() {
   const [registerUsername, setRegisterUsername] = useState("")
   const [registerPassword, setRegisterPassword] = useState("")
   const [registerConfirmPassword, setRegisterConfirmPassword] = useState("")
+  const [isLoaded, setIsLoaded] = useState(false)
   const router = useRouter()
+
+  useEffect(() => {
+    setIsLoaded(true)
+  }, [])
 
   const { language, setLanguage, t } = useLanguage()
 
@@ -180,6 +185,7 @@ export default function HomePage() {
               </button>
             </div>
 
+            {isLoaded && (
             <form onSubmit={handleAdminLogin} className="space-y-4">
               <div className="space-y-2">
                 <label className="text-sm font-medium text-gray-700">{t("login.username")}</label>
@@ -210,7 +216,7 @@ export default function HomePage() {
                 {t("login.login")}
               </Button>
             </form>
-          </div>
+            )}
         ) : (
           <>
             <div className="text-center mb-8">
