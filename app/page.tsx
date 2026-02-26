@@ -7,11 +7,14 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { User, Shield, X, Globe } from "lucide-react"
 import Image from "next/image"
-import { useLanguage } from "@/lib/i18n-context"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { BorealLoadingBar } from "@/components/boreal-loading-bar"
+import { useLanguage } from "@/lib/i18n-context"
 
 export default function HomePage() {
+  const router = useRouter()
+  const { language, setLanguage, t } = useLanguage()
+  
   const [username, setUsername] = useState("")
   const [password, setPassword] = useState("")
   const [showAdminLogin, setShowAdminLogin] = useState(false)
@@ -23,13 +26,10 @@ export default function HomePage() {
   const [registerPassword, setRegisterPassword] = useState("")
   const [registerConfirmPassword, setRegisterConfirmPassword] = useState("")
   const [isLoaded, setIsLoaded] = useState(false)
-  const router = useRouter()
 
   useEffect(() => {
     setIsLoaded(true)
   }, [])
-
-  const { language, setLanguage, t } = useLanguage()
 
   const handleClientLogin = (e: React.FormEvent) => {
     e.preventDefault()
