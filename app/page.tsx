@@ -182,10 +182,10 @@ export default function HomePage() {
 
             <form onSubmit={handleAdminLogin} className="space-y-4">
               <div className="space-y-2">
-                <label className="text-sm font-medium text-gray-700">{t("login.user")}</label>
+                <label className="text-sm font-medium text-gray-700">{t("login.username")}</label>
                 <Input
                   type="text"
-                  placeholder={t("login.enterUser")}
+                  placeholder={t("login.enterUsername")}
                   value={adminUser}
                   onChange={(e) => setAdminUser(e.target.value)}
                   className="w-full h-12 px-4 border-2 border-gray-200 focus:border-blue-500 rounded-xl"
