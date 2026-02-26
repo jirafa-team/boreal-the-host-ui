@@ -4,7 +4,7 @@ import type React from "react"
 import { createContext, useContext, useState, useLayoutEffect } from "react"
 import { translations } from "./translations"
 
-type Language = "es" | "en" | "pt" | "fr"
+type Language = "es" | "en" | "pt"
 
 interface LanguageContextType {
   language: Language
