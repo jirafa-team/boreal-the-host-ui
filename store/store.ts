@@ -3,7 +3,7 @@ import dataSourceReducer from './slices/dataSourceSlice';
 import authReducer, { authApi } from '@/features/auth/slices/authSlice';
 import organizationReducer, { organizationApi } from '@/features/organization/slices/organizationSlice';
 import facilityReducer, { facilityApi } from '@/app/admin/facilities/slice/facilitySlice';
-import userReducer, { userApi } from '@/features/user/slices/userSlice';
+import userReducer, { userApi } from '@/app/admin/users/slice/userSlice';
 import roomReducer, { roomApi } from '@/app/admin/rooms/slice/roomSlice';
 import staffReducer, { staffApi } from '@/app/admin/staff/slice/staffSlice';
 import roleReducer, { roleApi } from '@/features/role/slices/roleSlice';

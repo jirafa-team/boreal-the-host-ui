@@ -20,7 +20,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { useGetDepartmentsQuery } from '@/features/taxonomy-department/slices/taxonomyDepartmentSlice';
-import { useCreateUserMutation } from '@/features/user/slices/userSlice';
+import { useCreateUserMutation } from '@/app/admin/users/slice/userSlice';
 import { useLanguage } from '@/lib/i18n-context';
 import { SHIFT_TO_SCHEDULE, STAFF_ROLE_NAME } from '@/app/admin/staff/constants';
 

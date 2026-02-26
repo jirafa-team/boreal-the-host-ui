@@ -22,11 +22,11 @@ const initialState: UserState = {
 };
 
 export const MOCK_USERS: User[] = [
-  { id: '1', name: 'Carlos García', email: 'carlos@hotel.com', role: 'admin', status: 'active', lastLogin: '2024-01-15 10:30' },
-  { id: '2', name: 'María López', email: 'maria@hotel.com', role: 'staff', status: 'active', lastLogin: '2024-01-15 09:15' },
-  { id: '3', name: 'Juan Rodríguez', email: 'juan@hotel.com', role: 'staff', status: 'active', lastLogin: '2024-01-14 18:45' },
-  { id: '4', name: 'Ana Martínez', email: 'ana@hotel.com', role: 'viewer', status: 'active', lastLogin: '2024-01-15 08:00' },
-  { id: '5', name: 'Pedro Sánchez', email: 'pedro@hotel.com', role: 'staff', status: 'inactive', lastLogin: '2024-01-10 15:20' },
+  { id: '1', name: 'Carlos García', email: 'carlos@hotel.com', role: 'Hotel Administrator', status: 'active', lastLogin: '2024-01-15 10:30' },
+  { id: '2', name: 'María López', email: 'maria@hotel.com', role: 'Staff', status: 'active', lastLogin: '2024-01-15 09:15' },
+  { id: '3', name: 'Juan Rodríguez', email: 'juan@hotel.com', role: 'Staff', status: 'active', lastLogin: '2024-01-14 18:45' },
+  { id: '4', name: 'Ana Martínez', email: 'ana@hotel.com', role: 'Viewer', status: 'active', lastLogin: '2024-01-15 08:00' },
+  { id: '5', name: 'Pedro Sánchez', email: 'pedro@hotel.com', role: 'Staff', status: 'inactive', lastLogin: '2024-01-10 15:20' },
 ];
 
 export const userSlice = createSlice({
