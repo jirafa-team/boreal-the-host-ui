@@ -29,7 +29,18 @@ export default function HomePage() {
     setIsLoaded(true)
   }, [])
 
-  const { language, setLanguage, t } = useLanguage()
+  let language = "es"
+  let setLanguage = (lang: string) => {}
+  let t = (key: string) => key
+
+  try {
+    const langContext = useLanguage()
+    language = langContext.language
+    setLanguage = langContext.setLanguage
+    t = langContext.t
+  } catch (e) {
+    console.log("[v0] Error loading language context, using fallback")
+  }
 
   const handleClientLogin = (e: React.FormEvent) => {
     e.preventDefault()
