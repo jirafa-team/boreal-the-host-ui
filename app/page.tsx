@@ -176,7 +176,7 @@ export default function HomePage() {
           <div className="bg-white/95 backdrop-blur-lg rounded-3xl shadow-2xl p-12 flex flex-col items-center justify-center min-h-96">
             <BorealLoadingBar />
           </div>
-        ) : showAdminLogin ? (
+        ) : showAdminLogin && isLoaded ? (
           <div className="bg-white/95 backdrop-blur-lg rounded-3xl shadow-2xl p-8 space-y-6">
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-2xl font-bold text-gray-800">{t("login.adminAccess")}</h2>
@@ -185,7 +185,6 @@ export default function HomePage() {
               </button>
             </div>
 
-            {isLoaded && (
             <form onSubmit={handleAdminLogin} className="space-y-4">
               <div className="space-y-2">
                 <label className="text-sm font-medium text-gray-700">{t("login.username")}</label>
@@ -216,7 +215,7 @@ export default function HomePage() {
                 {t("login.login")}
               </Button>
             </form>
-            )}
+          </div>
         ) : (
           <>
             <div className="text-center mb-8">
