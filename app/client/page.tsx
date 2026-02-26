@@ -1332,7 +1332,7 @@ export default function ClientPage() {
                   className="relative overflow-hidden cursor-pointer hover:shadow-lg transition-all h-32"
                   onClick={() => {}} // DISABLED - Room Service functionality temporarily hidden
                 >
-                  <Image src="/club-sandwich.jpg" alt="Room Service" fill className="object-cover" loading="eager" />
+                  <Image src="/club-sandwich.jpg" alt="Room Service" fill className="object-cover" />
                   <div className="absolute inset-0 bg-gradient-to-r from-black/70 to-black/40" />
                   <div className="absolute inset-0 flex items-center justify-between px-6">
                     <div className="flex items-center gap-4">
