@@ -368,7 +368,7 @@ export const translations = {
       canViewReports: "Puede ver reportes",
       canManageUsers: "Puede gestionar usuarios",
       user: "usuario",
-      users: "usuarios",
+      users: "Usuarios",
       editUserInfo: "Edita la información del usuario",
       completeNewUserData: "Completa los datos del nuevo usuario",
       fullNamePlaceholder: "Nombre completo",
