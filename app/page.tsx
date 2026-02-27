@@ -3,13 +3,20 @@
 import type React from "react"
 import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
+import { useDispatch, useSelector } from "react-redux"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
+import { Switch } from "@/components/ui/switch"
 import { User, Shield, X, Globe } from "lucide-react"
 import Image from "next/image"
 import { useLanguage } from "@/lib/i18n-context"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { BorealLoadingBar } from "@/components/boreal-loading-bar"
+import type { RootState } from "@/store/store"
+import { setDataSource } from "@/store/slices/dataSourceSlice"
+import { updateUser, useLoginMutation } from "@/features/auth/slices/authSlice"
+import { jwtDecode } from "jwt-decode"
+import { JWTPayload } from "@/interfaces"
 
 export default function HomePage() {
   const [username, setUsername] = useState("")
@@ -18,12 +25,17 @@ export default function HomePage() {
   const [adminUser, setAdminUser] = useState("")
   const [adminPassword, setAdminPassword] = useState("")
   const [isLoading, setIsLoading] = useState(false)
+  const [loginError, setLoginError] = useState<string | null>(null)
   const [showRegister, setShowRegister] = useState(false)
   const [registerUsername, setRegisterUsername] = useState("")
   const [registerPassword, setRegisterPassword] = useState("")
   const [registerConfirmPassword, setRegisterConfirmPassword] = useState("")
   const [isLoaded, setIsLoaded] = useState(false)
   const router = useRouter()
+  const dispatch = useDispatch()
+  const [login, { isLoading: isLoginPending }] = useLoginMutation()
+  const dataSource = useSelector((state: RootState) => state.dataSource.dataSource)
+  const mockMode = dataSource === "mock"
 
   useEffect(() => {
     setIsLoaded(true)
@@ -71,14 +83,48 @@ export default function HomePage() {
     }, 800)
   }
 
-  const handleAdminLogin = (e: React.FormEvent) => {
+  const handleAdminLogin = async (e: React.FormEvent) => {
     e.preventDefault()
+    setLoginError(null)
 
-    if (adminUser === "system" && adminPassword === "1234") {
-      setIsLoading(true)
-      setTimeout(() => router.push("/system/organizations"), 800)
-    } else {
-      alert(t("login.invalidCredentials"))
+    if (dataSource === "mock") {
+      if (adminUser === "system" && adminPassword === "1234") {
+        setIsLoading(true)
+        setTimeout(() => router.push("/system/organizations"), 800)
+      } else if (adminUser === "admin" && adminPassword === "1234") {
+        setIsLoading(true)
+        setTimeout(() => router.push("/admin/select-establishment"), 800)
+      } else if (adminUser === "staff" && adminPassword === "1234") {
+        setIsLoading(true)
+        setTimeout(() => router.push("/staff/tasks"), 800)
+      } else {
+        setLoginError(t("login.invalidCredentials"))
+        setAdminPassword("")
+      }
+      return
+    }
+
+    try {
+      const { token } = await login({ email: adminUser, password: adminPassword }).unwrap()
+      const decoded = jwtDecode<JWTPayload>(token);
+
+      dispatch(
+        updateUser({
+          user: {
+            email: decoded.email,
+            uuid: decoded.uuid,
+            firstName: decoded.firstName,
+            lastName: decoded.lastName,
+          },
+          isLoggedIn: true,
+        })
+      )
+
+      router.push("/admin/select-establishment")
+    } catch (err) {
+      const error = err as { status?: number; data?: { message?: string } }
+      setLoginError(error?.data?.message ?? t("login.invalidCredentials"))
+      setAdminPassword("")
     }
   }
 
@@ -172,7 +218,7 @@ export default function HomePage() {
 
       {/* Content */}
       <div className="relative z-10 max-w-md w-full">
-        {isLoading ? (
+        {isLoading || isLoginPending ? (
           <div className="bg-white/95 backdrop-blur-lg rounded-3xl shadow-2xl p-12 flex flex-col items-center justify-center min-h-96">
             <BorealLoadingBar />
           </div>
@@ -184,6 +230,20 @@ export default function HomePage() {
                 <X className="w-6 h-6" />
               </button>
             </div>
+
+            <div className="flex items-center justify-between gap-2 py-2 px-3 mb-2 rounded-lg bg-gray-100">
+              <span className="text-sm font-medium text-gray-700">
+                {mockMode ? "MOCK" : "API"}
+              </span>
+              <Switch
+                checked={mockMode}
+                onCheckedChange={(checked) => dispatch(setDataSource(checked ? "mock" : "api"))}
+              />
+            </div>
+
+            {loginError && (
+              <p className="text-sm text-red-600 bg-red-50 px-3 py-2 rounded-lg">{loginError}</p>
+            )}
 
             <form onSubmit={handleAdminLogin} className="space-y-4">
               <div className="space-y-2">
@@ -274,7 +334,6 @@ export default function HomePage() {
                     >
                       {t("register.register")}
                     </Button>
-
                     <Button
                       type="button"
                       className="w-full h-12 bg-white border-2 border-gray-300 text-gray-700 px-6 py-3.5 rounded-xl font-semibold hover:bg-gray-50 transition-all shadow-md flex items-center justify-center gap-3"
