@@ -7,6 +7,7 @@ import { loadMockStaff, setStaff } from '@/app/admin/staff/slice/staffSlice';
 import type { User } from '@/interfaces/user/User';
 import { STAFF_ROLE_NAME } from '@/app/admin/staff/constants';
 import { userToStaffDisplay } from '@/app/admin/staff/utils/userToStaffDisplay';
+import { computeStaffStatsFromList } from '@/app/admin/staff/utils/computeStaffStatsFromList';
 import { StaffView } from '../components/StaffView';
 import type { StaffMemberDisplay } from '@/interfaces/staff/StaffMemberDisplay';
 import { useLanguage } from '@/lib/i18n-context';
@@ -27,6 +28,8 @@ export function StaffMockContainer() {
     () => staff.map(userToStaffDisplay),
     [staff]
   );
+
+  const staffStats = useMemo(() => computeStaffStatsFromList(staffList), [staffList]);
 
   const handleDelete = (id: string) => {
     if (typeof window !== 'undefined' && !window.confirm(t('admin.confirmDelete') ?? '¿Eliminar este miembro del personal?')) return;
@@ -65,6 +68,8 @@ export function StaffMockContainer() {
     <StaffView
       staffList={staffList}
       isLoading={false}
+      staffStats={staffStats}
+      staffStatsLoading={false}
       createDialogOpen={createDialogOpen}
       setCreateDialogOpen={setCreateDialogOpen}
       editStaff={editStaff}

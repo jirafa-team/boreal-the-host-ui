@@ -5,6 +5,7 @@ import { useSelector } from 'react-redux';
 import type { RootState } from '@/store/store';
 import {
   useGetStaffQuery,
+  useGetStaffStatsQuery,
   useDeleteStaffMutation,
 } from '@/app/admin/staff/slice/staffSlice';
 import { StaffView } from '../components/StaffView';
@@ -20,10 +21,14 @@ export function StaffApiContainer() {
   const { data: apiData, isLoading, error, refetch } = useGetStaffQuery(undefined, {
     skip: !isApiMode,
   });
+  const { data: statsData, isLoading: staffStatsLoading } = useGetStaffStatsQuery(undefined, {
+    skip: !isApiMode,
+  });
 
   const [deleteStaff] = useDeleteStaffMutation();
 
   const staffList: StaffMemberDisplay[] = apiData?.data?.objects ?? [];
+  const staffStats = statsData?.data ?? null;
 
   const handleDelete = async (id: string) => {
     try {
@@ -49,6 +54,8 @@ export function StaffApiContainer() {
       staffList={staffList}
       isLoading={isLoading}
       error={error}
+      staffStats={staffStats}
+      staffStatsLoading={staffStatsLoading}
       createDialogOpen={createDialogOpen}
       setCreateDialogOpen={setCreateDialogOpen}
       editStaff={editStaff}

@@ -17,5 +17,8 @@ export interface StaffMemberDisplay {
     workEndTime?: string;
     departmentId?: string;
     departmentName?: string;
-  }
+    currentRoom?: number | null;
+    tasksToday?: number;
+    maxCapacity?: number;
+  };
 }

@@ -5,6 +5,7 @@ import { STAFF_ROLE_NAME } from '@/app/admin/staff/constants';
 import { ENDPOINTS } from '@/shared/types/api';
 import { baseQueryWithOrg } from '@/store/baseQuery';
 import type { GetStaffResponse } from '@/interfaces/staff/GetStaffResponse';
+import type { StaffStatsByDepartment } from '@/interfaces/staff/StaffStatsByDepartment';
 
 interface StaffState {
   staff: User[];
@@ -51,6 +52,14 @@ export const staffApi = createApi({
       }),
       providesTags: ['Staff'],
     }),
+    getStaffStats: build.query<{ data: StaffStatsByDepartment[] }, void>({
+      query: () => ({
+        url: `${ENDPOINTS.STAFF}/stats`,
+        method: 'GET',
+        credentials: 'include',
+      }),
+      providesTags: ['Staff'],
+    }),
     deleteStaff: build.mutation<void, string>({
       query: (id) => ({
         url: `${ENDPOINTS.STAFF}/${id}`,
@@ -85,8 +94,12 @@ export interface UpdateStaffPayload {
   workEndTime?: string | null;
 }
 
-export const { useGetStaffQuery, useDeleteStaffMutation, useUpdateStaffMutation } =
-  staffApi;
+export const {
+  useGetStaffQuery,
+  useGetStaffStatsQuery,
+  useDeleteStaffMutation,
+  useUpdateStaffMutation,
+} = staffApi;
 
 export function loadMockStaff() {
   return (dispatch: (action: AnyAction) => void) => {
