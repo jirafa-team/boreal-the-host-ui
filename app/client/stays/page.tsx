@@ -2,7 +2,8 @@
 
 import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import Image from "next/image"
+import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Hotel, ArrowRight, LogOut } from "lucide-react"
 import { useLanguage } from "@/lib/i18n-context"
@@ -23,30 +24,30 @@ export default function StaysPage() {
   const stays = [
     {
       id: 1,
-      name: "Habitación Suite Deluxe",
+      hotelName: "The Grand Plaza Hotel",
+      roomName: "Habitación Suite Deluxe",
       checkIn: "2024-03-15",
       checkOut: "2024-03-18",
       status: "Confirmada",
-      price: "$450",
-      image: "bg-gradient-to-br from-blue-400 to-cyan-300",
+      hotelImage: "/club-sandwich.jpg",
     },
     {
       id: 2,
-      name: "Habitación Estándar",
+      hotelName: "Riverside Boutique Inn",
+      roomName: "Habitación Estándar",
       checkIn: "2024-04-10",
       checkOut: "2024-04-15",
       status: "Próxima",
-      price: "$300",
-      image: "bg-gradient-to-br from-purple-400 to-pink-300",
+      hotelImage: "/club-sandwich.jpg",
     },
     {
       id: 3,
-      name: "Penthouse",
+      hotelName: "Luxury Tower Resort",
+      roomName: "Penthouse",
       checkIn: "2024-05-01",
       checkOut: "2024-05-05",
       status: "Pendiente",
-      price: "$800",
-      image: "bg-gradient-to-br from-amber-400 to-orange-300",
+      hotelImage: "/club-sandwich.jpg",
     },
   ]
 
@@ -93,10 +94,16 @@ export default function StaysPage() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {stays.map((stay) => (
             <Card key={stay.id} className="bg-slate-800/50 border-slate-700 overflow-hidden hover:shadow-xl hover:shadow-cyan-500/10 transition-all duration-300 cursor-pointer" onClick={() => handleStayClick(stay.id)}>
-              <div className={`h-40 ${stay.image} relative`}>
-                <div className="absolute inset-0 bg-black/30 flex items-center justify-center">
-                  <Hotel className="w-12 h-12 text-white/40" />
-                </div>
+              {/* Hotel Image */}
+              <div className="relative h-48 bg-slate-700">
+                <Image
+                  src={stay.hotelImage}
+                  alt={stay.hotelName}
+                  fill
+                  className="object-cover"
+                  loading="eager"
+                />
+                <div className="absolute inset-0 bg-black/20" />
                 <div className="absolute top-3 right-3">
                   <span className={`px-3 py-1 rounded-full text-xs font-semibold ${
                     stay.status === "Confirmada" ? "bg-green-500/30 text-green-300" :
@@ -109,20 +116,25 @@ export default function StaysPage() {
               </div>
 
               <CardContent className="pt-6 space-y-4">
+                {/* Hotel Name as Title */}
                 <div>
-                  <h3 className="text-lg font-bold text-white mb-2">{stay.name}</h3>
-                  <div className="space-y-2 text-sm">
-                    <div className="flex justify-between text-slate-300">
-                      <span>{t("stays.checkIn") || "Check-in"}:</span>
-                      <span className="text-cyan-300 font-semibold">{stay.checkIn}</span>
-                    </div>
-                    <div className="flex justify-between text-slate-300">
-                      <span>{t("stays.checkOut") || "Check-out"}:</span>
-                      <span className="text-cyan-300 font-semibold">{stay.checkOut}</span>
-                    </div>
+                  <h3 className="text-lg font-bold text-white">{stay.hotelName}</h3>
+                  <p className="text-sm text-slate-400 mt-1">{stay.roomName}</p>
+                </div>
+
+                {/* Dates */}
+                <div className="space-y-2 text-sm">
+                  <div className="flex justify-between text-slate-300">
+                    <span>{t("stays.checkIn") || "Check-in"}:</span>
+                    <span className="text-cyan-300 font-semibold">{stay.checkIn}</span>
+                  </div>
+                  <div className="flex justify-between text-slate-300">
+                    <span>{t("stays.checkOut") || "Check-out"}:</span>
+                    <span className="text-cyan-300 font-semibold">{stay.checkOut}</span>
                   </div>
                 </div>
 
+                {/* Button */}
                 <div className="pt-4 border-t border-slate-600">
                   <Button className="w-full bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600 text-white font-semibold rounded-lg flex items-center justify-center gap-2">
                     {t("stays.completeCheckin") || "Completar Check-in"}
