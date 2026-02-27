@@ -89,22 +89,28 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     setIsLoaded(true)
   }, [])
 
-  // Cargar estado del sidebar desde localStorage
+  // Cargar estado del sidebar desde localStorage - solo una vez
   useEffect(() => {
     const savedSections = localStorage.getItem("adminSidebarSections")
     if (savedSections) {
-      setExpandedSections(new Set(JSON.parse(savedSections)))
+      try {
+        setExpandedSections(new Set(JSON.parse(savedSections)))
+      } catch {
+        setExpandedSections(new Set(["general", "spaces"]))
+      }
     } else {
-      // Valores por defecto en primera carga
       setExpandedSections(new Set(["general", "spaces"]))
     }
     setIsLoaded(true)
   }, [])
 
-  // Guardar estado cuando cambia
+  // Guardar estado cuando cambia - con debounce
   useEffect(() => {
     if (isLoaded) {
-      localStorage.setItem("adminSidebarSections", JSON.stringify(Array.from(expandedSections)))
+      const timer = setTimeout(() => {
+        localStorage.setItem("adminSidebarSections", JSON.stringify(Array.from(expandedSections)))
+      }, 300)
+      return () => clearTimeout(timer)
     }
   }, [expandedSections, isLoaded])
 
@@ -229,6 +235,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                           <Link
                             key={item.href}
                             href={item.href}
+                            prefetch={true}
                             className={`flex items-center gap-3 px-3 py-1.5 text-xs rounded-lg transition-colors ${isActive ? "bg-white/20 text-white font-medium" : "text-white/90 hover:bg-white/10"
                               }`}
                           >
@@ -248,6 +255,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                         <Link
                           key={item.href}
                           href={item.href}
+                          prefetch={true}
                           title={item.label}
                           className={`flex items-center justify-center gap-3 px-3 py-2 rounded-lg transition-colors ${isActive ? "bg-white/20 text-white font-medium" : "text-white/90 hover:bg-white/10"
                             }`}
@@ -304,7 +312,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             </div>
           </div>
 
-          {sidebarOpen && (
+          {sidebarOpen && isLoaded && (
             <div className="p-2 border-t border-white/10">
               <div className="flex items-center gap-2">
                 <Globe className="w-4 h-4 text-white/70 shrink-0" />

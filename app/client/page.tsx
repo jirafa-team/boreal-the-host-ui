@@ -174,9 +174,9 @@ const breakfastOccupancy = {
   "10:00 AM": { reserved: 5, capacity: 60 },
 }
 
-export default function ClientPage({ searchParams }: { searchParams: { type?: string } }) {
+export default function ClientPage() {
   const searchParamsHook = useSearchParams()
-  const clientType = searchParams.type || "normal"
+  const clientType = searchParamsHook.get("type") || "normal"
   const router = useRouter()
 
   // Calculate occupancy percentage and get color
@@ -564,7 +564,7 @@ export default function ClientPage({ searchParams }: { searchParams: { type?: st
                     className="relative overflow-hidden cursor-pointer hover:shadow-lg transition-all h-32"
                     onClick={() => {}} // DISABLED - Room Service functionality temporarily hidden
                   >
-                    <Image src="/club-sandwich.jpg" alt="Room Service" fill className="object-cover" />
+                    <Image src="/club-sandwich.jpg" alt="Room Service" fill className="object-cover" loading="eager" />
                     <div className="absolute inset-0 bg-gradient-to-r from-black/70 to-black/40" />
                     <div className="absolute inset-0 flex items-center justify-between px-6">
                       <div className="flex items-center gap-4">

@@ -1,7 +1,7 @@
 "use client"
 
 import { useRouter, useSearchParams } from "next/navigation"
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Hotel, Check, Loader2 } from "lucide-react"
 import { useLanguage } from "@/lib/i18n-context"
@@ -13,6 +13,11 @@ export default function QuickCheckinPage() {
   const isFutureReservation = searchParams.get("type") === "future"
   const [isLoading, setIsLoading] = useState(false)
   const [isSuccess, setIsSuccess] = useState(false)
+  const [isLoaded, setIsLoaded] = useState(false)
+
+  useEffect(() => {
+    setIsLoaded(true)
+  }, [])
 
   const handleCheckin = async () => {
     setIsLoading(true)
@@ -47,10 +52,12 @@ export default function QuickCheckinPage() {
               </div>
             </div>
           </div>
+          {isLoaded && (
           <div>
             <h2 className="text-2xl font-bold text-white mb-2">{t("client.processingCheckin")}</h2>
             <p className="text-white/70">{t("client.pleaseWait")}</p>
           </div>
+          )}
           <div className="flex justify-center gap-2">
             <div className="w-2 h-2 bg-[#67f1d0] rounded-full animate-bounce" style={{ animationDelay: "0ms" }} />
             <div className="w-2 h-2 bg-[#67f1d0] rounded-full animate-bounce" style={{ animationDelay: "150ms" }} />
@@ -73,10 +80,12 @@ export default function QuickCheckinPage() {
               </div>
             </div>
           </div>
+          {isLoaded && (
           <div>
             <h2 className="text-3xl font-bold text-white mb-2">{t("client.checkinCompleted")}</h2>
             <p className="text-white/70">{t("client.roomReadyRedirecting")}</p>
           </div>
+          )}
           <div className="h-1 w-32 mx-auto rounded-full bg-gradient-to-r from-green-400 to-emerald-400" />
         </div>
       </div>
@@ -96,6 +105,7 @@ export default function QuickCheckinPage() {
             </div>
           </div>
 
+          {isLoaded && (
           <div>
             <h1 className="text-3xl font-bold text-white mb-2">
               {isFutureReservation ? t("client.reservationConfirmed") : t("client.welcome")}
@@ -104,10 +114,12 @@ export default function QuickCheckinPage() {
               {isFutureReservation ? t("client.confirmEarlyCheckin") : t("client.roomReady")}
             </p>
           </div>
+          )}
         </div>
 
         <div className="h-1 w-32 mx-auto rounded-full bg-gradient-to-r from-[#6f65d0] to-[#67f1d0]" />
 
+        {isLoaded && (
         <div className="space-y-4">
           <Button
             onClick={handleCheckin}
@@ -118,6 +130,7 @@ export default function QuickCheckinPage() {
 
           <p className="text-white/50 text-sm">{t("client.tapButtonToEnter")}</p>
         </div>
+        )}
 
         <div className="flex justify-center gap-2">
           <div className="w-2 h-2 bg-[#67f1d0] rounded-full animate-bounce" style={{ animationDelay: "0ms" }} />
