@@ -124,10 +124,6 @@ export default function StaysPage() {
                 </div>
 
                 <div className="pt-4 border-t border-slate-600">
-                  <div className="flex items-center justify-between mb-4">
-                    <span className="text-2xl font-bold text-cyan-300">{stay.price}</span>
-                    <span className="text-xs text-slate-400">{t("stays.perNight") || "por noche"}</span>
-                  </div>
                   <Button className="w-full bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600 text-white font-semibold rounded-lg flex items-center justify-center gap-2">
                     {t("stays.completeCheckin") || "Completar Check-in"}
                     <ArrowRight className="w-4 h-4" />
