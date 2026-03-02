@@ -13,7 +13,7 @@ export interface User {
   id: string
   name: string
   email: string
-  role: "Hotel Administrator" | "Staff" | "Viewer"
+  role: "Hotel Administrator" | "Staff" | "Viewer" | "Customer"
   roleName?: string
   roleId?: string
   status: "active" | "inactive" | "pending"

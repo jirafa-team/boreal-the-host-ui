@@ -108,6 +108,13 @@ export function UsersApiContainer() {
               {t("admin.viewer")}
             </Badge>
           )
+        case "Customer":
+          return (
+            <Badge className="bg-green-500/10 text-green-600 border-green-500/20">
+              <Shield className="w-3 h-3 mr-1" />
+              {t("Cliente")}
+            </Badge>
+          )
       }
     },
     [t]
