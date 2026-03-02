@@ -44,9 +44,9 @@ export default function StaysPage() {
       id: 3,
       hotelName: "Luxury Tower Resort",
       roomName: "Penthouse",
-      checkIn: "2024-05-01",
-      checkOut: "2024-05-05",
-      status: "Pendiente",
+      checkIn: "2024-02-01",
+      checkOut: "2024-02-05",
+      status: "Finalizado",
       hotelImage: "/hotel-3.jpg",
     },
   ]
@@ -107,7 +107,7 @@ export default function StaysPage() {
                   <span className={`px-3 py-1 rounded-full text-xs font-semibold ${
                     stay.status === "Confirmada" ? "bg-green-500/30 text-green-300" :
                     stay.status === "Próxima" ? "bg-blue-500/30 text-blue-300" :
-                    "bg-yellow-500/30 text-yellow-300"
+                    "bg-gray-500/30 text-gray-300"
                   }`}>
                     {stay.status}
                   </span>
@@ -135,9 +135,31 @@ export default function StaysPage() {
 
                 {/* Button */}
                 <div className="pt-4 border-t border-slate-600">
-                  <Button className="w-full bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600 text-white font-semibold rounded-lg flex items-center justify-center gap-2">
-                    {t("stays.completeCheckin") || "Completar Check-in"}
-                    <ArrowRight className="w-4 h-4" />
+                  <Button 
+                    className="w-full bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600 text-white font-semibold rounded-lg flex items-center justify-center gap-2"
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      handleStayClick(stay.id)
+                    }}
+                  >
+                    {stay.status === "Confirmada" && (
+                      <>
+                        Continuar
+                        <ArrowRight className="w-4 h-4" />
+                      </>
+                    )}
+                    {stay.status === "Próxima" && (
+                      <>
+                        {t("stays.completeCheckin") || "Completar Check-in"}
+                        <ArrowRight className="w-4 h-4" />
+                      </>
+                    )}
+                    {stay.status === "Finalizado" && (
+                      <>
+                        Calificar Estadía
+                        <ArrowRight className="w-4 h-4" />
+                      </>
+                    )}
                   </Button>
                 </div>
               </CardContent>
