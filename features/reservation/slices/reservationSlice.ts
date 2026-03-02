@@ -30,7 +30,24 @@ export const reservationApi = createApi({
   tagTypes: ['Reservations'],
   endpoints: (build) => ({
     getReservations: build.query<{ data: GetReservationsResponse }, { page?: number; limit?: number } | void>({
-      query: (p) => ({ url: ENDPOINTS.RESERVATION, method: 'GET', params: p ?? {}, credentials: 'include' }),
+      query: (p) => ({
+        url: ENDPOINTS.RESERVATION,
+        method: 'GET',
+        params: p ?? {},
+        credentials: 'include',
+      }),
+      providesTags: ['Reservations'],
+    }),
+    getReservationsWithDetails: build.query<
+      { data: { objects?: unknown[]; [key: string]: unknown } },
+      { page?: number; limit?: number; role?: string } | void
+    >({
+      query: (p) => ({
+        url: ENDPOINTS.RESERVATION_WITH_DETAILS,
+        method: 'GET',
+        params: p ?? {},
+        credentials: 'include',
+      }),
       providesTags: ['Reservations'],
     }),
     getReservationById: build.query<{ data: Reservation }, string>({
@@ -57,5 +74,13 @@ export const reservationApi = createApi({
 });
 
 export const { setReservations, setPage, setTotalPages } = reservationSlice.actions;
-export const { useGetReservationsQuery, useGetReservationByIdQuery, useCreateReservationMutation, useUpdateReservationMutation, useConfirmReservationMutation, useDeleteReservationMutation } = reservationApi;
+export const {
+  useGetReservationsQuery,
+  useGetReservationsWithDetailsQuery,
+  useGetReservationByIdQuery,
+  useCreateReservationMutation,
+  useUpdateReservationMutation,
+  useConfirmReservationMutation,
+  useDeleteReservationMutation,
+} = reservationApi;
 export default reservationSlice.reducer;

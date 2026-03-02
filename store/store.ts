@@ -5,6 +5,7 @@ import organizationReducer, { organizationApi } from '@/features/organization/sl
 import facilityReducer, { facilityApi } from '@/app/admin/facilities/slice/facilitySlice';
 import userReducer, { userApi } from '@/app/admin/users/slice/userSlice';
 import roomReducer, { roomApi } from '@/app/admin/rooms/slice/roomSlice';
+import clientReducer from '@/app/admin/clients/slice/clientSlice';
 import staffReducer, { staffApi } from '@/app/admin/staff/slice/staffSlice';
 import roleReducer, { roleApi } from '@/features/role/slices/roleSlice';
 import staffTaskReducer, { staffTaskApi } from '@/features/staff-task/slices/staffTaskSlice';
@@ -23,6 +24,7 @@ export const store = configureStore({
     facility: facilityReducer,
     user: userReducer,
     room: roomReducer,
+    client: clientReducer,
     staff: staffReducer,
     role: roleReducer,
     staffTask: staffTaskReducer,

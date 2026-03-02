@@ -117,6 +117,8 @@ export function UserDialog({
                 <Input
                   id="password"
                   type="password"
+                  value={formData.password ?? ""}
+                  onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                   placeholder={editingUser ? t("admin.keepPasswordEmpty") : t("admin.passwordPlaceholder")}
                 />
               </div>

@@ -34,6 +34,7 @@ export type NewUserForm = Partial<
   roleId?: string
   status?: User["status"]
   phone?: string
+  password?: string
   permissions?: UserPermissions
 }
 

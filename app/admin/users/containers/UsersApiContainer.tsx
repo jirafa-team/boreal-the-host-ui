@@ -27,6 +27,7 @@ const initialFormData: NewUserForm = {
   roleId: "",
   status: "active",
   phone: "",
+  password: "",
   permissions: {
     canManageRooms: false,
     canManageClients: false,
@@ -203,6 +204,7 @@ export function UsersApiContainer() {
           lastName: formData.lastName.trim(),
           email: formData.email.trim(),
           roleName,
+          password: formData.password?.trim() || undefined,
         }).unwrap()
         toast({ title: "Éxito", description: t("admin.userCreated") ?? "Usuario creado correctamente." })
       }
