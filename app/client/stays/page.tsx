@@ -29,7 +29,7 @@ export default function StaysPage() {
       checkIn: "2024-03-15",
       checkOut: "2024-03-18",
       status: "Confirmada",
-      hotelImage: "/club-sandwich.jpg",
+      hotelImage: "/hotel-1.jpg",
     },
     {
       id: 2,
@@ -38,7 +38,7 @@ export default function StaysPage() {
       checkIn: "2024-04-10",
       checkOut: "2024-04-15",
       status: "Próxima",
-      hotelImage: "/club-sandwich.jpg",
+      hotelImage: "/hotel-2.jpg",
     },
     {
       id: 3,
@@ -47,7 +47,7 @@ export default function StaysPage() {
       checkIn: "2024-05-01",
       checkOut: "2024-05-05",
       status: "Pendiente",
-      hotelImage: "/club-sandwich.jpg",
+      hotelImage: "/hotel-3.jpg",
     },
   ]
 
@@ -70,8 +70,8 @@ export default function StaysPage() {
       <div className="max-w-7xl mx-auto mb-8">
         <div className="flex items-center justify-between mb-8">
           <div className="flex items-center gap-3">
-            <div className="bg-gradient-to-br from-cyan-400 to-blue-500 p-3 rounded-lg">
-              <Hotel className="w-6 h-6 text-white" />
+            <div className="bg-gradient-to-br from-cyan-400 to-blue-500 px-4 py-3 rounded-lg">
+              <h2 className="text-lg font-bold text-white">TheHost</h2>
             </div>
             <div>
               <h1 className="text-3xl font-bold text-white">{t("stays.myStays") || "Mis Estadías"}</h1>
