@@ -756,9 +756,9 @@ export default function StaffManagement() {
                 </Card>
               ))}
             </div>
-          </Card>
+          )}
         </div>
-      )}
+
         <div className="space-y-4">
           {/* Filters */}
           <Card className="p-4">
