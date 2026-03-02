@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation"
 import Image from "next/image"
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { Hotel, ArrowRight, LogOut } from "lucide-react"
+import { ArrowRight, LogOut } from "lucide-react"
 import { useLanguage } from "@/lib/i18n-context"
 
 export default function StaysPage() {
@@ -68,16 +68,15 @@ export default function StaysPage() {
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 p-6">
       {/* Header */}
       <div className="max-w-7xl mx-auto mb-8">
-        <div className="flex items-center justify-between mb-8">
-          <div className="flex items-center gap-3">
-            <div className="bg-gradient-to-br from-cyan-400 to-blue-500 px-4 py-3 rounded-lg">
-              <h2 className="text-lg font-bold text-white">TheHost</h2>
-            </div>
-            <div>
-              <h1 className="text-3xl font-bold text-white">{t("stays.myStays") || "Mis Estadías"}</h1>
-              <p className="text-slate-400">{t("stays.welcomeBack") || "Bienvenido de vuelta"}, {currentUser}</p>
-            </div>
-          </div>
+        <div className="flex items-center justify-between">
+          <Image
+            src="/images/thehost-20logo.png"
+            alt="TheHost Logo"
+            width={200}
+            height={100}
+            className="h-24 w-auto"
+            priority
+          />
           <Button
             onClick={handleLogout}
             variant="outline"
@@ -149,7 +148,6 @@ export default function StaysPage() {
         {/* Empty State */}
         {stays.length === 0 && (
           <div className="text-center py-16">
-            <Hotel className="w-16 h-16 text-slate-600 mx-auto mb-4" />
             <p className="text-slate-400 text-lg">{t("stays.noStays") || "No tienes estadías registradas"}</p>
           </div>
         )}
