@@ -13,7 +13,7 @@ import {
 } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Users, Plus } from "lucide-react"
+import { Users, Plus, CheckSquare } from "lucide-react"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { useLanguage } from "@/lib/i18n-context"
 
@@ -67,6 +67,12 @@ export default function StaffManagement() {
   const [selectedStaff, setSelectedStaff] = useState<StaffMember | null>(null)
   const [searchName, setSearchName] = useState("")
   const [showAddDialog, setShowAddDialog] = useState(false)
+  const [showAssignTaskDialog, setShowAssignTaskDialog] = useState(false)
+  const [newTask, setNewTask] = useState({
+    description: "",
+    priority: "normal",
+    deliveryTime: "1",
+  })
   const [newStaff, setNewStaff] = useState({
     name: "",
     email: "",
@@ -130,6 +136,19 @@ export default function StaffManagement() {
         email: "",
         department: "Limpieza",
         shift: "morning",
+      })
+    }
+  }
+
+  const handleAssignTask = () => {
+    if (selectedStaff && newTask.description) {
+      // Aquí puedes agregar la lógica para asignar la tarea
+      console.log("[v0] Tarea asignada a:", selectedStaff.name, newTask)
+      setShowAssignTaskDialog(false)
+      setNewTask({
+        description: "",
+        priority: "normal",
+        deliveryTime: "1",
       })
     }
   }
@@ -311,6 +330,77 @@ export default function StaffManagement() {
                   <span className="font-medium text-foreground">{selectedStaff.tasksToday}</span>
                 </div>
               </div>
+              <Button 
+                onClick={() => setShowAssignTaskDialog(true)} 
+                className="w-full bg-amber-600 hover:bg-amber-700"
+              >
+                <CheckSquare className="w-4 h-4 mr-2" />
+                {t("admin.createActivity")}
+              </Button>
+            </div>
+          </DialogContent>
+        </Dialog>
+      )}
+
+      {/* Assign Task Dialog */}
+      {selectedStaff && (
+        <Dialog open={showAssignTaskDialog} onOpenChange={setShowAssignTaskDialog}>
+          <DialogContent className="max-w-md">
+            <DialogHeader>
+              <DialogTitle>{t("admin.createActivity")}</DialogTitle>
+              <DialogDescription>
+                {t("admin.assignActivityToStaff")}: <span className="font-semibold">{selectedStaff.name}</span>
+              </DialogDescription>
+            </DialogHeader>
+            <div className="space-y-4 py-4">
+              <div>
+                <Label htmlFor="description" className="text-sm font-medium">
+                  {t("admin.activityDescription")}
+                </Label>
+                <Input
+                  id="description"
+                  placeholder={t("admin.exampleActivityDescription")}
+                  value={newTask.description}
+                  onChange={(e) => setNewTask({ ...newTask, description: e.target.value })}
+                  className="mt-2"
+                />
+              </div>
+              <div>
+                <Label htmlFor="priority" className="text-sm font-medium">
+                  {t("admin.priority")}
+                </Label>
+                <Select value={newTask.priority} onValueChange={(value) => setNewTask({ ...newTask, priority: value })}>
+                  <SelectTrigger className="mt-2">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="normal">{t("admin.normal")}</SelectItem>
+                    <SelectItem value="urgent">{t("admin.urgent")}</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div>
+                <Label htmlFor="deliveryTime" className="text-sm font-medium">
+                  {t("admin.deliveryTime")} (horas)
+                </Label>
+                <Input
+                  id="deliveryTime"
+                  type="number"
+                  min="1"
+                  max="24"
+                  value={newTask.deliveryTime}
+                  onChange={(e) => setNewTask({ ...newTask, deliveryTime: e.target.value })}
+                  className="mt-2"
+                />
+              </div>
+            </div>
+            <div className="flex justify-end gap-2">
+              <Button variant="outline" onClick={() => setShowAssignTaskDialog(false)}>
+                {t("admin.cancel")}
+              </Button>
+              <Button onClick={handleAssignTask} className="bg-amber-600 hover:bg-amber-700">
+                {t("admin.create")}
+              </Button>
             </div>
           </DialogContent>
         </Dialog>
