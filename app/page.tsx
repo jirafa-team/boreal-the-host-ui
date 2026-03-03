@@ -225,7 +225,7 @@ export default function HomePage() {
                   alt="TheHost Logo"
                   width={260}
                   height={130}
-                  style={{ width: "auto", height: "auto" }}
+                  className="h-32 w-auto"
                   priority
                 />
               </div>
