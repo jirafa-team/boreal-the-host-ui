@@ -68,10 +68,17 @@ export default function StaffManagement() {
   const [searchName, setSearchName] = useState("")
   const [showAddDialog, setShowAddDialog] = useState(false)
   const [showAssignTaskDialog, setShowAssignTaskDialog] = useState(false)
+  const [showBulkTaskDialog, setShowBulkTaskDialog] = useState(false)
   const [newTask, setNewTask] = useState({
     description: "",
     priority: "normal",
     deliveryTime: "1",
+  })
+  const [bulkTask, setBulkTask] = useState({
+    description: "",
+    priority: "normal",
+    deliveryTime: "1",
+    assignToAll: false,
   })
   const [newStaff, setNewStaff] = useState({
     name: "",
@@ -153,6 +160,19 @@ export default function StaffManagement() {
     }
   }
 
+  const handleAssignBulkTask = () => {
+    if (bulkTask.description) {
+      console.log("[v0] Tarea masiva asignada:", bulkTask, "A", bulkTask.assignToAll ? "todo el personal" : "seleccionado")
+      setShowBulkTaskDialog(false)
+      setBulkTask({
+        description: "",
+        priority: "normal",
+        deliveryTime: "1",
+        assignToAll: false,
+      })
+    }
+  }
+
   if (!isLoaded) {
     return null
   }
@@ -166,12 +186,13 @@ export default function StaffManagement() {
             <h1 className="text-2xl font-bold text-foreground">{t("admin.staffTitle")}</h1>
             <p className="text-sm text-muted-foreground">{t("admin.manageYour")} {t("admin.staffMembers")}</p>
           </div>
-          <Dialog open={showAddDialog} onOpenChange={setShowAddDialog}>
-            <Button onClick={() => setShowAddDialog(true)} className="bg-blue-600 hover:bg-blue-700">
-              <Plus className="w-4 h-4 mr-2" />
-              {t("admin.addStaff")}
-            </Button>
-            <DialogContent className="max-w-md">
+          <div className="flex gap-2">
+            <Dialog open={showAddDialog} onOpenChange={setShowAddDialog}>
+              <Button onClick={() => setShowAddDialog(true)} className="bg-blue-600 hover:bg-blue-700">
+                <Plus className="w-4 h-4 mr-2" />
+                {t("admin.addStaff")}
+              </Button>
+              <DialogContent className="max-w-md">
               <DialogHeader>
                 <DialogTitle>{t("admin.newUser")}</DialogTitle>
                 <DialogDescription>{t("admin.registerNewTeamMember")}</DialogDescription>
@@ -232,6 +253,69 @@ export default function StaffManagement() {
                 </Button>
                 <Button onClick={handleAddStaff} className="bg-blue-600 hover:bg-blue-700">
                   {t("admin.registerStaff")}
+                </Button>
+              </div>
+            </DialogContent>
+          </Dialog>
+
+          <Dialog open={showBulkTaskDialog} onOpenChange={setShowBulkTaskDialog}>
+            <Button onClick={() => setShowBulkTaskDialog(true)} className="bg-amber-600 hover:bg-amber-700">
+              <CheckSquare className="w-4 h-4 mr-2" />
+              {t("admin.createActivity")}
+            </Button>
+            <DialogContent className="max-w-md">
+              <DialogHeader>
+                <DialogTitle>{t("admin.createActivity")}</DialogTitle>
+                <DialogDescription>{t("admin.createNewActivity")}</DialogDescription>
+              </DialogHeader>
+              <div className="space-y-4 py-4">
+                <div>
+                  <Label htmlFor="bulk-description" className="text-sm font-medium">
+                    {t("admin.activityDescription")}
+                  </Label>
+                  <Input
+                    id="bulk-description"
+                    placeholder={t("admin.exampleActivityDescription")}
+                    value={bulkTask.description}
+                    onChange={(e) => setBulkTask({ ...bulkTask, description: e.target.value })}
+                    className="mt-2"
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="bulk-priority" className="text-sm font-medium">
+                    {t("admin.priority")}
+                  </Label>
+                  <Select value={bulkTask.priority} onValueChange={(value) => setBulkTask({ ...bulkTask, priority: value })}>
+                    <SelectTrigger className="mt-2">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="normal">{t("admin.normal")}</SelectItem>
+                      <SelectItem value="urgent">{t("admin.urgent")}</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div>
+                  <Label htmlFor="bulk-time" className="text-sm font-medium">
+                    {t("admin.deliveryTime")} (horas)
+                  </Label>
+                  <Input
+                    id="bulk-time"
+                    type="number"
+                    min="1"
+                    max="24"
+                    value={bulkTask.deliveryTime}
+                    onChange={(e) => setBulkTask({ ...bulkTask, deliveryTime: e.target.value })}
+                    className="mt-2"
+                  />
+                </div>
+              </div>
+              <div className="flex justify-end gap-2">
+                <Button variant="outline" onClick={() => setShowBulkTaskDialog(false)}>
+                  {t("admin.cancel")}
+                </Button>
+                <Button onClick={handleAssignBulkTask} className="bg-amber-600 hover:bg-amber-700">
+                  {t("admin.create")}
                 </Button>
               </div>
             </DialogContent>
