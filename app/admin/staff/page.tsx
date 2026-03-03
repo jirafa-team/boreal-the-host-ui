@@ -68,8 +68,6 @@ export default function StaffManagement() {
   const [searchName, setSearchName] = useState("")
   const [showAddDialog, setShowAddDialog] = useState(false)
   const [showAssignTaskDialog, setShowAssignTaskDialog] = useState(false)
-  const [showCreateActivityDialog, setShowCreateActivityDialog] = useState(false)
-  const [selectedStaffForActivity, setSelectedStaffForActivity] = useState<StaffMember | null>(null)
   const [newTask, setNewTask] = useState({
     description: "",
     priority: "normal",
@@ -155,19 +153,6 @@ export default function StaffManagement() {
     }
   }
 
-  const handleCreateActivity = () => {
-    if (selectedStaffForActivity && newTask.description) {
-      console.log("[v0] Actividad creada para:", selectedStaffForActivity.name, newTask)
-      setShowCreateActivityDialog(false)
-      setSelectedStaffForActivity(null)
-      setNewTask({
-        description: "",
-        priority: "normal",
-        deliveryTime: "1",
-      })
-    }
-  }
-
   if (!isLoaded) {
     return null
   }
@@ -181,85 +166,76 @@ export default function StaffManagement() {
             <h1 className="text-2xl font-bold text-foreground">{t("admin.staffTitle")}</h1>
             <p className="text-sm text-muted-foreground">{t("admin.manageYour")} {t("admin.staffMembers")}</p>
           </div>
-          <div className="flex gap-2">
-            <Button 
-              onClick={() => setShowCreateActivityDialog(true)} 
-              className="bg-amber-600 hover:bg-amber-700"
-            >
-              <CheckSquare className="w-4 h-4 mr-2" />
-              {t("admin.createActivity")}
+          <Dialog open={showAddDialog} onOpenChange={setShowAddDialog}>
+            <Button onClick={() => setShowAddDialog(true)} className="bg-blue-600 hover:bg-blue-700">
+              <Plus className="w-4 h-4 mr-2" />
+              {t("admin.addStaff")}
             </Button>
-            <Dialog open={showAddDialog} onOpenChange={setShowAddDialog}>
-              <Button onClick={() => setShowAddDialog(true)} className="bg-blue-600 hover:bg-blue-700">
-                <Plus className="w-4 h-4 mr-2" />
-                {t("admin.addStaff")}
-              </Button>
-              <DialogContent className="max-w-md">
-                <DialogHeader>
-                  <DialogTitle>{t("admin.newUser")}</DialogTitle>
-                  <DialogDescription>{t("admin.registerNewTeamMember")}</DialogDescription>
-                </DialogHeader>
-                <div className="space-y-4 py-4">
-                  <div>
-                    <Label htmlFor="name" className="text-sm font-medium">{t("admin.fullName")}</Label>
-                    <Input
-                      id="name"
-                      placeholder={t("admin.exampleFullName")}
-                      value={newStaff.name}
-                      onChange={(e) => setNewStaff({ ...newStaff, name: e.target.value })}
-                      className="mt-2"
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="email" className="text-sm font-medium">Email</Label>
-                    <Input
-                      id="email"
-                      placeholder={t("admin.exampleEmail")}
-                      value={newStaff.email}
-                      onChange={(e) => setNewStaff({ ...newStaff, email: e.target.value })}
-                      className="mt-2"
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="department" className="text-sm font-medium">{t("admin.department")}</Label>
-                    <Select value={newStaff.department} onValueChange={(value) => setNewStaff({ ...newStaff, department: value as any })}>
-                      <SelectTrigger className="mt-2">
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="Limpieza">{t("admin.cleaning")}</SelectItem>
-                        <SelectItem value="Mantenimiento">{t("admin.maintenance")}</SelectItem>
-                        <SelectItem value="Seguridad">{t("admin.security")}</SelectItem>
-                        <SelectItem value="Recepción">{t("admin.reception")}</SelectItem>
-                        <SelectItem value="Servicio">{t("admin.service")}</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  <div>
-                    <Label htmlFor="shift" className="text-sm font-medium">{t("admin.shift")}</Label>
-                    <Select value={newStaff.shift} onValueChange={(value) => setNewStaff({ ...newStaff, shift: value })}>
-                      <SelectTrigger className="mt-2">
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="morning">{t("admin.morning")}</SelectItem>
-                        <SelectItem value="afternoon">{t("admin.afternoon")}</SelectItem>
-                        <SelectItem value="evening">{t("admin.evening")}</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
+            <DialogContent className="max-w-md">
+              <DialogHeader>
+                <DialogTitle>{t("admin.newUser")}</DialogTitle>
+                <DialogDescription>{t("admin.registerNewTeamMember")}</DialogDescription>
+              </DialogHeader>
+              <div className="space-y-4 py-4">
+                <div>
+                  <Label htmlFor="name" className="text-sm font-medium">{t("admin.fullName")}</Label>
+                  <Input
+                    id="name"
+                    placeholder={t("admin.exampleFullName")}
+                    value={newStaff.name}
+                    onChange={(e) => setNewStaff({ ...newStaff, name: e.target.value })}
+                    className="mt-2"
+                  />
                 </div>
-                <div className="flex justify-end gap-2">
-                  <Button variant="outline" onClick={() => setShowAddDialog(false)}>
-                    {t("admin.cancel")}
-                  </Button>
-                  <Button onClick={handleAddStaff} className="bg-blue-600 hover:bg-blue-700">
-                    {t("admin.registerStaff")}
-                  </Button>
+                <div>
+                  <Label htmlFor="email" className="text-sm font-medium">Email</Label>
+                  <Input
+                    id="email"
+                    placeholder={t("admin.exampleEmail")}
+                    value={newStaff.email}
+                    onChange={(e) => setNewStaff({ ...newStaff, email: e.target.value })}
+                    className="mt-2"
+                  />
                 </div>
-              </DialogContent>
-            </Dialog>
-          </div>
+                <div>
+                  <Label htmlFor="department" className="text-sm font-medium">{t("admin.department")}</Label>
+                  <Select value={newStaff.department} onValueChange={(value) => setNewStaff({ ...newStaff, department: value as any })}>
+                    <SelectTrigger className="mt-2">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="Limpieza">{t("admin.cleaning")}</SelectItem>
+                      <SelectItem value="Mantenimiento">{t("admin.maintenance")}</SelectItem>
+                      <SelectItem value="Seguridad">{t("admin.security")}</SelectItem>
+                      <SelectItem value="Recepción">{t("admin.reception")}</SelectItem>
+                      <SelectItem value="Servicio">{t("admin.service")}</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div>
+                  <Label htmlFor="shift" className="text-sm font-medium">{t("admin.shift")}</Label>
+                  <Select value={newStaff.shift} onValueChange={(value) => setNewStaff({ ...newStaff, shift: value })}>
+                    <SelectTrigger className="mt-2">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="morning">{t("admin.morning")}</SelectItem>
+                      <SelectItem value="afternoon">{t("admin.afternoon")}</SelectItem>
+                      <SelectItem value="evening">{t("admin.evening")}</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+              <div className="flex justify-end gap-2">
+                <Button variant="outline" onClick={() => setShowAddDialog(false)}>
+                  {t("admin.cancel")}
+                </Button>
+                <Button onClick={handleAddStaff} className="bg-blue-600 hover:bg-blue-700">
+                  {t("admin.registerStaff")}
+                </Button>
+              </div>
+            </DialogContent>
+          </Dialog>
         </div>
       </header>
 
@@ -428,86 +404,7 @@ export default function StaffManagement() {
             </div>
           </DialogContent>
         </Dialog>
-      {/* Create Activity Dialog */}
-      <Dialog open={showCreateActivityDialog} onOpenChange={setShowCreateActivityDialog}>
-        <DialogContent className="max-w-md">
-          <DialogHeader>
-            <DialogTitle>{t("admin.createActivity")}</DialogTitle>
-            <DialogDescription>{t("admin.createNewActivity")}</DialogDescription>
-          </DialogHeader>
-          <div className="space-y-4 py-4">
-            <div>
-              <Label htmlFor="staff" className="text-sm font-medium">{t("admin.assignTo")}</Label>
-              <Select 
-                value={selectedStaffForActivity?.id.toString() || ""} 
-                onValueChange={(value) => {
-                  const member = staff.find(s => s.id === parseInt(value))
-                  setSelectedStaffForActivity(member || null)
-                }}
-              >
-                <SelectTrigger className="mt-2">
-                  <SelectValue placeholder={t("admin.selectStaff")} />
-                </SelectTrigger>
-                <SelectContent>
-                  {staff.map((member) => (
-                    <SelectItem key={member.id} value={member.id.toString()}>
-                      {member.name} - {member.department}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-            <div>
-              <Label htmlFor="description" className="text-sm font-medium">
-                {t("admin.activityDescription")}
-              </Label>
-              <Input
-                id="description"
-                placeholder={t("admin.exampleActivityDescription")}
-                value={newTask.description}
-                onChange={(e) => setNewTask({ ...newTask, description: e.target.value })}
-                className="mt-2"
-              />
-            </div>
-            <div>
-              <Label htmlFor="priority" className="text-sm font-medium">
-                {t("admin.priority")}
-              </Label>
-              <Select value={newTask.priority} onValueChange={(value) => setNewTask({ ...newTask, priority: value })}>
-                <SelectTrigger className="mt-2">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="normal">{t("admin.normal")}</SelectItem>
-                  <SelectItem value="urgent">{t("admin.urgent")}</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            <div>
-              <Label htmlFor="deliveryTime" className="text-sm font-medium">
-                {t("admin.deliveryTime")} (horas)
-              </Label>
-              <Input
-                id="deliveryTime"
-                type="number"
-                min="1"
-                max="24"
-                value={newTask.deliveryTime}
-                onChange={(e) => setNewTask({ ...newTask, deliveryTime: e.target.value })}
-                className="mt-2"
-              />
-            </div>
-          </div>
-          <div className="flex justify-end gap-2">
-            <Button variant="outline" onClick={() => setShowCreateActivityDialog(false)}>
-              {t("admin.cancel")}
-            </Button>
-            <Button onClick={handleCreateActivity} className="bg-amber-600 hover:bg-amber-700">
-              {t("admin.create")}
-            </Button>
-          </div>
-        </DialogContent>
-      </Dialog>
+      )}
     </div>
   )
 }
