@@ -40,7 +40,7 @@ export const staffTaskApi = createApi({
   endpoints: (build) => ({
     getStaffTasks: build.query<
       { data: GetStaffTasksResponse },
-      { page?: number; limit?: number; scheduledFrom?: string; scheduledTo?: string } | void
+      { page?: number; limit?: number; scheduledFrom?: string; scheduledTo?: string; userId?: string } | void
     >({
       query: (p) => ({ url: ENDPOINTS.STAFF_TASK, method: 'GET', params: p ?? {}, credentials: 'include' }),
       providesTags: ['StaffTasks'],
