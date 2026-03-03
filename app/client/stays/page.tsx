@@ -72,10 +72,10 @@ export default function StaysPage() {
           <Image
             src="/images/thehost-20logo.png"
             alt="TheHost Logo"
-            width={200}
-            height={100}
-            className="h-24 w-auto"
+            width={240}
+            height={120}
             priority
+            style={{ height: "auto" }}
           />
           <Button
             onClick={handleLogout}
