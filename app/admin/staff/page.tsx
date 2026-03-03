@@ -713,55 +713,161 @@ export default function StaffManagement() {
                         </SelectContent>
                       </Select>
                     </div>
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-              {staff
-                .filter((member) => member.name.toLowerCase().includes(searchName.toLowerCase()))
-                .map((member) => (
-                <Card
-                  key={member.id}
-                  className={`p-4 cursor-pointer hover:shadow-md transition-shadow ${
-                    member.status === "available" ? "border-green-200" : ""
-                  }`}
-                  onClick={() => setSelectedStaff(member)}
-                >
-                  <div className="flex flex-col items-center text-center">
-                    <div className="w-12 h-12 bg-gradient-to-br from-primary to-primary/80 rounded-full flex items-center justify-center text-white font-bold shadow-md mb-3">
-                      {member.avatar}
-                    </div>
-                    <h3 className="font-semibold text-foreground text-sm">{member.name}</h3>
-                    <p className="text-xs text-muted-foreground">{member.department}</p>
-                    <p className="text-xs text-muted-foreground mt-1">{member.shift}</p>
-                    <Badge className={`${getStatusColor(member.status)} text-white mt-3`}>
-                      {getStatusText(member.status)}
-                    </Badge>
-                    {member.currentRoom && (
-                      <p className="text-xs text-muted-foreground mt-2">Hab. {member.currentRoom}</p>
-                    )}
                   </div>
-                  <div className="mt-4 pt-4 border-t border-border">
-                    <div className="flex items-center justify-between text-sm mb-2">
-                      <span className="text-muted-foreground">{t("admin.tasksToday")}</span>
-                      <span className="font-semibold text-foreground">
-                        {member.tasksToday} / {member.maxCapacity}
-                      </span>
+                  <DialogFooter>
+                    <Button onClick={handleCreateActivity} className="bg-amber-600 hover:bg-amber-700">
+                      {t("admin.create")}
+                    </Button>
+                  </DialogFooter>
+                </DialogContent>
+              </Dialog>
+
+              {/* Add Staff Button */}
+              <Dialog open={addStaffDialogOpen} onOpenChange={setAddStaffDialogOpen}>
+                <button
+                  onClick={() => setAddStaffDialogOpen(true)}
+                  className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-all"
+                >
+                  <Plus className="w-4 h-4" />
+                  {t("admin.addStaff")}
+                </button>
+                <DialogContent className="max-w-md">
+                  <DialogHeader>
+                    <DialogTitle>{t("admin.newUser")}</DialogTitle>
+                    <DialogDescription>{t("admin.registerNewTeamMember")}</DialogDescription>
+                  </DialogHeader>
+                  <div className="space-y-4 py-4">
+                    <div>
+                      <Label htmlFor="name" className="text-sm font-medium">{t("admin.fullName")}</Label>
+                      <Input
+                        id="name"
+                        placeholder={t("admin.exampleFullName")}
+                        value={newStaff.name}
+                        onChange={(e) => setNewStaff({ ...newStaff, name: e.target.value })}
+                        className="mt-2"
+                      />
                     </div>
-                    <div className="w-full bg-muted rounded-full h-2">
-                      <div
-                        className="bg-primary rounded-full h-2 transition-all"
-                        style={{ width: `${(member.tasksToday / member.maxCapacity) * 100}%` }}
+                    <div>
+                      <Label htmlFor="email" className="text-sm font-medium">Email</Label>
+                      <Input
+                        id="email"
+                        placeholder={t("admin.exampleEmail")}
+                        value={newStaff.email}
+                        onChange={(e) => setNewStaff({ ...newStaff, email: e.target.value })}
+                        className="mt-2"
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="phone" className="text-sm font-medium">{t("admin.phone")}</Label>
+                      <Input
+                        id="phone"
+                        placeholder={t("admin.examplePhone")}
+                        value={newStaff.phone}
+                        onChange={(e) => setNewStaff({ ...newStaff, phone: e.target.value })}
+                        className="mt-2"
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="department" className="text-sm font-medium">{t("admin.department")}</Label>
+                      <Select value={newStaff.department} onValueChange={(value) => setNewStaff({ ...newStaff, department: value })}>
+                        <SelectTrigger className="mt-2">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="Limpieza">{t("admin.cleaning")}</SelectItem>
+                          <SelectItem value="Mantenimiento">{t("admin.maintenance")}</SelectItem>
+                          <SelectItem value="Seguridad">{t("admin.security")}</SelectItem>
+                          <SelectItem value="Recepción">{t("admin.reception")}</SelectItem>
+                          <SelectItem value="Servicio">{t("admin.service")}</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div>
+                      <Label htmlFor="shift" className="text-sm font-medium">{t("admin.shift")}</Label>
+                      <Select value={newStaff.shift} onValueChange={(value) => setNewStaff({ ...newStaff, shift: value })}>
+                        <SelectTrigger className="mt-2">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="morning">{t("admin.morning")}</SelectItem>
+                          <SelectItem value="afternoon">{t("admin.afternoon")}</SelectItem>
+                          <SelectItem value="evening">{t("admin.evening")}</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div>
+                      <Label htmlFor="capacity" className="text-sm font-medium">{t("admin.dailyCapacity")}</Label>
+                      <Input
+                        id="capacity"
+                        type="number"
+                        placeholder={t("admin.exampleCapacity")}
+                        value={newStaff.capacity}
+                        onChange={(e) => setNewStaff({ ...newStaff, capacity: parseInt(e.target.value) || 8 })}
+                        className="mt-2"
                       />
                     </div>
                   </div>
-                </Card>
-              ))}
+                  <DialogFooter>
+                    <Button onClick={handleAddStaff} className="bg-blue-600 hover:bg-blue-700">
+                      {t("admin.registerStaff")}
+                    </Button>
+                  </DialogFooter>
+                </DialogContent>
+              </Dialog>
             </div>
-          )}
-        </div>
+          </header>
 
-        <div className="space-y-4">
-          {/* Filters */}
-          <Card className="p-4">
+          {/* Main Content */}
+          {viewMode === "overview" && (
+            <div className="flex-1 overflow-auto">
+              <div className="p-8 space-y-6">
+                {/* Staff Grid */}
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                  {staff
+                    .filter((member) => member.name.toLowerCase().includes(searchName.toLowerCase()))
+                    .map((member) => (
+                    <Card
+                      key={member.id}
+                      className={`p-4 cursor-pointer hover:shadow-md transition-shadow ${
+                        member.status === "available" ? "border-green-200" : ""
+                      }`}
+                      onClick={() => setSelectedStaff(member)}
+                    >
+                      <div className="flex flex-col items-center text-center">
+                        <div className="w-12 h-12 bg-gradient-to-br from-primary to-primary/80 rounded-full flex items-center justify-center text-white font-bold shadow-md mb-3">
+                          {member.avatar}
+                        </div>
+                        <h3 className="font-semibold text-foreground text-sm">{member.name}</h3>
+                        <p className="text-xs text-muted-foreground">{member.department}</p>
+                        <p className="text-xs text-muted-foreground mt-1">{member.shift}</p>
+                        <Badge className={`${getStatusColor(member.status)} text-white mt-3`}>
+                          {getStatusText(member.status)}
+                        </Badge>
+                        {member.currentRoom && (
+                          <p className="text-xs text-muted-foreground mt-2">Hab. {member.currentRoom}</p>
+                        )}
+                      </div>
+                      <div className="mt-4 pt-4 border-t border-border">
+                        <div className="flex items-center justify-between text-sm mb-2">
+                          <span className="text-muted-foreground">{t("admin.tasksToday")}</span>
+                          <span className="font-semibold text-foreground">
+                            {member.tasksToday} / {member.maxCapacity}
+                          </span>
+                        </div>
+                        <div className="w-full bg-muted rounded-full h-2">
+                          <div
+                            className="bg-primary rounded-full h-2 transition-all"
+                            style={{ width: `${(member.tasksToday / member.maxCapacity) * 100}%` }}
+                          />
+                        </div>
+                      </div>
+                    </Card>
+                  ))}
+                </div>
+
+                {/* Kanban View - Hidden when viewMode is overview */}
+                {viewMode === "kanban" && (
+                  <div className="space-y-4">
             <div className="flex gap-4 items-end">
               <div className="flex-1">
                 <Label htmlFor="search-name" className="text-sm font-medium">Buscar por nombre</Label>
@@ -905,11 +1011,12 @@ export default function StaffManagement() {
                   ))}
               </div>
             </div>
+          )}
         </div>
-      </header>
+      )}
 
       {/* Staff Detail Dialog */}
-      {isLoaded && selectedStaff && (
+      {selectedStaff && (
         <Dialog open={!!selectedStaff} onOpenChange={() => {
           setSelectedStaff(null)
           setEditingStaff(null)
