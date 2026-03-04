@@ -563,43 +563,6 @@ export default function RoomsManagement() {
                       </div>
                       <span className="text-sm font-medium text-foreground">{room.capacity} {room.capacity === 1 ? "persona" : "personas"}</span>
                     </div>
-                    {/* Guest */}
-                    <div className="flex items-center gap-2">
-                      <div 
-                        className="w-6 h-6 rounded-full flex items-center justify-center"
-                        style={{ 
-                          backgroundColor: room.status === "available" 
-                            ? "rgba(35, 94, 32, 0.15)" 
-                            : room.status === "occupied" 
-                              ? "rgba(170, 44, 44, 0.15)" 
-                              : room.status === "reserved" 
-                                ? "rgba(30, 58, 138, 0.15)" 
-                                : "rgba(180, 83, 9, 0.15)" 
-                        }}
-                      >
-                        <User 
-                          className="w-3.5 h-3.5" 
-                          style={{ 
-                            color: room.status === "available" 
-                              ? "#235E20" 
-                              : room.status === "occupied" 
-                                ? "#AA2C2C" 
-                                : room.status === "reserved" 
-                                  ? "#1E3A8A" 
-                                  : "#B45309" 
-                          }} 
-                        />
-                      </div>
-                      <button 
-                        onClick={(e) => {
-                          e.stopPropagation()
-                          // TODO: Add guest detail modal or navigation here
-                        }}
-                        className="text-sm font-medium text-foreground hover:text-primary hover:underline cursor-pointer transition-colors"
-                      >
-                        {room.guest}
-                      </button>
-                    </div>
                     {room.checkIn && room.checkOut && (
                       <div className="flex items-center gap-2 mt-2 text-xs">
                         <div 
