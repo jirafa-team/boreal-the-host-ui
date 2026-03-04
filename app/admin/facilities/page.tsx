@@ -304,7 +304,7 @@ export default function FacilitiesPage() {
                         <p className="text-sm text-muted-foreground capitalize truncate">{facility.type}</p>
                       </div>
                     </div>
-                    <div className="flex items-center gap-3 flex-shrink-0">
+                    <div className="flex flex-col gap-2 items-end flex-shrink-0">
                       <Badge variant="outline" className="text-xs whitespace-nowrap">
                         {facility.startTime} - {facility.endTime}
                       </Badge>
