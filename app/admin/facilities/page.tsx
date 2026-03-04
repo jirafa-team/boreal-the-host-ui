@@ -295,8 +295,8 @@ export default function FacilitiesPage() {
             return (
               <Card key={facility.id} className="hover:shadow-lg transition-shadow">
                 <div className="p-5 space-y-4">
-                  <div className="flex items-center justify-between gap-3">
-                    <div className="flex items-center gap-3">
+                  <div className="flex items-start justify-between gap-4">
+                    <div className="flex items-center gap-3 flex-1">
                       <div className={`${facility.color} p-2 rounded-lg flex-shrink-0`}>
                         <Icon className="w-5 h-5 text-white" />
                       </div>
@@ -305,15 +305,15 @@ export default function FacilitiesPage() {
                         <p className="text-sm text-muted-foreground capitalize">{facility.type}</p>
                       </div>
                     </div>
-                    <Badge variant="outline" className="flex-shrink-0">
-                      {facility.startTime} - {facility.endTime}
-                    </Badge>
-                  </div>
-
-                  {/* Capacity */}
-                  <div className="flex items-center gap-2 text-sm">
-                    <Users className="w-4 h-4 text-muted-foreground" />
-                    <p className="font-semibold">{facility.capacity}</p>
+                    <div className="flex flex-col gap-2 items-end flex-shrink-0">
+                      <Badge variant="outline">
+                        {facility.startTime} - {facility.endTime}
+                      </Badge>
+                      <div className="flex items-center gap-2 text-sm">
+                        <Users className="w-4 h-4 text-muted-foreground" />
+                        <p className="font-semibold">{facility.capacity}</p>
+                      </div>
+                    </div>
                   </div>
 
                   {/* Actions */}
