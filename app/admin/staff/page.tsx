@@ -199,30 +199,34 @@ export default function StaffManagement() {
             <h1 className="text-2xl font-bold text-foreground">{t("admin.staffTitle")}</h1>
             <p className="text-sm text-muted-foreground">{t("admin.manageYour")} {t("admin.staffMembers")}</p>
           </div>
-          <div className="flex items-center gap-2">
-            <button
-              onClick={() => setViewMode("list")}
-              className={`flex items-center gap-2 px-3 py-2 rounded-lg transition-colors ${
-                viewMode === "list"
-                  ? "bg-primary text-white"
-                  : "bg-muted text-muted-foreground hover:bg-muted/80"
-              }`}
-            >
-              <Grid className="w-4 h-4" />
-              {t("admin.day")}
-            </button>
-            <button
-              onClick={() => setViewMode("kanban")}
-              className={`flex items-center gap-2 px-3 py-2 rounded-lg transition-colors ${
-                viewMode === "kanban"
-                  ? "bg-primary text-white"
-                  : "bg-muted text-muted-foreground hover:bg-muted/80"
-              }`}
-            >
-              <LayoutGrid className="w-4 h-4" />
-              {t("admin.kanban")}
-            </button>
-          </div>
+          <div className="flex gap-4 items-center ml-auto">
+            {/* View Mode Toggle */}
+            <div className="inline-flex h-10 items-center rounded-lg bg-gray-100 p-1 border border-gray-200">
+              <button
+                onClick={() => setViewMode("list")}
+                className={`px-5 py-2 rounded-md font-medium text-sm transition-all flex items-center gap-2 ${
+                  viewMode === "list"
+                    ? "text-white shadow-md"
+                    : "text-gray-700 hover:text-gray-900"
+                }`}
+                style={viewMode === "list" ? { backgroundColor: "#394a63" } : {}}
+              >
+                <Grid className="w-4 h-4" />
+                {t("admin.day")}
+              </button>
+              <button
+                onClick={() => setViewMode("kanban")}
+                className={`px-5 py-2 rounded-md font-medium text-sm transition-all flex items-center gap-2 ${
+                  viewMode === "kanban"
+                    ? "text-white shadow-md"
+                    : "text-gray-700 hover:text-gray-900"
+                }`}
+                style={viewMode === "kanban" ? { backgroundColor: "#394a63" } : {}}
+              >
+                <LayoutGrid className="w-4 h-4" />
+                {t("admin.kanban")}
+              </button>
+            </div>
           <Dialog open={showAddDialog} onOpenChange={setShowAddDialog}>
             <div className="flex gap-3">
               <DialogTrigger asChild>
