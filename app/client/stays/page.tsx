@@ -111,8 +111,14 @@ export default function StaysPage() {
               {/* Check-in Button for First Stay */}
               {index === 0 && stay.status === "Confirmada" && (
                 <div className="absolute -top-12 left-0 right-0 z-10">
-                  <Button className="w-full bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white font-semibold rounded-lg flex items-center justify-center gap-2 h-10">
-                    ✓ {t("stays.completeCheckin") || "Completar Check-in Ahora"}
+                  <Button 
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      router.push("/client/checkin")
+                    }}
+                    className="w-full bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white font-semibold rounded-lg flex items-center justify-center gap-2 h-10"
+                  >
+                    ⚠ {t("stays.completeCheckInData") || "Completar datos para check-in"}
                   </Button>
                 </div>
               )}
