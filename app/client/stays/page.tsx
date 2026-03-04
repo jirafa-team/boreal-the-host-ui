@@ -92,12 +92,11 @@ export default function StaysPage() {
             {/* User Avatar - Clickeable */}
             <button
               onClick={() => router.push("/client/profile")}
-              className="flex items-center gap-2 px-3 py-2 rounded-lg bg-slate-700/50 border border-slate-600 hover:border-cyan-500/50 hover:bg-slate-700/70 transition-all cursor-pointer"
+              className="flex items-center justify-center p-2 rounded-lg bg-slate-700/50 border border-slate-600 hover:border-cyan-500/50 hover:bg-slate-700/70 transition-all cursor-pointer"
             >
               <div className="w-8 h-8 rounded-full bg-gradient-to-br from-cyan-500 to-blue-500 flex items-center justify-center font-semibold text-white text-xs">
                 {userInitials || "U"}
               </div>
-              <span className="text-sm font-medium text-slate-200">{currentUser || "Usuario"}</span>
             </button>
           </div>
         </div>
