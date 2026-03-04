@@ -209,7 +209,7 @@ export default function StaffManagement() {
               }`}
               style={viewMode === "list" ? { backgroundColor: "#394a63" } : {}}
             >
-              {t("admin.day")}
+              {t("admin.day") || "Lista"}
             </button>
             <button
               onClick={() => setViewMode("kanban")}
@@ -225,6 +225,7 @@ export default function StaffManagement() {
           </div>
           <Dialog open={showAddDialog} onOpenChange={setShowAddDialog}>
             <div className="flex gap-3">
+              {viewMode === "list" && (
               <DialogTrigger asChild>
                 <button
                   className="flex items-center justify-center w-10 h-10 rounded-full text-white shadow-md hover:shadow-lg transition-all duration-300 hover:scale-110 group relative"
@@ -237,6 +238,8 @@ export default function StaffManagement() {
                   </span>
                 </button>
               </DialogTrigger>
+              )}
+              {viewMode === "kanban" && (
               <button
                 onClick={() => setShowMaintenanceActivityDialog(true)}
                 className="flex items-center justify-center w-10 h-10 rounded-full text-white shadow-md hover:shadow-lg transition-all duration-300 hover:scale-110 group relative"
@@ -248,6 +251,7 @@ export default function StaffManagement() {
                   {t("admin.createActivity")}
                 </span>
               </button>
+              )}
             </div>
             <DialogContent className="max-w-md">
               <DialogHeader>
