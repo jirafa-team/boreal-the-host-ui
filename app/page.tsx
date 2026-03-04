@@ -76,7 +76,7 @@ export default function HomePage() {
 
     if (adminUser === "system" && adminPassword === "1234") {
       setIsLoading(true)
-      setTimeout(() => router.push("/select-establishment"), 800)
+      setTimeout(() => router.push("/admin/select-establishment"), 800)
     } else {
       alert(t("login.invalidCredentials"))
     }
