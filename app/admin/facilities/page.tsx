@@ -138,7 +138,7 @@ export default function FacilitiesPage() {
           <div className="flex items-center justify-between">
             <div>
               <h1 className="text-2xl font-bold text-foreground">{t("admin.amenitiesManagement")}</h1>
-              <p className="text-sm text-muted-foreground">{t("admin.facilitiesManagementDesc")}</p>
+              <p className="text-sm text-muted-foreground">{t("admin.configureNewAmenity")}</p>
             </div>
             <Dialog open={addFacilityOpen} onOpenChange={setAddFacilityOpen}>
               <DialogTrigger asChild>
@@ -213,17 +213,17 @@ export default function FacilitiesPage() {
             </DialogHeader>
             <form onSubmit={handleSaveEdit} className="space-y-4">
               <div>
-                <Label htmlFor="edit-name">{t("admin.name")}</Label>
+                <Label htmlFor="edit-name">{t("admin.amenityName")}</Label>
                 <Input id="edit-name" name="name" defaultValue={editingFacility?.name} required />
               </div>
               <div>
-                <Label htmlFor="edit-type">{t("admin.type")}</Label>
+                <Label htmlFor="edit-type">{t("admin.amenityType")}</Label>
                 <Select name="type" defaultValue={editingFacility?.type} required>
                   <SelectTrigger>
                     <SelectValue placeholder={t("admin.selectType")} />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="fitness">{t("admin.fitness")}</SelectItem>
+                    <SelectItem value="fitness">Fitness</SelectItem>
                     <SelectItem value="recreation">{t("admin.recreation")}</SelectItem>
                     <SelectItem value="wellness">{t("admin.wellness")}</SelectItem>
                     <SelectItem value="business">{t("admin.business")}</SelectItem>
@@ -246,7 +246,7 @@ export default function FacilitiesPage() {
                 </div>
               </div>
               <Button type="submit" className="w-full">
-                {t("admin.saveChanges")}
+                {t("common.continue")}
               </Button>
             </form>
           </DialogContent>
