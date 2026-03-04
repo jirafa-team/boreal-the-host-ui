@@ -295,27 +295,24 @@ export default function FacilitiesPage() {
             return (
               <Card key={facility.id} className="hover:shadow-lg transition-shadow">
                 <div className="p-5 space-y-4">
-                  <div className="flex items-center gap-3">
-                    <div className={`${facility.color} p-2 rounded-lg flex-shrink-0`}>
-                      <Icon className="w-5 h-5 text-white" />
+                  <div className="flex items-center justify-between gap-3">
+                    <div className="flex items-center gap-3">
+                      <div className={`${facility.color} p-2 rounded-lg flex-shrink-0`}>
+                        <Icon className="w-5 h-5 text-white" />
+                      </div>
+                      <div>
+                        <h3 className="font-bold text-lg text-foreground">{facility.name}</h3>
+                        <p className="text-sm text-muted-foreground capitalize">{facility.type}</p>
+                      </div>
                     </div>
-                    <div>
-                      <h3 className="font-bold text-lg text-foreground">{facility.name}</h3>
-                      <p className="text-sm text-muted-foreground capitalize">{facility.type}</p>
-                    </div>
+                    <Badge variant="outline" className="flex-shrink-0">
+                      {facility.startTime} - {facility.endTime}
+                    </Badge>
                   </div>
 
                   {/* Details */}
-                  <div className="grid grid-cols-2 gap-3 text-sm">
-                    <div className="bg-muted p-2 rounded">
-                      <p className="text-muted-foreground text-xs">Apertura</p>
-                      <p className="font-semibold">{facility.startTime}</p>
-                    </div>
-                    <div className="bg-muted p-2 rounded">
-                      <p className="text-muted-foreground text-xs">Cierre</p>
-                      <p className="font-semibold">{facility.endTime}</p>
-                    </div>
-                    <div className="bg-muted p-2 rounded">
+                  <div className="flex gap-3 text-sm">
+                    <div className="bg-muted p-2 rounded flex-1">
                       <p className="text-muted-foreground text-xs">Capacidad</p>
                       <p className="font-semibold">{facility.capacity}</p>
                     </div>
