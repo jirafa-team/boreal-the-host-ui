@@ -13,7 +13,7 @@ import {
 } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Users, Plus, CheckSquare } from "lucide-react"
+import { Users, Plus, CheckSquare, Grid, LayoutGrid } from "lucide-react"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { useLanguage } from "@/lib/i18n-context"
 
@@ -66,6 +66,7 @@ export default function StaffManagement() {
 
   const [selectedStaff, setSelectedStaff] = useState<StaffMember | null>(null)
   const [searchName, setSearchName] = useState("")
+  const [viewMode, setViewMode] = useState<"list" | "kanban">("list")
   const [showAddDialog, setShowAddDialog] = useState(false)
   const [showAssignTaskDialog, setShowAssignTaskDialog] = useState(false)
   const [showMaintenanceActivityDialog, setShowMaintenanceActivityDialog] = useState(false)
@@ -197,6 +198,30 @@ export default function StaffManagement() {
             <h1 className="text-2xl font-bold text-foreground">{t("admin.staffTitle")}</h1>
             <p className="text-sm text-muted-foreground">{t("admin.manageYour")} {t("admin.staffMembers")}</p>
           </div>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => setViewMode("list")}
+              className={`flex items-center gap-2 px-3 py-2 rounded-lg transition-colors ${
+                viewMode === "list"
+                  ? "bg-primary text-white"
+                  : "bg-muted text-muted-foreground hover:bg-muted/80"
+              }`}
+            >
+              <Grid className="w-4 h-4" />
+              {t("admin.day")}
+            </button>
+            <button
+              onClick={() => setViewMode("kanban")}
+              className={`flex items-center gap-2 px-3 py-2 rounded-lg transition-colors ${
+                viewMode === "kanban"
+                  ? "bg-primary text-white"
+                  : "bg-muted text-muted-foreground hover:bg-muted/80"
+              }`}
+            >
+              <LayoutGrid className="w-4 h-4" />
+              {t("admin.kanban")}
+            </button>
+          </div>
           <Dialog open={showAddDialog} onOpenChange={setShowAddDialog}>
             <div className="flex gap-2">
               <Button onClick={() => setShowAddDialog(true)} className="bg-blue-600 hover:bg-blue-700">
@@ -293,7 +318,8 @@ export default function StaffManagement() {
             </div>
           </div>
 
-          {/* Staff Grid */}
+          {/* List View */}
+          {viewMode === "list" && (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
             {staff.length === 0 ? (
               <div className="col-span-full text-center py-12">
@@ -337,6 +363,59 @@ export default function StaffManagement() {
                 ))
             )}
           </div>
+          )}
+
+          {/* Kanban View */}
+          {viewMode === "kanban" && (
+          <div className="space-y-4">
+            {/* Kanban Columns */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 overflow-x-auto pb-4">
+              {["available", "busy", "off"].map((status) => (
+                <div key={status} className="bg-muted/50 rounded-lg p-4 min-w-sm">
+                  <h3 className="font-semibold text-foreground mb-4 capitalize">
+                    {status === "available" ? t("admin.statusAvailable") : 
+                     status === "busy" ? t("admin.statusBusy") : 
+                     t("admin.statusOff")}
+                  </h3>
+                  <div className="space-y-3">
+                    {staff
+                      .filter((member) => 
+                        member.status === status &&
+                        member.name.toLowerCase().includes(searchName.toLowerCase())
+                      )
+                      .map((member) => (
+                        <Card
+                          key={member.id}
+                          className="p-3 cursor-pointer hover:shadow-md transition-shadow"
+                          onClick={() => setSelectedStaff(member)}
+                        >
+                          <div className="flex items-start gap-3">
+                            <div className="w-10 h-10 bg-gradient-to-br from-primary to-primary/80 rounded-full flex items-center justify-center text-white font-bold text-sm flex-shrink-0">
+                              {member.avatar}
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <h4 className="font-semibold text-sm text-foreground truncate">{member.name}</h4>
+                              <p className="text-xs text-muted-foreground">{member.department}</p>
+                              <div className="mt-2 flex items-center justify-between text-xs">
+                                <span className="text-muted-foreground">{t("admin.tasksToday")}</span>
+                                <span className="font-semibold">{member.tasksToday}/{member.maxCapacity}</span>
+                              </div>
+                              <div className="w-full bg-muted rounded-full h-1.5 mt-1">
+                                <div
+                                  className="bg-primary rounded-full h-1.5 transition-all"
+                                  style={{ width: `${(member.tasksToday / member.maxCapacity) * 100}%` }}
+                                />
+                              </div>
+                            </div>
+                          </div>
+                        </Card>
+                      ))}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+          )}
         </div>
       </div>
 
