@@ -320,8 +320,9 @@ export default function FacilitiesPage() {
               <Dialog open={addFacilityOpen} onOpenChange={setAddFacilityOpen}>
                 <DialogTrigger asChild>
                   <button 
-                    className="flex items-center justify-center w-10 h-10 rounded-full bg-gradient-to-br from-primary to-primary/80 text-white shadow-md hover:shadow-lg transition-all duration-300 hover:scale-110 group relative"
-                title={t("admin.addAmenity")}
+                    className="flex items-center justify-center w-10 h-10 rounded-full text-white shadow-md hover:shadow-lg transition-all duration-300 hover:scale-110 group relative"
+                    style={{ backgroundColor: "#1557F6" }}
+                    title={t("admin.addAmenity")}
               >
                 <div className="relative flex items-center justify-center">
                   <Plus className="w-5 h-5" />
@@ -380,12 +381,13 @@ export default function FacilitiesPage() {
               <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
                 <DialogTrigger asChild>
                   <button 
-                    className="relative group w-10 h-10 rounded-full bg-primary hover:bg-primary/90 text-white flex items-center justify-center transition-all shadow-md hover:shadow-lg"
+                    className="relative group w-10 h-10 rounded-full text-white flex items-center justify-center transition-all shadow-md hover:shadow-lg"
+                    style={{ backgroundColor: "#1557F6" }}
                     title={t("admin.addReservation")}
                   >
                     <div className="relative">
                       <CalendarIcon className="w-5 h-5" />
-                      <span className="absolute -top-1 -right-1 bg-primary text-white text-xs font-bold w-4 h-4 rounded-full flex items-center justify-center" style={{fontSize: '10px'}}>+</span>
+                      <span className="absolute -top-1 -right-1 text-white text-xs font-bold w-4 h-4 rounded-full flex items-center justify-center" style={{fontSize: '10px', backgroundColor: "#1557F6"}}>+</span>
                     </div>
                     <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-1.5 bg-gray-900 text-white text-xs rounded pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
                       {t("admin.newReservation")}
