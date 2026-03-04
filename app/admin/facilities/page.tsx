@@ -142,9 +142,8 @@ export default function FacilitiesPage() {
             </div>
             <Dialog open={addFacilityOpen} onOpenChange={setAddFacilityOpen}>
               <DialogTrigger asChild>
-                <Button className="flex items-center gap-2">
+                <Button size="icon">
                   <Plus className="w-4 h-4" />
-                  {t("admin.addAmenity")}
                 </Button>
               </DialogTrigger>
               <DialogContent className="max-w-md">
@@ -305,23 +304,6 @@ export default function FacilitiesPage() {
                         <p className="text-sm text-muted-foreground capitalize">{facility.type}</p>
                       </div>
                     </div>
-                    <div className="flex gap-2 flex-shrink-0">
-                      <Button
-                        variant="outline"
-                        size="icon"
-                        onClick={() => handleEditFacility(facility)}
-                      >
-                        <Edit2 className="w-4 h-4" />
-                      </Button>
-                      <Button
-                        variant="outline"
-                        size="icon"
-                        className="text-destructive hover:text-destructive"
-                        onClick={() => handleDeleteFacility(facility.id)}
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </Button>
-                    </div>
                   </div>
 
                   <div className="flex justify-end gap-4">
@@ -332,6 +314,23 @@ export default function FacilitiesPage() {
                       <div className="flex items-center gap-2 text-sm">
                         <Users className="w-4 h-4 text-muted-foreground" />
                         <p className="font-semibold">{facility.capacity}</p>
+                      </div>
+                      <div className="flex gap-2 pt-1">
+                        <Button
+                          variant="outline"
+                          size="icon"
+                          onClick={() => handleEditFacility(facility)}
+                        >
+                          <Edit2 className="w-4 h-4" />
+                        </Button>
+                        <Button
+                          variant="outline"
+                          size="icon"
+                          className="text-destructive hover:text-destructive"
+                          onClick={() => handleDeleteFacility(facility.id)}
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </Button>
                       </div>
                     </div>
                   </div>
