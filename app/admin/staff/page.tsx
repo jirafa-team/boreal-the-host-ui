@@ -67,7 +67,6 @@ export default function StaffManagement() {
 
   const [selectedStaff, setSelectedStaff] = useState<StaffMember | null>(null)
   const [searchName, setSearchName] = useState("")
-  const [viewMode, setViewMode] = useState<"list" | "kanban">("list")
   const [showAddDialog, setShowAddDialog] = useState(false)
   const [showAssignTaskDialog, setShowAssignTaskDialog] = useState(false)
   const [newTask, setNewTask] = useState({
@@ -179,47 +178,19 @@ export default function StaffManagement() {
             <h1 className="text-2xl font-bold text-foreground">{t("admin.staffTitle")}</h1>
             <p className="text-sm text-muted-foreground">{t("admin.manageYour")} {t("admin.staffMembers")}</p>
           </div>
-          <div className="inline-flex h-10 items-center rounded-lg bg-gray-100 p-1 border border-gray-200">
-            <button
-              onClick={() => setViewMode("list")}
-              className={`px-5 py-2 rounded-md font-medium text-sm transition-all ${
-                viewMode === "list"
-                  ? "text-white shadow-md"
-                  : "text-gray-700 hover:text-gray-900"
-              }`}
-              style={viewMode === "list" ? { backgroundColor: "#394a63" } : {}}
-            >
-              {t("admin.day") || "Lista"}
-            </button>
-            <button
-              onClick={() => setViewMode("kanban")}
-              className={`px-5 py-2 rounded-md font-medium text-sm transition-all ${
-                viewMode === "kanban"
-                  ? "text-white shadow-md"
-                  : "text-gray-700 hover:text-gray-900"
-              }`}
-              style={viewMode === "kanban" ? { backgroundColor: "#394a63" } : {}}
-            >
-              {t("admin.kanban")}
-            </button>
-          </div>
           <Dialog open={showAddDialog} onOpenChange={setShowAddDialog}>
-            <div className="flex gap-3">
-              {viewMode === "list" && (
-              <DialogTrigger asChild>
-                <button
-                  className="flex items-center justify-center w-10 h-10 rounded-full text-white shadow-md hover:shadow-lg transition-all duration-300 hover:scale-110 group relative"
-                  style={{ backgroundColor: "#1557F6" }}
-                  title={t("admin.addStaff")}
-                >
-                  <Plus className="w-5 h-5" />
-                  <span className="absolute top-full mt-2 px-2 py-1 bg-gray-900 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap">
-                    {t("admin.addStaff")}
-                  </span>
-                </button>
-              </DialogTrigger>
-              )}
-            </div>
+            <DialogTrigger asChild>
+              <button
+                className="flex items-center justify-center w-10 h-10 rounded-full text-white shadow-md hover:shadow-lg transition-all duration-300 hover:scale-110 group relative"
+                style={{ backgroundColor: "#1557F6" }}
+                title={t("admin.addStaff")}
+              >
+                <Plus className="w-5 h-5" />
+                <span className="absolute top-full mt-2 px-2 py-1 bg-gray-900 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap">
+                  {t("admin.addStaff")}
+                </span>
+              </button>
+            </DialogTrigger>
             <DialogContent className="max-w-md">
               <DialogHeader>
                 <DialogTitle>{t("admin.newUser")}</DialogTitle>
@@ -306,7 +277,6 @@ export default function StaffManagement() {
           </div>
 
           {/* List View */}
-          {viewMode === "list" && (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
             {staff.length === 0 ? (
               <div className="col-span-full text-center py-12">
@@ -350,7 +320,6 @@ export default function StaffManagement() {
                 ))
             )}
           </div>
-          )}
         </div>
       </div>
 
