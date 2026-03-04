@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation"
 import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { ChevronLeft, ChevronRight, Search, Hotel, Users, Building2, Clock, AlertCircle, CheckCircle2, Dumbbell, Waves, Sparkles, Video, Coffee, UtensilsCrossed, Calendar, CheckSquare } from "lucide-react"
+import { Plus, Dumbbell, Waves, Sparkles, Video, Coffee, UtensilsCrossed, Calendar, CheckSquare } from "lucide-react"
 import { useLanguage } from "@/lib/i18n-context"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -208,6 +208,7 @@ export default function DashboardControl() {
     scheduledTime: "",
   })
   const [dialogOpen, setDialogOpen] = useState(false)
+  const [showRoomBookingDialog, setShowRoomBookingDialog] = useState(false)
   const [clientSuggestions, setClientSuggestions] = useState<string[]>([])
   const [showClientSuggestions, setShowClientSuggestions] = useState(false)
   const [newBooking, setNewBooking] = useState({
@@ -745,6 +746,67 @@ export default function DashboardControl() {
                     <ChevronRight className="w-5 h-5" />
                   </button>
                 </div>
+
+                {/* Add Booking Button */}
+                <Dialog open={showRoomBookingDialog} onOpenChange={setShowRoomBookingDialog}>
+                  <DialogTrigger asChild>
+                    <button
+                      className="flex items-center justify-center w-10 h-10 rounded-full text-white shadow-md hover:shadow-lg transition-all duration-300 hover:scale-110 group relative"
+                      style={{ backgroundColor: "#1557F6" }}
+                      title="Crear reserva"
+                    >
+                      <Plus className="w-5 h-5" />
+                      <span className="absolute top-full mt-2 px-2 py-1 bg-gray-900 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap">
+                        Crear reserva
+                      </span>
+                    </button>
+                  </DialogTrigger>
+                  <DialogContent className="max-w-md">
+                    <DialogHeader>
+                      <DialogTitle>Crear Reserva de Habitación</DialogTitle>
+                      <DialogDescription>Ingresa los datos de la nueva reserva</DialogDescription>
+                    </DialogHeader>
+                    <div className="space-y-4">
+                      <div>
+                        <Label htmlFor="room-select">Habitación</Label>
+                        <Select>
+                          <SelectTrigger id="room-select">
+                            <SelectValue placeholder="Seleccionar habitación" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {rooms.filter(r => r.status === "available").map(room => (
+                              <SelectItem key={room.id} value={room.id}>
+                                {room.number} - {room.type}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <div>
+                        <Label htmlFor="guest-name">Nombre del huésped</Label>
+                        <Input id="guest-name" placeholder="Ej: Juan Pérez" />
+                      </div>
+                      <div className="grid grid-cols-2 gap-4">
+                        <div>
+                          <Label htmlFor="check-in">Check-in</Label>
+                          <Input id="check-in" type="date" />
+                        </div>
+                        <div>
+                          <Label htmlFor="check-out">Check-out</Label>
+                          <Input id="check-out" type="date" />
+                        </div>
+                      </div>
+                      <Button 
+                        className="w-full"
+                        onClick={() => {
+                          setShowRoomBookingDialog(false)
+                        }}
+                      >
+                        Crear Reserva
+                      </Button>
+                    </div>
+                  </DialogContent>
+                </Dialog>
               </div>
             </div>
 
