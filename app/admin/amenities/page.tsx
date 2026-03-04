@@ -140,9 +140,16 @@ export default function AmenitiesPage() {
             </div>
             <Dialog open={addFacilityOpen} onOpenChange={setAddFacilityOpen}>
               <DialogTrigger asChild>
-                <Button size="icon">
-                  <Plus className="w-4 h-4" />
-                </Button>
+                <button
+                  className="flex items-center justify-center w-10 h-10 rounded-full text-white shadow-md hover:shadow-lg transition-all duration-300 hover:scale-110 group relative"
+                  style={{ backgroundColor: "#1557F6" }}
+                  title={t("admin.addAmenity")}
+                >
+                  <Plus className="w-5 h-5" />
+                  <span className="absolute top-full mt-2 px-2 py-1 bg-gray-900 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap">
+                    {t("admin.addAmenity")}
+                  </span>
+                </button>
               </DialogTrigger>
               <DialogContent className="max-w-md">
                 <DialogHeader>
