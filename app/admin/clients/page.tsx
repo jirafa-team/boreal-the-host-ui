@@ -211,7 +211,8 @@ export default function ClientsPage() {
     checkOut: "",
     roomType: "standard" as const,
     status: "active" as const,
-    nationality: ""
+    nationality: "",
+    createUserForClient: false,
   })
 
   const activeClients = clients.filter((client) => client.status === "checked-in" || client.status === "reserved")
@@ -739,7 +740,7 @@ export default function ClientsPage() {
                     <option value="Venezuela">🇻🇪 Venezuela</option>
                     <option value="Ecuador">🇪🇨 Ecuador</option>
                     <option value="Bolivia">🇧🇴 Bolivia</option>
-                    <option value="Paraguay">🇵🇾 Paraguay</option>
+                    <option value="Paraguay">🇵��� Paraguay</option>
                     <option value="Uruguay">🇺🇾 Uruguay</option>
                     <option value="Guatemala">🇬🇹 Guatemala</option>
                     <option value="Honduras">🇭🇳 Honduras</option>
@@ -830,6 +831,20 @@ export default function ClientsPage() {
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 min-h-20"
                   placeholder="Notas adicionales sobre el cliente..."
                 />
+              </div>
+
+              {/* Create User for Client */}
+              <div className="flex items-center gap-3">
+                <input
+                  type="checkbox"
+                  id="createUserForClient"
+                  checked={newClient.createUserForClient}
+                  onChange={(e) => setNewClient({ ...newClient, createUserForClient: e.target.checked })}
+                  className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-2 focus:ring-blue-500 cursor-pointer"
+                />
+                <label htmlFor="createUserForClient" className="text-sm font-medium text-gray-700 cursor-pointer">
+                  Crear usuario para cliente
+                </label>
               </div>
             </div>
 
