@@ -211,7 +211,7 @@ export default function CheckInPage() {
   }
 
   return (
-    <div className="min-h-screen h-screen w-full bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center p-4 overflow-y-auto">
+    <div className="min-h-screen w-full bg-gradient-to-br from-gray-50 to-gray-100 flex items-start justify-center p-4 pt-8 overflow-y-auto">
       <Card className="w-full max-w-md border-0 shadow-xl">
         <CardHeader
           className="text-center space-y-4 relative overflow-hidden py-8"
