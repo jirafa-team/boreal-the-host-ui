@@ -710,7 +710,7 @@ export default function ClientsPage() {
                 </div>
               </div>
 
-              {/* Phone and Room */}
+              {/* Phone and Nationality */}
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">Teléfono</label>
@@ -721,54 +721,6 @@ export default function ClientsPage() {
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                     placeholder="+1 (555) 000-0000"
                   />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Habitación</label>
-                  <input
-                    type="text"
-                    value={newClient.room}
-                    onChange={(e) => setNewClient({ ...newClient, room: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    placeholder="Ej: 205"
-                  />
-                </div>
-              </div>
-
-              {/* Check In and Check Out */}
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Check-in</label>
-                  <input
-                    type="date"
-                    value={newClient.checkIn}
-                    onChange={(e) => setNewClient({ ...newClient, checkIn: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Check-out</label>
-                  <input
-                    type="date"
-                    value={newClient.checkOut}
-                    onChange={(e) => setNewClient({ ...newClient, checkOut: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  />
-                </div>
-              </div>
-
-              {/* Room Type and Nationality */}
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Tipo de Habitación</label>
-                  <select
-                    value={newClient.roomType}
-                    onChange={(e) => setNewClient({ ...newClient, roomType: e.target.value as "standard" | "deluxe" | "premium" })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  >
-                    <option value="standard">Estándar</option>
-                    <option value="deluxe">Deluxe</option>
-                    <option value="premium">Premium</option>
-                  </select>
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">Nacionalidad</label>
