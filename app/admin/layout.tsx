@@ -1,7 +1,7 @@
 "use client"
 
 import type React from "react"
-import { useState, useEffect } from "react"
+import { useState, useEffect, useMemo } from "react"
 import {
   Hotel,
   Calendar,
@@ -33,40 +33,31 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const [sidebarOpen, setSidebarOpen] = useState(true)
-  const [expandedSections, setExpandedSections] = useState<Set<string>>(new Set())
-  const [isLoaded, setIsLoaded] = useState(false)
   const [mockMode, setMockMode] = useState(false)
+  const [expandedSections, setExpandedSections] = useState<Set<string>>(() => {
+    if (typeof window !== "undefined") {
+      const savedSections = localStorage.getItem("adminSidebarSections")
+      if (savedSections) {
+        try {
+          return new Set(JSON.parse(savedSections))
+        } catch {
+          return new Set(["general", "myHotel"])
+        }
+      }
+    }
+    return new Set(["general", "myHotel"])
+  })
+  
   const pathname = usePathname()
   const { t, language, setLanguage } = useLanguage()
 
-  useEffect(() => {
-    setIsLoaded(true)
-  }, [])
-
-  // Cargar estado del sidebar desde localStorage - solo una vez
-  useEffect(() => {
-    const savedSections = localStorage.getItem("adminSidebarSections")
-    if (savedSections) {
-      try {
-        setExpandedSections(new Set(JSON.parse(savedSections)))
-      } catch {
-        setExpandedSections(new Set(["general", "spaces"]))
-      }
-    } else {
-      setExpandedSections(new Set(["general", "spaces"]))
-    }
-    setIsLoaded(true)
-  }, [])
-
   // Guardar estado cuando cambia - con debounce
   useEffect(() => {
-    if (isLoaded) {
-      const timer = setTimeout(() => {
-        localStorage.setItem("adminSidebarSections", JSON.stringify(Array.from(expandedSections)))
-      }, 300)
-      return () => clearTimeout(timer)
-    }
-  }, [expandedSections, isLoaded])
+    const timer = setTimeout(() => {
+      localStorage.setItem("adminSidebarSections", JSON.stringify(Array.from(expandedSections)))
+    }, 300)
+    return () => clearTimeout(timer)
+  }, [expandedSections])
 
   // Ocultar sidebar en la página de selección de establecimiento
   const hideSidebar = pathname === '/admin/select-establishment'
@@ -74,27 +65,14 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   // Detectar si estamos en modo agentico
   const isAgenticoMode = pathname === '/admin/agentico'
   
-  // Clase de fondo dinámico del sidebar
-  const sidebarBgClass = isAgenticoMode 
-    ? "bg-gradient-to-br from-purple-950 via-slate-950 to-slate-950"
-    : "bg-gradient-to-b from-gray-900 to-black"
-
-  const languages = [
-    { code: "es", name: "Español", label: "ES" },
-    { code: "en", name: "English", label: "EN" },
-    { code: "pt", name: "Português", label: "PT" },
-    { code: "fr", name: "Français", label: "FR" },
-  ]
-
-  const navSections = [
+  // Memoizar navSections para evitar recreación innecesaria
+  const navSections = useMemo(() => [
     {
       id: "general",
       title: t("admin.general"),
       items: [
         { href: "/admin/home", label: t("admin.home"), icon: Home },
         { href: "/admin/dashboard", label: t("admin.controlDashboard"), icon: BarChart3 },
-        // { href: "/admin", label: t("admin.dashboard"), icon: BarChart3 },
-        // { href: "/admin/sales-assistant", label: t("admin.salesAssistant"), icon: TrendingUp },
       ],
     },
     {
@@ -111,8 +89,6 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       title: t("admin.communication"),
       items: [
         { href: "/admin/clients", label: t("admin.clients"), icon: Users },
-        // { href: "/admin/notifications", label: t("admin.notifications"), icon: Bell },
-        // { href: "/admin/recommendations", label: t("admin.recommendations"), icon: Compass },
       ],
     },
     {
@@ -123,6 +99,13 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         { href: "/admin/settings", label: t("admin.settings"), icon: Settings },
       ],
     },
+  ], [t])
+
+  const languages = [
+    { code: "es", name: "Español", label: "ES" },
+    { code: "en", name: "English", label: "EN" },
+    { code: "pt", name: "Português", label: "PT" },
+    { code: "fr", name: "Français", label: "FR" },
   ]
 
   const toggleSection = (sectionId: string) => {
@@ -145,7 +128,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           } : { backgroundColor: "#034AAE" }}
         >
           <div className="p-4 border-b border-white/10 flex items-center justify-between">
-            {sidebarOpen && isLoaded && <h2 className="font-bold text-lg text-white">{t("admin.adminPanel")}</h2>}
+            {sidebarOpen && <h2 className="font-bold text-lg text-white">{t("admin.adminPanel")}</h2>}
             <Button
               variant="ghost"
               size="icon"
@@ -157,7 +140,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           </div>
 
           <nav className="flex-1 p-2 space-y-2 overflow-y-auto">
-            {isLoaded && navSections.map((section) => (
+            {navSections.map((section) => (
               <div key={section.id}>
                 {sidebarOpen ? (
                   <>
@@ -234,34 +217,32 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
               </div>
               
               {/* Organization Circle */}
-              {isLoaded && (
-                <>
-                  <Link
-                    href="/admin/select-establishment"
-                    className="relative group w-10 h-10 rounded-full bg-white/20 hover:bg-white/30 text-white flex items-center justify-center transition-all shrink-0"
-                    title={t("admin.accommodations")}
-                  >
-                    <Hotel className="w-5 h-5" />
-                    <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-1.5 bg-gray-900 text-white text-xs rounded pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
-                      {t("admin.accommodations")}
-                    </div>
-                  </Link>
-                  <Link
-                    href="/"
-                    className="relative group w-10 h-10 rounded-full bg-white/20 hover:bg-white/30 text-white flex items-center justify-center transition-all shrink-0"
-                    title={t("admin.logout")}
-                  >
-                    <LogOut className="w-5 h-5" />
-                    <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-1.5 bg-gray-900 text-white text-xs rounded pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
-                      {t("admin.logout")}
-                    </div>
-                  </Link>
-                </>
-              )}
+              <>
+                <Link
+                  href="/admin/select-establishment"
+                  className="relative group w-10 h-10 rounded-full bg-white/20 hover:bg-white/30 text-white flex items-center justify-center transition-all shrink-0"
+                  title={t("admin.accommodations")}
+                >
+                  <Hotel className="w-5 h-5" />
+                  <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-1.5 bg-gray-900 text-white text-xs rounded pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
+                    {t("admin.accommodations")}
+                  </div>
+                </Link>
+                <Link
+                  href="/"
+                  className="relative group w-10 h-10 rounded-full bg-white/20 hover:bg-white/30 text-white flex items-center justify-center transition-all shrink-0"
+                  title={t("admin.logout")}
+                >
+                  <LogOut className="w-5 h-5" />
+                  <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-1.5 bg-gray-900 text-white text-xs rounded pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
+                    {t("admin.logout")}
+                  </div>
+                </Link>
+              </>
             </div>
           </div>
 
-          {sidebarOpen && isLoaded && (
+          {sidebarOpen && (
             <div className="p-2 border-t border-white/10">
               <div className="flex items-center gap-2">
                 <Globe className="w-4 h-4 text-white/70 shrink-0" />
