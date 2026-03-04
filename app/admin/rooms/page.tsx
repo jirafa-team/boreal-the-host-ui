@@ -564,16 +564,16 @@ export default function RoomsManagement() {
                             }} 
                           />
                         </div>
-                      <button 
-                        onClick={(e) => {
-                          e.stopPropagation()
-                          // TODO: Add guest detail modal or navigation here
-                        }}
-                        className="text-sm font-medium text-foreground hover:text-primary hover:underline cursor-pointer transition-colors"
-                      >
-                        {room.guest}
-                      </button>
-                    </div>
+                        <button 
+                          onClick={(e) => {
+                            e.stopPropagation()
+                            // TODO: Add guest detail modal or navigation here
+                          }}
+                          className="text-sm font-medium text-foreground hover:text-primary hover:underline cursor-pointer transition-colors"
+                        >
+                          {room.guest}
+                        </button>
+                      </div>
                     {room.checkIn && room.checkOut && (
                       <div className="flex items-center gap-2 mt-2 text-xs">
                         <div 
