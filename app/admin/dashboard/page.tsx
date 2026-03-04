@@ -835,6 +835,17 @@ export default function DashboardControl() {
                           )}
                         </div>
                       </div>
+                      <div>
+                        <Label htmlFor="people-count">Cantidad de Personas</Label>
+                        <Input 
+                          id="people-count"
+                          type="number"
+                          min="1"
+                          max="10"
+                          defaultValue="1"
+                          placeholder="Número de personas"
+                        />
+                      </div>
                       <div className="grid grid-cols-2 gap-4">
                         <div>
                           <Label htmlFor="check-in">Check-in</Label>
