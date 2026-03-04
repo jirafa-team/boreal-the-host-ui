@@ -4,6 +4,10 @@ export const translations = {
       continue: "Continuar",
       cancel: "Cancelar",
       logout: "Cerrar sesión",
+      back: "Atrás",
+      profile: "Mi Perfil",
+      email: "Email",
+      appVersion: "Versión de la aplicación",
     },
     login: {
       welcome: "Bienvenido a TheHost",
@@ -548,6 +552,10 @@ export const translations = {
       continue: "Continue",
       cancel: "Cancel",
       logout: "Logout",
+      back: "Back",
+      profile: "My Profile",
+      email: "Email",
+      appVersion: "App Version",
     },
     login: {
       welcome: "Welcome to TheHost",
@@ -1073,6 +1081,10 @@ export const translations = {
       continue: "Continuar",
       cancel: "Cancelar",
       logout: "Sair",
+      back: "Voltar",
+      profile: "Meu Perfil",
+      email: "Email",
+      appVersion: "Versão do Aplicativo",
     },
     login: {
       welcome: "Bem-vindo ao TheHost",
