@@ -207,6 +207,17 @@ export default function DashboardControl() {
     scheduledDate: "",
     scheduledTime: "",
   })
+  const [dialogOpen, setDialogOpen] = useState(false)
+  const [clientSuggestions, setClientSuggestions] = useState<string[]>([])
+  const [showClientSuggestions, setShowClientSuggestions] = useState(false)
+  const [newBooking, setNewBooking] = useState({
+    facilityId: "",
+    clientName: "",
+    clientRoom: "",
+    time: "",
+    duration: 60,
+    people: 1,
+  })
 
   const mockFacilities: Facility[] = [
     { id: "1", name: "Gimnasio", type: "fitness", capacity: 15, icon: Dumbbell, color: "bg-orange-500", startTime: "06:00", endTime: "22:00" },
@@ -539,6 +550,44 @@ export default function DashboardControl() {
         scheduledDate: "",
         scheduledTime: "",
       })
+    }
+  }
+
+  const handleClientNameChange = (value: string) => {
+    setNewBooking({ ...newBooking, clientName: value })
+    if (value.length > 0) {
+      const uniqueClients = Array.from(new Set(bookings.map((b) => b.clientName)))
+      const filtered = uniqueClients.filter((client) =>
+        client.toLowerCase().includes(value.toLowerCase())
+      )
+      setClientSuggestions(filtered)
+      setShowClientSuggestions(true)
+    } else {
+      setShowClientSuggestions(false)
+    }
+  }
+
+  const handleSelectClient = (clientName: string) => {
+    setNewBooking({ ...newBooking, clientName })
+    setShowClientSuggestions(false)
+    // Auto-fill room based on client
+    const clientBooking = bookings.find((b) => b.clientName === clientName)
+    if (clientBooking) {
+      setNewBooking((prev) => ({ ...prev, clientRoom: clientBooking.clientRoom }))
+    }
+  }
+
+  const handleAddBooking = () => {
+    if (newBooking.facilityId && newBooking.clientName && newBooking.time) {
+      setBookings([
+        ...bookings,
+        {
+          ...newBooking,
+          status: "confirmed",
+        },
+      ])
+      setNewBooking({ facilityId: "", clientName: "", clientRoom: "", time: "", duration: 60, people: 1 })
+      setDialogOpen(false)
     }
   }
 
@@ -1055,6 +1104,154 @@ export default function DashboardControl() {
       {/* Facilities Timeline Section */}
       {(activeTab === "facilities") && (
         <div className="px-8 py-6">
+          <div className="mb-4 flex justify-end">
+            <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+              <DialogTrigger asChild>
+                <button 
+                  className="relative group w-10 h-10 rounded-full text-white flex items-center justify-center transition-all shadow-md hover:shadow-lg"
+                  style={{ backgroundColor: "#1557F6" }}
+                  title="Nueva Reserva"
+                >
+                  <div className="relative">
+                    <Calendar className="w-5 h-5" />
+                    <span className="absolute -top-1 -right-1 text-white text-xs font-bold w-4 h-4 rounded-full flex items-center justify-center" style={{fontSize: '10px', backgroundColor: "#1557F6"}}>+</span>
+                  </div>
+                  <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-1.5 bg-gray-900 text-white text-xs rounded pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
+                    Nueva Reserva
+                  </div>
+                </button>
+              </DialogTrigger>
+              <DialogContent className="max-w-lg">
+                <DialogHeader>
+                  <DialogTitle className="text-lg">Reserva Manual</DialogTitle>
+                  <DialogDescription>Crear una nueva reserva para un cliente</DialogDescription>
+                </DialogHeader>
+                <div className="space-y-5">
+                  {/* Facility Selection */}
+                  <div>
+                    <Label htmlFor="facility" className="text-sm font-medium mb-2 block">Amenity</Label>
+                    <Select
+                      value={newBooking.facilityId}
+                      onValueChange={(value) => setNewBooking({ ...newBooking, facilityId: value })}
+                    >
+                      <SelectTrigger className="h-11">
+                        <SelectValue placeholder="Selecciona un amenity" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {facilities.map((facility) => (
+                          <SelectItem key={facility.id} value={facility.id}>
+                            {facility.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  {/* Client Name with Autocomplete */}
+                  <div>
+                    <Label htmlFor="clientName" className="text-sm font-medium mb-2 block">Nombre del Cliente</Label>
+                    <div className="relative">
+                      <Input
+                        id="clientName"
+                        value={newBooking.clientName}
+                        onChange={(e) => handleClientNameChange(e.target.value)}
+                        placeholder="Comienza a escribir el nombre"
+                        className="h-11"
+                      />
+                      {showClientSuggestions && clientSuggestions.length > 0 && (
+                        <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-300 rounded-lg shadow-lg z-50">
+                          {clientSuggestions.map((client) => (
+                            <button
+                              key={client}
+                              onClick={() => handleSelectClient(client)}
+                              className="w-full text-left px-3 py-2 hover:bg-gray-100 border-b last:border-b-0 text-sm"
+                            >
+                              {client}
+                            </button>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Room (Auto-filled) */}
+                  <div>
+                    <Label htmlFor="clientRoom" className="text-sm font-medium mb-2 block">Habitación</Label>
+                    <Input
+                      id="clientRoom"
+                      value={newBooking.clientRoom}
+                      onChange={(e) => setNewBooking({ ...newBooking, clientRoom: e.target.value })}
+                      placeholder="Auto-llenado por cliente"
+                      className="h-11 bg-gray-50"
+                    />
+                  </div>
+
+                  {/* Number of People */}
+                  <div>
+                    <Label className="text-sm font-medium mb-2 block">Número de Personas</Label>
+                    <div className="flex items-center gap-3 bg-gray-50 p-3 rounded-lg">
+                      <button
+                        onClick={() => setNewBooking({ ...newBooking, people: Math.max(1, newBooking.people - 1) })}
+                        className="w-9 h-9 rounded-lg bg-white border border-gray-300 flex items-center justify-center hover:bg-gray-100 font-semibold"
+                      >
+                        −
+                      </button>
+                      <span className="text-lg font-bold w-12 text-center">{newBooking.people}</span>
+                      <button
+                        onClick={() => setNewBooking({ ...newBooking, people: newBooking.people + 1 })}
+                        className="w-9 h-9 rounded-lg bg-white border border-gray-300 flex items-center justify-center hover:bg-gray-100 font-semibold"
+                      >
+                        +
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Start Time */}
+                  <div>
+                    <Label htmlFor="time" className="text-sm font-medium mb-2 block">Hora de Inicio</Label>
+                    <Select
+                      value={newBooking.time}
+                      onValueChange={(value) => setNewBooking({ ...newBooking, time: value })}
+                    >
+                      <SelectTrigger className="h-11">
+                        <SelectValue placeholder="Selecciona hora" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {timeSlotsArray.map((slot) => (
+                          <SelectItem key={slot} value={slot}>
+                            {slot}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  {/* Duration */}
+                  <div>
+                    <Label htmlFor="duration" className="text-sm font-medium mb-2 block">Duración</Label>
+                    <Select
+                      value={newBooking.duration.toString()}
+                      onValueChange={(value) => setNewBooking({ ...newBooking, duration: Number.parseInt(value) })}
+                    >
+                      <SelectTrigger className="h-11">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="60">1 Hora</SelectItem>
+                        <SelectItem value="120">2 Horas</SelectItem>
+                        <SelectItem value="180">3 Horas</SelectItem>
+                        <SelectItem value="240">4 Horas</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <Button onClick={handleAddBooking} className="w-full h-11 font-medium">
+                    Crear Reserva
+                  </Button>
+                </div>
+              </DialogContent>
+            </Dialog>
+          </div>
           <div className="bg-card rounded-lg border border-border overflow-hidden">
             <div className="overflow-x-auto">
               <div style={{ width: "fit-content", minWidth: "100%" }}>

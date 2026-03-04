@@ -72,20 +72,10 @@ export default function FacilitiesPage() {
   const [selectedDate, setSelectedDate] = React.useState(new Date().toISOString().split('T')[0])
   const [currentDate, setCurrentDate] = React.useState(new Date())
   const [timelineMode, setTimelineMode] = React.useState<"week" | "month">("week")
-  const [newBooking, setNewBooking] = React.useState({
-    facilityId: "",
-    clientName: "",
-    clientRoom: "",
-    time: "",
-    duration: 60,
-    people: 1,
-  })
   const [dialogOpen, setDialogOpen] = React.useState(false)
   const [addFacilityOpen, setAddFacilityOpen] = React.useState(false)
   const [editingFacility, setEditingFacility] = React.useState<Facility | null>(null)
   const [editDialogOpen, setEditDialogOpen] = React.useState(false)
-  const [clientSuggestions, setClientSuggestions] = React.useState<string[]>([])
-  const [showClientSuggestions, setShowClientSuggestions] = React.useState(false)
   const [selectedSlotBookings, setSelectedSlotBookings] = React.useState<Booking[]>([])
   const [bookingsDetailOpen, setBookingsDetailOpen] = React.useState(false)
 
@@ -377,154 +367,6 @@ export default function FacilitiesPage() {
                       {t("admin.addAmenity")}
                     </Button>
                   </form>
-                </DialogContent>
-              </Dialog>
-              )}
-              {viewMode === "timeline" && (
-              <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-                <DialogTrigger asChild>
-                  <button 
-                    className="relative group w-10 h-10 rounded-full text-white flex items-center justify-center transition-all shadow-md hover:shadow-lg"
-                    style={{ backgroundColor: "#1557F6" }}
-                    title={t("admin.addReservation")}
-                  >
-                    <div className="relative">
-                      <CalendarIcon className="w-5 h-5" />
-                      <span className="absolute -top-1 -right-1 text-white text-xs font-bold w-4 h-4 rounded-full flex items-center justify-center" style={{fontSize: '10px', backgroundColor: "#1557F6"}}>+</span>
-                    </div>
-                    <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-1.5 bg-gray-900 text-white text-xs rounded pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
-                      {t("admin.newReservation")}
-                    </div>
-                  </button>
-                </DialogTrigger>
-                <DialogContent className="max-w-lg">
-                  <DialogHeader>
-                    <DialogTitle className="text-lg">{t("admin.manualReservation")}</DialogTitle>
-                    <DialogDescription>{t("admin.createReservationForClient")}</DialogDescription>
-                  </DialogHeader>
-                  <div className="space-y-5">
-                    {/* Facility Selection */}
-                    <div>
-                      <Label htmlFor="facility" className="text-sm font-medium mb-2 block">{t("admin.facility")}</Label>
-                      <Select
-                        value={newBooking.facilityId}
-                        onValueChange={(value) => setNewBooking({ ...newBooking, facilityId: value })}
-                      >
-                        <SelectTrigger className="h-11">
-                          <SelectValue placeholder={t("admin.selectFacility")} />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {facilities.map((facility) => (
-                            <SelectItem key={facility.id} value={facility.id}>
-                              {facility.name}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </div>
-
-                    {/* Client Name with Autocomplete */}
-                    <div>
-                      <Label htmlFor="clientName" className="text-sm font-medium mb-2 block">{t("admin.clientName")}</Label>
-                      <div className="relative">
-                        <Input
-                          id="clientName"
-                          value={newBooking.clientName}
-                          onChange={(e) => handleClientNameChange(e.target.value)}
-                          placeholder={t("admin.startTypingName")}
-                          className="h-11"
-                        />
-                        {showClientSuggestions && clientSuggestions.length > 0 && (
-                          <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-300 rounded-lg shadow-lg z-50">
-                            {clientSuggestions.map((client) => (
-                              <button
-                                key={client}
-                                onClick={() => handleSelectClient(client)}
-                                className="w-full text-left px-3 py-2 hover:bg-gray-100 border-b last:border-b-0 text-sm"
-                              >
-                                {client}
-                              </button>
-                            ))}
-                          </div>
-                        )}
-                      </div>
-                    </div>
-
-                    {/* Room (Auto-filled) */}
-                    <div>
-                      <Label htmlFor="clientRoom" className="text-sm font-medium mb-2 block">{t("admin.room")}</Label>
-                      <Input
-                        id="clientRoom"
-                        value={newBooking.clientRoom}
-                        onChange={(e) => setNewBooking({ ...newBooking, clientRoom: e.target.value })}
-                        placeholder={t("admin.autoFilledByClient")}
-                        className="h-11 bg-gray-50"
-                      />
-                    </div>
-
-                    {/* Number of People */}
-                    <div>
-                      <Label className="text-sm font-medium mb-2 block">{t("admin.numberOfPeople")}</Label>
-                      <div className="flex items-center gap-3 bg-gray-50 p-3 rounded-lg">
-                        <button
-                          onClick={() => setNewBooking({ ...newBooking, people: Math.max(1, newBooking.people - 1) })}
-                          className="w-9 h-9 rounded-lg bg-white border border-gray-300 flex items-center justify-center hover:bg-gray-100 font-semibold"
-                        >
-                          −
-                        </button>
-                        <span className="text-lg font-bold w-12 text-center">{newBooking.people}</span>
-                        <button
-                          onClick={() => setNewBooking({ ...newBooking, people: newBooking.people + 1 })}
-                          className="w-9 h-9 rounded-lg bg-white border border-gray-300 flex items-center justify-center hover:bg-gray-100 font-semibold"
-                        >
-                          +
-                </button>
-              </div>
-            </div>
-
-                    {/* Start Time */}
-                    <div>
-                      <Label htmlFor="time" className="text-sm font-medium mb-2 block">{t("admin.startTime")}</Label>
-                      <Select
-                        value={newBooking.time}
-                        onValueChange={(value) => setNewBooking({ ...newBooking, time: value })}
-                      >
-                        <SelectTrigger className="h-11">
-                          <SelectValue placeholder={t("admin.selectTime")} />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {timeSlots.map((slot) => (
-                            <SelectItem key={slot} value={slot}>
-                              {slot}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </div>
-
-                    {/* Duration */}
-                    <div>
-                      <Label htmlFor="duration" className="text-sm font-medium mb-2 block">{t("admin.duration")}</Label>
-                      <Select
-                        value={newBooking.duration.toString()}
-                        onValueChange={(value) => setNewBooking({ ...newBooking, duration: Number.parseInt(value) })}
-                      >
-                        <SelectTrigger className="h-11">
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="60">{t("admin.oneHour")}</SelectItem>
-                          <SelectItem value="120">{t("admin.twoHours")}</SelectItem>
-                          <SelectItem value="180">{t("admin.threeHours")}</SelectItem>
-                          <SelectItem value="240">{t("admin.fourHours")}</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-
-                    <Button onClick={handleAddBooking} className="w-full h-11 font-medium">
-                      {t("admin.createReservation")}
-                    </Button>
-                  </div>
                 </DialogContent>
               </Dialog>
               )}
