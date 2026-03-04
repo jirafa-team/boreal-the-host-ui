@@ -19,6 +19,8 @@ export default function HomePage() {
   const [adminPassword, setAdminPassword] = useState("")
   const [isLoading, setIsLoading] = useState(false)
   const [showRegister, setShowRegister] = useState(false)
+  const [registerFirstName, setRegisterFirstName] = useState("")
+  const [registerLastName, setRegisterLastName] = useState("")
   const [registerEmail, setRegisterEmail] = useState("")
   const [registerPassword, setRegisterPassword] = useState("")
   const [registerConfirmPassword, setRegisterConfirmPassword] = useState("")
@@ -85,6 +87,18 @@ export default function HomePage() {
   const handleRegister = (e: React.FormEvent) => {
     e.preventDefault()
 
+    // Validación de nombre vacío
+    if (!registerFirstName.trim()) {
+      alert(t("register.firstNameMissing"))
+      return
+    }
+
+    // Validación de apellido vacío
+    if (!registerLastName.trim()) {
+      alert(t("register.lastNameMissing"))
+      return
+    }
+
     // Validación de email vacío
     if (!registerEmail.trim()) {
       alert(t("register.emailMissing"))
@@ -124,7 +138,7 @@ export default function HomePage() {
     }
 
     // Registro exitoso
-    users.push({ email: registerEmail, password: registerPassword })
+    users.push({ firstName: registerFirstName, lastName: registerLastName, email: registerEmail, password: registerPassword })
     localStorage.setItem("users", JSON.stringify(users))
 
     // Guardar usuario logueado
@@ -314,6 +328,29 @@ export default function HomePage() {
                   <h2 className="text-2xl font-bold text-gray-900 text-center">{t("register.registerTitle")}</h2>
                   
                   <form onSubmit={handleRegister} className="space-y-4">
+                    <div className="grid grid-cols-2 gap-3">
+                      <div className="space-y-2">
+                        <label className="text-sm font-medium text-gray-700">{t("register.firstName")}</label>
+                        <Input
+                          type="text"
+                          placeholder={t("register.enterFirstName")}
+                          value={registerFirstName}
+                          onChange={(e) => setRegisterFirstName(e.target.value)}
+                          className="w-full h-12 px-4 border-2 border-gray-200 focus:border-blue-500 rounded-xl"
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <label className="text-sm font-medium text-gray-700">{t("register.lastName")}</label>
+                        <Input
+                          type="text"
+                          placeholder={t("register.enterLastName")}
+                          value={registerLastName}
+                          onChange={(e) => setRegisterLastName(e.target.value)}
+                          className="w-full h-12 px-4 border-2 border-gray-200 focus:border-blue-500 rounded-xl"
+                        />
+                      </div>
+                    </div>
+
                     <div className="space-y-2">
                       <label className="text-sm font-medium text-gray-700">{t("register.email")}</label>
                       <Input
@@ -350,7 +387,7 @@ export default function HomePage() {
                     <Button
                       type="submit"
                       className="w-full h-12 bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 text-white rounded-xl font-semibold transition-all shadow-md"
-                      disabled={!registerEmail || !registerPassword || !registerConfirmPassword}
+                      disabled={!registerFirstName || !registerLastName || !registerEmail || !registerPassword || !registerConfirmPassword}
                     >
                       {t("register.createAccount")}
                     </Button>
@@ -359,6 +396,8 @@ export default function HomePage() {
                       type="button"
                       onClick={() => {
                         setShowRegister(false)
+                        setRegisterFirstName("")
+                        setRegisterLastName("")
                         setRegisterEmail("")
                         setRegisterPassword("")
                         setRegisterConfirmPassword("")
