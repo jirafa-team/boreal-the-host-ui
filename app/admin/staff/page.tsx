@@ -223,15 +223,30 @@ export default function StaffManagement() {
             </button>
           </div>
           <Dialog open={showAddDialog} onOpenChange={setShowAddDialog}>
-            <div className="flex gap-2">
-              <Button onClick={() => setShowAddDialog(true)} className="bg-blue-600 hover:bg-blue-700">
-                <Plus className="w-4 h-4 mr-2" />
-                {t("admin.addStaff")}
-              </Button>
-              <Button onClick={() => setShowMaintenanceActivityDialog(true)} className="bg-amber-600 hover:bg-amber-700">
-                <CheckSquare className="w-4 h-4 mr-2" />
-                {t("admin.createActivity")}
-              </Button>
+            <div className="flex gap-3">
+              <DialogTrigger asChild>
+                <button
+                  className="flex items-center justify-center w-10 h-10 rounded-full text-white shadow-md hover:shadow-lg transition-all duration-300 hover:scale-110 group relative"
+                  style={{ backgroundColor: "#1557F6" }}
+                  title={t("admin.addStaff")}
+                >
+                  <Plus className="w-5 h-5" />
+                  <span className="absolute top-full mt-2 px-2 py-1 bg-gray-900 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap">
+                    {t("admin.addStaff")}
+                  </span>
+                </button>
+              </DialogTrigger>
+              <button
+                onClick={() => setShowMaintenanceActivityDialog(true)}
+                className="flex items-center justify-center w-10 h-10 rounded-full text-white shadow-md hover:shadow-lg transition-all duration-300 hover:scale-110 group relative"
+                style={{ backgroundColor: "#1557F6" }}
+                title={t("admin.createActivity")}
+              >
+                <CheckSquare className="w-5 h-5" />
+                <span className="absolute top-full mt-2 px-2 py-1 bg-gray-900 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap">
+                  {t("admin.createActivity")}
+                </span>
+              </button>
             </div>
             <DialogContent className="max-w-md">
               <DialogHeader>
