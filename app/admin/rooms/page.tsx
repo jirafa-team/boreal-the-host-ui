@@ -667,7 +667,7 @@ export default function RoomsManagement() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">{t("admin.roomType")}</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">{t("admin.type")}</label>
                 <select
                   value={newRoom.type}
                   onChange={(e) => setNewRoom({ ...newRoom, type: e.target.value })}
@@ -676,9 +676,23 @@ export default function RoomsManagement() {
                   <option>Individual</option>
                   <option>Doble</option>
                   <option>Suite</option>
+                  <option>Familiar</option>
                   <option>Deluxe</option>
                   <option>Presidencial</option>
                 </select>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Capacidad (Personas)</label>
+                <input
+                  type="number"
+                  min="1"
+                  max="10"
+                  value={newRoom.capacity}
+                  onChange={(e) => setNewRoom({ ...newRoom, capacity: parseInt(e.target.value) || 1 })}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  placeholder="Cantidad de personas"
+                />
               </div>
 
               <div>
