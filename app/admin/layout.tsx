@@ -108,7 +108,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     },
     {
       id: "services",
-      title: t("admin.services"),
+      title: t("admin.amenities"),
       items: [
         { href: "/admin/staff", label: t("admin.staff"), icon: Sparkles },
         // { href: "/admin/events", label: t("admin.events"), icon: Calendar },
