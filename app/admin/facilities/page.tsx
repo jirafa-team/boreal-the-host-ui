@@ -262,12 +262,9 @@ export default function FacilitiesPage() {
   }
 
   const navigateDate = (direction: "prev" | "next") => {
-    const newDate = new Date(currentDate)
-    if (timelineMode === "week") {
-      newDate.setDate(newDate.getDate() + (direction === "next" ? 7 : -7))
-    } else {
-      newDate.setMonth(newDate.getMonth() + (direction === "next" ? 1 : -1))
-    }
+    // No longer needed - removed with timeline
+  }
+
     setCurrentDate(newDate)
   }
 
@@ -295,20 +292,7 @@ export default function FacilitiesPage() {
                 >
                   Lista
                 </button>
-                <button
-                  onClick={() => setViewMode("timeline")}
-                  className={`px-5 py-2 rounded-md font-medium text-sm transition-all ${
-                    viewMode === "timeline"
-                      ? "text-white shadow-md"
-                      : "text-gray-700 hover:text-gray-900"
-                  }`}
-                  style={viewMode === "timeline" ? { backgroundColor: "#394a63" } : {}}
-                >
-                  Timeline
-                </button>
               </div>
-              {viewMode === "list" && (
-              <Dialog open={addFacilityOpen} onOpenChange={setAddFacilityOpen}>
                 <DialogTrigger asChild>
                   <button 
                     className="flex items-center justify-center w-10 h-10 rounded-full text-white shadow-md hover:shadow-lg transition-all duration-300 hover:scale-110 group relative"
@@ -474,251 +458,180 @@ export default function FacilitiesPage() {
             </div>
           </DialogContent>
         </Dialog>
-        {viewMode === "list" && (
-          <>
-            {/* Date Filter for List View */}
-            <div className="mb-6 p-4 bg-white rounded-lg border border-gray-200">
-              <div className="flex items-center gap-2">
-                <label className="text-sm font-medium text-foreground">
-                  {language === 'es' || language === 'pt' ? 'Fecha:' : 'Date:'}
-                </label>
-                <div className="relative">
-                  <input
-                    type="date"
-                    value={selectedDate}
-                    onChange={(e) => setSelectedDate(e.target.value)}
-                    className="absolute inset-0 opacity-0 cursor-pointer w-full h-full"
+        {/* List View */}
+        <div>
+              <Label htmlFor="facility-name" className="text-sm font-medium">{t("admin.amenityName")}</Label>
+              <Input
+                id="facility-name"
+                value={newFacility.name}
+                onChange={(e) => setNewFacility({ ...newFacility, name: e.target.value })}
+                className="mt-2"
+              />
+            </div>
+            <div>
+              <Label htmlFor="facility-type" className="text-sm font-medium">{t("admin.type")}</Label>
+              <Select value={newFacility.type} onValueChange={(value) => setNewFacility({ ...newFacility, type: value as FacilityType })}>
+                <SelectTrigger className="mt-2">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="gym">{t("admin.gym")}</SelectItem>
+                  <SelectItem value="pool">{t("admin.pool")}</SelectItem>
+                  <SelectItem value="spa">{t("admin.spa")}</SelectItem>
+                  <SelectItem value="restaurant">{t("admin.restaurant")}</SelectItem>
+                  <SelectItem value="lounge">{t("admin.lounge")}</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div>
+              <Label htmlFor="facility-capacity" className="text-sm font-medium">{t("admin.capacity")}</Label>
+              <Input
+                id="facility-capacity"
+                type="number"
+                value={newFacility.capacity}
+                onChange={(e) => setNewFacility({ ...newFacility, capacity: Number.parseInt(e.target.value) })}
+                className="mt-2"
+              />
+            </div>
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <Label htmlFor="start-time" className="text-sm font-medium">{t("admin.startTime")}</Label>
+                <Input
+                  id="start-time"
+                  type="time"
+                  value={newFacility.startTime}
+                  onChange={(e) => setNewFacility({ ...newFacility, startTime: e.target.value })}
+                  className="mt-2"
+                />
+              </div>
+              <div>
+                <Label htmlFor="end-time" className="text-sm font-medium">{t("admin.endTime")}</Label>
+                <Input
+                  id="end-time"
+                  type="time"
+                  value={newFacility.endTime}
+                  onChange={(e) => setNewFacility({ ...newFacility, endTime: e.target.value })}
+                  className="mt-2"
+                />
+              </div>
+            </div>
+          </div>
+          <div className="flex justify-end gap-2">
+            <Button variant="outline" onClick={() => setAddFacilityOpen(false)}>
+              {t("admin.cancel")}
+            </Button>
+            <Button onClick={handleAddFacility}>
+              {t("admin.add")}
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Edit Facility Dialog */}
+      <Dialog open={editDialogOpen} onOpenChange={setEditDialogOpen}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>{t("admin.editAmenity")}</DialogTitle>
+          </DialogHeader>
+          {editingFacility && (
+            <div className="space-y-4 py-4">
+              <div>
+                <Label htmlFor="edit-name" className="text-sm font-medium">{t("admin.amenityName")}</Label>
+                <Input
+                  id="edit-name"
+                  value={editingFacility.name}
+                  onChange={(e) => setEditingFacility({ ...editingFacility, name: e.target.value })}
+                  className="mt-2"
+                />
+              </div>
+              <div>
+                <Label htmlFor="edit-type" className="text-sm font-medium">{t("admin.type")}</Label>
+                <Select value={editingFacility.type} onValueChange={(value) => setEditingFacility({ ...editingFacility, type: value as FacilityType })}>
+                  <SelectTrigger className="mt-2">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="gym">{t("admin.gym")}</SelectItem>
+                    <SelectItem value="pool">{t("admin.pool")}</SelectItem>
+                    <SelectItem value="spa">{t("admin.spa")}</SelectItem>
+                    <SelectItem value="restaurant">{t("admin.restaurant")}</SelectItem>
+                    <SelectItem value="lounge">{t("admin.lounge")}</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div>
+                <Label htmlFor="edit-capacity" className="text-sm font-medium">{t("admin.capacity")}</Label>
+                <Input
+                  id="edit-capacity"
+                  type="number"
+                  value={editingFacility.capacity}
+                  onChange={(e) => setEditingFacility({ ...editingFacility, capacity: Number.parseInt(e.target.value) })}
+                  className="mt-2"
+                />
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <Label htmlFor="edit-start-time" className="text-sm font-medium">{t("admin.startTime")}</Label>
+                  <Input
+                    id="edit-start-time"
+                    type="time"
+                    value={editingFacility.startTime}
+                    onChange={(e) => setEditingFacility({ ...editingFacility, startTime: e.target.value })}
+                    className="mt-2"
                   />
-                  <div className="pointer-events-none flex items-center gap-2 px-3 py-2 border border-gray-300 rounded-lg bg-white w-40">
-                    <Calendar className="w-4 h-4 text-muted-foreground" />
-                    <span className="text-sm">{convertISOToLocaleFormat(selectedDate)}</span>
-                  </div>
+                </div>
+                <div>
+                  <Label htmlFor="edit-end-time" className="text-sm font-medium">{t("admin.endTime")}</Label>
+                  <Input
+                    id="edit-end-time"
+                    type="time"
+                    value={editingFacility.endTime}
+                    onChange={(e) => setEditingFacility({ ...editingFacility, endTime: e.target.value })}
+                    className="mt-2"
+                  />
                 </div>
               </div>
             </div>
-            
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {facilities.map((facility) => {
-              const Icon = facility.icon
-              const facilityBookings = bookings.filter((b) => b.facilityId === facility.id)
-              return (
-                <Card key={facility.id} className="p-6 hover:shadow-lg transition-shadow relative">
-                  <div className="flex items-start gap-4 mb-4">
-                    <div className={`${facility.color} p-3 rounded-lg shrink-0`}>
-                      <Icon className="w-6 h-6 text-white" />
-                    </div>
-                    <div className="flex-1">
-                      <h3 className="font-semibold text-lg">{facility.name}</h3>
-                      <p className="text-sm text-muted-foreground capitalize">{facility.type}</p>
-                    </div>
-                  </div>
-
-                  {/* Top Right Corner - Time Slot and Capacity */}
-                  <div className="absolute top-6 right-6 space-y-2 flex flex-col items-end">
-                    {/* Time Slot - Elegant Dark Pink Chip */}
-                    <Badge className="bg-sky-100 hover:bg-sky-200 text-black text-xs font-bold px-3 py-1.5 shrink-0 border-sky-200">
-                      <Clock className="w-3 h-3 mr-1" />
-                      {facility.startTime} - {facility.endTime}
-                    </Badge>
-
-                    {/* Capacity with Person Icon */}
-                    <div className="flex items-center gap-2 text-sm">
-                      <Users className="w-4 h-4 text-muted-foreground" />
-                      <span className="font-medium text-foreground">
-                        {facility.capacity}
-                      </span>
-                    </div>
-                  </div>
-
-                  <Button
-                    onClick={() => handleEditFacility(facility)}
-                    className="w-full px-3 py-2 text-sm font-medium rounded-lg bg-primary/10 text-primary hover:bg-primary/20 transition-colors"
-                  >
-                    {t("admin.edit")}
-                  </Button>
-                </Card>
-              )
-            })}
+          )}
+          <div className="flex justify-end gap-2">
+            <Button variant="outline" onClick={() => setEditDialogOpen(false)}>
+              {t("admin.cancel")}
+            </Button>
+            <Button onClick={handleEditFacilityUpdate}>
+              {t("admin.update")}
+            </Button>
           </div>
-          </>
-        )}
+        </DialogContent>
+      </Dialog>
 
-        {/* Timeline View */}
-        {viewMode === "timeline" && (
-          <>
-            {/* Date Navigation for Timeline */}
-            <div className="mb-6 flex gap-2 justify-end items-center flex-wrap">
-                <button
-                  onClick={() => navigateDate("prev")}
-                  className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
-                  title={language === 'es' || language === 'pt' ? "Fecha anterior" : "Previous date"}
-                >
-                  <ChevronLeft className="w-5 h-5" />
-                </button>
-                <div className="relative">
-                  <input
-                    type="date"
-                    value={currentDate.toISOString().split('T')[0]}
-                    onChange={(e) => setCurrentDate(new Date(e.target.value))}
-                    className="absolute inset-0 opacity-0 cursor-pointer w-full h-full"
-                  />
-                  <div className="pointer-events-none flex items-center gap-2 px-3 py-2 border border-gray-300 rounded-lg bg-white w-40">
-                    <Calendar className="w-4 h-4 text-muted-foreground" />
-                    <span className="text-sm">{convertISOToLocaleFormat(currentDate.toISOString().split('T')[0])}</span>
+      {/* Bookings Detail Dialog */}
+      <Dialog open={bookingsDetailOpen} onOpenChange={setBookingsDetailOpen}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>{t("admin.bookings")}</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-3 max-h-96 overflow-y-auto">
+            {selectedBookings.map((booking) => (
+              <Card key={booking.id} className="p-4">
+                <div className="space-y-2">
+                  <p className="font-semibold text-sm">{booking.clientName}</p>
+                  <div className="text-xs text-muted-foreground space-y-1">
+                    <p>{t("admin.room")}: {booking.clientRoom}</p>
+                    <p>{t("admin.startTime")}: {booking.time}</p>
+                    <p>{t("admin.duration")}: {booking.duration} {t("admin.minutes")}</p>
+                    <p className={`font-medium ${booking.status === "confirmed" ? "text-green-600" : "text-amber-600"}`}>
+                      {booking.status === "confirmed" ? t("admin.confirmed") : t("admin.pending")}
+                    </p>
                   </div>
                 </div>
-                <button
-                  onClick={() => navigateDate("next")}
-                  className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
-                  title={language === 'es' || language === 'pt' ? "Fecha siguiente" : "Next date"}
-                >
-                  <ChevronRight className="w-5 h-5" />
-                </button>
-              </div>
-            <div className="bg-card rounded-lg border border-border overflow-hidden">
-            <div className="overflow-x-auto">
-              <div style={{ width: "fit-content", minWidth: "100%" }}>
-                {/* Header con horas */}
-                <div className="flex border-b border-border bg-muted/50 sticky top-0 z-10">
-                  <div className="w-64 p-4 font-semibold border-r border-border bg-muted/50 shrink-0">Facility</div>
-                  {timeSlots.map((slot) => (
-                    <div key={slot} className="w-32 p-3 text-center text-sm font-medium border-r border-border shrink-0">
-                      {slot}
-                    </div>
-                  ))}
-                </div>
-
-                {/* Filas de facilities */}
-                {facilities.map((facility, idx) => {
-                  const Icon = facility.icon
-                  return (
-                    <div key={facility.id} className={`flex ${idx % 2 === 0 ? "bg-background" : "bg-muted/30"}`}>
-                      {/* Info de facility */}
-                      <div className="w-64 p-4 border-r border-border flex items-center gap-3 shrink-0 group relative">
-                        <div className={`${facility.color} p-2 rounded-lg shrink-0`}>
-                          <Icon className="w-5 h-5 text-white" />
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <p className="font-semibold text-sm truncate">{facility.name}</p>
-                          <p className="text-xs text-muted-foreground capitalize">{facility.type}</p>
-                          <p className="text-xs text-muted-foreground mt-0.5">Cap. {facility.capacity}</p>
-                          <p className="text-xs text-muted-foreground mt-0.5">{facility.startTime} - {facility.endTime}</p>
-                        </div>
-                        <Button
-                          onClick={() => handleEditFacility(facility)}
-                          className="absolute right-2 top-2 opacity-0 group-hover:opacity-100 transition-opacity px-2 py-1 text-xs rounded bg-primary/10 text-primary hover:bg-primary/20"
-                        >
-                          Editar
-                        </Button>
-                      </div>
-
-                      <div className="flex">
-                        {timeSlots.map((slot) => {
-                          const bookingAtStart = isBookingStart(facility.id, slot)
-                          const booking = getBookingForSlot(facility.id, slot)
-                          const slotBookings = getBookingsAtSlot(facility.id, slot)
-                          const occupancy = getOccupancyPercentage(facility.id, slot)
-
-                          // Si hay una reserva que empieza en este slot
-                          if (bookingAtStart) {
-                            const durationHours = bookingAtStart.duration / 60
-                            const widthInColumns = durationHours
-
-                            return (
-                              <div
-                                key={slot}
-                                className="relative border-r border-border group shrink-0"
-                                style={{ width: `${widthInColumns * 128}px` }}
-                              >
-                                <div
-                                  className={`absolute inset-2 rounded-lg ${
-                                    bookingAtStart.status === "confirmed"
-                                      ? "bg-gradient-to-br from-green-500/30 to-green-600/20 border-2 border-green-500"
-                                      : "bg-gradient-to-br from-amber-500/30 to-amber-600/20 border-2 border-amber-500"
-                                  } p-3 flex flex-col justify-center hover:shadow-lg transition-all cursor-pointer hover:scale-[1.02] min-h-[72px]`}
-                                  onClick={() => slotBookings.length > 0 && handleShowBookingsDetail(slotBookings)}
-                                >
-                                  {/* Multi-party facilities show only capacity info */}
-                                  {isMultiPartyFacility(facility.type) ? (
-                                    <div className="flex flex-col items-center justify-center gap-2">
-                                      <p className="text-lg font-bold text-foreground">
-                                        {slotBookings.length}/{facility.capacity}
-                                      </p>
-                                      <p className="text-[10px] text-muted-foreground">
-                                        Ocupación: {occupancy}%
-                                      </p>
-                                    </div>
-                                  ) : (
-                                    <>
-                                      <p className="text-sm font-bold truncate text-foreground">
-                                        {slotBookings.length > 1 ? `${slotBookings.length} participantes` : bookingAtStart.clientName}
-                                      </p>
-                                      <p className="text-[10px] text-muted-foreground truncate">
-                                        {slotBookings.length > 1 ? `Ocupación: ${occupancy}%` : `Hab. ${bookingAtStart.clientRoom}`}
-                                      </p>
-                                      <div className="text-[10px] text-muted-foreground font-medium mt-0.5 flex items-center gap-2">
-                                        <span>{bookingAtStart.duration / 60}h</span>
-                                        {slotBookings.length > 0 && (
-                                          <span className="text-xs px-1.5 py-0.5 rounded bg-primary/20 text-primary">
-                                            {slotBookings.length}/{facility.capacity}
-                                          </span>
-                                        )}
-                                      </div>
-                                    </>
-                                  )}
-                                  
-                                  {/* Barra de ocupación */}
-                                  {slotBookings.length > 0 && (
-                                    <div className="mt-2 w-full bg-black/10 rounded-full h-1.5">
-                                      <div
-                                        className={`h-1.5 rounded-full transition-all ${
-                                          occupancy > 80
-                                            ? "bg-red-500"
-                                            : occupancy > 50
-                                              ? "bg-amber-500"
-                                              : "bg-green-500"
-                                        }`}
-                                        style={{ width: `${occupancy}%` }}
-                                      />
-                                    </div>
-                                  )}
-                                </div>
-
-                                {/* Tooltip mejorado */}
-                                <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 hidden group-hover:block z-20">
-                                  <div className="bg-popover border border-border rounded-lg shadow-xl p-4 min-w-[280px]">
-                                    <p className="font-bold text-sm mb-3">Detalles del horario {slot}</p>
-                                    {slotBookings.length > 0 ? (
-                                      <div className="space-y-2">
-                                        <p className="text-xs text-muted-foreground">
-                                          <span className="font-medium">Ocupación:</span> {slotBookings.length}/{facility.capacity} ({occupancy}%)
-                                        </p>
-                                        {slotBookings.length <= 3 ? (
-                                          <div className="space-y-2">
-                                            {slotBookings.map((b, idx) => (
-                                              <div key={idx} className="text-xs text-muted-foreground border-t border-border pt-2">
-                                                <p className="font-medium text-foreground">{b.clientName}</p>
-                                                <p>Hab. {b.clientRoom}</p>
-                                              </div>
-                                            ))}
-                                          </div>
-                                        ) : (
-                                          <Button
-                                            onClick={() => handleShowBookingsDetail(slotBookings)}
-                                            className="mt-2 text-xs text-primary hover:underline font-medium"
-                                          >
-                                            Ver los {slotBookings.length} participantes →
-                                          </Button>
-                                        )}
-                                      </div>
-                                    ) : (
-                                      <p className="text-xs text-muted-foreground">Sin reservas</p>
-                                    )}
-                                  </div>
-                                </div>
-                              </div>
-                            )
-                          }
+              </Card>
+            ))}
+          </div>
+        </DialogContent>
+      </Dialog>
+    </>
+  )
+}
                           // Si hay una reserva que cubre este slot pero no empieza aquí, mostrar barra de ocupación
                           else if (booking) {
                             const slotBookingsAtTime = getBookingsAtSlot(facility.id, slot)
