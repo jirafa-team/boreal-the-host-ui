@@ -122,26 +122,7 @@ export default function FacilitiesPage() {
     return bookings.filter((b) => b.facilityId === facilityId)
   }
 
-  const getOccupancyPercentage = (facilityId: string): number => {
-    const facility = facilities.find((f) => f.id === facilityId)
-    if (!facility) return 0
-    const facilityBookings = getBookingsForFacility(facilityId)
-    return Math.round((facilityBookings.length / facility.capacity) * 100)
-  }
 
-  const getOccupancyColor = (percent: number): string => {
-    if (percent === 0) return "text-gray-500"
-    if (percent <= 33) return "text-green-600"
-    if (percent <= 66) return "text-amber-600"
-    return "text-red-600"
-  }
-
-  const getOccupancyBgColor = (percent: number): string => {
-    if (percent === 0) return "bg-gray-100"
-    if (percent <= 33) return "bg-green-100"
-    if (percent <= 66) return "bg-amber-100"
-    return "bg-red-100"
-  }
 
   const handleShowBookingsDetail = (facilityId: string) => {
     const facilityBookings = getBookingsForFacility(facilityId)
@@ -310,8 +291,6 @@ export default function FacilitiesPage() {
         <div className="grid gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
           {facilities.map((facility) => {
             const Icon = facility.icon
-            const occupancyPercent = getOccupancyPercentage(facility.id)
-            const facilityBookings = getBookingsForFacility(facility.id)
 
             return (
               <Card key={facility.id} className="overflow-hidden hover:shadow-lg transition-shadow">
@@ -322,31 +301,6 @@ export default function FacilitiesPage() {
                   <div>
                     <h3 className="font-bold text-lg text-foreground">{facility.name}</h3>
                     <p className="text-sm text-muted-foreground capitalize">{facility.type}</p>
-                  </div>
-
-                  {/* Occupancy */}
-                  <div className="space-y-2">
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm font-medium">Ocupación</span>
-                      <span className={`font-bold ${getOccupancyColor(occupancyPercent)}`}>
-                        {occupancyPercent}%
-                      </span>
-                    </div>
-                    <div className={`w-full rounded-full h-2 ${getOccupancyBgColor(occupancyPercent)}`}>
-                      <div
-                        className={`h-2 rounded-full transition-all ${
-                          occupancyPercent > 80
-                            ? "bg-red-500"
-                            : occupancyPercent > 50
-                              ? "bg-amber-500"
-                              : "bg-green-500"
-                        }`}
-                        style={{ width: `${occupancyPercent}%` }}
-                      />
-                    </div>
-                    <p className="text-xs text-muted-foreground">
-                      {facilityBookings.length} de {facility.capacity} lugares
-                    </p>
                   </div>
 
                   {/* Details */}
@@ -367,14 +321,6 @@ export default function FacilitiesPage() {
 
                   {/* Actions */}
                   <div className="flex gap-2 pt-2">
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      className="flex-1 gap-2"
-                      onClick={() => handleShowBookingsDetail(facility.id)}
-                    >
-                      {facilityBookings.length > 0 ? `${facilityBookings.length} Reservas` : "Sin reservas"}
-                    </Button>
                     <Button
                       variant="outline"
                       size="icon"
