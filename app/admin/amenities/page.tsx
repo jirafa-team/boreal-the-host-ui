@@ -64,7 +64,7 @@ const mockBookings: Booking[] = [
   },
 ]
 
-export default function FacilitiesPage() {
+export default function AmenitiesPage() {
   const { t } = useLanguage()
   const [facilities, setFacilities] = React.useState<Facility[]>(mockFacilities)
   const [bookings, setBookings] = React.useState<Booking[]>(mockBookings)
@@ -121,8 +121,6 @@ export default function FacilitiesPage() {
   const getBookingsForFacility = (facilityId: string): Booking[] => {
     return bookings.filter((b) => b.facilityId === facilityId)
   }
-
-
 
   const handleShowBookingsDetail = (facilityId: string) => {
     const facilityBookings = getBookingsForFacility(facilityId)
@@ -286,7 +284,7 @@ export default function FacilitiesPage() {
           </DialogContent>
         </Dialog>
 
-        {/* Facilities Grid */}
+        {/* Amenities Grid */}
         <div className="grid gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
           {facilities.map((facility) => {
             const Icon = facility.icon

@@ -103,7 +103,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       items: [
         { href: "/admin/rooms", label: t("admin.rooms"), icon: Hotel },
         // { href: "/admin/space-builder", label: t("admin.spaceDesign"), icon: LayoutGrid },
-        { href: "/admin/facilities", label: t("admin.amenities"), icon: Building2 },
+        { href: "/admin/amenities", label: t("admin.amenities"), icon: Building2 },
       ],
     },
     {
