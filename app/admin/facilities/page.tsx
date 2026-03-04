@@ -317,6 +317,7 @@ export default function FacilitiesPage() {
                   Timeline
                 </button>
               </div>
+              {viewMode === "list" && (
               <Dialog open={addFacilityOpen} onOpenChange={setAddFacilityOpen}>
                 <DialogTrigger asChild>
                   <button 
@@ -378,6 +379,8 @@ export default function FacilitiesPage() {
                   </form>
                 </DialogContent>
               </Dialog>
+              )}
+              {viewMode === "timeline" && (
               <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
                 <DialogTrigger asChild>
                   <button 
@@ -524,6 +527,7 @@ export default function FacilitiesPage() {
                   </div>
                 </DialogContent>
               </Dialog>
+              )}
             </div>
           </div>
         </div>
