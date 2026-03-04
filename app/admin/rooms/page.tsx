@@ -360,15 +360,6 @@ export default function RoomsManagement() {
               <p className="text-sm text-muted-foreground">{t("admin.manageYourRooms")}</p>
             </div>
             <div className="flex gap-4 items-center ml-auto">
-              {/* View Mode Toggle */}
-              <div className="inline-flex h-10 items-center rounded-lg bg-gray-100 p-1 border border-gray-200">
-              <button
-                className="px-5 py-2 rounded-md font-medium text-sm transition-all text-white shadow-md"
-                style={{ backgroundColor: "#394a63" }}
-              >
-                Grid
-              </button>
-            </div>
               <button
                 onClick={() => setShowCreateModal(true)}
                 className="flex items-center justify-center w-10 h-10 rounded-full text-white shadow-md hover:shadow-lg transition-all duration-300 hover:scale-110 group relative"
