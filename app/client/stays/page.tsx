@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation"
 import Image from "next/image"
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { ArrowRight, LogOut } from "lucide-react"
+import { ArrowRight, LogOut, User } from "lucide-react"
 import { useLanguage } from "@/lib/i18n-context"
 
 export default function StaysPage() {
@@ -77,22 +77,40 @@ export default function StaysPage() {
             priority
             style={{ height: "auto" }}
           />
-          <Button
-            onClick={handleLogout}
-            variant="outline"
-            className="bg-red-500/10 border-red-500/30 text-red-400 hover:bg-red-500/20"
-          >
-            <LogOut className="w-4 h-4 mr-2" />
-            {t("common.logout") || "Cerrar sesión"}
-          </Button>
+          <div className="flex items-center gap-4">
+            {/* User Avatar */}
+            <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-slate-700/50 border border-slate-600">
+              <div className="w-8 h-8 rounded-full bg-gradient-to-br from-cyan-500 to-blue-500 flex items-center justify-center">
+                <User className="w-4 h-4 text-white" />
+              </div>
+              <span className="text-sm font-medium text-slate-200">{currentUser || "Usuario"}</span>
+            </div>
+            <Button
+              onClick={handleLogout}
+              variant="outline"
+              className="bg-red-500/10 border-red-500/30 text-red-400 hover:bg-red-500/20"
+            >
+              <LogOut className="w-4 h-4 mr-2" />
+              {t("common.logout") || "Cerrar sesión"}
+            </Button>
+          </div>
         </div>
       </div>
 
       {/* Stays Grid */}
       <div className="max-w-7xl mx-auto">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {stays.map((stay) => (
-            <Card key={stay.id} className="bg-slate-800/50 border-slate-700 overflow-hidden hover:shadow-xl hover:shadow-cyan-500/10 transition-all duration-300 cursor-pointer" onClick={() => handleStayClick(stay.id)}>
+          {stays.map((stay, index) => (
+            <div key={stay.id} className="relative">
+              {/* Check-in Button for First Stay */}
+              {index === 0 && stay.status === "Confirmada" && (
+                <div className="absolute -top-12 left-0 right-0 z-10">
+                  <Button className="w-full bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white font-semibold rounded-lg flex items-center justify-center gap-2 h-10">
+                    ✓ {t("stays.completeCheckin") || "Completar Check-in Ahora"}
+                  </Button>
+                </div>
+              )}
+              <Card className="bg-slate-800/50 border-slate-700 overflow-hidden hover:shadow-xl hover:shadow-cyan-500/10 transition-all duration-300 cursor-pointer" onClick={() => handleStayClick(stay.id)}>
               {/* Hotel Image */}
               <div className="relative h-48 bg-slate-700">
                 <Image
@@ -142,6 +160,7 @@ export default function StaysPage() {
                 </div>
               </CardContent>
             </Card>
+            </div>
           ))}
         </div>
 
