@@ -5,19 +5,30 @@ import { useRouter } from "next/navigation"
 import Image from "next/image"
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { ArrowRight, User } from "lucide-react"
+import { ArrowRight } from "lucide-react"
 import { useLanguage } from "@/lib/i18n-context"
 
 export default function StaysPage() {
   const router = useRouter()
   const { t } = useLanguage()
   const [currentUser, setCurrentUser] = useState<string | null>(null)
+  const [userInitials, setUserInitials] = useState<string>("")
   const [isLoaded, setIsLoaded] = useState(false)
 
   useEffect(() => {
     setIsLoaded(true)
     const user = localStorage.getItem("currentUser")
     setCurrentUser(user)
+    
+    // Obtener nombre y apellido para las iniciales
+    if (user) {
+      const users = JSON.parse(localStorage.getItem("users") || "[]")
+      const currentUserData = users.find((u: any) => u.email === user)
+      if (currentUserData) {
+        const initials = `${currentUserData.firstName?.charAt(0) || ""}${currentUserData.lastName?.charAt(0) || ""}`.toUpperCase()
+        setUserInitials(initials || "U")
+      }
+    }
   }, [])
 
   // Mock data de estadías
@@ -83,8 +94,8 @@ export default function StaysPage() {
               onClick={() => router.push("/client/profile")}
               className="flex items-center gap-2 px-3 py-2 rounded-lg bg-slate-700/50 border border-slate-600 hover:border-cyan-500/50 hover:bg-slate-700/70 transition-all cursor-pointer"
             >
-              <div className="w-8 h-8 rounded-full bg-gradient-to-br from-cyan-500 to-blue-500 flex items-center justify-center">
-                <User className="w-4 h-4 text-white" />
+              <div className="w-8 h-8 rounded-full bg-gradient-to-br from-cyan-500 to-blue-500 flex items-center justify-center font-semibold text-white text-xs">
+                {userInitials || "U"}
               </div>
               <span className="text-sm font-medium text-slate-200">{currentUser || "Usuario"}</span>
             </button>
