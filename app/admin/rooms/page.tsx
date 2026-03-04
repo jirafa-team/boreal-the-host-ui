@@ -387,7 +387,8 @@ export default function RoomsManagement() {
               </div>
               <button
                 onClick={() => setShowCreateModal(true)}
-                className="flex items-center justify-center w-10 h-10 rounded-full bg-gradient-to-br from-indigo-600 to-indigo-700 text-white shadow-md hover:shadow-lg transition-all duration-300 hover:scale-110 group relative"
+                className="flex items-center justify-center w-10 h-10 rounded-full text-white shadow-md hover:shadow-lg transition-all duration-300 hover:scale-110 group relative"
+                style={{ backgroundColor: "#1557F6" }}
                 title={t("admin.createRoom")}
               >
                 <div className="relative flex items-center justify-center">
