@@ -5,6 +5,8 @@ import { ChevronLeft, ChevronRight, Search, LayoutGrid, Calendar, Plus, User } f
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { useLanguage } from "@/lib/i18n-context"
 import { useToast } from "@/hooks/use-toast"
 
