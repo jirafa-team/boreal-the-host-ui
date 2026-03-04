@@ -467,7 +467,7 @@ export default function CheckInPage() {
               type="submit"
               className="w-full mt-6 text-white font-semibold"
               style={{
-                background: "linear-gradient(to right, #6f65d0, #67f1d0)",
+                background: "linear-gradient(to right, #3b82f6, #60a5fa)",
               }}
             >
               Completar Check-In
