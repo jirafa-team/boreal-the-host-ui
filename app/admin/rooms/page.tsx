@@ -556,12 +556,12 @@ export default function RoomsManagement() {
                                 ? "#235E20" 
                                 : room.status === "occupied" 
                                   ? "#AA2C2C" 
-                                : room.status === "reserved" 
-                                  ? "#1E3A8A" 
-                                  : "#B45309" 
-                          }} 
-                        />
-                      </div>
+                                  : room.status === "reserved" 
+                                    ? "#1E3A8A" 
+                                    : "#B45309" 
+                            }} 
+                          />
+                        </div>
                       <button 
                         onClick={(e) => {
                           e.stopPropagation()
