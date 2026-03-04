@@ -81,6 +81,8 @@ export default function StaffManagement() {
     priority: "normal",
     deliveryTime: "1",
     assignedStaff: "",
+    scheduledDate: "",
+    scheduledTime: "",
   })
   const [newStaff, setNewStaff] = useState({
     name: "",
@@ -182,6 +184,8 @@ export default function StaffManagement() {
         priority: "normal",
         deliveryTime: "1",
         assignedStaff: "",
+        scheduledDate: "",
+        scheduledTime: "",
       })
     }
   }
@@ -553,7 +557,6 @@ export default function StaffManagement() {
         <DialogContent className="max-w-md">
           <DialogHeader>
             <DialogTitle>{t("admin.createActivity")}</DialogTitle>
-            <DialogDescription>{t("admin.createNewActivity")}</DialogDescription>
           </DialogHeader>
           <div className="space-y-4 py-4">
             <div>
@@ -614,6 +617,32 @@ export default function StaffManagement() {
                     ))}
                 </SelectContent>
               </Select>
+            </div>
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <Label htmlFor="scheduled-date" className="text-sm font-medium">
+                  Fecha Programada
+                </Label>
+                <Input
+                  id="scheduled-date"
+                  type="date"
+                  value={newMaintenanceActivity.scheduledDate}
+                  onChange={(e) => setNewMaintenanceActivity({ ...newMaintenanceActivity, scheduledDate: e.target.value })}
+                  className="mt-2"
+                />
+              </div>
+              <div>
+                <Label htmlFor="scheduled-time" className="text-sm font-medium">
+                  Hora Programada
+                </Label>
+                <Input
+                  id="scheduled-time"
+                  type="time"
+                  value={newMaintenanceActivity.scheduledTime}
+                  onChange={(e) => setNewMaintenanceActivity({ ...newMaintenanceActivity, scheduledTime: e.target.value })}
+                  className="mt-2"
+                />
+              </div>
             </div>
           </div>
           <div className="flex justify-end gap-2">
