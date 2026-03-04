@@ -68,10 +68,17 @@ export default function StaffManagement() {
   const [searchName, setSearchName] = useState("")
   const [showAddDialog, setShowAddDialog] = useState(false)
   const [showAssignTaskDialog, setShowAssignTaskDialog] = useState(false)
+  const [showMaintenanceActivityDialog, setShowMaintenanceActivityDialog] = useState(false)
   const [newTask, setNewTask] = useState({
     description: "",
     priority: "normal",
     deliveryTime: "1",
+  })
+  const [newMaintenanceActivity, setNewMaintenanceActivity] = useState({
+    description: "",
+    priority: "normal",
+    deliveryTime: "1",
+    assignedStaff: "",
   })
   const [newStaff, setNewStaff] = useState({
     name: "",
@@ -164,6 +171,19 @@ export default function StaffManagement() {
     }
   }
 
+  const handleCreateMaintenanceActivity = () => {
+    if (newMaintenanceActivity.description && newMaintenanceActivity.assignedStaff) {
+      console.log("[v0] Actividad de mantenimiento creada:", newMaintenanceActivity)
+      setShowMaintenanceActivityDialog(false)
+      setNewMaintenanceActivity({
+        description: "",
+        priority: "normal",
+        deliveryTime: "1",
+        assignedStaff: "",
+      })
+    }
+  }
+
   if (!isLoaded) {
     return null
   }
@@ -178,10 +198,16 @@ export default function StaffManagement() {
             <p className="text-sm text-muted-foreground">{t("admin.manageYour")} {t("admin.staffMembers")}</p>
           </div>
           <Dialog open={showAddDialog} onOpenChange={setShowAddDialog}>
-            <Button onClick={() => setShowAddDialog(true)} className="bg-blue-600 hover:bg-blue-700">
-              <Plus className="w-4 h-4 mr-2" />
-              {t("admin.addStaff")}
-            </Button>
+            <div className="flex gap-2">
+              <Button onClick={() => setShowAddDialog(true)} className="bg-blue-600 hover:bg-blue-700">
+                <Plus className="w-4 h-4 mr-2" />
+                {t("admin.addStaff")}
+              </Button>
+              <Button onClick={() => setShowMaintenanceActivityDialog(true)} className="bg-amber-600 hover:bg-amber-700">
+                <CheckSquare className="w-4 h-4 mr-2" />
+                {t("admin.createActivity")}
+              </Button>
+            </div>
             <DialogContent className="max-w-md">
               <DialogHeader>
                 <DialogTitle>{t("admin.newUser")}</DialogTitle>
@@ -422,6 +448,85 @@ export default function StaffManagement() {
           </DialogContent>
         </Dialog>
       )}
+
+      {/* Maintenance Activity Dialog */}
+      <Dialog open={showMaintenanceActivityDialog} onOpenChange={setShowMaintenanceActivityDialog}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>{t("admin.createActivity")}</DialogTitle>
+            <DialogDescription>{t("admin.createNewActivity")}</DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div>
+              <Label htmlFor="maintenance-description" className="text-sm font-medium">
+                {t("admin.activityDescription")}
+              </Label>
+              <Input
+                id="maintenance-description"
+                placeholder={t("admin.exampleActivityDescription")}
+                value={newMaintenanceActivity.description}
+                onChange={(e) => setNewMaintenanceActivity({ ...newMaintenanceActivity, description: e.target.value })}
+                className="mt-2"
+              />
+            </div>
+            <div>
+              <Label htmlFor="maintenance-priority" className="text-sm font-medium">
+                {t("admin.priority")}
+              </Label>
+              <Select value={newMaintenanceActivity.priority} onValueChange={(value) => setNewMaintenanceActivity({ ...newMaintenanceActivity, priority: value })}>
+                <SelectTrigger className="mt-2">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="normal">{t("admin.normal")}</SelectItem>
+                  <SelectItem value="urgent">{t("admin.urgent")}</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div>
+              <Label htmlFor="maintenance-time" className="text-sm font-medium">
+                {t("admin.deliveryTime")} (horas)
+              </Label>
+              <Input
+                id="maintenance-time"
+                type="number"
+                min="1"
+                max="24"
+                value={newMaintenanceActivity.deliveryTime}
+                onChange={(e) => setNewMaintenanceActivity({ ...newMaintenanceActivity, deliveryTime: e.target.value })}
+                className="mt-2"
+              />
+            </div>
+            <div>
+              <Label htmlFor="assign-staff" className="text-sm font-medium">
+                {t("admin.assignTo")}
+              </Label>
+              <Select value={newMaintenanceActivity.assignedStaff} onValueChange={(value) => setNewMaintenanceActivity({ ...newMaintenanceActivity, assignedStaff: value })}>
+                <SelectTrigger className="mt-2">
+                  <SelectValue placeholder={t("admin.selectStaff")} />
+                </SelectTrigger>
+                <SelectContent>
+                  {staff
+                    .filter((member) => member.department === "Mantenimiento")
+                    .map((member) => (
+                      <SelectItem key={member.id} value={member.id.toString()}>
+                        {member.name}
+                      </SelectItem>
+                    ))}
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+          <div className="flex justify-end gap-2">
+            <Button variant="outline" onClick={() => setShowMaintenanceActivityDialog(false)}>
+              {t("admin.cancel")}
+            </Button>
+            <Button onClick={handleCreateMaintenanceActivity} className="bg-amber-600 hover:bg-amber-700">
+              {t("admin.create")}
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }
