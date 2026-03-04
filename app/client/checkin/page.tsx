@@ -260,8 +260,8 @@ export default function CheckInPage() {
 
         <CardContent className="pt-6">
           <div className="mb-6">
-            <h2 className="text-3xl font-bold text-white mb-2">Completa tu Check-in</h2>
-            <p className="text-gray-300 text-sm">Por favor, completa los siguientes datos para finalizar tu registro en el hotel</p>
+            <h2 className="text-3xl font-bold text-blue-900 mb-2">Completa tu Check-in</h2>
+            <p className="text-gray-600 text-sm">Por favor, completa los siguientes datos para finalizar tu registro en el hotel</p>
           </div>
           <form onSubmit={handleSubmit} className="space-y-4">
             <Input
