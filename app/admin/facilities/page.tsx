@@ -14,7 +14,7 @@ import {
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Plus, Dumbbell, Waves, Sparkles, Video, Coffee, UtensilsCrossed, Edit2, Trash2 } from "lucide-react"
+import { Plus, Dumbbell, Waves, Sparkles, Video, Coffee, UtensilsCrossed, Edit2, Trash2, Users } from "lucide-react"
 import { useLanguage } from "@/lib/i18n-context"
 import React from "react"
 
@@ -310,12 +310,10 @@ export default function FacilitiesPage() {
                     </Badge>
                   </div>
 
-                  {/* Details */}
-                  <div className="flex gap-3 text-sm">
-                    <div className="bg-muted p-2 rounded flex-1">
-                      <p className="text-muted-foreground text-xs">Capacidad</p>
-                      <p className="font-semibold">{facility.capacity}</p>
-                    </div>
+                  {/* Capacity */}
+                  <div className="flex items-center gap-2 text-sm">
+                    <Users className="w-4 h-4 text-muted-foreground" />
+                    <p className="font-semibold">{facility.capacity}</p>
                   </div>
 
                   {/* Actions */}
