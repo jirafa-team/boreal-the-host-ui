@@ -98,22 +98,12 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       ],
     },
     {
-      id: "spaces",
-      title: t("admin.amenities"),
+      id: "myHotel",
+      title: t("admin.myHotel"),
       items: [
         { href: "/admin/rooms", label: t("admin.rooms"), icon: Hotel },
-        // { href: "/admin/space-builder", label: t("admin.spaceDesign"), icon: LayoutGrid },
         { href: "/admin/amenities", label: t("admin.amenities"), icon: Building2 },
-      ],
-    },
-    {
-      id: "services",
-      title: t("admin.staff"),
-      items: [
         { href: "/admin/staff", label: t("admin.staff"), icon: Sparkles },
-        // { href: "/admin/events", label: t("admin.events"), icon: Calendar },
-        // { href: "/admin/tickets", label: t("admin.tickets"), icon: Ticket },
-        // { href: "/admin/pedidos", label: t("admin.orders"), icon: ShoppingBag },
       ],
     },
     {
