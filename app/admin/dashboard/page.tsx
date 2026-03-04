@@ -5,11 +5,12 @@ import { useRouter } from "next/navigation"
 import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { ChevronLeft, ChevronRight, Search, Hotel, Users, Building2, Clock, AlertCircle, CheckCircle2, Dumbbell, Waves, Sparkles, Video, Coffee, UtensilsCrossed, Calendar } from "lucide-react"
+import { ChevronLeft, ChevronRight, Search, Hotel, Users, Building2, Clock, AlertCircle, CheckCircle2, Dumbbell, Waves, Sparkles, Video, Coffee, UtensilsCrossed, Calendar, CheckSquare } from "lucide-react"
 import { useLanguage } from "@/lib/i18n-context"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 
 type RoomStatus = "available" | "occupied" | "maintenance" | "reserved"
 type FacilityStatus = "available" | "booked"
@@ -197,6 +198,15 @@ export default function DashboardControl() {
     { id: 5, room: "103", guestName: "Emma Wilson", status: "pending" as const, balance: 550, lateCheckout: false },
     { id: 6, room: "502", guestName: "Roberto Silva", status: "completed" as const, balance: 0, lateCheckout: false },
   ])
+  const [showMaintenanceActivityDialog, setShowMaintenanceActivityDialog] = useState(false)
+  const [newMaintenanceActivity, setNewMaintenanceActivity] = useState({
+    description: "",
+    priority: "normal",
+    deliveryTime: "1",
+    assignedStaff: "",
+    scheduledDate: "",
+    scheduledTime: "",
+  })
 
   const mockFacilities: Facility[] = [
     { id: "1", name: "Gimnasio", type: "fitness", capacity: 15, icon: Dumbbell, color: "bg-orange-500", startTime: "06:00", endTime: "22:00" },
@@ -517,6 +527,21 @@ export default function DashboardControl() {
   const facilities: Facility[] = mockFacilities
   const facilityList: Facility[] = mockFacilities // Declare facilityList variable
 
+  const handleCreateMaintenanceActivity = () => {
+    if (newMaintenanceActivity.description && newMaintenanceActivity.assignedStaff) {
+      console.log("[v0] Actividad de mantenimiento creada:", newMaintenanceActivity)
+      setShowMaintenanceActivityDialog(false)
+      setNewMaintenanceActivity({
+        description: "",
+        priority: "normal",
+        deliveryTime: "1",
+        assignedStaff: "",
+        scheduledDate: "",
+        scheduledTime: "",
+      })
+    }
+  }
+
   return (
     <div>
       {/* Header */}
@@ -801,6 +826,17 @@ export default function DashboardControl() {
                     </SelectContent>
                   </Select>
                 </div>
+                <button
+                  onClick={() => setShowMaintenanceActivityDialog(true)}
+                  className="flex items-center justify-center w-10 h-10 rounded-full text-white shadow-md hover:shadow-lg transition-all duration-300 hover:scale-110 group relative"
+                  style={{ backgroundColor: "#1557F6" }}
+                  title="Crear Actividad"
+                >
+                  <CheckSquare className="w-5 h-5" />
+                  <span className="absolute top-full mt-2 px-2 py-1 bg-gray-900 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap">
+                    Crear Actividad
+                  </span>
+                </button>
               </div>
             </Card>
 
@@ -911,6 +947,110 @@ export default function DashboardControl() {
           </Card>
         </div>
       )}
+
+      {/* Maintenance Activity Dialog */}
+      <Dialog open={showMaintenanceActivityDialog} onOpenChange={setShowMaintenanceActivityDialog}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>Crear Actividad</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 py-4">
+            <div>
+              <Label htmlFor="maintenance-description" className="text-sm font-medium">
+                Descripción
+              </Label>
+              <Input
+                id="maintenance-description"
+                placeholder="Describe la actividad..."
+                value={newMaintenanceActivity.description}
+                onChange={(e) => setNewMaintenanceActivity({ ...newMaintenanceActivity, description: e.target.value })}
+                className="mt-2"
+              />
+            </div>
+            <div>
+              <Label htmlFor="maintenance-priority" className="text-sm font-medium">
+                Prioridad
+              </Label>
+              <Select value={newMaintenanceActivity.priority} onValueChange={(value) => setNewMaintenanceActivity({ ...newMaintenanceActivity, priority: value })}>
+                <SelectTrigger className="mt-2">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="normal">Normal</SelectItem>
+                  <SelectItem value="urgent">Urgente</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div>
+              <Label htmlFor="maintenance-time" className="text-sm font-medium">
+                Tiempo de entrega (horas)
+              </Label>
+              <Input
+                id="maintenance-time"
+                type="number"
+                min="1"
+                max="24"
+                value={newMaintenanceActivity.deliveryTime}
+                onChange={(e) => setNewMaintenanceActivity({ ...newMaintenanceActivity, deliveryTime: e.target.value })}
+                className="mt-2"
+              />
+            </div>
+            <div>
+              <Label htmlFor="assign-staff" className="text-sm font-medium">
+                Asignar a
+              </Label>
+              <Select value={newMaintenanceActivity.assignedStaff} onValueChange={(value) => setNewMaintenanceActivity({ ...newMaintenanceActivity, assignedStaff: value })}>
+                <SelectTrigger className="mt-2">
+                  <SelectValue placeholder="Selecciona personal" />
+                </SelectTrigger>
+                <SelectContent>
+                  {staffMembers
+                    .filter((member) => member.department === "Mantenimiento")
+                    .map((member) => (
+                      <SelectItem key={member.id} value={member.id.toString()}>
+                        {member.name}
+                      </SelectItem>
+                    ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <Label htmlFor="scheduled-date" className="text-sm font-medium">
+                  Fecha Programada
+                </Label>
+                <Input
+                  id="scheduled-date"
+                  type="date"
+                  value={newMaintenanceActivity.scheduledDate}
+                  onChange={(e) => setNewMaintenanceActivity({ ...newMaintenanceActivity, scheduledDate: e.target.value })}
+                  className="mt-2"
+                />
+              </div>
+              <div>
+                <Label htmlFor="scheduled-time" className="text-sm font-medium">
+                  Hora Programada
+                </Label>
+                <Input
+                  id="scheduled-time"
+                  type="time"
+                  value={newMaintenanceActivity.scheduledTime}
+                  onChange={(e) => setNewMaintenanceActivity({ ...newMaintenanceActivity, scheduledTime: e.target.value })}
+                  className="mt-2"
+                />
+              </div>
+            </div>
+          </div>
+          <div className="flex justify-end gap-2">
+            <Button variant="outline" onClick={() => setShowMaintenanceActivityDialog(false)}>
+              Cancelar
+            </Button>
+            <Button onClick={handleCreateMaintenanceActivity} className="bg-amber-600 hover:bg-amber-700">
+              Crear
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
 
       {/* Facilities Timeline Section */}
       {(activeTab === "facilities") && (

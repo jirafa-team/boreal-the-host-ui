@@ -70,19 +70,10 @@ export default function StaffManagement() {
   const [viewMode, setViewMode] = useState<"list" | "kanban">("list")
   const [showAddDialog, setShowAddDialog] = useState(false)
   const [showAssignTaskDialog, setShowAssignTaskDialog] = useState(false)
-  const [showMaintenanceActivityDialog, setShowMaintenanceActivityDialog] = useState(false)
   const [newTask, setNewTask] = useState({
     description: "",
     priority: "normal",
     deliveryTime: "1",
-  })
-  const [newMaintenanceActivity, setNewMaintenanceActivity] = useState({
-    description: "",
-    priority: "normal",
-    deliveryTime: "1",
-    assignedStaff: "",
-    scheduledDate: "",
-    scheduledTime: "",
   })
   const [newStaff, setNewStaff] = useState({
     name: "",
@@ -175,21 +166,6 @@ export default function StaffManagement() {
     }
   }
 
-  const handleCreateMaintenanceActivity = () => {
-    if (newMaintenanceActivity.description && newMaintenanceActivity.assignedStaff) {
-      console.log("[v0] Actividad de mantenimiento creada:", newMaintenanceActivity)
-      setShowMaintenanceActivityDialog(false)
-      setNewMaintenanceActivity({
-        description: "",
-        priority: "normal",
-        deliveryTime: "1",
-        assignedStaff: "",
-        scheduledDate: "",
-        scheduledTime: "",
-      })
-    }
-  }
-
   if (!isLoaded) {
     return null
   }
@@ -242,19 +218,6 @@ export default function StaffManagement() {
                   </span>
                 </button>
               </DialogTrigger>
-              )}
-              {viewMode === "kanban" && (
-              <button
-                onClick={() => setShowMaintenanceActivityDialog(true)}
-                className="flex items-center justify-center w-10 h-10 rounded-full text-white shadow-md hover:shadow-lg transition-all duration-300 hover:scale-110 group relative"
-                style={{ backgroundColor: "#1557F6" }}
-                title={t("admin.createActivity")}
-              >
-                <CheckSquare className="w-5 h-5" />
-                <span className="absolute top-full mt-2 px-2 py-1 bg-gray-900 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap">
-                  {t("admin.createActivity")}
-                </span>
-              </button>
               )}
             </div>
             <DialogContent className="max-w-md">
@@ -500,109 +463,6 @@ export default function StaffManagement() {
         </Dialog>
       )}
 
-      {/* Maintenance Activity Dialog */}
-      <Dialog open={showMaintenanceActivityDialog} onOpenChange={setShowMaintenanceActivityDialog}>
-        <DialogContent className="max-w-md">
-          <DialogHeader>
-            <DialogTitle>{t("admin.createActivity")}</DialogTitle>
-          </DialogHeader>
-          <div className="space-y-4 py-4">
-            <div>
-              <Label htmlFor="maintenance-description" className="text-sm font-medium">
-                {t("admin.activityDescription")}
-              </Label>
-              <Input
-                id="maintenance-description"
-                placeholder={t("admin.exampleActivityDescription")}
-                value={newMaintenanceActivity.description}
-                onChange={(e) => setNewMaintenanceActivity({ ...newMaintenanceActivity, description: e.target.value })}
-                className="mt-2"
-              />
-            </div>
-            <div>
-              <Label htmlFor="maintenance-priority" className="text-sm font-medium">
-                {t("admin.priority")}
-              </Label>
-              <Select value={newMaintenanceActivity.priority} onValueChange={(value) => setNewMaintenanceActivity({ ...newMaintenanceActivity, priority: value })}>
-                <SelectTrigger className="mt-2">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="normal">{t("admin.normal")}</SelectItem>
-                  <SelectItem value="urgent">{t("admin.urgent")}</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            <div>
-              <Label htmlFor="maintenance-time" className="text-sm font-medium">
-                {t("admin.deliveryTime")} (horas)
-              </Label>
-              <Input
-                id="maintenance-time"
-                type="number"
-                min="1"
-                max="24"
-                value={newMaintenanceActivity.deliveryTime}
-                onChange={(e) => setNewMaintenanceActivity({ ...newMaintenanceActivity, deliveryTime: e.target.value })}
-                className="mt-2"
-              />
-            </div>
-            <div>
-              <Label htmlFor="assign-staff" className="text-sm font-medium">
-                {t("admin.assignTo")}
-              </Label>
-              <Select value={newMaintenanceActivity.assignedStaff} onValueChange={(value) => setNewMaintenanceActivity({ ...newMaintenanceActivity, assignedStaff: value })}>
-                <SelectTrigger className="mt-2">
-                  <SelectValue placeholder={t("admin.selectStaff")} />
-                </SelectTrigger>
-                <SelectContent>
-                  {staff
-                    .filter((member) => member.department === "Mantenimiento")
-                    .map((member) => (
-                      <SelectItem key={member.id} value={member.id.toString()}>
-                        {member.name}
-                      </SelectItem>
-                    ))}
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="grid grid-cols-2 gap-3">
-              <div>
-                <Label htmlFor="scheduled-date" className="text-sm font-medium">
-                  Fecha Programada
-                </Label>
-                <Input
-                  id="scheduled-date"
-                  type="date"
-                  value={newMaintenanceActivity.scheduledDate}
-                  onChange={(e) => setNewMaintenanceActivity({ ...newMaintenanceActivity, scheduledDate: e.target.value })}
-                  className="mt-2"
-                />
-              </div>
-              <div>
-                <Label htmlFor="scheduled-time" className="text-sm font-medium">
-                  Hora Programada
-                </Label>
-                <Input
-                  id="scheduled-time"
-                  type="time"
-                  value={newMaintenanceActivity.scheduledTime}
-                  onChange={(e) => setNewMaintenanceActivity({ ...newMaintenanceActivity, scheduledTime: e.target.value })}
-                  className="mt-2"
-                />
-              </div>
-            </div>
-          </div>
-          <div className="flex justify-end gap-2">
-            <Button variant="outline" onClick={() => setShowMaintenanceActivityDialog(false)}>
-              {t("admin.cancel")}
-            </Button>
-            <Button onClick={handleCreateMaintenanceActivity} className="bg-amber-600 hover:bg-amber-700">
-              {t("admin.create")}
-            </Button>
-          </div>
-        </DialogContent>
-      </Dialog>
     </div>
   )
 }
