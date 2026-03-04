@@ -22,6 +22,7 @@ import { StaffKanbanTimeline } from './StaffKanbanTimeline';
 import { DepartmentStatsCards } from './DepartmentStatsCards';
 import { CreateStaffDialog } from './CreateStaffDialog';
 import { EditStaffDialog } from './EditStaffDialog';
+import { useGetDepartmentsQuery } from '@/features/taxonomy-department/slices/taxonomyDepartmentSlice';
 
 export interface StaffViewProps {
   staffList: StaffMemberDisplay[];
@@ -65,6 +66,9 @@ export function StaffView({
   const [filterDate, setFilterDate] = useState('');
   const [activityDialogOpen, setActivityDialogOpen] = useState(false);
 
+  const { data: departmentsData } = useGetDepartmentsQuery(undefined, { skip: !isApiMode });
+  const departments = departmentsData?.data ?? [];
+
   const filteredList = useMemo(() => {
     let list = staffList;
     const q = searchName.toLowerCase().trim();
@@ -78,10 +82,14 @@ export function StaffView({
       );
     }
     if (filterDepartment !== 'all') {
-      list = list.filter((s) => (s.employee?.departmentName ?? '') === filterDepartment);
+      list = list.filter((s) =>
+        isApiMode
+          ? (s.employee?.departmentId ?? '') === filterDepartment
+          : (s.employee?.departmentName ?? '') === filterDepartment
+      );
     }
     return list;
-  }, [staffList, searchName, filterDepartment]);
+  }, [staffList, searchName, filterDepartment, isApiMode]);
 
   return (
     <>
@@ -97,9 +105,8 @@ export function StaffView({
                 <button
                   type="button"
                   onClick={() => setViewMode('overview')}
-                  className={`px-5 py-2 rounded-md font-medium text-sm transition-all ${
-                    viewMode === 'overview' ? 'text-white shadow-md' : 'text-gray-700 hover:text-gray-900'
-                  }`}
+                  className={`px-5 py-2 rounded-md font-medium text-sm transition-all ${viewMode === 'overview' ? 'text-white shadow-md' : 'text-gray-700 hover:text-gray-900'
+                    }`}
                   style={viewMode === 'overview' ? { backgroundColor: '#394a63' } : {}}
                 >
                   General
@@ -107,9 +114,8 @@ export function StaffView({
                 <button
                   type="button"
                   onClick={() => setViewMode('kanban')}
-                  className={`px-5 py-2 rounded-md font-medium text-sm transition-all ${
-                    viewMode === 'kanban' ? 'text-white shadow-md' : 'text-gray-700 hover:text-gray-900'
-                  }`}
+                  className={`px-5 py-2 rounded-md font-medium text-sm transition-all ${viewMode === 'kanban' ? 'text-white shadow-md' : 'text-gray-700 hover:text-gray-900'
+                    }`}
                   style={viewMode === 'kanban' ? { backgroundColor: '#394a63' } : {}}
                 >
                   Kanban
@@ -190,11 +196,21 @@ export function StaffView({
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="all">Todos los departamentos</SelectItem>
-                  <SelectItem value="Limpieza">Limpieza</SelectItem>
-                  <SelectItem value="Mantenimiento">Mantenimiento</SelectItem>
-                  <SelectItem value="Seguridad">Seguridad</SelectItem>
-                  <SelectItem value="Recepción">Recepción</SelectItem>
-                  <SelectItem value="Servicio">Servicio</SelectItem>
+                  {isApiMode
+                    ? departments.map((d) => (
+                      <SelectItem key={d.id} value={d.id}>
+                        {d.name}
+                      </SelectItem>
+                    ))
+                    : (
+                      <>
+                        <SelectItem value="Limpieza">Limpieza</SelectItem>
+                        <SelectItem value="Mantenimiento">Mantenimiento</SelectItem>
+                        <SelectItem value="Seguridad">Seguridad</SelectItem>
+                        <SelectItem value="Recepción">Recepción</SelectItem>
+                        <SelectItem value="Servicio">Servicio</SelectItem>
+                      </>
+                    )}
                 </SelectContent>
               </Select>
             </div>

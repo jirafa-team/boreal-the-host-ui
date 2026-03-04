@@ -71,12 +71,10 @@ export function StaffCardGrid({ staffList, onEdit, onDelete, isLoading }: StaffC
           member.employee?.workStartTime && member.employee?.workEndTime
             ? `${member.employee.workStartTime} - ${member.employee.workEndTime}`
             : (t('admin.dayOff') ?? 'Día libre');
-        const tasksToday = member.employee?.tasksToday ?? 0;
-        const maxCapacity = member.employee?.maxCapacity ?? 8;
-        const progress = maxCapacity > 0 ? (tasksToday / maxCapacity) * 100 : 0;
         const currentRoom = member.employee?.currentRoom;
         const totalTasks = member.employee?.totalTasks ?? 0;
         const completedTasks = member.employee?.completedTasks ?? 0;
+        const progress = totalTasks > 0 ? (completedTasks / totalTasks) * 100 : 0;
 
         return (
           <Card
