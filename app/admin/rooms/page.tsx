@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { ChevronLeft, ChevronRight, Search, LayoutGrid, Calendar, Plus, User } from "lucide-react"
+import { ChevronLeft, ChevronRight, Search, LayoutGrid, Calendar, Plus, User, Users } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -15,6 +15,7 @@ type Room = {
   number: string
   type: string
   floor: number
+  capacity: number
   status: RoomStatus
   guest?: string
   checkIn?: string
@@ -40,67 +41,72 @@ export default function RoomsManagement() {
   const [showCreateModal, setShowCreateModal] = useState(false)
   const [showEditModal, setShowEditModal] = useState(false)
   const [selectedRoom, setSelectedRoom] = useState<Room | null>(null)
-  const [newRoom, setNewRoom] = useState({ number: "", type: "Individual", floor: 1 })
+  const [newRoom, setNewRoom] = useState({ number: "", type: "Individual", floor: 1, capacity: 1 })
   const { t } = useLanguage()
 
   const [rooms, setRooms] = useState<Room[]>([
-    { id: "1", number: "101", type: "Individual", floor: 1, status: "available" },
+    { id: "1", number: "101", type: "Individual", floor: 1, capacity: 1, status: "available" },
     {
       id: "2",
       number: "102",
       type: "Doble",
       floor: 1,
+      capacity: 2,
       status: "occupied",
       guest: "Juan Pérez",
       checkIn: "2025-01-10",
       checkOut: "2025-01-15",
     },
-    { id: "3", number: "103", type: "Suite", floor: 1, status: "maintenance" },
+    { id: "3", number: "103", type: "Suite", floor: 1, capacity: 3, status: "maintenance" },
     {
       id: "4",
       number: "104",
       type: "Doble",
       floor: 1,
+      capacity: 2,
       status: "reserved",
       guest: "María García",
       checkIn: "2025-01-12",
       checkOut: "2025-01-14",
     },
-    { id: "5", number: "201", type: "Deluxe", floor: 2, status: "available" },
+    { id: "5", number: "201", type: "Deluxe", floor: 2, capacity: 2, status: "available" },
     {
       id: "6",
       number: "202",
       type: "Suite",
       floor: 2,
+      capacity: 4,
       status: "occupied",
       guest: "Carlos López",
       checkIn: "2025-01-09",
       checkOut: "2025-01-16",
     },
-    { id: "7", number: "203", type: "Individual", floor: 2, status: "available" },
+    { id: "7", number: "203", type: "Individual", floor: 2, capacity: 1, status: "available" },
     {
       id: "8",
       number: "204",
       type: "Presidencial",
       floor: 2,
+      capacity: 5,
       status: "occupied",
       guest: "Ana Martínez",
       checkIn: "2025-01-11",
       checkOut: "2025-01-13",
     },
-    { id: "9", number: "301", type: "Doble", floor: 3, status: "available" },
+    { id: "9", number: "301", type: "Doble", floor: 3, capacity: 2, status: "available" },
     {
       id: "10",
       number: "302",
       type: "Suite",
       floor: 3,
+      capacity: 4,
       status: "reserved",
       guest: "Luis Rodríguez",
       checkIn: "2025-01-13",
       checkOut: "2025-01-18",
     },
-    { id: "11", number: "303", type: "Individual", floor: 3, status: "available" },
-    { id: "12", number: "304", type: "Doble", floor: 3, status: "available" },
+    { id: "11", number: "303", type: "Individual", floor: 3, capacity: 1, status: "available" },
+    { id: "12", number: "304", type: "Doble", floor: 3, capacity: 2, status: "available" },
   ])
 
   const handleCreateRoom = () => {
@@ -123,9 +129,10 @@ export default function RoomsManagement() {
         number: roomNumber,
         type: newRoom.type,
         floor: newRoom.floor,
+        capacity: newRoom.capacity,
         status: "available"
       }]);
-      setNewRoom({ number: "", type: "Individual", floor: 1 });
+      setNewRoom({ number: "", type: "Individual", floor: 1, capacity: 1 });
       setShowCreateModal(false);
       toast({
         title: "Éxito",
@@ -527,6 +534,36 @@ export default function RoomsManagement() {
 
                 <div className="space-y-2">
                   <div className="pt-2 border-t border-border">
+                    {/* Capacity */}
+                    <div className="flex items-center gap-2 mb-2">
+                      <div 
+                        className="w-6 h-6 rounded-full flex items-center justify-center"
+                        style={{ 
+                          backgroundColor: room.status === "available" 
+                            ? "rgba(35, 94, 32, 0.15)" 
+                            : room.status === "occupied" 
+                              ? "rgba(170, 44, 44, 0.15)" 
+                              : room.status === "reserved" 
+                                ? "rgba(30, 58, 138, 0.15)" 
+                                : "rgba(180, 83, 9, 0.15)" 
+                        }}
+                      >
+                        <Users 
+                          className="w-3.5 h-3.5" 
+                          style={{ 
+                            color: room.status === "available" 
+                              ? "#235E20" 
+                              : room.status === "occupied" 
+                                ? "#AA2C2C" 
+                                : room.status === "reserved" 
+                                  ? "#1E3A8A" 
+                                  : "#B45309" 
+                          }} 
+                        />
+                      </div>
+                      <span className="text-sm font-medium text-foreground">{room.capacity} {room.capacity === 1 ? "persona" : "personas"}</span>
+                    </div>
+                    {/* Guest */}
                     <div className="flex items-center gap-2">
                       <div 
                         className="w-6 h-6 rounded-full flex items-center justify-center"
