@@ -63,6 +63,7 @@ export const translations = {
       perNight: "por noche",
       completeCheckin: "Completar Check-in",
       completeCheckInData: "Completar datos para check-in",
+      awaitingTravelStart: "Esperando el inicio del viaje",
       noStays: "No tienes estadías registradas",
     },
     client: {
@@ -618,6 +619,7 @@ export const translations = {
       perNight: "per night",
       completeCheckin: "Complete Check-in",
       completeCheckInData: "Complete check-in details",
+      awaitingTravelStart: "Awaiting travel start",
       noStays: "You have no stays registered",
     },
     client: {
@@ -1154,6 +1156,7 @@ export const translations = {
       perNight: "por noite",
       completeCheckin: "Completar Check-in",
       completeCheckInData: "Completar dados para check-in",
+      awaitingTravelStart: "Aguardando o início da viagem",
       noStays: "Você não tem estadias registradas",
     },
     client: {
