@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation"
 import Image from "next/image"
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { ArrowRight, LogOut, User } from "lucide-react"
+import { ArrowRight, User } from "lucide-react"
 import { useLanguage } from "@/lib/i18n-context"
 
 export default function StaysPage() {
@@ -78,21 +78,16 @@ export default function StaysPage() {
             style={{ height: "auto" }}
           />
           <div className="flex items-center gap-4">
-            {/* User Avatar */}
-            <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-slate-700/50 border border-slate-600">
+            {/* User Avatar - Clickeable */}
+            <button
+              onClick={() => router.push("/client/profile")}
+              className="flex items-center gap-2 px-3 py-2 rounded-lg bg-slate-700/50 border border-slate-600 hover:border-cyan-500/50 hover:bg-slate-700/70 transition-all cursor-pointer"
+            >
               <div className="w-8 h-8 rounded-full bg-gradient-to-br from-cyan-500 to-blue-500 flex items-center justify-center">
                 <User className="w-4 h-4 text-white" />
               </div>
               <span className="text-sm font-medium text-slate-200">{currentUser || "Usuario"}</span>
-            </div>
-            <Button
-              onClick={handleLogout}
-              variant="outline"
-              className="bg-red-500/10 border-red-500/30 text-red-400 hover:bg-red-500/20"
-            >
-              <LogOut className="w-4 h-4 mr-2" />
-              {t("common.logout") || "Cerrar sesión"}
-            </Button>
+            </button>
           </div>
         </div>
       </div>
