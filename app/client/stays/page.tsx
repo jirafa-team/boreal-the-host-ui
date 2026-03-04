@@ -111,10 +111,13 @@ export default function StaysPage() {
               {index === 0 && stay.status === "Confirmada" && (
                 <div className="absolute -top-12 left-0 right-0 z-10">
                   <Button 
-                    disabled
-                    className="w-full bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 text-white font-semibold rounded-lg flex items-center justify-center gap-2 h-10 cursor-not-allowed opacity-75"
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      router.push("/client/checkin")
+                    }}
+                    className="w-full bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white font-semibold rounded-lg flex items-center justify-center gap-2 h-10"
                   >
-                    ✓ {t("stays.awaitingCheckIn") || "Esperando inicio del viaje"}
+                    ⚠ {t("stays.completeCheckInData") || "Completar datos para check-in"}
                   </Button>
                 </div>
               )}
