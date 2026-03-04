@@ -20,5 +20,7 @@ export interface StaffMemberDisplay {
     currentRoom?: number | null;
     tasksToday?: number;
     maxCapacity?: number;
+    totalTasks?: number;
+    completedTasks?: number;
   };
 }

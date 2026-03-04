@@ -49,6 +49,7 @@ export function StaffList({ staffList, onEdit, onDelete, isLoading }: StaffListP
                 <th className="text-left py-4 px-4 font-semibold text-gray-700">{t('admin.status')}</th>
                 <th className="text-left py-4 px-4 font-semibold text-gray-700">{t('admin.department') ?? 'Departamento'}</th>
                 <th className="text-left py-4 px-4 font-semibold text-gray-700">{t('admin.schedule') ?? 'Horario'}</th>
+                <th className="text-left py-4 px-4 font-semibold text-gray-700">{t('admin.tasksTotal') ?? 'Tareas'}</th>
                 <th className="text-right py-4 px-4 font-semibold text-gray-700">{t('admin.actions')}</th>
               </tr>
             </thead>
@@ -62,6 +63,11 @@ export function StaffList({ staffList, onEdit, onDelete, isLoading }: StaffListP
                   <td className="py-4 px-4 text-gray-600">
                     {staff.employee.workStartTime && staff.employee.workEndTime
                       ? `${staff.employee.workStartTime} - ${staff.employee.workEndTime}`
+                      : '—'}
+                  </td>
+                  <td className="py-4 px-4 text-gray-600">
+                    {staff.employee?.totalTasks != null && staff.employee?.completedTasks != null
+                      ? `${staff.employee.totalTasks} (${t('admin.completed') ?? 'completadas'}: ${staff.employee.completedTasks})`
                       : '—'}
                   </td>
                   <td className="py-4 px-4">

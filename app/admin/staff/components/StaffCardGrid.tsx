@@ -75,13 +75,14 @@ export function StaffCardGrid({ staffList, onEdit, onDelete, isLoading }: StaffC
         const maxCapacity = member.employee?.maxCapacity ?? 8;
         const progress = maxCapacity > 0 ? (tasksToday / maxCapacity) * 100 : 0;
         const currentRoom = member.employee?.currentRoom;
+        const totalTasks = member.employee?.totalTasks ?? 0;
+        const completedTasks = member.employee?.completedTasks ?? 0;
 
         return (
           <Card
             key={member.id}
-            className={`p-4 cursor-pointer hover:shadow-md transition-shadow ${
-              workStatus === 'available' ? 'border-green-200' : 'border-border'
-            }`}
+            className={`p-4 cursor-pointer hover:shadow-md transition-shadow ${workStatus === 'available' ? 'border-green-200' : 'border-border'
+              }`}
             onClick={() => onEdit(member)}
           >
             <CardContent className="p-0">
@@ -105,7 +106,7 @@ export function StaffCardGrid({ staffList, onEdit, onDelete, isLoading }: StaffC
                 <div className="flex items-center justify-between text-sm mb-2">
                   <span className="text-muted-foreground">{t('admin.tasksToday')}</span>
                   <span className="font-semibold text-foreground">
-                    {tasksToday} / {maxCapacity}
+                    {completedTasks} / {totalTasks}
                   </span>
                 </div>
                 <div className="w-full bg-muted rounded-full h-2">

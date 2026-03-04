@@ -81,6 +81,8 @@ export function StaffKanbanTimeline({ staffList, onEdit, isLoading }: StaffKanba
             const workStatus = member.employee?.workStatus ?? 'available';
             const tasksToday = member.employee?.tasksToday ?? 0;
             const maxCapacity = member.employee?.maxCapacity ?? 8;
+            const totalTasks = member.employee?.totalTasks ?? 0;
+            const completedTasks = member.employee?.completedTasks ?? 0;
             return (
               <div key={member.id} className="flex gap-2">
                 <div className="w-48 flex-shrink-0 sticky left-0 bg-background">
@@ -94,12 +96,12 @@ export function StaffKanbanTimeline({ staffList, onEdit, isLoading }: StaffKanba
                       </div>
                       <div className="flex-1 min-w-0">
                         <h3 className="font-semibold text-foreground text-sm truncate">{member.name}</h3>
-                        <div className="flex items-center gap-2 mt-1">
+                        <div className="flex items-center gap-2 mt-1 flex-wrap">
                           <Badge className={getWorkStatusColor(workStatus) + ' text-white text-xs py-0'}>
                             {getWorkStatusLabel(workStatus, t)}
                           </Badge>
                           <span className="text-xs text-muted-foreground">
-                            {tasksToday}/{maxCapacity}
+                            {completedTasks}/{totalTasks}
                           </span>
                         </div>
                       </div>
