@@ -98,22 +98,12 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       ],
     },
     {
-      id: "spaces",
-      title: t("admin.spaces"),
+      id: "myHotel",
+      title: t("admin.myHotel"),
       items: [
         { href: "/admin/rooms", label: t("admin.rooms"), icon: Hotel },
-        // { href: "/admin/space-builder", label: t("admin.spaceDesign"), icon: LayoutGrid },
-        { href: "/admin/facilities", label: t("admin.amenities"), icon: Building2 },
-      ],
-    },
-    {
-      id: "services",
-      title: t("admin.services"),
-      items: [
+        { href: "/admin/amenities", label: t("admin.amenities"), icon: Building2 },
         { href: "/admin/staff", label: t("admin.staff"), icon: Sparkles },
-        // { href: "/admin/events", label: t("admin.events"), icon: Calendar },
-        // { href: "/admin/tickets", label: t("admin.tickets"), icon: Ticket },
-        // { href: "/admin/pedidos", label: t("admin.orders"), icon: ShoppingBag },
       ],
     },
     {
@@ -173,7 +163,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                   <>
                     <button
                       onClick={() => toggleSection(section.id)}
-                      className="w-full px-3 mb-2 text-[10px] font-semibold text-white/70 uppercase tracking-wider hover:text-white/90 flex items-center justify-between transition-colors hidden"
+                      className="w-full px-3 mb-2 text-[10px] font-semibold text-white/70 uppercase tracking-wider hover:text-white/90 flex items-center justify-between transition-colors"
                     >
                       <span>{section.title}</span>
                       <ChevronDown
@@ -182,7 +172,9 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
                         }`}
                       />
                     </button>
-                    <div className="space-y-1 mb-2">
+                    <div className={`space-y-1 mb-2 overflow-hidden transition-all duration-200 ${
+                      expandedSections.has(section.id) ? "max-h-96" : "max-h-0"
+                    }`}>
                       {section.items.map((item) => {
                         const Icon = item.icon
                         const isActive = pathname === item.href
