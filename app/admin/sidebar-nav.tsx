@@ -237,7 +237,16 @@ export const SidebarNav = memo(function SidebarNav({ sidebarOpen, onToggleSideba
       </div>
 
       {sidebarOpen && (
-        <div className="p-2 border-t border-white/10">
+        <div className="p-2 border-t border-white/10 space-y-2">
+          {/* Boreal CRM Button */}
+          <button className="w-full flex items-center justify-between px-3 py-2 rounded-lg bg-white/10 hover:bg-white/20 transition-colors group">
+            <span className="text-sm font-semibold text-white">Boreal CRM</span>
+            <span className="px-2 py-1 bg-amber-500/90 text-white text-[10px] font-bold rounded group-hover:bg-amber-500 transition-colors">
+              PRO
+            </span>
+          </button>
+
+          {/* Language Selector */}
           <div className="flex items-center gap-2">
             <Globe className="w-4 h-4 text-white/70 shrink-0" />
             <div className="inline-flex w-full h-7 items-center rounded-md bg-white/10 border border-white/20 overflow-hidden">
