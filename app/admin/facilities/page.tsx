@@ -138,7 +138,7 @@ export default function FacilitiesPage() {
           <div className="flex items-center justify-between">
             <div>
               <h1 className="text-2xl font-bold text-foreground">{t("admin.amenitiesManagement")}</h1>
-              <p className="text-sm text-muted-foreground">Administra los amenities y espacios del hotel</p>
+              <p className="text-sm text-muted-foreground">{t("admin.facilitiesManagementDesc")}</p>
             </div>
             <Dialog open={addFacilityOpen} onOpenChange={setAddFacilityOpen}>
               <DialogTrigger asChild>
@@ -165,7 +165,7 @@ export default function FacilitiesPage() {
                         <SelectValue placeholder={t("admin.selectType")} />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="fitness">Fitness</SelectItem>
+                        <SelectItem value="fitness">{t("admin.fitness")}</SelectItem>
                         <SelectItem value="recreation">{t("admin.recreation")}</SelectItem>
                         <SelectItem value="wellness">{t("admin.wellness")}</SelectItem>
                         <SelectItem value="business">{t("admin.business")}</SelectItem>
@@ -213,21 +213,21 @@ export default function FacilitiesPage() {
             </DialogHeader>
             <form onSubmit={handleSaveEdit} className="space-y-4">
               <div>
-                <Label htmlFor="edit-name">Nombre</Label>
+                <Label htmlFor="edit-name">{t("admin.name")}</Label>
                 <Input id="edit-name" name="name" defaultValue={editingFacility?.name} required />
               </div>
               <div>
-                <Label htmlFor="edit-type">Tipo</Label>
+                <Label htmlFor="edit-type">{t("admin.type")}</Label>
                 <Select name="type" defaultValue={editingFacility?.type} required>
                   <SelectTrigger>
-                    <SelectValue placeholder="Seleccionar tipo" />
+                    <SelectValue placeholder={t("admin.selectType")} />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="fitness">Fitness</SelectItem>
-                    <SelectItem value="recreation">Recreación</SelectItem>
-                    <SelectItem value="wellness">Bienestar</SelectItem>
-                    <SelectItem value="business">Negocios</SelectItem>
-                    <SelectItem value="dining">Gastronomía</SelectItem>
+                    <SelectItem value="fitness">{t("admin.fitness")}</SelectItem>
+                    <SelectItem value="recreation">{t("admin.recreation")}</SelectItem>
+                    <SelectItem value="wellness">{t("admin.wellness")}</SelectItem>
+                    <SelectItem value="business">{t("admin.business")}</SelectItem>
+                    <SelectItem value="dining">{t("admin.dining")}</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -246,7 +246,7 @@ export default function FacilitiesPage() {
                 </div>
               </div>
               <Button type="submit" className="w-full">
-                Guardar Cambios
+                {t("admin.saveChanges")}
               </Button>
             </form>
           </DialogContent>
@@ -256,8 +256,8 @@ export default function FacilitiesPage() {
         <Dialog open={bookingsDetailOpen} onOpenChange={setBookingsDetailOpen}>
           <DialogContent className="max-w-md">
             <DialogHeader>
-              <DialogTitle>Participantes</DialogTitle>
-              <DialogDescription>Listado de reservas para esta instalación</DialogDescription>
+              <DialogTitle>{t("admin.participants")}</DialogTitle>
+              <DialogDescription>{t("admin.bookingsList")}</DialogDescription>
             </DialogHeader>
             <div className="space-y-3 max-h-[400px] overflow-y-auto">
               {selectedSlotBookings.length > 0 ? (
@@ -266,21 +266,21 @@ export default function FacilitiesPage() {
                     <div className="space-y-2">
                       <p className="font-semibold text-sm">{booking.clientName}</p>
                       <div className="text-xs text-muted-foreground space-y-1">
-                        <p>Habitación: {booking.clientRoom}</p>
-                        <p>Hora: {booking.time}</p>
-                        <p>Duración: {booking.duration} minutos</p>
+                        <p>{t("admin.room")}: {booking.clientRoom}</p>
+                        <p>{t("admin.time")}: {booking.time}</p>
+                        <p>{t("admin.duration")}: {booking.duration} {t("admin.minutes")}</p>
                         <Badge
                           variant={booking.status === "confirmed" ? "default" : "secondary"}
                           className={booking.status === "confirmed" ? "bg-green-600" : "bg-amber-600"}
                         >
-                          {booking.status === "confirmed" ? "Confirmada" : "Pendiente"}
+                          {booking.status === "confirmed" ? t("admin.confirmed") : t("admin.pending")}
                         </Badge>
                       </div>
                     </div>
                   </Card>
                 ))
               ) : (
-                <p className="text-sm text-muted-foreground text-center py-4">Sin reservas</p>
+                <p className="text-sm text-muted-foreground text-center py-4">{t("admin.noBookings")}</p>
               )}
             </div>
           </DialogContent>
