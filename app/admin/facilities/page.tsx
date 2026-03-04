@@ -294,19 +294,39 @@ export default function FacilitiesPage() {
 
             return (
               <Card key={facility.id} className="hover:shadow-lg transition-shadow">
-                <div className="p-5 space-y-4">
+                <div className="p-4 space-y-3">
                   <div className="flex items-start justify-between gap-4">
                     <div className="flex items-center gap-3 flex-1">
                       <div className={`${facility.color} p-2 rounded-lg flex-shrink-0`}>
                         <Icon className="w-5 h-5 text-white" />
                       </div>
-                      <div>
+                      <div className="flex-1">
                         <h3 className="font-bold text-lg text-foreground">{facility.name}</h3>
                         <p className="text-sm text-muted-foreground capitalize">{facility.type}</p>
                       </div>
                     </div>
-                    <div className="flex flex-col gap-2 items-end flex-shrink-0">
-                      <Badge variant="outline">
+                    <div className="flex gap-2 flex-shrink-0">
+                      <Button
+                        variant="outline"
+                        size="icon"
+                        onClick={() => handleEditFacility(facility)}
+                      >
+                        <Edit2 className="w-4 h-4" />
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="icon"
+                        className="text-destructive hover:text-destructive"
+                        onClick={() => handleDeleteFacility(facility.id)}
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </Button>
+                    </div>
+                  </div>
+
+                  <div className="flex justify-end gap-4">
+                    <div className="flex flex-col gap-2 items-end">
+                      <Badge variant="outline" className="text-xs">
                         {facility.startTime} - {facility.endTime}
                       </Badge>
                       <div className="flex items-center gap-2 text-sm">
@@ -314,25 +334,6 @@ export default function FacilitiesPage() {
                         <p className="font-semibold">{facility.capacity}</p>
                       </div>
                     </div>
-                  </div>
-
-                  {/* Actions */}
-                  <div className="flex gap-2 pt-2">
-                    <Button
-                      variant="outline"
-                      size="icon"
-                      onClick={() => handleEditFacility(facility)}
-                    >
-                      <Edit2 className="w-4 h-4" />
-                    </Button>
-                    <Button
-                      variant="outline"
-                      size="icon"
-                      className="text-destructive hover:text-destructive"
-                      onClick={() => handleDeleteFacility(facility.id)}
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </Button>
                   </div>
                 </div>
               </Card>
