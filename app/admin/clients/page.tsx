@@ -211,7 +211,8 @@ export default function ClientsPage() {
     checkOut: "",
     roomType: "standard" as const,
     status: "active" as const,
-    nationality: ""
+    nationality: "",
+    createUserForClient: false,
   })
 
   const activeClients = clients.filter((client) => client.status === "checked-in" || client.status === "reserved")
@@ -710,7 +711,7 @@ export default function ClientsPage() {
                 </div>
               </div>
 
-              {/* Phone and Room */}
+              {/* Phone and Nationality */}
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">Teléfono</label>
@@ -723,91 +724,102 @@ export default function ClientsPage() {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Habitación</label>
-                  <input
-                    type="text"
-                    value={newClient.room}
-                    onChange={(e) => setNewClient({ ...newClient, room: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    placeholder="Ej: 205"
-                  />
-                </div>
-              </div>
-
-              {/* Check In and Check Out */}
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Check-in</label>
-                  <input
-                    type="date"
-                    value={newClient.checkIn}
-                    onChange={(e) => setNewClient({ ...newClient, checkIn: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Check-out</label>
-                  <input
-                    type="date"
-                    value={newClient.checkOut}
-                    onChange={(e) => setNewClient({ ...newClient, checkOut: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  />
-                </div>
-              </div>
-
-              {/* Room Type and Nationality */}
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Tipo de Habitación</label>
-                  <select
-                    value={newClient.roomType}
-                    onChange={(e) => setNewClient({ ...newClient, roomType: e.target.value as "standard" | "deluxe" | "premium" })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  >
-                    <option value="standard">Estándar</option>
-                    <option value="deluxe">Deluxe</option>
-                    <option value="premium">Premium</option>
-                  </select>
-                </div>
-                <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">Nacionalidad</label>
-                  <input
-                    type="text"
+                  <select
                     value={newClient.nationality}
                     onChange={(e) => setNewClient({ ...newClient, nationality: e.target.value })}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    placeholder="Ej: España"
-                  />
+                  >
+                    <option value="">Seleccionar país</option>
+                    <option value="España">🇪🇸 España</option>
+                    <option value="México">🇲🇽 México</option>
+                    <option value="Argentina">🇦🇷 Argentina</option>
+                    <option value="Colombia">🇨🇴 Colombia</option>
+                    <option value="Perú">🇵🇪 Perú</option>
+                    <option value="Chile">🇨🇱 Chile</option>
+                    <option value="Venezuela">🇻🇪 Venezuela</option>
+                    <option value="Ecuador">🇪🇨 Ecuador</option>
+                    <option value="Bolivia">🇧🇴 Bolivia</option>
+                    <option value="Paraguay">🇵��� Paraguay</option>
+                    <option value="Uruguay">🇺🇾 Uruguay</option>
+                    <option value="Guatemala">🇬🇹 Guatemala</option>
+                    <option value="Honduras">🇭🇳 Honduras</option>
+                    <option value="El Salvador">🇸🇻 El Salvador</option>
+                    <option value="Nicaragua">🇳🇮 Nicaragua</option>
+                    <option value="Costa Rica">🇨🇷 Costa Rica</option>
+                    <option value="Panamá">🇵🇦 Panamá</option>
+                    <option value="Cuba">🇨🇺 Cuba</option>
+                    <option value="República Dominicana">🇩🇴 República Dominicana</option>
+                    <option value="Puerto Rico">🇵🇷 Puerto Rico</option>
+                    <option value="Estados Unidos">🇺🇸 Estados Unidos</option>
+                    <option value="Canadá">🇨🇦 Canadá</option>
+                    <option value="Francia">🇫🇷 Francia</option>
+                    <option value="Italia">🇮🇹 Italia</option>
+                    <option value="Alemania">🇩🇪 Alemania</option>
+                    <option value="Portugal">🇵🇹 Portugal</option>
+                    <option value="Reino Unido">🇬🇧 Reino Unido</option>
+                    <option value="Irlanda">🇮🇪 Irlanda</option>
+                    <option value="Suiza">🇨🇭 Suiza</option>
+                    <option value="Austria">🇦🇹 Austria</option>
+                    <option value="Países Bajos">🇳🇱 Países Bajos</option>
+                    <option value="Bélgica">🇧🇪 Bélgica</option>
+                    <option value="Dinamarca">🇩🇰 Dinamarca</option>
+                    <option value="Suecia">🇸🇪 Suecia</option>
+                    <option value="Noruega">🇳🇴 Noruega</option>
+                    <option value="Finlandia">🇫🇮 Finlandia</option>
+                    <option value="Rusia">🇷🇺 Rusia</option>
+                    <option value="China">🇨🇳 China</option>
+                    <option value="Japón">🇯🇵 Japón</option>
+                    <option value="Corea del Sur">🇰🇷 Corea del Sur</option>
+                    <option value="India">🇮🇳 India</option>
+                    <option value="Tailandia">🇹🇭 Tailandia</option>
+                    <option value="Vietnam">🇻🇳 Vietnam</option>
+                    <option value="Filipinas">🇵🇭 Filipinas</option>
+                    <option value="Indonesia">🇮🇩 Indonesia</option>
+                    <option value="Malasia">🇲🇾 Malasia</option>
+                    <option value="Singapur">🇸🇬 Singapur</option>
+                    <option value="Tailandia">🇹🇭 Tailandia</option>
+                    <option value="Australia">🇦🇺 Australia</option>
+                    <option value="Nueva Zelanda">🇳🇿 Nueva Zelanda</option>
+                    <option value="Sudáfrica">🇿🇦 Sudáfrica</option>
+                    <option value="Egipto">🇪🇬 Egipto</option>
+                    <option value="Marruecos">🇲🇦 Marruecos</option>
+                    <option value="Emiratos Árabes">🇦🇪 Emiratos Árabes</option>
+                    <option value="Israel">🇮🇱 Israel</option>
+                    <option value="Arabia Saudí">🇸🇦 Arabia Saudí</option>
+                    <option value="Turquía">🇹🇷 Turquía</option>
+                    <option value="Grecia">🇬🇷 Grecia</option>
+                  </select>
                 </div>
               </div>
 
-              {/* Status */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Estado</label>
-                <select
-                  value={newClient.status}
-                  onChange={(e) => setNewClient({ ...newClient, status: e.target.value as "active" | "checkout" })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                >
-                  <option value="active">Activo</option>
-                  <option value="checkout">Check-out</option>
-                </select>
-              </div>
+              {/* Status and Category */}
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Estado</label>
+                  <select
+                    value={newClient.status}
+                    onChange={(e) => setNewClient({ ...newClient, status: e.target.value as "active" | "checkout" })}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  >
+                    <option value="active">Activo</option>
+                    <option value="checkout">Check-out</option>
+                  </select>
+                </div>
 
-              {/* Client Category */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Categoría de Cliente</label>
-                <select
-                  value={newClient.category}
-                  onChange={(e) => setNewClient({ ...newClient, category: e.target.value as "Basic" | "Preferred" | "Elite" | "VIP" })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                >
-                  <option value="Basic">Basic</option>
-                  <option value="Preferred">Preferred</option>
-                  <option value="Elite">Elite</option>
-                  <option value="VIP">VIP</option>
-                </select>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Categoría de Cliente</label>
+                  <select
+                    value={newClient.category}
+                    onChange={(e) => setNewClient({ ...newClient, category: e.target.value as "Basic" | "Preferred" | "Elite" | "VIP" })}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  >
+                    <option value="Basic">Basic</option>
+                    <option value="Preferred">Preferred</option>
+                    <option value="Elite">Elite</option>
+                    <option value="VIP">VIP</option>
+                  </select>
+                </div>
               </div>
 
               {/* Notes */}
@@ -819,6 +831,20 @@ export default function ClientsPage() {
                   className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 min-h-20"
                   placeholder="Notas adicionales sobre el cliente..."
                 />
+              </div>
+
+              {/* Create User for Client */}
+              <div className="flex items-center gap-3">
+                <input
+                  type="checkbox"
+                  id="createUserForClient"
+                  checked={newClient.createUserForClient}
+                  onChange={(e) => setNewClient({ ...newClient, createUserForClient: e.target.checked })}
+                  className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-2 focus:ring-blue-500 cursor-pointer"
+                />
+                <label htmlFor="createUserForClient" className="text-sm font-medium text-gray-700 cursor-pointer">
+                  Crear usuario para cliente
+                </label>
               </div>
             </div>
 

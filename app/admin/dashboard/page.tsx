@@ -211,6 +211,8 @@ export default function DashboardControl() {
   const [showRoomBookingDialog, setShowRoomBookingDialog] = useState(false)
   const [clientSuggestions, setClientSuggestions] = useState<string[]>([])
   const [showClientSuggestions, setShowClientSuggestions] = useState(false)
+  const [selectedClient, setSelectedClient] = useState<any>(null)
+  const [clientSearchTerm, setClientSearchTerm] = useState("")
   const [newBooking, setNewBooking] = useState({
     facilityId: "",
     clientName: "",
@@ -219,6 +221,19 @@ export default function DashboardControl() {
     duration: 60,
     people: 1,
   })
+
+  const mockClients = [
+    { id: "1", name: "Juan Pérez", email: "juan@example.com", phone: "+34 612 345 678", room: "301", checkIn: "2026-03-01", checkOut: "2026-03-05" },
+    { id: "2", name: "María García", email: "maria@example.com", phone: "+34 623 456 789", room: "205", checkIn: "2026-03-02", checkOut: "2026-03-06" },
+    { id: "3", name: "Carlos López", email: "carlos@example.com", phone: "+34 634 567 890", room: "412", checkIn: "2026-03-03", checkOut: "2026-03-07" },
+    { id: "4", name: "Ana Martínez", email: "ana@example.com", phone: "+34 645 678 901", room: "308", checkIn: "2026-03-04", checkOut: "2026-03-08" },
+    { id: "5", name: "Laura Sánchez", email: "laura@example.com", phone: "+34 656 789 012", room: "501", checkIn: "2026-03-05", checkOut: "2026-03-09" },
+  ]
+
+  const filteredClients = mockClients.filter(client => 
+    client.name.toLowerCase().includes(clientSearchTerm.toLowerCase()) ||
+    client.email.toLowerCase().includes(clientSearchTerm.toLowerCase())
+  )
 
   const mockFacilities: Facility[] = [
     { id: "1", name: "Gimnasio", type: "fitness", capacity: 15, icon: Dumbbell, color: "bg-orange-500", startTime: "06:00", endTime: "22:00" },
@@ -783,8 +798,53 @@ export default function DashboardControl() {
                         </Select>
                       </div>
                       <div>
-                        <Label htmlFor="guest-name">Nombre del huésped</Label>
-                        <Input id="guest-name" placeholder="Ej: Juan Pérez" />
+                        <Label htmlFor="guest-select">Cliente</Label>
+                        <div className="relative">
+                          <Input 
+                            id="guest-select"
+                            placeholder="Buscar cliente..."
+                            value={clientSearchTerm}
+                            onChange={(e) => {
+                              setClientSearchTerm(e.target.value)
+                              setShowClientSuggestions(true)
+                            }}
+                            onFocus={() => setShowClientSuggestions(true)}
+                          />
+                          {showClientSuggestions && (
+                            <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-gray-200 rounded-lg shadow-lg z-50 max-h-48 overflow-y-auto">
+                              {filteredClients.length > 0 ? (
+                                filteredClients.map(client => (
+                                  <button
+                                    key={client.id}
+                                    type="button"
+                                    onClick={() => {
+                                      setSelectedClient(client)
+                                      setClientSearchTerm(client.name)
+                                      setShowClientSuggestions(false)
+                                    }}
+                                    className="w-full text-left px-4 py-2 hover:bg-gray-100 border-b last:border-b-0 transition-colors"
+                                  >
+                                    <p className="font-medium text-sm">{client.name}</p>
+                                    <p className="text-xs text-gray-500">{client.email} - Habitación {client.room}</p>
+                                  </button>
+                                ))
+                              ) : (
+                                <div className="px-4 py-2 text-sm text-gray-500">No se encontraron clientes</div>
+                              )}
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                      <div>
+                        <Label htmlFor="people-count">Cantidad de Personas</Label>
+                        <Input 
+                          id="people-count"
+                          type="number"
+                          min="1"
+                          max="10"
+                          defaultValue="1"
+                          placeholder="Número de personas"
+                        />
                       </div>
                       <div className="grid grid-cols-2 gap-4">
                         <div>

@@ -19,7 +19,9 @@ export default function HomePage() {
   const [adminPassword, setAdminPassword] = useState("")
   const [isLoading, setIsLoading] = useState(false)
   const [showRegister, setShowRegister] = useState(false)
-  const [registerUsername, setRegisterUsername] = useState("")
+  const [registerFirstName, setRegisterFirstName] = useState("")
+  const [registerLastName, setRegisterLastName] = useState("")
+  const [registerEmail, setRegisterEmail] = useState("")
   const [registerPassword, setRegisterPassword] = useState("")
   const [registerConfirmPassword, setRegisterConfirmPassword] = useState("")
   const [isLoaded, setIsLoaded] = useState(false)
@@ -85,15 +87,28 @@ export default function HomePage() {
   const handleRegister = (e: React.FormEvent) => {
     e.preventDefault()
 
-    // Validación de username vacío
-    if (!registerUsername.trim()) {
-      alert(t("register.usernameMissing"))
+    // Validación de nombre vacío
+    if (!registerFirstName.trim()) {
+      alert(t("register.firstNameMissing"))
       return
     }
 
-    // Validación de username reservado
-    if (registerUsername === "1" || registerUsername === "2" || registerUsername === "3" || registerUsername === "system") {
-      alert(t("register.usernameReserved"))
+    // Validación de apellido vacío
+    if (!registerLastName.trim()) {
+      alert(t("register.lastNameMissing"))
+      return
+    }
+
+    // Validación de email vacío
+    if (!registerEmail.trim()) {
+      alert(t("register.emailMissing"))
+      return
+    }
+
+    // Validación de formato de email
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+    if (!emailRegex.test(registerEmail)) {
+      alert(t("register.invalidEmail"))
       return
     }
 
@@ -117,17 +132,17 @@ export default function HomePage() {
 
     // Validación de usuario ya existente
     const users = JSON.parse(localStorage.getItem("users") || "[]")
-    if (users.some((u: any) => u.username === registerUsername)) {
-      alert(t("register.usernameExists"))
+    if (users.some((u: any) => u.email === registerEmail)) {
+      alert(t("register.emailExists"))
       return
     }
 
     // Registro exitoso
-    users.push({ username: registerUsername, password: registerPassword })
+    users.push({ firstName: registerFirstName, lastName: registerLastName, email: registerEmail, password: registerPassword })
     localStorage.setItem("users", JSON.stringify(users))
 
     // Guardar usuario logueado
-    localStorage.setItem("currentUser", registerUsername)
+    localStorage.setItem("currentUser", registerEmail)
 
     // Redirigir a stays
     setIsLoading(true)
@@ -313,13 +328,36 @@ export default function HomePage() {
                   <h2 className="text-2xl font-bold text-gray-900 text-center">{t("register.registerTitle")}</h2>
                   
                   <form onSubmit={handleRegister} className="space-y-4">
+                    <div className="grid grid-cols-2 gap-3">
+                      <div className="space-y-2">
+                        <label className="text-sm font-medium text-gray-700">{t("register.firstName")}</label>
+                        <Input
+                          type="text"
+                          placeholder={t("register.enterFirstName")}
+                          value={registerFirstName}
+                          onChange={(e) => setRegisterFirstName(e.target.value)}
+                          className="w-full h-12 px-4 border-2 border-gray-200 focus:border-blue-500 rounded-xl"
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <label className="text-sm font-medium text-gray-700">{t("register.lastName")}</label>
+                        <Input
+                          type="text"
+                          placeholder={t("register.enterLastName")}
+                          value={registerLastName}
+                          onChange={(e) => setRegisterLastName(e.target.value)}
+                          className="w-full h-12 px-4 border-2 border-gray-200 focus:border-blue-500 rounded-xl"
+                        />
+                      </div>
+                    </div>
+
                     <div className="space-y-2">
-                      <label className="text-sm font-medium text-gray-700">{t("register.username")}</label>
+                      <label className="text-sm font-medium text-gray-700">{t("register.email")}</label>
                       <Input
-                        type="text"
-                        placeholder={t("register.enterUsername")}
-                        value={registerUsername}
-                        onChange={(e) => setRegisterUsername(e.target.value)}
+                        type="email"
+                        placeholder={t("register.enterEmail")}
+                        value={registerEmail}
+                        onChange={(e) => setRegisterEmail(e.target.value)}
                         className="w-full h-12 px-4 border-2 border-gray-200 focus:border-blue-500 rounded-xl"
                       />
                     </div>
@@ -349,7 +387,7 @@ export default function HomePage() {
                     <Button
                       type="submit"
                       className="w-full h-12 bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 text-white rounded-xl font-semibold transition-all shadow-md"
-                      disabled={!registerUsername || !registerPassword || !registerConfirmPassword}
+                      disabled={!registerFirstName || !registerLastName || !registerEmail || !registerPassword || !registerConfirmPassword}
                     >
                       {t("register.createAccount")}
                     </Button>
@@ -358,7 +396,9 @@ export default function HomePage() {
                       type="button"
                       onClick={() => {
                         setShowRegister(false)
-                        setRegisterUsername("")
+                        setRegisterFirstName("")
+                        setRegisterLastName("")
+                        setRegisterEmail("")
                         setRegisterPassword("")
                         setRegisterConfirmPassword("")
                       }}

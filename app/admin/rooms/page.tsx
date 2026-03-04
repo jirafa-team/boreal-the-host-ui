@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { ChevronLeft, ChevronRight, Search, LayoutGrid, Calendar, Plus, User } from "lucide-react"
+import { ChevronLeft, ChevronRight, Search, LayoutGrid, Calendar, Plus, User, Users } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -15,6 +15,7 @@ type Room = {
   number: string
   type: string
   floor: number
+  capacity: number
   status: RoomStatus
   guest?: string
   checkIn?: string
@@ -40,67 +41,72 @@ export default function RoomsManagement() {
   const [showCreateModal, setShowCreateModal] = useState(false)
   const [showEditModal, setShowEditModal] = useState(false)
   const [selectedRoom, setSelectedRoom] = useState<Room | null>(null)
-  const [newRoom, setNewRoom] = useState({ number: "", type: "Individual", floor: 1 })
+  const [newRoom, setNewRoom] = useState({ number: "", type: "Individual", floor: 1, capacity: 1 })
   const { t } = useLanguage()
 
   const [rooms, setRooms] = useState<Room[]>([
-    { id: "1", number: "101", type: "Individual", floor: 1, status: "available" },
+    { id: "1", number: "101", type: "Individual", floor: 1, capacity: 1, status: "available" },
     {
       id: "2",
       number: "102",
       type: "Doble",
       floor: 1,
+      capacity: 2,
       status: "occupied",
       guest: "Juan Pérez",
       checkIn: "2025-01-10",
       checkOut: "2025-01-15",
     },
-    { id: "3", number: "103", type: "Suite", floor: 1, status: "maintenance" },
+    { id: "3", number: "103", type: "Suite", floor: 1, capacity: 3, status: "maintenance" },
     {
       id: "4",
       number: "104",
       type: "Doble",
       floor: 1,
+      capacity: 2,
       status: "reserved",
       guest: "María García",
       checkIn: "2025-01-12",
       checkOut: "2025-01-14",
     },
-    { id: "5", number: "201", type: "Deluxe", floor: 2, status: "available" },
+    { id: "5", number: "201", type: "Deluxe", floor: 2, capacity: 2, status: "available" },
     {
       id: "6",
       number: "202",
       type: "Suite",
       floor: 2,
+      capacity: 4,
       status: "occupied",
       guest: "Carlos López",
       checkIn: "2025-01-09",
       checkOut: "2025-01-16",
     },
-    { id: "7", number: "203", type: "Individual", floor: 2, status: "available" },
+    { id: "7", number: "203", type: "Individual", floor: 2, capacity: 1, status: "available" },
     {
       id: "8",
       number: "204",
       type: "Presidencial",
       floor: 2,
+      capacity: 5,
       status: "occupied",
       guest: "Ana Martínez",
       checkIn: "2025-01-11",
       checkOut: "2025-01-13",
     },
-    { id: "9", number: "301", type: "Doble", floor: 3, status: "available" },
+    { id: "9", number: "301", type: "Doble", floor: 3, capacity: 2, status: "available" },
     {
       id: "10",
       number: "302",
       type: "Suite",
       floor: 3,
+      capacity: 4,
       status: "reserved",
       guest: "Luis Rodríguez",
       checkIn: "2025-01-13",
       checkOut: "2025-01-18",
     },
-    { id: "11", number: "303", type: "Individual", floor: 3, status: "available" },
-    { id: "12", number: "304", type: "Doble", floor: 3, status: "available" },
+    { id: "11", number: "303", type: "Individual", floor: 3, capacity: 1, status: "available" },
+    { id: "12", number: "304", type: "Doble", floor: 3, capacity: 2, status: "available" },
   ])
 
   const handleCreateRoom = () => {
@@ -123,9 +129,10 @@ export default function RoomsManagement() {
         number: roomNumber,
         type: newRoom.type,
         floor: newRoom.floor,
+        capacity: newRoom.capacity,
         status: "available"
       }]);
-      setNewRoom({ number: "", type: "Individual", floor: 1 });
+      setNewRoom({ number: "", type: "Individual", floor: 1, capacity: 1 });
       setShowCreateModal(false);
       toast({
         title: "Éxito",
@@ -527,7 +534,8 @@ export default function RoomsManagement() {
 
                 <div className="space-y-2">
                   <div className="pt-2 border-t border-border">
-                    <div className="flex items-center gap-2">
+                    {/* Capacity */}
+                    <div className="flex items-center gap-2 mb-2">
                       <div 
                         className="w-6 h-6 rounded-full flex items-center justify-center"
                         style={{ 
@@ -540,7 +548,7 @@ export default function RoomsManagement() {
                                 : "rgba(180, 83, 9, 0.15)" 
                         }}
                       >
-                        <User 
+                        <Users 
                           className="w-3.5 h-3.5" 
                           style={{ 
                             color: room.status === "available" 
@@ -553,15 +561,7 @@ export default function RoomsManagement() {
                           }} 
                         />
                       </div>
-                      <button 
-                        onClick={(e) => {
-                          e.stopPropagation()
-                          // TODO: Add guest detail modal or navigation here
-                        }}
-                        className="text-sm font-medium text-foreground hover:text-primary hover:underline cursor-pointer transition-colors"
-                      >
-                        {room.guest}
-                      </button>
+                      <span className="text-sm font-medium text-foreground">{room.capacity} {room.capacity === 1 ? "persona" : "personas"}</span>
                     </div>
                     {room.checkIn && room.checkOut && (
                       <div className="flex items-center gap-2 mt-2 text-xs">
@@ -630,7 +630,7 @@ export default function RoomsManagement() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">{t("admin.roomType")}</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1">{t("admin.type")}</label>
                 <select
                   value={newRoom.type}
                   onChange={(e) => setNewRoom({ ...newRoom, type: e.target.value })}
@@ -639,9 +639,23 @@ export default function RoomsManagement() {
                   <option>Individual</option>
                   <option>Doble</option>
                   <option>Suite</option>
+                  <option>Familiar</option>
                   <option>Deluxe</option>
                   <option>Presidencial</option>
                 </select>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Capacidad (Personas)</label>
+                <input
+                  type="number"
+                  min="1"
+                  max="10"
+                  value={newRoom.capacity}
+                  onChange={(e) => setNewRoom({ ...newRoom, capacity: parseInt(e.target.value) || 1 })}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  placeholder="Cantidad de personas"
+                />
               </div>
 
               <div>
@@ -706,6 +720,17 @@ export default function RoomsManagement() {
                   <option value="Suite">Suite</option>
                   <option value="Familiar">Familiar</option>
                 </select>
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium text-foreground mb-1">Capacidad (Personas)</label>
+                <Input
+                  type="number"
+                  value={selectedRoom.capacity}
+                  onChange={(e) => setSelectedRoom({ ...selectedRoom, capacity: parseInt(e.target.value) || 1 })}
+                  min={1}
+                  max={10}
+                />
               </div>
               
               <div>
