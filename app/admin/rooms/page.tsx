@@ -723,6 +723,17 @@ export default function RoomsManagement() {
               </div>
               
               <div>
+                <label className="block text-sm font-medium text-foreground mb-1">Capacidad (Personas)</label>
+                <Input
+                  type="number"
+                  value={selectedRoom.capacity}
+                  onChange={(e) => setSelectedRoom({ ...selectedRoom, capacity: parseInt(e.target.value) || 1 })}
+                  min={1}
+                  max={10}
+                />
+              </div>
+              
+              <div>
                 <label className="block text-sm font-medium text-foreground mb-1">Piso</label>
                 <Input
                   type="number"
