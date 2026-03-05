@@ -211,7 +211,7 @@ export default function CheckInPage() {
   }
 
   return (
-    <div className="min-h-screen h-screen w-full bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center p-4 overflow-y-auto">
+    <div className="min-h-screen w-full bg-gradient-to-br from-gray-50 to-gray-100 flex items-start justify-center p-4 pt-8 overflow-y-auto">
       <Card className="w-full max-w-md border-0 shadow-xl">
         <CardHeader
           className="text-center space-y-4 relative overflow-hidden py-8"
@@ -259,6 +259,10 @@ export default function CheckInPage() {
         </CardHeader>
 
         <CardContent className="pt-6">
+          <div className="mb-6">
+            <h2 className="text-3xl font-bold text-blue-900 mb-2">Completa tu Check-in</h2>
+            <p className="text-gray-600 text-sm">Por favor, completa los siguientes datos para finalizar tu registro en el hotel</p>
+          </div>
           <form onSubmit={handleSubmit} className="space-y-4">
             <Input
               id="firstName"
@@ -463,7 +467,7 @@ export default function CheckInPage() {
               type="submit"
               className="w-full mt-6 text-white font-semibold"
               style={{
-                background: "linear-gradient(to right, #6f65d0, #67f1d0)",
+                background: "linear-gradient(to right, #3b82f6, #60a5fa)",
               }}
             >
               Completar Check-In
