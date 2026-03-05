@@ -1,6 +1,7 @@
 import { createSlice, type PayloadAction, type AnyAction } from '@reduxjs/toolkit';
 import { createApi } from '@reduxjs/toolkit/query/react';
 import type { User } from '@/interfaces/user/User';
+import type { UserWithOptionalStaff } from '@/app/admin/staff/utils/userToStaffDisplay';
 import { STAFF_ROLE_NAME } from '@/app/admin/staff/constants';
 import { ENDPOINTS } from '@/shared/types/api';
 import { baseQueryWithOrg } from '@/store/baseQuery';
@@ -8,15 +9,58 @@ import type { GetStaffResponse } from '@/interfaces/staff/GetStaffResponse';
 import type { StaffStatsByDepartment } from '@/interfaces/staff/StaffStatsByDepartment';
 
 interface StaffState {
-  staff: User[];
+  staff: UserWithOptionalStaff[];
 }
 
-const MOCK_STAFF: User[] = [
-  { id: '1', firstName: 'María', lastName: 'González', email: 'maria@hotel.com', roleName: STAFF_ROLE_NAME, status: 'active' },
-  { id: '2', firstName: 'Roberto', lastName: 'Fernández', email: 'roberto@hotel.com', roleName: STAFF_ROLE_NAME, status: 'active' },
-  { id: '3', firstName: 'Carmen', lastName: 'Silva', email: 'carmen@hotel.com', roleName: STAFF_ROLE_NAME, status: 'active' },
-  { id: '4', firstName: 'Diego', lastName: 'Ramírez', email: 'diego@hotel.com', roleName: STAFF_ROLE_NAME, status: 'active' },
-  { id: '5', firstName: 'Laura', lastName: 'Pérez', email: 'laura@hotel.com', roleName: STAFF_ROLE_NAME, status: 'active' },
+const MOCK_STAFF: UserWithOptionalStaff[] = [
+  {
+    id: '1',
+    firstName: 'María',
+    lastName: 'González',
+    email: 'maria@hotel.com',
+    roleName: STAFF_ROLE_NAME,
+    status: 'active',
+    employee: {
+      workStatus: 'busy',
+      departmentName: 'Limpieza',
+      workStartTime: '07:00',
+      workEndTime: '15:00',
+      tasksToday: 5,
+      maxCapacity: 8,
+    },
+  },
+  {
+    id: '2',
+    firstName: 'Roberto',
+    lastName: 'Fernández',
+    email: 'roberto@hotel.com',
+    roleName: STAFF_ROLE_NAME,
+    status: 'active',
+    employee: {
+      workStatus: 'available',
+      departmentName: 'Mantenimiento',
+      workStartTime: '07:00',
+      workEndTime: '15:00',
+      tasksToday: 3,
+      maxCapacity: 8,
+    },
+  },
+  {
+    id: '3',
+    firstName: 'Carmen',
+    lastName: 'Silva',
+    email: 'carmen@hotel.com',
+    roleName: STAFF_ROLE_NAME,
+    status: 'active',
+    employee: {
+      workStatus: 'busy',
+      departmentName: 'Limpieza',
+      workStartTime: '11:00',
+      workEndTime: '19:00',
+      tasksToday: 6,
+      maxCapacity: 8,
+    },
+  },
 ];
 
 const initialState: StaffState = {
@@ -27,7 +71,7 @@ export const staffSlice = createSlice({
   name: 'staff',
   initialState,
   reducers: {
-    setStaff: (state, action: PayloadAction<User[]>) => {
+    setStaff: (state, action: PayloadAction<UserWithOptionalStaff[]>) => {
       state.staff = action.payload;
     },
   },

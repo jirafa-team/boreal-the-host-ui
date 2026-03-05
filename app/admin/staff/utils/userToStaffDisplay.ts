@@ -1,13 +1,15 @@
 import type { User } from '@/interfaces/user/User';
 import type { StaffMemberDisplay } from '@/interfaces/staff/StaffMemberDisplay';
 
-interface UserWithOptionalStaff extends User {
+export interface UserWithOptionalStaff extends User {
   employee?: {
     workStatus?: string;
     workStartTime?: string;
     workEndTime?: string;
     departmentId?: string;
     departmentName?: string;
+    tasksToday?: number;
+    maxCapacity?: number;
   };
   departmentId?: string;
   workStartTime?: string;
@@ -38,6 +40,8 @@ export function userToStaffDisplay(u: UserWithOptionalStaff): StaffMemberDisplay
       workEndTime: u.employee?.workEndTime,
       departmentId: u.employee?.departmentId,
       departmentName: u.employee?.departmentName,
+      tasksToday: u.employee?.tasksToday,
+      maxCapacity: u.employee?.maxCapacity,
     },
   };
 }

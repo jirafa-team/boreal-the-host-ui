@@ -1,8 +1,9 @@
 'use client';
 
-import { useState, useMemo } from 'react';
-import { Card, CardContent } from '@/components/ui/card';
+import { useState } from 'react';
+import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import {
@@ -11,261 +12,280 @@ import {
   DialogDescription,
   DialogHeader,
   DialogTitle,
+  DialogTrigger,
 } from '@/components/ui/dialog';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { useLanguage } from '@/lib/i18n-context';
-import { Calendar, Plus } from 'lucide-react';
-import type { StaffMemberDisplay } from '@/interfaces/staff/StaffMemberDisplay';
-import type { StaffStatsByDepartment } from '@/interfaces/staff/StaffStatsByDepartment';
-import { StaffCardGrid } from './StaffCardGrid';
-import { StaffKanbanTimeline } from './StaffKanbanTimeline';
-import { DepartmentStatsCards } from './DepartmentStatsCards';
+import { Plus, CheckSquare } from 'lucide-react';
+import type { StaffMemberView, NewStaffForm, NewTaskForm } from './types';
 import { CreateStaffDialog } from './CreateStaffDialog';
-import { EditStaffDialog } from './EditStaffDialog';
-import { useGetDepartmentsQuery } from '@/features/taxonomy-department/slices/taxonomyDepartmentSlice';
+import { AssignTaskDialog } from './AssignTaskDialog';
 
-export interface StaffViewProps {
-  staffList: StaffMemberDisplay[];
-  isLoading: boolean;
+type TFunction = (key: string) => string;
+
+export type StaffViewProps = {
+  staff: StaffMemberView[];
+  isLoading?: boolean;
   error?: unknown;
-  staffStats?: StaffStatsByDepartment[] | null;
-  staffStatsLoading?: boolean;
-  createDialogOpen: boolean;
-  setCreateDialogOpen: (open: boolean) => void;
-  editStaff: StaffMemberDisplay | null;
-  setEditStaff: (staff: StaffMemberDisplay | null) => void;
-  onDelete: (id: string) => void;
-  onCreateSuccess: () => void;
-  onEditSuccess: () => void;
-  isApiMode: boolean;
-  onMockCreate?: (payload: { firstName: string; lastName: string; email: string; workStartTime?: string; workEndTime?: string; departmentId?: string }) => void;
-  onMockUpdate?: (id: string, payload: { firstName?: string; lastName?: string; email?: string; position?: string; status?: string }) => void;
+  searchName: string;
+  onSearchNameChange: (value: string) => void;
+  selectedStaff: StaffMemberView | null;
+  onSelectedStaffChange: (member: StaffMemberView | null) => void;
+  showAddDialog: boolean;
+  onShowAddDialogChange: (open: boolean) => void;
+  showAssignTaskDialog: boolean;
+  onShowAssignTaskDialogChange: (open: boolean) => void;
+  newStaff: NewStaffForm;
+  onNewStaffChange: (updater: (prev: NewStaffForm) => NewStaffForm) => void;
+  newTask: NewTaskForm;
+  onNewTaskChange: (updater: (prev: NewTaskForm) => NewTaskForm) => void;
+  onAddStaff: () => void;
+  onAssignTask: () => void;
+  t: TFunction;
+};
+
+function getStatusColor(status: string): string {
+  switch (status) {
+    case 'available':
+      return 'bg-green-500';
+    case 'busy':
+      return 'bg-yellow-500';
+    case 'off':
+      return 'bg-gray-400';
+    default:
+      return 'bg-gray-400';
+  }
 }
 
 export function StaffView({
-  staffList,
+  staff,
   isLoading,
   error,
-  staffStats = null,
-  staffStatsLoading = false,
-  createDialogOpen,
-  setCreateDialogOpen,
-  editStaff,
-  setEditStaff,
-  onDelete,
-  onCreateSuccess,
-  onEditSuccess,
-  isApiMode,
-  onMockCreate,
-  onMockUpdate,
+  searchName,
+  onSearchNameChange,
+  selectedStaff,
+  onSelectedStaffChange,
+  showAddDialog,
+  onShowAddDialogChange,
+  showAssignTaskDialog,
+  onShowAssignTaskDialogChange,
+  newStaff,
+  onNewStaffChange,
+  newTask,
+  onNewTaskChange,
+  onAddStaff,
+  onAssignTask,
+  t,
 }: StaffViewProps) {
-  const { t } = useLanguage();
-  const [viewMode, setViewMode] = useState<'overview' | 'kanban'>('overview');
-  const [searchName, setSearchName] = useState('');
-  const [filterDepartment, setFilterDepartment] = useState('all');
-  const [filterDate, setFilterDate] = useState('');
-  const [activityDialogOpen, setActivityDialogOpen] = useState(false);
-
-  const { data: departmentsData } = useGetDepartmentsQuery(undefined, { skip: !isApiMode });
-  const departments = departmentsData?.data ?? [];
-
-  const filteredList = useMemo(() => {
-    let list = staffList;
-    const q = searchName.toLowerCase().trim();
-    if (q) {
-      list = list.filter(
-        (s) =>
-          s.name?.toLowerCase().includes(q) ||
-          s.email?.toLowerCase().includes(q) ||
-          s.firstName?.toLowerCase().includes(q) ||
-          s.lastName?.toLowerCase().includes(q)
-      );
+  const getStatusText = (status: string) => {
+    switch (status) {
+      case 'available':
+        return t('admin.available');
+      case 'busy':
+        return t('admin.busy');
+      case 'off':
+        return t('admin.off');
+      default:
+        return status;
     }
-    if (filterDepartment !== 'all') {
-      list = list.filter((s) =>
-        isApiMode
-          ? (s.employee?.departmentId ?? '') === filterDepartment
-          : (s.employee?.departmentName ?? '') === filterDepartment
-      );
-    }
-    return list;
-  }, [staffList, searchName, filterDepartment, isApiMode]);
+  };
+
+  const filteredStaff = staff.filter((member) =>
+    member.name.toLowerCase().includes(searchName.toLowerCase())
+  );
 
   return (
-    <>
-      <header className="bg-card border-b border-border sticky top-0 z-10">
-        <div className="px-8 py-4">
-          <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-2xl font-bold text-foreground">{t('admin.staffTitle')}</h1>
-              <p className="text-sm text-muted-foreground">{t('admin.manageYour')} {t('admin.staffMembers')}</p>
-            </div>
-            <div className="flex gap-4 items-center ml-auto">
-              <div className="inline-flex h-10 items-center rounded-lg bg-gray-100 p-1 border border-gray-200">
-                <button
-                  type="button"
-                  onClick={() => setViewMode('overview')}
-                  className={`px-5 py-2 rounded-md font-medium text-sm transition-all ${viewMode === 'overview' ? 'text-white shadow-md' : 'text-gray-700 hover:text-gray-900'
-                    }`}
-                  style={viewMode === 'overview' ? { backgroundColor: '#394a63' } : {}}
-                >
-                  General
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setViewMode('kanban')}
-                  className={`px-5 py-2 rounded-md font-medium text-sm transition-all ${viewMode === 'kanban' ? 'text-white shadow-md' : 'text-gray-700 hover:text-gray-900'
-                    }`}
-                  style={viewMode === 'kanban' ? { backgroundColor: '#394a63' } : {}}
-                >
-                  Kanban
-                </button>
-              </div>
-              <Dialog open={activityDialogOpen} onOpenChange={setActivityDialogOpen}>
-                <button
-                  type="button"
-                  onClick={() => setActivityDialogOpen(true)}
-                  className="flex items-center justify-center w-10 h-10 rounded-full bg-gradient-to-br from-amber-500 to-amber-600 text-white shadow-md hover:shadow-lg transition-all duration-300 hover:scale-110 group relative"
-                  title={t('admin.createActivity')}
-                >
-                  <div className="relative flex items-center justify-center">
-                    <Calendar className="w-5 h-5" />
-                    <span className="absolute text-base font-bold -bottom-0.5 -right-0.5 text-white drop-shadow-lg">+</span>
-                  </div>
-                  <span className="absolute top-full mt-2 px-2 py-1 bg-gray-900 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap">
-                    {t('admin.createActivity')}
-                  </span>
-                </button>
-                <DialogContent className="max-w-md">
-                  <DialogHeader>
-                    <DialogTitle>{t('admin.createNewActivity')}</DialogTitle>
-                    <DialogDescription>{t('admin.assignActivityToStaff')}</DialogDescription>
-                  </DialogHeader>
-                  <div className="space-y-5 py-4">
-                    <div>
-                      <Label htmlFor="assignedTo" className="text-sm font-medium mb-2 block">{t('admin.assignTo')}</Label>
-                      <Select disabled>
-                        <SelectTrigger id="assignedTo" className="h-10">
-                          <SelectValue placeholder={t('admin.selectStaff')} />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {staffList.map((member) => (
-                            <SelectItem key={member.id} value={member.id}>
-                              {member.name} ({member.employee?.departmentName ?? '—'})
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </div>
-                  </div>
-                </DialogContent>
-              </Dialog>
+    <div className="flex flex-col h-screen bg-background">
+      <header className="bg-card border-b border-border px-8 py-4">
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-2xl font-bold text-foreground">
+              {t('admin.staffTitle')}
+            </h1>
+            <p className="text-sm text-muted-foreground">
+              {t('admin.manageYour')} {t('admin.staffMembers')}
+            </p>
+          </div>
+          <Dialog open={showAddDialog} onOpenChange={onShowAddDialogChange}>
+            <DialogTrigger asChild>
               <button
-                type="button"
-                onClick={() => setCreateDialogOpen(true)}
-                className="flex items-center justify-center w-10 h-10 rounded-full bg-gray-100 border border-gray-200 text-gray-700 hover:bg-gray-200"
-                title={t('admin.addStaff') ?? 'Añadir personal'}
+                className="flex items-center justify-center w-10 h-10 rounded-full text-white shadow-md hover:shadow-lg transition-all duration-300 hover:scale-110 group relative"
+                style={{ backgroundColor: '#1557F6' }}
+                title={t('admin.addStaff')}
               >
                 <Plus className="w-5 h-5" />
+                <span className="absolute top-full mt-2 px-2 py-1 bg-gray-900 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap">
+                  {t('admin.addStaff')}
+                </span>
               </button>
-            </div>
-          </div>
+            </DialogTrigger>
+            <CreateStaffDialog
+              open={showAddDialog}
+              onOpenChange={onShowAddDialogChange}
+              newStaff={newStaff}
+              onNewStaffChange={onNewStaffChange}
+              onSubmit={onAddStaff}
+              t={t}
+            />
+          </Dialog>
         </div>
       </header>
 
-      <div className="space-y-4 p-6">
-        <DepartmentStatsCards staffStats={staffStats ?? []} isLoading={staffStatsLoading} />
-
-        <Card className="p-4">
-          <div className="flex gap-4 items-end">
+      <div className="flex-1 overflow-auto p-8">
+        <div className="space-y-6">
+          <div className="flex gap-4">
             <div className="flex-1">
-              <Label htmlFor="search-name" className="text-sm font-medium">Buscar por nombre</Label>
+              <Label htmlFor="search" className="text-sm font-medium">
+                {t('admin.searchByName')}
+              </Label>
               <Input
-                id="search-name"
-                placeholder="Ej: María, Roberto..."
+                id="search"
+                placeholder={t('admin.searchUsers')}
                 value={searchName}
-                onChange={(e) => setSearchName(e.target.value)}
-                className="mt-2"
-              />
-            </div>
-            <div className="w-48">
-              <Label htmlFor="filter-dept" className="text-sm font-medium">Filtrar por departamento</Label>
-              <Select value={filterDepartment} onValueChange={setFilterDepartment}>
-                <SelectTrigger id="filter-dept" className="mt-2">
-                  <SelectValue placeholder="Todos los departamentos" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">Todos los departamentos</SelectItem>
-                  {isApiMode
-                    ? departments.map((d) => (
-                      <SelectItem key={d.id} value={d.id}>
-                        {d.name}
-                      </SelectItem>
-                    ))
-                    : (
-                      <>
-                        <SelectItem value="Limpieza">Limpieza</SelectItem>
-                        <SelectItem value="Mantenimiento">Mantenimiento</SelectItem>
-                        <SelectItem value="Seguridad">Seguridad</SelectItem>
-                        <SelectItem value="Recepción">Recepción</SelectItem>
-                        <SelectItem value="Servicio">Servicio</SelectItem>
-                      </>
-                    )}
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="w-48">
-              <Label htmlFor="filter-date" className="text-sm font-medium">Filtrar por fecha</Label>
-              <Input
-                id="filter-date"
-                type="date"
-                value={filterDate}
-                onChange={(e) => setFilterDate(e.target.value)}
+                onChange={(e) => onSearchNameChange(e.target.value)}
                 className="mt-2"
               />
             </div>
           </div>
-        </Card>
 
-        {error && (
-          <Card className="border-destructive bg-destructive/10">
-            <CardContent className="p-4 text-destructive">
+          {error && (
+            <p className="text-sm text-destructive">
               {t('admin.errorLoadingStaff') ?? 'Error al cargar el personal.'}
-            </CardContent>
-          </Card>
-        )}
+            </p>
+          )}
 
-        {viewMode === 'overview' ? (
-          <StaffCardGrid
-            staffList={filteredList}
-            onEdit={setEditStaff}
-            onDelete={onDelete}
-            isLoading={isLoading}
-          />
-        ) : (
-          <StaffKanbanTimeline
-            staffList={filteredList}
-            onEdit={setEditStaff}
-            isLoading={isLoading}
-          />
-        )}
-
-        <CreateStaffDialog
-          open={createDialogOpen}
-          onClose={() => setCreateDialogOpen(false)}
-          onSuccess={onCreateSuccess}
-          isApiMode={isApiMode}
-          onMockCreate={!isApiMode ? onMockCreate : undefined}
-        />
-
-        <EditStaffDialog
-          open={!!editStaff}
-          staff={editStaff}
-          onClose={() => setEditStaff(null)}
-          onSuccess={onEditSuccess}
-          onMockUpdate={!isApiMode ? onMockUpdate : undefined}
-        />
+          {isLoading ? (
+            <p className="text-sm text-muted-foreground py-4">Cargando...</p>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+              {staff.length === 0 ? (
+                <div className="col-span-full text-center py-12">
+                  <p className="text-muted-foreground">{t('admin.selectFeature')}</p>
+                </div>
+              ) : (
+                filteredStaff.map((member) => (
+                  <Card
+                    key={member.id}
+                    className="p-4 cursor-pointer hover:shadow-md transition-shadow"
+                    onClick={() => onSelectedStaffChange(member)}
+                  >
+                    <div className="flex flex-col items-center text-center">
+                      <div className="w-12 h-12 bg-gradient-to-br from-primary to-primary/80 rounded-full flex items-center justify-center text-white font-bold shadow-md mb-3">
+                        {member.avatar}
+                      </div>
+                      <h3 className="font-semibold text-foreground text-sm">
+                        {member.name}
+                      </h3>
+                      <p className="text-xs text-muted-foreground">
+                        {member.department}
+                      </p>
+                      <p className="text-xs text-muted-foreground mt-1">
+                        {member.shift}
+                      </p>
+                      <Badge
+                        className={`${getStatusColor(member.status)} text-white mt-3`}
+                      >
+                        {getStatusText(member.status)}
+                      </Badge>
+                    </div>
+                    <div className="mt-4 pt-4 border-t border-border">
+                      <div className="flex items-center justify-between text-sm">
+                        <span className="text-muted-foreground">
+                          {t('admin.tasksToday')}
+                        </span>
+                        <span className="font-semibold text-foreground">
+                          {member.tasksToday} / {member.maxCapacity}
+                        </span>
+                      </div>
+                      <div className="w-full bg-muted rounded-full h-2 mt-2">
+                        <div
+                          className="bg-primary rounded-full h-2 transition-all"
+                          style={{
+                            width: `${(member.tasksToday / member.maxCapacity) * 100}%`,
+                          }}
+                        />
+                      </div>
+                    </div>
+                  </Card>
+                ))
+              )}
+            </div>
+          )}
+        </div>
       </div>
-    </>
+
+      {selectedStaff && (
+        <Dialog
+          open={!!selectedStaff}
+          onOpenChange={(open) => !open && onSelectedStaffChange(null)}
+        >
+          <DialogContent className="max-w-md">
+            <DialogHeader>
+              <DialogTitle>{t('admin.staffDetails')}</DialogTitle>
+            </DialogHeader>
+            <div className="space-y-4">
+              <div className="flex items-center gap-4">
+                <div className="w-16 h-16 bg-gradient-to-br from-primary to-primary/80 rounded-full flex items-center justify-center text-white font-bold text-xl">
+                  {selectedStaff.avatar}
+                </div>
+                <div>
+                  <h3 className="text-xl font-semibold text-foreground">
+                    {selectedStaff.name}
+                  </h3>
+                  <Badge
+                    className={`${getStatusColor(selectedStaff.status)} text-white mt-1`}
+                  >
+                    {getStatusText(selectedStaff.status)}
+                  </Badge>
+                </div>
+              </div>
+              <div className="space-y-2">
+                <div className="flex justify-between py-2 border-b border-border">
+                  <span className="text-muted-foreground">
+                    {t('admin.department')}
+                  </span>
+                  <span className="font-medium text-foreground">
+                    {selectedStaff.department}
+                  </span>
+                </div>
+                <div className="flex justify-between py-2 border-b border-border">
+                  <span className="text-muted-foreground">
+                    {t('admin.shift')}
+                  </span>
+                  <span className="font-medium text-foreground">
+                    {selectedStaff.shift}
+                  </span>
+                </div>
+                <div className="flex justify-between py-2">
+                  <span className="text-muted-foreground">
+                    {t('admin.tasksToday')}
+                  </span>
+                  <span className="font-medium text-foreground">
+                    {selectedStaff.tasksToday}
+                  </span>
+                </div>
+              </div>
+              <Button
+                onClick={() => onShowAssignTaskDialogChange(true)}
+                className="w-full bg-amber-600 hover:bg-amber-700"
+              >
+                <CheckSquare className="w-4 h-4 mr-2" />
+                {t('admin.createActivity')}
+              </Button>
+            </div>
+          </DialogContent>
+        </Dialog>
+      )}
+
+      {selectedStaff && (
+        <AssignTaskDialog
+          open={showAssignTaskDialog}
+          onOpenChange={onShowAssignTaskDialogChange}
+          selectedStaffName={selectedStaff.name}
+          newTask={newTask}
+          onNewTaskChange={onNewTaskChange}
+          onSubmit={onAssignTask}
+          t={t}
+        />
+      )}
+    </div>
   );
 }

@@ -1,69 +1,114 @@
 'use client';
 
-import { useState } from 'react';
+import { useMemo, useState, useCallback } from 'react';
 import { useSelector } from 'react-redux';
 import type { RootState } from '@/store/store';
-import {
-  useGetStaffQuery,
-  useGetStaffStatsQuery,
-  useDeleteStaffMutation,
-} from '@/app/admin/staff/slice/staffSlice';
+import { useGetStaffQuery } from '@/app/admin/staff/slice/staffSlice';
+import { useCreateUserMutation } from '@/app/admin/users/slice/userSlice';
+import { useGetDepartmentsQuery } from '@/features/taxonomy-department/slices/taxonomyDepartmentSlice';
+import { staffDisplayToView } from '@/app/admin/staff/utils/staffDisplayToView';
 import { StaffView } from '../components/StaffView';
-import type { StaffMemberDisplay } from '@/interfaces/staff/StaffMemberDisplay';
+import type { StaffMemberView, NewStaffForm, NewTaskForm } from '../components/types';
+import { useLanguage } from '@/lib/i18n-context';
+import { STAFF_ROLE_NAME, SHIFT_TO_SCHEDULE } from '@/app/admin/staff/constants';
+
+const initialNewStaff: NewStaffForm = {
+  name: '',
+  email: '',
+  department: 'Limpieza',
+  shift: 'morning',
+};
+
+const initialNewTask: NewTaskForm = {
+  description: '',
+  priority: 'normal',
+  deliveryTime: '1',
+};
 
 export function StaffApiContainer() {
+  const { t } = useLanguage();
   const dataSource = useSelector((state: RootState) => state.dataSource.dataSource);
   const isApiMode = dataSource === 'api';
-
-  const [createDialogOpen, setCreateDialogOpen] = useState(false);
-  const [editStaff, setEditStaff] = useState<StaffMemberDisplay | null>(null);
 
   const { data: apiData, isLoading, error, refetch } = useGetStaffQuery(undefined, {
     skip: !isApiMode,
   });
-  const { data: statsData, isLoading: staffStatsLoading } = useGetStaffStatsQuery(undefined, {
-    skip: !isApiMode,
-  });
+  const [createUser] = useCreateUserMutation();
+  const { data: departmentsData } = useGetDepartmentsQuery(undefined, { skip: !isApiMode });
+  const departments = departmentsData?.data ?? [];
 
-  const [deleteStaff] = useDeleteStaffMutation();
+  const staff: StaffMemberView[] = useMemo(() => {
+    const list = apiData?.data?.objects ?? [];
+    return list.map(staffDisplayToView);
+  }, [apiData]);
 
-  const staffList: StaffMemberDisplay[] = apiData?.data?.objects ?? [];
-  const staffStats = statsData?.data ?? null;
+  const [searchName, setSearchName] = useState('');
+  const [selectedStaff, setSelectedStaff] = useState<StaffMemberView | null>(null);
+  const [showAddDialog, setShowAddDialog] = useState(false);
+  const [showAssignTaskDialog, setShowAssignTaskDialog] = useState(false);
+  const [newStaff, setNewStaff] = useState<NewStaffForm>(initialNewStaff);
+  const [newTask, setNewTask] = useState<NewTaskForm>(initialNewTask);
 
-  const handleDelete = async (id: string) => {
+  const resolveDepartmentId = useCallback(
+    (departmentName: string): string | undefined => {
+      const byName = departments.find(
+        (d) => d.name?.toLowerCase() === departmentName.toLowerCase()
+      );
+      return byName?.id;
+    },
+    [departments]
+  );
+
+  const handleAddStaff = useCallback(async () => {
+    if (!newStaff.name.trim() || !newStaff.email.trim()) return;
+    const [firstName, ...lastParts] = newStaff.name.trim().split(/\s+/);
+    const lastName = lastParts.join(' ') || firstName;
+    const schedule = SHIFT_TO_SCHEDULE[newStaff.shift] ?? SHIFT_TO_SCHEDULE.morning;
+    const departmentId = resolveDepartmentId(newStaff.department);
     try {
-      await deleteStaff(id).unwrap();
+      await createUser({
+        firstName,
+        lastName,
+        email: newStaff.email.trim(),
+        roleName: STAFF_ROLE_NAME,
+        departmentId: departmentId ?? undefined,
+        workStartTime: schedule.workStartTime,
+        workEndTime: schedule.workEndTime,
+      }).unwrap();
+      setShowAddDialog(false);
+      setNewStaff(initialNewStaff);
       refetch();
     } catch {
-      // error handled by mutation
+      // Error handled by mutation / UI
     }
-  };
+  }, [newStaff, createUser, resolveDepartmentId, refetch]);
 
-  const handleCreateSuccess = () => {
-    setCreateDialogOpen(false);
-    refetch();
-  };
-
-  const handleEditSuccess = () => {
-    setEditStaff(null);
-    refetch();
-  };
+  const handleAssignTask = useCallback(() => {
+    // No assign-task API wired; close dialog and reset form
+    setShowAssignTaskDialog(false);
+    setNewTask(initialNewTask);
+  }, []);
 
   return (
     <StaffView
-      staffList={staffList}
+      staff={staff}
       isLoading={isLoading}
       error={error}
-      staffStats={staffStats}
-      staffStatsLoading={staffStatsLoading}
-      createDialogOpen={createDialogOpen}
-      setCreateDialogOpen={setCreateDialogOpen}
-      editStaff={editStaff}
-      setEditStaff={setEditStaff}
-      onDelete={handleDelete}
-      onCreateSuccess={handleCreateSuccess}
-      onEditSuccess={handleEditSuccess}
-      isApiMode={true}
+      searchName={searchName}
+      onSearchNameChange={setSearchName}
+      selectedStaff={selectedStaff}
+      onSelectedStaffChange={setSelectedStaff}
+      showAddDialog={showAddDialog}
+      onShowAddDialogChange={setShowAddDialog}
+      showAssignTaskDialog={showAssignTaskDialog}
+      onShowAssignTaskDialogChange={setShowAssignTaskDialog}
+      newStaff={newStaff}
+      onNewStaffChange={setNewStaff}
+      newTask={newTask}
+      onNewTaskChange={setNewTask}
+      onAddStaff={handleAddStaff}
+      onAssignTask={handleAssignTask}
+      t={t}
     />
   );
 }

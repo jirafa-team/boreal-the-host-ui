@@ -1,85 +1,131 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState, useCallback } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import type { RootState } from '@/store/store';
 import { loadMockStaff, setStaff } from '@/app/admin/staff/slice/staffSlice';
-import type { User } from '@/interfaces/user/User';
-import { STAFF_ROLE_NAME } from '@/app/admin/staff/constants';
+import type { UserWithOptionalStaff } from '@/app/admin/staff/utils/userToStaffDisplay';
 import { userToStaffDisplay } from '@/app/admin/staff/utils/userToStaffDisplay';
-import { computeStaffStatsFromList } from '@/app/admin/staff/utils/computeStaffStatsFromList';
+import { staffDisplayToView } from '@/app/admin/staff/utils/staffDisplayToView';
 import { StaffView } from '../components/StaffView';
-import type { StaffMemberDisplay } from '@/interfaces/staff/StaffMemberDisplay';
+import type {
+  StaffMemberView,
+  NewStaffForm,
+  NewTaskForm,
+} from '../components/types';
 import { useLanguage } from '@/lib/i18n-context';
+import { SHIFT_TO_SCHEDULE } from '@/app/admin/staff/constants';
+
+const initialNewStaff: NewStaffForm = {
+  name: '',
+  email: '',
+  department: 'Limpieza',
+  shift: 'morning',
+};
+
+const initialNewTask: NewTaskForm = {
+  description: '',
+  priority: 'normal',
+  deliveryTime: '1',
+};
 
 export function StaffMockContainer() {
   const { t } = useLanguage();
   const dispatch = useDispatch();
-  const staff = useSelector((state: RootState) => state.staff.staff);
+  const staffFromSlice = useSelector((state: RootState) => state.staff.staff);
 
-  const [createDialogOpen, setCreateDialogOpen] = useState(false);
-  const [editStaff, setEditStaff] = useState<StaffMemberDisplay | null>(null);
+  const [searchName, setSearchName] = useState('');
+  const [selectedStaff, setSelectedStaff] = useState<StaffMemberView | null>(
+    null
+  );
+  const [showAddDialog, setShowAddDialog] = useState(false);
+  const [showAssignTaskDialog, setShowAssignTaskDialog] = useState(false);
+  const [newStaff, setNewStaff] = useState<NewStaffForm>(initialNewStaff);
+  const [newTask, setNewTask] = useState<NewTaskForm>(initialNewTask);
 
   useEffect(() => {
     dispatch(loadMockStaff());
   }, [dispatch]);
 
-  const staffList: StaffMemberDisplay[] = useMemo(
-    () => staff.map(userToStaffDisplay),
-    [staff]
-  );
+  const staff: StaffMemberView[] = useMemo(() => {
+    const list = staffFromSlice.map(userToStaffDisplay);
+    return list.map(staffDisplayToView);
+  }, [staffFromSlice]);
 
-  const staffStats = useMemo(() => computeStaffStatsFromList(staffList), [staffList]);
-
-  const handleDelete = (id: string) => {
-    if (typeof window !== 'undefined' && !window.confirm(t('admin.confirmDelete') ?? '¿Eliminar este miembro del personal?')) return;
-    dispatch(setStaff(staff.filter((u) => u.id !== id)));
-  };
-
-  const handleCreateSuccess = () => {
-    setCreateDialogOpen(false);
-  };
-
-  const handleEditSuccess = () => {
-    setEditStaff(null);
-  };
-
-  const handleMockCreate = (payload: { firstName: string; lastName: string; email: string; workStartTime?: string; workEndTime?: string; departmentId?: string }) => {
-    const newUser: User = {
+  const handleAddStaff = useCallback(() => {
+    if (!newStaff.name.trim() || !newStaff.email.trim()) return;
+    const scheduleData = SHIFT_TO_SCHEDULE[newStaff.shift] ?? SHIFT_TO_SCHEDULE.morning;
+    const [firstName, ...lastParts] = newStaff.name.trim().split(/\s+/);
+    const lastName = lastParts.join(' ') || firstName;
+    const newMember: UserWithOptionalStaff = {
       id: `mock-${Date.now()}`,
-      firstName: payload.firstName,
-      lastName: payload.lastName,
-      email: payload.email,
-      roleName: STAFF_ROLE_NAME,
+      firstName,
+      lastName,
+      name: newStaff.name.trim(),
+      email: newStaff.email.trim(),
+      roleName: 'Staff',
       status: 'active',
+      employee: {
+        workStatus: 'available',
+        departmentName: newStaff.department as string,
+        workStartTime: scheduleData.workStartTime,
+        workEndTime: scheduleData.workEndTime,
+        tasksToday: 0,
+        maxCapacity: 8,
+      },
     };
-    dispatch(setStaff([...staff, newUser]));
-  };
+    dispatch(setStaff([...staffFromSlice, newMember]));
+    setShowAddDialog(false);
+    setNewStaff(initialNewStaff);
+  }, [newStaff, staffFromSlice, dispatch]);
 
-  const handleMockUpdate = (id: string, payload: { firstName?: string; lastName?: string; email?: string; position?: string; status?: string }) => {
-    dispatch(
-      setStaff(
-        staff.map((u) => (u.id === id ? { ...u, ...payload } : u))
-      )
-    );
-  };
+  const handleAssignTask = useCallback(() => {
+    if (!selectedStaff || !newTask.description.trim()) return;
+    const nextList = staffFromSlice.map((u) => {
+      if (u.id !== selectedStaff.id) return u;
+      const current = (u as UserWithOptionalStaff).employee?.tasksToday ?? 0;
+      const max = (u as UserWithOptionalStaff).employee?.maxCapacity ?? 8;
+      return {
+        ...u,
+        employee: {
+          ...(u as UserWithOptionalStaff).employee,
+          tasksToday: Math.min(current + 1, max),
+          maxCapacity: (u as UserWithOptionalStaff).employee?.maxCapacity ?? 8,
+        },
+      };
+    }) as UserWithOptionalStaff[];
+    dispatch(setStaff(nextList));
+    setShowAssignTaskDialog(false);
+    setNewTask(initialNewTask);
+    setSelectedStaff((prev) => {
+      if (!prev || prev.id !== selectedStaff.id) return prev;
+      const max = prev.maxCapacity;
+      return {
+        ...prev,
+        tasksToday: Math.min(prev.tasksToday + 1, max),
+      };
+    });
+  }, [selectedStaff, newTask, staffFromSlice, dispatch]);
 
   return (
     <StaffView
-      staffList={staffList}
+      staff={staff}
       isLoading={false}
-      staffStats={staffStats}
-      staffStatsLoading={false}
-      createDialogOpen={createDialogOpen}
-      setCreateDialogOpen={setCreateDialogOpen}
-      editStaff={editStaff}
-      setEditStaff={setEditStaff}
-      onDelete={handleDelete}
-      onCreateSuccess={handleCreateSuccess}
-      onEditSuccess={handleEditSuccess}
-      isApiMode={false}
-      onMockCreate={handleMockCreate}
-      onMockUpdate={handleMockUpdate}
+      searchName={searchName}
+      onSearchNameChange={setSearchName}
+      selectedStaff={selectedStaff}
+      onSelectedStaffChange={setSelectedStaff}
+      showAddDialog={showAddDialog}
+      onShowAddDialogChange={setShowAddDialog}
+      showAssignTaskDialog={showAssignTaskDialog}
+      onShowAssignTaskDialogChange={setShowAssignTaskDialog}
+      newStaff={newStaff}
+      onNewStaffChange={setNewStaff}
+      newTask={newTask}
+      onNewTaskChange={setNewTask}
+      onAddStaff={handleAddStaff}
+      onAssignTask={handleAssignTask}
+      t={t}
     />
   );
 }
