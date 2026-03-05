@@ -314,6 +314,14 @@ export function DashboardApiContainer() {
     // No-op in API mode; checkouts not yet integrated
   }
 
+  const facilityBookingSuggestions = useMemo(
+    () =>
+      Array.from(
+        new Set(bookings.map((b) => b.clientName).filter(Boolean))
+      ) as string[],
+    [bookings]
+  )
+
   if (roomsLoading && activeTab === "rooms") {
     return (
       <div className="p-8">
@@ -365,6 +373,12 @@ export function DashboardApiContainer() {
       t={t}
       language={language}
       orgId={orgId}
+      rooms={rooms}
+      roomBookingClients={[]}
+      facilityBookingSuggestions={facilityBookingSuggestions}
+      onCreateRoomBooking={() => {}}
+      onCreateMaintenanceActivity={() => {}}
+      onAddFacilityBooking={() => {}}
     />
   )
 }

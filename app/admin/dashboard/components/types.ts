@@ -88,3 +88,43 @@ export type DateColumn = {
 }
 
 export type DashboardTab = "rooms" | "staff" | "facilities" | "checkouts"
+
+/** Client option for room booking autocomplete */
+export type RoomBookingClient = {
+  id: string
+  name: string
+  email: string
+  phone: string
+  room: string
+  checkIn: string
+  checkOut: string
+}
+
+/** Payload when submitting "Crear Reserva de Habitación" */
+export type RoomBookingFormPayload = {
+  roomId: string
+  clientName: string
+  people: number
+  checkIn: string
+  checkOut: string
+}
+
+/** Payload when submitting "Crear Actividad" (maintenance) */
+export type MaintenanceActivityFormPayload = {
+  description: string
+  priority: "normal" | "urgent"
+  deliveryTime: string
+  assignedStaffId: string
+  scheduledDate: string
+  scheduledTime: string
+}
+
+/** Payload when submitting "Reserva Manual" (facility booking) */
+export type FacilityBookingFormPayload = {
+  facilityId: string
+  clientName: string
+  clientRoom: string
+  people: number
+  time: string
+  duration: number
+}

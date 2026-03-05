@@ -22,6 +22,10 @@ import type {
   DashboardTab,
   RoomStatus,
   StaffStatus,
+  RoomBookingClient,
+  RoomBookingFormPayload,
+  MaintenanceActivityFormPayload,
+  FacilityBookingFormPayload,
 } from "../components/types"
 import {
   generateDateColumns,
@@ -152,7 +156,55 @@ const MOCK_BOOKINGS: Booking[] = [
   },
 ]
 
-const MOCK_ROOMS: Room[] = [
+const MOCK_CLIENTS: RoomBookingClient[] = [
+  {
+    id: "1",
+    name: "Juan Pérez",
+    email: "juan@example.com",
+    phone: "+34 612 345 678",
+    room: "301",
+    checkIn: "2026-03-01",
+    checkOut: "2026-03-05",
+  },
+  {
+    id: "2",
+    name: "María García",
+    email: "maria@example.com",
+    phone: "+34 623 456 789",
+    room: "205",
+    checkIn: "2026-03-02",
+    checkOut: "2026-03-06",
+  },
+  {
+    id: "3",
+    name: "Carlos López",
+    email: "carlos@example.com",
+    phone: "+34 634 567 890",
+    room: "412",
+    checkIn: "2026-03-03",
+    checkOut: "2026-03-07",
+  },
+  {
+    id: "4",
+    name: "Ana Martínez",
+    email: "ana@example.com",
+    phone: "+34 645 678 901",
+    room: "308",
+    checkIn: "2026-03-04",
+    checkOut: "2026-03-08",
+  },
+  {
+    id: "5",
+    name: "Laura Sánchez",
+    email: "laura@example.com",
+    phone: "+34 656 789 012",
+    room: "501",
+    checkIn: "2026-03-05",
+    checkOut: "2026-03-09",
+  },
+]
+
+const INITIAL_MOCK_ROOMS: Room[] = [
   { id: "1", number: "101", type: "Individual", floor: 1, status: "available" },
   {
     id: "2",
@@ -428,12 +480,21 @@ export function DashboardMockContainer() {
   const [checkoutSearchRoom, setCheckoutSearchRoom] = useState("")
   const [checkoutSearchGuest, setCheckoutSearchGuest] = useState("")
   const [checkoutSearchStatus, setCheckoutSearchStatus] = useState("all")
+  const [rooms, setRooms] = useState<Room[]>(INITIAL_MOCK_ROOMS)
+  const [bookings, setBookings] = useState<Booking[]>(MOCK_BOOKINGS)
 
   const facilities = MOCK_FACILITIES
-  const bookings = MOCK_BOOKINGS
-  const rooms = MOCK_ROOMS
   const staffMembers = MOCK_STAFF
   const requests = MOCK_REQUESTS
+
+  const roomBookingClients = MOCK_CLIENTS
+  const facilityBookingSuggestions = useMemo(
+    () =>
+      Array.from(
+        new Set(bookings.map((b) => b.clientName).filter(Boolean))
+      ) as string[],
+    [bookings]
+  )
 
   const filteredRooms = useMemo(
     () =>
@@ -520,6 +581,42 @@ export function DashboardMockContainer() {
     (c) => c.status === "pending"
   ).length
 
+  const handleCreateRoomBooking = (payload: RoomBookingFormPayload) => {
+    setRooms((prev) =>
+      prev.map((room) =>
+        room.id === payload.roomId
+          ? {
+              ...room,
+              status: "reserved" as RoomStatus,
+              guest: payload.clientName,
+              checkIn: payload.checkIn,
+              checkOut: payload.checkOut,
+            }
+          : room
+      )
+    )
+  }
+
+  const handleCreateMaintenanceActivity = (
+    _payload: MaintenanceActivityFormPayload
+  ) => {
+    // Mock: no persisted list of activities; could add state if needed
+  }
+
+  const handleAddFacilityBooking = (payload: FacilityBookingFormPayload) => {
+    setBookings((prev) => [
+      ...prev,
+      {
+        facilityId: payload.facilityId,
+        clientName: payload.clientName,
+        clientRoom: payload.clientRoom,
+        time: payload.time,
+        duration: payload.duration,
+        status: "confirmed" as const,
+      },
+    ])
+  }
+
   return (
     <DashboardView
       activeTab={activeTab}
@@ -563,6 +660,12 @@ export function DashboardMockContainer() {
       t={t}
       language={language}
       orgId={orgId}
+      rooms={rooms}
+      roomBookingClients={roomBookingClients}
+      facilityBookingSuggestions={facilityBookingSuggestions}
+      onCreateRoomBooking={handleCreateRoomBooking}
+      onCreateMaintenanceActivity={handleCreateMaintenanceActivity}
+      onAddFacilityBooking={handleAddFacilityBooking}
     />
   )
 }

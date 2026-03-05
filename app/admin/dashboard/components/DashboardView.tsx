@@ -1,10 +1,19 @@
 "use client"
 
+import { useState, useMemo } from "react"
 import { useRouter } from "next/navigation"
 import { ROUTES } from "@/shared/types/routes"
 import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog"
 import {
   ChevronLeft,
   ChevronRight,
@@ -15,6 +24,8 @@ import {
   Clock,
   CheckCircle2,
   Calendar,
+  Plus,
+  CheckSquare,
 } from "lucide-react"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -45,6 +56,10 @@ import type {
   DashboardTab,
   RoomStatus,
   StaffStatus,
+  RoomBookingClient,
+  RoomBookingFormPayload,
+  MaintenanceActivityFormPayload,
+  FacilityBookingFormPayload,
 } from "./types"
 
 type TFunction = (key: string) => string
@@ -91,6 +106,15 @@ export type DashboardViewProps = {
   t: TFunction
   language: string
   orgId: string | undefined
+  /** All rooms (for room booking dialog select) */
+  rooms: Room[]
+  /** Clients for room booking autocomplete */
+  roomBookingClients: RoomBookingClient[]
+  /** Client name suggestions for facility booking autocomplete */
+  facilityBookingSuggestions: string[]
+  onCreateRoomBooking: (payload: RoomBookingFormPayload) => void
+  onCreateMaintenanceActivity: (payload: MaintenanceActivityFormPayload) => void
+  onAddFacilityBooking: (payload: FacilityBookingFormPayload) => void
 }
 
 export function DashboardView({
@@ -134,9 +158,79 @@ export function DashboardView({
   t,
   language,
   orgId,
+  rooms,
+  roomBookingClients,
+  facilityBookingSuggestions,
+  onCreateRoomBooking,
+  onCreateMaintenanceActivity,
+  onAddFacilityBooking,
 }: DashboardViewProps) {
   const router = useRouter()
   const timeSlotsArray = getFacilityTimeSlotsArray()
+
+  const [showRoomBookingDialog, setShowRoomBookingDialog] = useState(false)
+  const [showMaintenanceActivityDialog, setShowMaintenanceActivityDialog] =
+    useState(false)
+  const [showFacilityBookingDialog, setShowFacilityBookingDialog] =
+    useState(false)
+
+  const [roomBookingRoomId, setRoomBookingRoomId] = useState("")
+  const [roomBookingClientSearch, setRoomBookingClientSearch] = useState("")
+  const [roomBookingClientName, setRoomBookingClientName] = useState("")
+  const [roomBookingPeople, setRoomBookingPeople] = useState(1)
+  const [roomBookingCheckIn, setRoomBookingCheckIn] = useState("")
+  const [roomBookingCheckOut, setRoomBookingCheckOut] = useState("")
+  const [showRoomClientSuggestions, setShowRoomClientSuggestions] =
+    useState(false)
+
+  const [maintenanceDescription, setMaintenanceDescription] = useState("")
+  const [maintenancePriority, setMaintenancePriority] = useState<
+    "normal" | "urgent"
+  >("normal")
+  const [maintenanceDeliveryTime, setMaintenanceDeliveryTime] = useState("1")
+  const [maintenanceAssignedStaffId, setMaintenanceAssignedStaffId] =
+    useState("")
+  const [maintenanceScheduledDate, setMaintenanceScheduledDate] = useState("")
+  const [maintenanceScheduledTime, setMaintenanceScheduledTime] = useState("")
+
+  const [facilityBookingFacilityId, setFacilityBookingFacilityId] = useState("")
+  const [facilityBookingClientName, setFacilityBookingClientName] = useState("")
+  const [facilityBookingClientRoom, setFacilityBookingClientRoom] = useState("")
+  const [facilityBookingPeople, setFacilityBookingPeople] = useState(1)
+  const [facilityBookingTime, setFacilityBookingTime] = useState("")
+  const [facilityBookingDuration, setFacilityBookingDuration] = useState(60)
+  const [facilityClientSearchTerm, setFacilityClientSearchTerm] = useState("")
+  const [showFacilityClientSuggestions, setShowFacilityClientSuggestions] =
+    useState(false)
+
+  const filteredRoomBookingClients = useMemo(
+    () =>
+      roomBookingClients.filter(
+        (c) =>
+          c.name.toLowerCase().includes(roomBookingClientSearch.toLowerCase()) ||
+          c.email.toLowerCase().includes(roomBookingClientSearch.toLowerCase())
+      ),
+    [roomBookingClients, roomBookingClientSearch]
+  )
+
+  const filteredFacilityBookingSuggestions = useMemo(
+    () =>
+      facilityBookingSuggestions.filter((name) =>
+        name.toLowerCase().includes(facilityClientSearchTerm.toLowerCase())
+      ),
+    [facilityBookingSuggestions, facilityClientSearchTerm]
+  )
+
+  const maintenanceStaffMembers = useMemo(
+    () =>
+      staffMembers.filter((m) => m.department === "Mantenimiento"),
+    [staffMembers]
+  )
+
+  const availableRooms = useMemo(
+    () => rooms.filter((r) => r.status === "available"),
+    [rooms]
+  )
 
   return (
     <div>
@@ -309,6 +403,171 @@ export function DashboardView({
                     <ChevronRight className="w-5 h-5" />
                   </button>
                 </div>
+                <Dialog
+                  open={showRoomBookingDialog}
+                  onOpenChange={setShowRoomBookingDialog}
+                >
+                  <DialogTrigger asChild>
+                    <button
+                      className="flex items-center justify-center w-10 h-10 rounded-full text-white shadow-md hover:shadow-lg transition-all duration-300 hover:scale-110 group relative"
+                      style={{ backgroundColor: "#1557F6" }}
+                      title="Crear reserva"
+                    >
+                      <Plus className="w-5 h-5" />
+                      <span className="absolute top-full mt-2 px-2 py-1 bg-gray-900 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap">
+                        Crear reserva
+                      </span>
+                    </button>
+                  </DialogTrigger>
+                  <DialogContent className="max-w-md">
+                    <DialogHeader>
+                      <DialogTitle>Crear Reserva de Habitación</DialogTitle>
+                      <DialogDescription>
+                        Ingresa los datos de la nueva reserva
+                      </DialogDescription>
+                    </DialogHeader>
+                    <div className="space-y-4">
+                      <div>
+                        <Label htmlFor="room-select">Habitación</Label>
+                        <Select
+                          value={roomBookingRoomId}
+                          onValueChange={setRoomBookingRoomId}
+                        >
+                          <SelectTrigger id="room-select">
+                            <SelectValue placeholder="Seleccionar habitación" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {availableRooms.map((room) => (
+                              <SelectItem key={room.id} value={room.id}>
+                                {room.number} - {room.type}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <div>
+                        <Label htmlFor="guest-select">Cliente</Label>
+                        <div className="relative">
+                          <Input
+                            id="guest-select"
+                            placeholder="Buscar cliente..."
+                            value={
+                              showRoomClientSuggestions
+                                ? roomBookingClientSearch
+                                : roomBookingClientName
+                            }
+                            onChange={(e) => {
+                              setRoomBookingClientSearch(e.target.value)
+                              setRoomBookingClientName(e.target.value)
+                              setShowRoomClientSuggestions(true)
+                            }}
+                            onFocus={() => setShowRoomClientSuggestions(true)}
+                          />
+                          {showRoomClientSuggestions && (
+                            <div className="absolute top-full left-0 right-0 mt-1 bg-white dark:bg-popover border border-border rounded-lg shadow-lg z-50 max-h-48 overflow-y-auto">
+                              {filteredRoomBookingClients.length > 0 ? (
+                                filteredRoomBookingClients.map((client) => (
+                                  <button
+                                    key={client.id}
+                                    type="button"
+                                    onClick={() => {
+                                      setRoomBookingClientName(client.name)
+                                      setRoomBookingClientSearch(client.name)
+                                      setShowRoomClientSuggestions(false)
+                                    }}
+                                    className="w-full text-left px-4 py-2 hover:bg-muted border-b last:border-b-0 transition-colors"
+                                  >
+                                    <p className="font-medium text-sm">
+                                      {client.name}
+                                    </p>
+                                    <p className="text-xs text-muted-foreground">
+                                      {client.email} - Habitación {client.room}
+                                    </p>
+                                  </button>
+                                ))
+                              ) : (
+                                <div className="px-4 py-2 text-sm text-muted-foreground">
+                                  No se encontraron clientes
+                                </div>
+                              )}
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                      <div>
+                        <Label htmlFor="people-count">Cantidad de Personas</Label>
+                        <Input
+                          id="people-count"
+                          type="number"
+                          min={1}
+                          max={10}
+                          value={roomBookingPeople}
+                          onChange={(e) =>
+                            setRoomBookingPeople(
+                              Math.min(
+                                10,
+                                Math.max(1, parseInt(e.target.value, 10) || 1)
+                              )
+                            )
+                          }
+                          placeholder="Número de personas"
+                        />
+                      </div>
+                      <div className="grid grid-cols-2 gap-4">
+                        <div>
+                          <Label htmlFor="check-in">Check-in</Label>
+                          <Input
+                            id="check-in"
+                            type="date"
+                            value={roomBookingCheckIn}
+                            onChange={(e) =>
+                              setRoomBookingCheckIn(e.target.value)
+                            }
+                          />
+                        </div>
+                        <div>
+                          <Label htmlFor="check-out">Check-out</Label>
+                          <Input
+                            id="check-out"
+                            type="date"
+                            value={roomBookingCheckOut}
+                            onChange={(e) =>
+                              setRoomBookingCheckOut(e.target.value)
+                            }
+                          />
+                        </div>
+                      </div>
+                      <Button
+                        className="w-full"
+                        onClick={() => {
+                          if (
+                            roomBookingRoomId &&
+                            roomBookingClientName &&
+                            roomBookingCheckIn &&
+                            roomBookingCheckOut
+                          ) {
+                            onCreateRoomBooking({
+                              roomId: roomBookingRoomId,
+                              clientName: roomBookingClientName,
+                              people: roomBookingPeople,
+                              checkIn: roomBookingCheckIn,
+                              checkOut: roomBookingCheckOut,
+                            })
+                            setShowRoomBookingDialog(false)
+                            setRoomBookingRoomId("")
+                            setRoomBookingClientSearch("")
+                            setRoomBookingClientName("")
+                            setRoomBookingPeople(1)
+                            setRoomBookingCheckIn("")
+                            setRoomBookingCheckOut("")
+                          }
+                        }}
+                      >
+                        Crear Reserva
+                      </Button>
+                    </div>
+                  </DialogContent>
+                </Dialog>
               </div>
             </div>
 
@@ -473,6 +732,187 @@ export function DashboardView({
                     </SelectContent>
                   </Select>
                 </div>
+                <Dialog
+                  open={showMaintenanceActivityDialog}
+                  onOpenChange={setShowMaintenanceActivityDialog}
+                >
+                  <DialogTrigger asChild>
+                    <button
+                      className="flex items-center justify-center w-10 h-10 rounded-full text-white shadow-md hover:shadow-lg transition-all duration-300 hover:scale-110 group relative"
+                      style={{ backgroundColor: "#1557F6" }}
+                      title="Crear Actividad"
+                    >
+                      <CheckSquare className="w-5 h-5" />
+                      <span className="absolute top-full mt-2 px-2 py-1 bg-gray-900 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap">
+                        Crear Actividad
+                      </span>
+                    </button>
+                  </DialogTrigger>
+                  <DialogContent className="max-w-md">
+                    <DialogHeader>
+                      <DialogTitle>Crear Actividad</DialogTitle>
+                    </DialogHeader>
+                    <div className="space-y-4 py-4">
+                      <div>
+                        <Label
+                          htmlFor="maintenance-description"
+                          className="text-sm font-medium"
+                        >
+                          Descripción
+                        </Label>
+                        <Input
+                          id="maintenance-description"
+                          placeholder="Describe la actividad..."
+                          value={maintenanceDescription}
+                          onChange={(e) =>
+                            setMaintenanceDescription(e.target.value)
+                          }
+                          className="mt-2"
+                        />
+                      </div>
+                      <div>
+                        <Label
+                          htmlFor="maintenance-priority"
+                          className="text-sm font-medium"
+                        >
+                          Prioridad
+                        </Label>
+                        <Select
+                          value={maintenancePriority}
+                          onValueChange={(v: "normal" | "urgent") =>
+                            setMaintenancePriority(v)
+                          }
+                        >
+                          <SelectTrigger className="mt-2">
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="normal">Normal</SelectItem>
+                            <SelectItem value="urgent">Urgente</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <div>
+                        <Label
+                          htmlFor="maintenance-time"
+                          className="text-sm font-medium"
+                        >
+                          Tiempo de entrega (horas)
+                        </Label>
+                        <Input
+                          id="maintenance-time"
+                          type="number"
+                          min={1}
+                          max={24}
+                          value={maintenanceDeliveryTime}
+                          onChange={(e) =>
+                            setMaintenanceDeliveryTime(e.target.value)
+                          }
+                          className="mt-2"
+                        />
+                      </div>
+                      <div>
+                        <Label
+                          htmlFor="assign-staff"
+                          className="text-sm font-medium"
+                        >
+                          Asignar a
+                        </Label>
+                        <Select
+                          value={maintenanceAssignedStaffId}
+                          onValueChange={setMaintenanceAssignedStaffId}
+                        >
+                          <SelectTrigger className="mt-2">
+                            <SelectValue placeholder="Selecciona personal" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {maintenanceStaffMembers.map((member) => (
+                              <SelectItem
+                                key={member.id}
+                                value={member.id.toString()}
+                              >
+                                {member.name}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <div className="grid grid-cols-2 gap-3">
+                        <div>
+                          <Label
+                            htmlFor="scheduled-date"
+                            className="text-sm font-medium"
+                          >
+                            Fecha Programada
+                          </Label>
+                          <Input
+                            id="scheduled-date"
+                            type="date"
+                            value={maintenanceScheduledDate}
+                            onChange={(e) =>
+                              setMaintenanceScheduledDate(e.target.value)
+                            }
+                            className="mt-2"
+                          />
+                        </div>
+                        <div>
+                          <Label
+                            htmlFor="scheduled-time"
+                            className="text-sm font-medium"
+                          >
+                            Hora Programada
+                          </Label>
+                          <Input
+                            id="scheduled-time"
+                            type="time"
+                            value={maintenanceScheduledTime}
+                            onChange={(e) =>
+                              setMaintenanceScheduledTime(e.target.value)
+                            }
+                            className="mt-2"
+                          />
+                        </div>
+                      </div>
+                    </div>
+                    <div className="flex justify-end gap-2">
+                      <Button
+                        variant="outline"
+                        onClick={() =>
+                          setShowMaintenanceActivityDialog(false)
+                        }
+                      >
+                        Cancelar
+                      </Button>
+                      <Button
+                        onClick={() => {
+                          if (
+                            maintenanceDescription &&
+                            maintenanceAssignedStaffId
+                          ) {
+                            onCreateMaintenanceActivity({
+                              description: maintenanceDescription,
+                              priority: maintenancePriority,
+                              deliveryTime: maintenanceDeliveryTime,
+                              assignedStaffId: maintenanceAssignedStaffId,
+                              scheduledDate: maintenanceScheduledDate,
+                              scheduledTime: maintenanceScheduledTime,
+                            })
+                            setShowMaintenanceActivityDialog(false)
+                            setMaintenanceDescription("")
+                            setMaintenancePriority("normal")
+                            setMaintenanceDeliveryTime("1")
+                            setMaintenanceAssignedStaffId("")
+                            setMaintenanceScheduledDate("")
+                            setMaintenanceScheduledTime("")
+                          }
+                        }}
+                        className="bg-amber-600 hover:bg-amber-700"
+                      >
+                        Crear
+                      </Button>
+                    </div>
+                  </DialogContent>
+                </Dialog>
               </div>
             </Card>
 
@@ -616,6 +1056,245 @@ export function DashboardView({
 
       {activeTab === "facilities" && (
         <div className="px-8 py-6">
+          <div className="mb-4 flex justify-end">
+            <Dialog
+              open={showFacilityBookingDialog}
+              onOpenChange={setShowFacilityBookingDialog}
+            >
+              <DialogTrigger asChild>
+                <button
+                  className="relative group w-10 h-10 rounded-full text-white flex items-center justify-center transition-all shadow-md hover:shadow-lg"
+                  style={{ backgroundColor: "#1557F6" }}
+                  title="Nueva Reserva"
+                >
+                  <div className="relative">
+                    <Calendar className="w-5 h-5" />
+                    <span
+                      className="absolute -top-1 -right-1 text-white text-xs font-bold w-4 h-4 rounded-full flex items-center justify-center"
+                      style={{
+                        fontSize: "10px",
+                        backgroundColor: "#1557F6",
+                      }}
+                    >
+                      +
+                    </span>
+                  </div>
+                  <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-1.5 bg-gray-900 text-white text-xs rounded pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
+                    Nueva Reserva
+                  </div>
+                </button>
+              </DialogTrigger>
+              <DialogContent className="max-w-lg">
+                <DialogHeader>
+                  <DialogTitle className="text-lg">
+                    Reserva Manual
+                  </DialogTitle>
+                  <DialogDescription>
+                    Crear una nueva reserva para un cliente
+                  </DialogDescription>
+                </DialogHeader>
+                <div className="space-y-5">
+                  <div>
+                    <Label
+                      htmlFor="facility"
+                      className="text-sm font-medium mb-2 block"
+                    >
+                      Amenity
+                    </Label>
+                    <Select
+                      value={facilityBookingFacilityId}
+                      onValueChange={setFacilityBookingFacilityId}
+                    >
+                      <SelectTrigger className="h-11">
+                        <SelectValue placeholder="Selecciona un amenity" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {facilities.map((facility) => (
+                          <SelectItem
+                            key={facility.id}
+                            value={facility.id}
+                          >
+                            {facility.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div>
+                    <Label
+                      htmlFor="clientName"
+                      className="text-sm font-medium mb-2 block"
+                    >
+                      Nombre del Cliente
+                    </Label>
+                    <div className="relative">
+                      <Input
+                        id="clientName"
+                        value={facilityBookingClientName}
+                        onChange={(e) => {
+                          setFacilityBookingClientName(e.target.value)
+                          setFacilityClientSearchTerm(e.target.value)
+                          setShowFacilityClientSuggestions(true)
+                        }}
+                        placeholder="Comienza a escribir el nombre"
+                        className="h-11"
+                      />
+                      {showFacilityClientSuggestions &&
+                        filteredFacilityBookingSuggestions.length > 0 && (
+                          <div className="absolute top-full left-0 right-0 mt-1 bg-white dark:bg-popover border border-border rounded-lg shadow-lg z-50">
+                            {filteredFacilityBookingSuggestions.map(
+                              (name) => (
+                                <button
+                                  key={name}
+                                  type="button"
+                                  onClick={() => {
+                                    setFacilityBookingClientName(name)
+                                    setFacilityClientSearchTerm(name)
+                                    setShowFacilityClientSuggestions(false)
+                                    const fromBooking = bookings.find(
+                                      (b) => b.clientName === name
+                                    )
+                                    if (fromBooking) {
+                                      setFacilityBookingClientRoom(
+                                        fromBooking.clientRoom
+                                      )
+                                    }
+                                  }}
+                                  className="w-full text-left px-3 py-2 hover:bg-muted border-b last:border-b-0 text-sm"
+                                >
+                                  {name}
+                                </button>
+                              )
+                            )}
+                          </div>
+                        )}
+                    </div>
+                  </div>
+                  <div>
+                    <Label
+                      htmlFor="clientRoom"
+                      className="text-sm font-medium mb-2 block"
+                    >
+                      Habitación
+                    </Label>
+                    <Input
+                      id="clientRoom"
+                      value={facilityBookingClientRoom}
+                      onChange={(e) =>
+                        setFacilityBookingClientRoom(e.target.value)
+                      }
+                      placeholder="Auto-llenado por cliente"
+                      className="h-11 bg-muted"
+                    />
+                  </div>
+                  <div>
+                    <Label className="text-sm font-medium mb-2 block">
+                      Número de Personas
+                    </Label>
+                    <div className="flex items-center gap-3 bg-muted p-3 rounded-lg">
+                      <button
+                        type="button"
+                        onClick={() =>
+                          setFacilityBookingPeople((p) => Math.max(1, p - 1))
+                        }
+                        className="w-9 h-9 rounded-lg bg-background border border-border flex items-center justify-center hover:bg-muted font-semibold"
+                      >
+                        −
+                      </button>
+                      <span className="text-lg font-bold w-12 text-center">
+                        {facilityBookingPeople}
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() =>
+                          setFacilityBookingPeople((p) => p + 1)
+                        }
+                        className="w-9 h-9 rounded-lg bg-background border border-border flex items-center justify-center hover:bg-muted font-semibold"
+                      >
+                        +
+                      </button>
+                    </div>
+                  </div>
+                  <div>
+                    <Label
+                      htmlFor="time"
+                      className="text-sm font-medium mb-2 block"
+                    >
+                      Hora de Inicio
+                    </Label>
+                    <Select
+                      value={facilityBookingTime}
+                      onValueChange={setFacilityBookingTime}
+                    >
+                      <SelectTrigger className="h-11">
+                        <SelectValue placeholder="Selecciona hora" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {timeSlotsArray.map((slot) => (
+                          <SelectItem key={slot} value={slot}>
+                            {slot}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div>
+                    <Label
+                      htmlFor="duration"
+                      className="text-sm font-medium mb-2 block"
+                    >
+                      Duración
+                    </Label>
+                    <Select
+                      value={facilityBookingDuration.toString()}
+                      onValueChange={(v) =>
+                        setFacilityBookingDuration(parseInt(v, 10))
+                      }
+                    >
+                      <SelectTrigger className="h-11">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="60">1 Hora</SelectItem>
+                        <SelectItem value="120">2 Horas</SelectItem>
+                        <SelectItem value="180">3 Horas</SelectItem>
+                        <SelectItem value="240">4 Horas</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <Button
+                    onClick={() => {
+                      if (
+                        facilityBookingFacilityId &&
+                        facilityBookingClientName &&
+                        facilityBookingTime
+                      ) {
+                        onAddFacilityBooking({
+                          facilityId: facilityBookingFacilityId,
+                          clientName: facilityBookingClientName,
+                          clientRoom: facilityBookingClientRoom,
+                          people: facilityBookingPeople,
+                          time: facilityBookingTime,
+                          duration: facilityBookingDuration,
+                        })
+                        setShowFacilityBookingDialog(false)
+                        setFacilityBookingFacilityId("")
+                        setFacilityBookingClientName("")
+                        setFacilityBookingClientRoom("")
+                        setFacilityBookingPeople(1)
+                        setFacilityBookingTime("")
+                        setFacilityBookingDuration(60)
+                        setFacilityClientSearchTerm("")
+                      }
+                    }}
+                    className="w-full h-11 font-medium"
+                  >
+                    Crear Reserva
+                  </Button>
+                </div>
+              </DialogContent>
+            </Dialog>
+          </div>
           <div className="bg-card rounded-lg border border-border overflow-hidden">
             <div className="overflow-x-auto">
               <div style={{ width: "fit-content", minWidth: "100%" }}>
