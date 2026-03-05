@@ -6,6 +6,7 @@ export interface Room {
   type: string;
   roomTypeId?: string;
   floor: number;
+  capacity?: number;
   status: RoomStatus;
   guest?: string;
   checkIn?: string;

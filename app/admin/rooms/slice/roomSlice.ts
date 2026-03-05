@@ -23,16 +23,18 @@ const initialState: RoomState = {
 };
 
 export const MOCK_ROOMS: Room[] = [
-  { id: '1', number: '101', type: 'Individual', floor: 1, status: 'available' },
-  { id: '2', number: '102', type: 'Doble', floor: 1, status: 'occupied', guest: 'Juan Pérez', checkIn: '2025-01-10', checkOut: '2025-01-15' },
-  { id: '3', number: '103', type: 'Suite', floor: 1, status: 'maintenance' },
-  { id: '4', number: '104', type: 'Doble', floor: 1, status: 'reserved', guest: 'María García', checkIn: '2025-01-12', checkOut: '2025-01-14' },
-  { id: '5', number: '201', type: 'Deluxe', floor: 2, status: 'available' },
-  { id: '6', number: '202', type: 'Suite', floor: 2, status: 'occupied', guest: 'Carlos López', checkIn: '2025-01-09', checkOut: '2025-01-16' },
-  { id: '7', number: '203', type: 'Individual', floor: 2, status: 'available' },
-  { id: '8', number: '204', type: 'Presidencial', floor: 2, status: 'occupied', guest: 'Ana Martínez', checkIn: '2025-01-11', checkOut: '2025-01-13' },
-  { id: '9', number: '301', type: 'Doble', floor: 3, status: 'available' },
-  { id: '10', number: '302', type: 'Suite', floor: 3, status: 'reserved', guest: 'Luis Rodríguez', checkIn: '2025-01-13', checkOut: '2025-01-18' },
+  { id: '1', number: '101', type: 'Individual', floor: 1, capacity: 1, status: 'available' },
+  { id: '2', number: '102', type: 'Doble', floor: 1, capacity: 2, status: 'occupied', guest: 'Juan Pérez', checkIn: '2025-01-10', checkOut: '2025-01-15' },
+  { id: '3', number: '103', type: 'Suite', floor: 1, capacity: 3, status: 'maintenance' },
+  { id: '4', number: '104', type: 'Doble', floor: 1, capacity: 2, status: 'reserved', guest: 'María García', checkIn: '2025-01-12', checkOut: '2025-01-14' },
+  { id: '5', number: '201', type: 'Deluxe', floor: 2, capacity: 2, status: 'available' },
+  { id: '6', number: '202', type: 'Suite', floor: 2, capacity: 4, status: 'occupied', guest: 'Carlos López', checkIn: '2025-01-09', checkOut: '2025-01-16' },
+  { id: '7', number: '203', type: 'Individual', floor: 2, capacity: 1, status: 'available' },
+  { id: '8', number: '204', type: 'Presidencial', floor: 2, capacity: 5, status: 'occupied', guest: 'Ana Martínez', checkIn: '2025-01-11', checkOut: '2025-01-13' },
+  { id: '9', number: '301', type: 'Doble', floor: 3, capacity: 2, status: 'available' },
+  { id: '10', number: '302', type: 'Suite', floor: 3, capacity: 4, status: 'reserved', guest: 'Luis Rodríguez', checkIn: '2025-01-13', checkOut: '2025-01-18' },
+  { id: '11', number: '303', type: 'Individual', floor: 3, capacity: 1, status: 'available' },
+  { id: '12', number: '304', type: 'Doble', floor: 3, capacity: 2, status: 'available' },
 ];
 
 export const roomSlice = createSlice({

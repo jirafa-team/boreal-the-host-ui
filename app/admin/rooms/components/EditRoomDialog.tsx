@@ -80,6 +80,26 @@ export function EditRoomDialog({ open, onOpenChange, room, roomTypes, onRoomChan
             </select>
           </div>
           <div>
+            <label className="block text-sm font-medium text-foreground mb-1">
+              Capacidad (Personas)
+            </label>
+            <Input
+              type="number"
+              value={room.capacity ?? 1}
+              onChange={(e) =>
+                onRoomChange((prev) => ({
+                  ...prev,
+                  capacity: Math.min(
+                    10,
+                    Math.max(1, parseInt(e.target.value, 10) || 1)
+                  ),
+                }))
+              }
+              min={1}
+              max={10}
+            />
+          </div>
+          <div>
             <label className="block text-sm font-medium text-foreground mb-1">Piso</label>
             <Input
               type="number"

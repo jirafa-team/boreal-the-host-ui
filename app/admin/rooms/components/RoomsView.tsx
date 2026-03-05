@@ -7,7 +7,6 @@ import { LayoutGrid, Search, Calendar } from "lucide-react"
 import { CreateRoomDialog } from "./CreateRoomDialog"
 import { EditRoomDialog } from "./EditRoomDialog"
 import { RoomGrid } from "./RoomGrid"
-import { RoomTimeline } from "./RoomTimeline"
 import { StatsCards } from "./StatsCards"
 import type { Room, RoomStatus, RoomStats, NewRoomForm, DateColumn } from "./types"
 
@@ -114,34 +113,19 @@ export function RoomsView({
               <p className="text-sm text-muted-foreground">{t("admin.manageYourRooms")}</p>
             </div>
             <div className="flex gap-4 items-center ml-auto">
-              <div className="inline-flex h-10 items-center rounded-lg bg-gray-100 p-1 border border-gray-200">
-                <button
-                  type="button"
-                  onClick={() => setLayoutMode("grid")}
-                  className={`px-5 py-2 rounded-md font-medium text-sm transition-all ${layoutMode === "grid" ? "text-white shadow-md" : "text-gray-700 hover:text-gray-900"
-                    }`}
-                  style={layoutMode === "grid" ? { backgroundColor: "#394a63" } : {}}
-                >
-                  Grid
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setLayoutMode("kanban")}
-                  className={`px-5 py-2 rounded-md font-medium text-sm transition-all ${layoutMode === "kanban" ? "text-white shadow-md" : "text-gray-700 hover:text-gray-900"
-                    }`}
-                  style={layoutMode === "kanban" ? { backgroundColor: "#394a63" } : {}}
-                >
-                  Timeline
-                </button>
-              </div>
               <button
                 type="button"
                 onClick={() => setShowCreateModal(true)}
-                className="flex items-center justify-center w-10 h-10 rounded-full bg-gradient-to-br from-indigo-600 to-indigo-700 text-white shadow-md hover:shadow-lg transition-all duration-300 hover:scale-110 group relative"
+                className="flex items-center justify-center w-10 h-10 rounded-full text-white shadow-md hover:shadow-lg transition-all duration-300 hover:scale-110 group relative"
+                style={{ backgroundColor: "#1557F6" }}
                 title={t("admin.createRoom")}
               >
-                <LayoutGrid className="w-5 h-5" />
-                <span className="absolute text-base font-bold -bottom-0.5 -right-0.5 text-white drop-shadow-lg">+</span>
+                <div className="relative flex items-center justify-center">
+                  <LayoutGrid className="w-5 h-5" />
+                  <span className="absolute text-base font-bold -bottom-0.5 -right-0.5 text-white drop-shadow-lg">
+                    +
+                  </span>
+                </div>
                 <span className="absolute top-full mt-2 px-2 py-1 bg-gray-900 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap">
                   {t("admin.createRoom")}
                 </span>
@@ -198,28 +182,11 @@ export function RoomsView({
               </div>
             </Card>
 
-            {layoutMode === "grid" ? (
+            {layoutMode === "grid" && (
               <RoomGrid
                 rooms={filteredRooms}
                 onEditRoom={handleEditRoom}
                 getStatusLabel={getStatusLabel}
-                t={t}
-              />
-            ) : (
-              <RoomTimeline
-                rooms={filteredRooms}
-                dateColumns={dateColumns}
-                timelineMode={timelineMode}
-                currentDate={currentDate}
-                selectedMonth={selectedMonth}
-                onCurrentDateChange={onCurrentDateChange}
-                onSelectedMonthChange={onSelectedMonthChange}
-                navigateDate={navigateDate}
-                getRoomStatusForDate={getRoomStatusForDate}
-                getStatusColor={getStatusColor}
-                onTimelineModeChange={setTimelineMode}
-                language={language}
-                convertISOToLocaleFormat={convertISOToLocaleFormat}
                 t={t}
               />
             )}
@@ -241,7 +208,6 @@ export function RoomsView({
         onNewRoomChange={setNewRoom}
         onSubmit={onCreateRoom}
         t={t}
-        roomTypes={roomTypes}
       />
       <EditRoomDialog
         open={showEditModal}

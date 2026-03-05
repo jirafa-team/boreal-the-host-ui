@@ -10,8 +10,9 @@ export type LayoutMode = "grid" | "kanban";
 
 export type NewRoomForm = {
   number: string;
-  roomTypeId: string;
+  type: string;
   floor: number;
+  capacity: number;
 };
 
 export type RoomStats = {

@@ -9,7 +9,12 @@ import { useToast } from "@/hooks/use-toast"
 import { RoomsView } from "../components/RoomsView"
 import type { Room, RoomStatus, NewRoomForm, RoomStats, DateColumn } from "../components/types"
 
-const initialNewRoom: NewRoomForm = { number: "", type: "Individual", floor: 1 }
+const initialNewRoom: NewRoomForm = {
+  number: "",
+  type: "Individual",
+  floor: 1,
+  capacity: 1,
+}
 const ROOM_TYPES_EDIT = ["Individual", "Doble", "Suite", "Familiar"]
 
 function getStatusColor(status: RoomStatus): string {
@@ -171,6 +176,7 @@ export function RoomsMockContainer() {
           number: newRoom.number,
           type: newRoom.type,
           floor: newRoom.floor,
+          capacity: newRoom.capacity,
           status: "available",
         },
       ])

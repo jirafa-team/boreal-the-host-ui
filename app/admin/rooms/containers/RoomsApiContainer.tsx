@@ -15,7 +15,12 @@ import { useToast } from "@/hooks/use-toast"
 import { RoomsView } from "../components/RoomsView"
 import type { Room, RoomStatus, NewRoomForm, RoomStats, DateColumn } from "../components/types"
 
-const initialNewRoom: NewRoomForm = { number: "", roomTypeId: "", floor: 1 }
+const initialNewRoom: NewRoomForm = {
+  number: "",
+  type: "Individual",
+  floor: 1,
+  capacity: 1,
+}
 
 function getStatusColor(status: RoomStatus): string {
   const colors: Record<RoomStatus, string> = {
@@ -39,14 +44,16 @@ export function RoomsApiContainer() {
   const [updateRoom] = useUpdateRoomMutation()
   const [deleteRoom] = useDeleteRoomMutation()
 
-  const roomTypes = roomTypesData?.data ?? []
+  const roomTypes: Array<{ id: string; name: string }> =
+    roomTypesData?.data ?? []
 
   const rooms: Room[] = useMemo(() => {
     const raw = apiData?.data?.objects ?? []
-    return raw.map((r: Room & { roomType?: { id: string; name: string } }) => ({
+    return raw.map((r: Room & { roomType?: { id: string; name: string }; capacity?: number }) => ({
       ...r,
       type: r.roomType?.name ?? r.type ?? "",
       roomTypeId: r.roomType?.id ?? r.roomTypeId,
+      capacity: r.capacity ?? 1,
     }))
   }, [apiData?.data?.objects])
 
@@ -168,12 +175,16 @@ export function RoomsApiContainer() {
 
   const handleCreateRoom = React.useCallback(async () => {
     if (!newRoom.number.trim()) return
-    console.log('newRoom', newRoom)
+    const roomType = roomTypes.find(
+      (rt: { id: string; name: string }) =>
+        rt.name === newRoom.type
+    )
     try {
       await createRoom({
         number: newRoom.number,
-        roomTypeId: newRoom.roomTypeId,
+        roomTypeId: roomType?.id ?? "",
         floor: newRoom.floor,
+        capacity: newRoom.capacity,
       }).unwrap()
       setNewRoom(initialNewRoom)
       setShowCreateModal(false)
@@ -181,7 +192,7 @@ export function RoomsApiContainer() {
     } catch {
       toast({ title: "Error", description: "No se pudo crear la habitación.", variant: "destructive" })
     }
-  }, [newRoom, createRoom, toast])
+  }, [newRoom, createRoom, toast, roomTypes])
 
   const handleUpdateRoom = React.useCallback(async () => {
     if (!selectedRoom) return
@@ -192,6 +203,7 @@ export function RoomsApiContainer() {
           number: selectedRoom.number,
           roomTypeId: selectedRoom.roomTypeId,
           floor: selectedRoom.floor,
+          capacity: selectedRoom.capacity,
           status: selectedRoom.status,
           guest: selectedRoom.guest,
           checkIn: selectedRoom.checkIn,

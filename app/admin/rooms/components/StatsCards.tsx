@@ -12,18 +12,24 @@ export type StatsCardsProps = {
   t: TFunction
 }
 
-const STATUS_CONFIG: { key: RoomStatus | "total"; labelKey: string; bgActive: string; textInactive: string }[] = [
-  { key: "total", labelKey: "admin.totalRooms", bgActive: "#1E40AF", textInactive: "text-blue-600" },
-  { key: "available", labelKey: "admin.availableRooms", bgActive: "#235E20", textInactive: "" },
-  { key: "occupied", labelKey: "admin.occupiedRooms", bgActive: "#AA2C2C", textInactive: "" },
-  { key: "reserved", labelKey: "admin.reservedRooms", bgActive: "#1E3A8A", textInactive: "text-blue-700" },
-  { key: "maintenance", labelKey: "admin.maintenanceRooms", bgActive: "#CA8A04", textInactive: "text-yellow-600" },
+const STATUS_CONFIG: {
+  key: RoomStatus | "total"
+  labelKey: string
+  bgActive: string
+  textInactive: string
+  subtitleActiveClass: string
+}[] = [
+  { key: "total", labelKey: "admin.totalRooms", bgActive: "#1E40AF", textInactive: "text-blue-600", subtitleActiveClass: "text-blue-100" },
+  { key: "available", labelKey: "admin.availableRooms", bgActive: "#235E20", textInactive: "", subtitleActiveClass: "text-green-100" },
+  { key: "occupied", labelKey: "admin.occupiedRooms", bgActive: "#AA2C2C", textInactive: "", subtitleActiveClass: "text-red-100" },
+  { key: "reserved", labelKey: "admin.reservedRooms", bgActive: "#1E3A8A", textInactive: "text-blue-700", subtitleActiveClass: "text-blue-100" },
+  { key: "maintenance", labelKey: "admin.maintenanceRooms", bgActive: "#CA8A04", textInactive: "text-yellow-600", subtitleActiveClass: "text-yellow-100" },
 ]
 
 export function StatsCards({ stats, statusFilter, onFilterByStatus, t }: StatsCardsProps) {
   return (
     <div className="grid grid-cols-2 md:grid-cols-5 gap-2 mb-4">
-      {STATUS_CONFIG.map(({ key, labelKey, bgActive, textInactive }) => {
+      {STATUS_CONFIG.map(({ key, labelKey, bgActive, textInactive, subtitleActiveClass }) => {
         const isTotal = key === "total"
         const filter = isTotal ? null : (key as RoomStatus)
         const isActive = statusFilter === filter
@@ -54,10 +60,7 @@ export function StatsCards({ stats, statusFilter, onFilterByStatus, t }: StatsCa
                 {value}
               </p>
               <p
-                className={`text-xs font-medium ${
-                  isActive ? (key === "total" ? "text-blue-100" : "text-muted-foreground") : "text-muted-foreground"
-                }`}
-                style={isActive && key !== "total" ? { color: "inherit" } : {}}
+                className={`text-xs font-medium ${isActive ? subtitleActiveClass : "text-muted-foreground"}`}
               >
                 {t(labelKey)}
               </p>
