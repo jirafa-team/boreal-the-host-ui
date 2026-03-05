@@ -20,6 +20,9 @@ const initialNewClient: NewClientForm = {
   roomType: "standard",
   status: "active",
   nationality: "",
+  category: "Basic",
+  notes: "",
+  createUserForClient: false,
 }
 
 type ReservationWithDetails = {

@@ -20,6 +20,9 @@ const initialNewClient: NewClientForm = {
   roomType: "standard",
   status: "active",
   nationality: "",
+  category: "Basic",
+  notes: "",
+  createUserForClient: false,
 }
 
 export function ClientsMockContainer() {
@@ -79,16 +82,17 @@ export function ClientsMockContainer() {
       name: newClient.name,
       email: newClient.email,
       phone: newClient.phone,
-      room: newClient.room,
-      checkIn: newClient.checkIn,
-      checkOut: newClient.checkOut,
+      room: newClient.room || "-",
+      checkIn: newClient.checkIn || "-",
+      checkOut: newClient.checkOut || "-",
       status,
-      vip: false,
+      vip: newClient.category === "VIP" || newClient.category === "Elite",
       nationality: newClient.nationality,
       guests: 1,
       totalSpent: 0,
-      notes: "",
+      notes: newClient.notes ?? "",
       roomType: newClient.roomType,
+      category: newClient.category,
     }
     dispatch(setClients([...clients, client]))
     setShowNewClientModal(false)

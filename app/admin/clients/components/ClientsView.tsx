@@ -34,6 +34,15 @@ import type { Client, ClientStatus } from "./types"
 
 type TFunction = (key: string) => string
 
+const NATIONALITY_OPTIONS = [
+  "España", "México", "Argentina", "Colombia", "Perú", "Chile", "Venezuela", "Ecuador", "Bolivia", "Paraguay", "Uruguay",
+  "Guatemala", "Honduras", "El Salvador", "Nicaragua", "Costa Rica", "Panamá", "Cuba", "República Dominicana", "Puerto Rico",
+  "Estados Unidos", "Canadá", "Francia", "Italia", "Alemania", "Portugal", "Reino Unido", "Irlanda", "Suiza", "Austria",
+  "Países Bajos", "Bélgica", "Dinamarca", "Suecia", "Noruega", "Finlandia", "Rusia", "China", "Japón", "Corea del Sur",
+  "India", "Tailandia", "Vietnam", "Filipinas", "Indonesia", "Malasia", "Singapur", "Australia", "Nueva Zelanda",
+  "Sudáfrica", "Egipto", "Marruecos", "Emiratos Árabes", "Israel", "Arabia Saudita", "Turquía", "Grecia", "USA", "Brasil",
+]
+
 export type NewClientForm = {
   name: string
   email: string
@@ -44,8 +53,9 @@ export type NewClientForm = {
   roomType: "standard" | "deluxe" | "premium"
   status: "active" | "checkout"
   nationality: string
-  category?: "Basic" | "Preferred" | "Elite" | "VIP"
-  notes?: string
+  category: "Basic" | "Preferred" | "Elite" | "VIP"
+  notes: string
+  createUserForClient: boolean
 }
 
 export type ClientsViewProps = {
@@ -367,7 +377,6 @@ export function ClientsView({
                       <th className="text-left p-4 text-sm font-medium text-muted-foreground">{t("admin.checkIn")}</th>
                       <th className="text-left p-4 text-sm font-medium text-muted-foreground">{t("admin.checkOut")}</th>
                       <th className="text-left p-4 text-sm font-medium text-muted-foreground">{t("admin.status")}</th>
-                      <th className="text-left p-4 text-sm font-medium text-muted-foreground">Huéspedes</th>
                       <th className="text-left p-4 text-sm font-medium text-muted-foreground">{t("admin.spent")}</th>
                       <th className="text-right p-4 text-sm font-medium text-muted-foreground">{t("admin.actions")}</th>
                     </tr>
@@ -422,7 +431,7 @@ export function ClientsView({
                                 <span className="text-sm font-semibold text-primary">{client.room}</span>
                               </div>
                             </td>
-                            <td className="p-4">
+                            <td className="p-4" colSpan={2}>
                               <div className="space-y-1">
                                 <div className="flex items-center gap-2 text-sm">
                                   <Calendar className="w-3 h-3 text-muted-foreground" />
@@ -440,9 +449,6 @@ export function ClientsView({
                             </td>
                             <td className="p-4">
                               <span className="font-semibold text-foreground">{displaySpent(client.totalSpent)}</span>
-                            </td>
-                            <td className="p-4">
-                              <span className="font-semibold text-foreground">-</span>
                             </td>
                             <td className="p-4">
                               <div className="flex items-center justify-end gap-2">
@@ -495,7 +501,7 @@ export function ClientsView({
                                 <td className="p-4">
                                   <p className="text-sm text-muted-foreground">{member.email}</p>
                                 </td>
-                                <td className="p-4" colSpan={5}>
+                                <td className="p-4" colSpan={4}>
                                   <p className="text-sm text-muted-foreground">{member.phone}</p>
                                 </td>
                               </tr>
@@ -552,95 +558,100 @@ export function ClientsView({
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Habitación</label>
-                  <input
-                    type="text"
-                    value={newClient.room}
-                    onChange={(e) => setNewClient((prev) => ({ ...prev, room: e.target.value }))}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    placeholder="Ej: 205"
-                  />
-                </div>
-              </div>
-
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Check-in</label>
-                  <input
-                    type="date"
-                    value={newClient.checkIn}
-                    onChange={(e) => setNewClient((prev) => ({ ...prev, checkIn: e.target.value }))}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Check-out</label>
-                  <input
-                    type="date"
-                    value={newClient.checkOut}
-                    onChange={(e) => setNewClient((prev) => ({ ...prev, checkOut: e.target.value }))}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  />
-                </div>
-              </div>
-
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Tipo de Habitación</label>
-                  <select
-                    value={newClient.roomType}
-                    onChange={(e) =>
-                      setNewClient((prev) => ({ ...prev, roomType: e.target.value as "standard" | "deluxe" | "premium" }))
-                    }
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  >
-                    <option value="standard">Estándar</option>
-                    <option value="deluxe">Deluxe</option>
-                    <option value="premium">Premium</option>
-                  </select>
-                </div>
-                <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">Nacionalidad</label>
-                  <input
-                    type="text"
+                  <select
                     value={newClient.nationality}
                     onChange={(e) => setNewClient((prev) => ({ ...prev, nationality: e.target.value }))}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    placeholder="Ej: España"
-                  />
+                  >
+                    <option value="">Seleccionar país</option>
+                    {NATIONALITY_OPTIONS.map((country) => (
+                      <option key={country} value={country}>
+                        {country}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Estado</label>
+                  <select
+                    value={newClient.status}
+                    onChange={(e) =>
+                      setNewClient((prev) => ({ ...prev, status: e.target.value as "active" | "checkout" }))
+                    }
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  >
+                    <option value="active">Activo</option>
+                    <option value="checkout">Check-out</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Categoría de Cliente</label>
+                  <select
+                    value={newClient.category}
+                    onChange={(e) =>
+                      setNewClient((prev) => ({
+                        ...prev,
+                        category: e.target.value as "Basic" | "Preferred" | "Elite" | "VIP",
+                      }))
+                    }
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  >
+                    <option value="Basic">Basic</option>
+                    <option value="Preferred">Preferred</option>
+                    <option value="Elite">Elite</option>
+                    <option value="VIP">VIP</option>
+                  </select>
                 </div>
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Estado</label>
-                <select
-                  value={newClient.status}
-                  onChange={(e) =>
-                    setNewClient((prev) => ({ ...prev, status: e.target.value as "active" | "checkout" }))
-                  }
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                >
-                  <option value="active">Activo</option>
-                  <option value="checkout">Check-out</option>
-                </select>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Notas</label>
+                <textarea
+                  value={newClient.notes}
+                  onChange={(e) => setNewClient((prev) => ({ ...prev, notes: e.target.value }))}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 min-h-20"
+                  placeholder="Notas adicionales sobre el cliente..."
+                />
               </div>
 
-              <div className="flex gap-3 mt-8">
-                <button
-                  type="button"
-                  onClick={() => setShowNewClientModal(false)}
-                  className="px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition-colors font-medium flex-1"
+              <div className="flex items-center gap-3">
+                <input
+                  type="checkbox"
+                  id="createUserForClient"
+                  checked={newClient.createUserForClient}
+                  onChange={(e) =>
+                    setNewClient((prev) => ({ ...prev, createUserForClient: e.target.checked }))
+                  }
+                  className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-2 focus:ring-blue-500 cursor-pointer"
+                />
+                <label
+                  htmlFor="createUserForClient"
+                  className="text-sm font-medium text-gray-700 cursor-pointer"
                 >
-                  Cancelar
-                </button>
-                <button
-                  type="button"
-                  onClick={onAddClient}
-                  className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium flex-1"
-                >
-                  Agregar Cliente
-                </button>
+                  Crear usuario para cliente
+                </label>
               </div>
+            </div>
+
+            <div className="flex gap-3 mt-8">
+              <button
+                type="button"
+                onClick={() => setShowNewClientModal(false)}
+                className="px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition-colors font-medium flex-1"
+              >
+                Cancelar
+              </button>
+              <button
+                type="button"
+                onClick={onAddClient}
+                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium flex-1"
+              >
+                Agregar Cliente
+              </button>
             </div>
           </div>
         </div>
