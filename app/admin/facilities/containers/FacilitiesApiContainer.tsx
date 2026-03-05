@@ -8,127 +8,70 @@ import {
   useGetFacilitiesQuery,
   useCreateFacilityMutation,
   useUpdateFacilityMutation,
+  useDeleteFacilityMutation,
 } from "@/app/admin/facilities/slice/facilitySlice"
 import { FacilitiesView } from "../components/FacilitiesView"
-import { mapApiFacilityToUi, TIME_SLOTS, type Booking, type Facility, type NewBookingForm } from "../components/types"
+import { mapApiFacilityToUi, type Booking, type Facility } from "../components/types"
 import { useGetFacilityTypesQuery } from "@/features/taxonomy-facility-type/slices/taxonomyFacilityTypeSlice"
-import { TaxonomyFacilityType } from "@/interfaces/taxonomy-facility-type/TaxonomyFacilityType"
-
-const initialNewBooking: NewBookingForm = {
-  facilityId: "",
-  clientName: "",
-  clientRoom: "",
-  time: "",
-  duration: 60,
-  people: 1,
-}
 
 export function FacilitiesApiContainer() {
-  const { t, language } = useLanguage()
+  const { t } = useLanguage()
   const dataSource = useSelector((state: RootState) => state.dataSource.dataSource)
   const skip = dataSource !== "api"
 
   const { data: apiData, isLoading, error } = useGetFacilitiesQuery(undefined, { skip })
   const [createFacility] = useCreateFacilityMutation()
   const [updateFacility] = useUpdateFacilityMutation()
+  const [deleteFacility] = useDeleteFacilityMutation()
+
+  const { data: typesData } = useGetFacilityTypesQuery(undefined, { skip })
+  const facilityTypes = typesData?.data ?? []
 
   const facilities: Facility[] = React.useMemo(() => {
     const list = apiData?.data?.objects ?? []
     return list.map(mapApiFacilityToUi)
   }, [apiData])
 
-  const { data } = useGetFacilityTypesQuery()
-  const facilitiesTypes: TaxonomyFacilityType[] = data?.data ?? []
-
   const bookings: Booking[] = []
 
-  const [viewMode, setViewMode] = React.useState<"list" | "timeline">("list")
-  const [selectedDate, setSelectedDate] = React.useState(new Date().toISOString().split("T")[0])
-  const [currentDate, setCurrentDate] = React.useState(new Date())
-  const [timelineMode, setTimelineMode] = React.useState<"week" | "month">("week")
-  const [newBooking, setNewBooking] = React.useState<NewBookingForm>(initialNewBooking)
-  const [dialogOpen, setDialogOpen] = React.useState(false)
   const [addFacilityOpen, setAddFacilityOpen] = React.useState(false)
   const [editingFacility, setEditingFacility] = React.useState<Facility | null>(null)
   const [editDialogOpen, setEditDialogOpen] = React.useState(false)
-  const [clientSuggestions, setClientSuggestions] = React.useState<string[]>([])
-  const [showClientSuggestions, setShowClientSuggestions] = React.useState(false)
   const [selectedSlotBookings, setSelectedSlotBookings] = React.useState<Booking[]>([])
   const [bookingsDetailOpen, setBookingsDetailOpen] = React.useState(false)
 
-  const getBookingForSlot = React.useCallback((_facilityId: string, _time: string) => undefined, [])
-  const isBookingStart = React.useCallback((_facilityId: string, _time: string) => undefined, [])
-  const getBookingsAtSlot = React.useCallback((_facilityId: string, _timeSlot: string) => [] as Booking[], [])
-  const getOccupancyPercentage = React.useCallback((_facilityId: string, _timeSlot: string) => 0, [])
-  const isMultiPartyFacility = React.useCallback((facilityType: string): boolean => {
-    return ["fitness", "recreation", "wellness", "dining"].includes(facilityType)
-  }, [])
-
-  const convertISOToLocaleFormat = React.useCallback(
-    (isoDate: string): string => {
-      const [year, month, day] = isoDate.split("-")
-      if (language === "es" || language === "pt") {
-        return `${day}/${month}/${year}`
-      }
-      return `${month}/${day}/${year}`
+  const resolveFacilityTypeId = React.useCallback(
+    (typeValue: string): string => {
+      const byId = facilityTypes.find((ft) => ft.id === typeValue)
+      if (byId) return byId.id
+      const byName = facilityTypes.find(
+        (ft) => ft.name?.toLowerCase() === typeValue.toLowerCase()
+      )
+      return byName?.id ?? typeValue
     },
-    [language]
+    [facilityTypes]
   )
-
-  const navigateDate = React.useCallback(
-    (direction: "prev" | "next") => {
-      setCurrentDate((prev) => {
-        const newDate = new Date(prev)
-        if (timelineMode === "week") {
-          newDate.setDate(newDate.getDate() + (direction === "next" ? 7 : -7))
-        } else {
-          newDate.setMonth(newDate.getMonth() + (direction === "next" ? 1 : -1))
-        }
-        return newDate
-      })
-    },
-    [timelineMode]
-  )
-
-  const handleClientNameChange = React.useCallback((value: string) => {
-    setNewBooking((prev) => ({ ...prev, clientName: value }))
-    setClientSuggestions([])
-    setShowClientSuggestions(false)
-  }, [])
-
-  const handleSelectClient = React.useCallback((clientName: string) => {
-    setNewBooking((prev) => ({ ...prev, clientName }))
-    setShowClientSuggestions(false)
-  }, [])
-
-  const handleAddBooking = React.useCallback(() => {
-    setNewBooking(initialNewBooking)
-    setDialogOpen(false)
-  }, [])
 
   const handleAddFacility = React.useCallback(
     async (e: React.FormEvent<HTMLFormElement>) => {
       e.preventDefault()
       const formData = new FormData(e.currentTarget)
-      const name = formData.get("name") as string
-      const type = (formData.get("type") as string) ?? "fitness"
-      const capacity = Number(formData.get("capacity"))
-      const openTime = formData.get("startTime") as string
-      const closeTime = formData.get("endTime") as string
+      const typeValue = (formData.get("type") as string) ?? "fitness"
+      const facilityTypeId = resolveFacilityTypeId(typeValue)
       try {
         await createFacility({
-          name,
-          facilityTypeId: type,
-          capacity,
-          openTime,
-          closeTime,
+          name: formData.get("name") as string,
+          facilityTypeId,
+          capacity: Number(formData.get("capacity")),
+          openTime: formData.get("startTime") as string,
+          closeTime: formData.get("endTime") as string,
         }).unwrap()
         setAddFacilityOpen(false)
       } catch {
         // Error handled by RTK Query / UI
       }
     },
-    [createFacility]
+    [createFacility, resolveFacilityTypeId]
   )
 
   const handleEditFacility = React.useCallback((facility: Facility) => {
@@ -141,12 +84,14 @@ export function FacilitiesApiContainer() {
       e.preventDefault()
       if (!editingFacility) return
       const formData = new FormData(e.currentTarget)
+      const typeValue = (formData.get("type") as string) ?? editingFacility.type
+      const facilityTypeId = resolveFacilityTypeId(typeValue)
       try {
         await updateFacility({
           id: editingFacility.id,
           payload: {
             name: formData.get("name") as string,
-            facilityTypeId: formData.get("type") as string,
+            facilityTypeId,
             capacity: Number(formData.get("capacity")),
             openTime: formData.get("startTime") as string,
             closeTime: formData.get("endTime") as string,
@@ -158,7 +103,18 @@ export function FacilitiesApiContainer() {
         // Error handled by RTK Query / UI
       }
     },
-    [editingFacility, updateFacility]
+    [editingFacility, updateFacility, resolveFacilityTypeId]
+  )
+
+  const handleDeleteFacility = React.useCallback(
+    async (facilityId: string) => {
+      try {
+        await deleteFacility(facilityId).unwrap()
+      } catch {
+        // Error handled by RTK Query / UI
+      }
+    },
+    [deleteFacility]
   )
 
   const handleEditDialogOpenChange = React.useCallback((open: boolean) => {
@@ -166,23 +122,16 @@ export function FacilitiesApiContainer() {
     if (!open) setEditingFacility(null)
   }, [])
 
+  const getBookingsForFacility = React.useCallback((_facilityId: string): Booking[] => {
+    return []
+  }, [])
+
   return (
     <FacilitiesView
-      viewMode={viewMode}
-      setViewMode={setViewMode}
       facilities={facilities}
-      facilitiesTypes={facilitiesTypes}
       bookings={bookings}
-      selectedDate={selectedDate}
-      onSelectedDateChange={setSelectedDate}
-      currentDate={currentDate}
-      setCurrentDate={setCurrentDate}
-      timelineMode={timelineMode}
-      setTimelineMode={setTimelineMode}
       addFacilityOpen={addFacilityOpen}
       setAddFacilityOpen={setAddFacilityOpen}
-      dialogOpen={dialogOpen}
-      setDialogOpen={setDialogOpen}
       editDialogOpen={editDialogOpen}
       setEditDialogOpen={handleEditDialogOpenChange}
       editingFacility={editingFacility}
@@ -190,28 +139,12 @@ export function FacilitiesApiContainer() {
       setBookingsDetailOpen={setBookingsDetailOpen}
       selectedSlotBookings={selectedSlotBookings}
       setSelectedSlotBookings={setSelectedSlotBookings}
-      newBooking={newBooking}
-      setNewBooking={setNewBooking}
-      clientSuggestions={clientSuggestions}
-      setClientSuggestions={setClientSuggestions}
-      showClientSuggestions={showClientSuggestions}
-      setShowClientSuggestions={setShowClientSuggestions}
       onAddFacility={handleAddFacility}
       onSaveEdit={handleSaveEdit}
-      onAddBooking={handleAddBooking}
       onEditFacility={handleEditFacility}
-      onClientNameChange={handleClientNameChange}
-      onSelectClient={handleSelectClient}
-      getBookingForSlot={getBookingForSlot}
-      isBookingStart={isBookingStart}
-      getBookingsAtSlot={getBookingsAtSlot}
-      getOccupancyPercentage={getOccupancyPercentage}
-      isMultiPartyFacility={isMultiPartyFacility}
-      navigateDate={navigateDate}
-      language={language}
-      convertISOToLocaleFormat={convertISOToLocaleFormat}
+      onDeleteFacility={handleDeleteFacility}
+      getBookingsForFacility={getBookingsForFacility}
       t={t}
-      timeSlots={TIME_SLOTS}
       isLoading={isLoading}
       error={error}
     />

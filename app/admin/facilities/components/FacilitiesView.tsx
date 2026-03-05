@@ -1,33 +1,29 @@
 "use client"
 
-import { Plus, Calendar as CalendarIcon } from "lucide-react"
+import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
+import { Card } from "@/components/ui/card"
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+  DialogDescription,
+} from "@/components/ui/dialog"
+import { Plus, Edit2, Trash2, Users } from "lucide-react"
 import { AddFacilityDialog } from "./AddFacilityDialog"
 import { BookingsDetailDialog } from "./BookingsDetailDialog"
 import { EditFacilityDialog } from "./EditFacilityDialog"
-import { FacilityList } from "./FacilityList"
-import { FacilityTimeline } from "./FacilityTimeline"
-import { NewBookingDialog } from "./NewBookingDialog"
-import type { Booking, Facility, NewBookingForm } from "./types"
-import { TaxonomyFacilityType } from "@/interfaces/taxonomy-facility-type/TaxonomyFacilityType"
+import type { Booking, Facility } from "./types"
 
 type TFunction = (key: string) => string
 
 export type FacilitiesViewProps = {
-  viewMode: "list" | "timeline"
-  setViewMode: (mode: "list" | "timeline") => void
   facilities: Facility[]
-  facilitiesTypes: TaxonomyFacilityType[]
   bookings: Booking[]
-  selectedDate: string
-  onSelectedDateChange: (date: string) => void
-  currentDate: Date
-  setCurrentDate: (date: Date) => void
-  timelineMode: "week" | "month"
-  setTimelineMode: (mode: "week" | "month") => void
   addFacilityOpen: boolean
   setAddFacilityOpen: (open: boolean) => void
-  dialogOpen: boolean
-  setDialogOpen: (open: boolean) => void
   editDialogOpen: boolean
   setEditDialogOpen: (open: boolean) => void
   editingFacility: Facility | null
@@ -35,48 +31,20 @@ export type FacilitiesViewProps = {
   setBookingsDetailOpen: (open: boolean) => void
   selectedSlotBookings: Booking[]
   setSelectedSlotBookings: (bookings: Booking[]) => void
-  newBooking: NewBookingForm
-  setNewBooking: (updater: (prev: NewBookingForm) => NewBookingForm) => void
-  clientSuggestions: string[]
-  setClientSuggestions: (s: string[]) => void
-  showClientSuggestions: boolean
-  setShowClientSuggestions: (v: boolean) => void
   onAddFacility: (e: React.FormEvent<HTMLFormElement>) => void
   onSaveEdit: (e: React.FormEvent<HTMLFormElement>) => void
-  onAddBooking: () => void
   onEditFacility: (facility: Facility) => void
-  onClientNameChange: (value: string) => void
-  onSelectClient: (clientName: string) => void
-  getBookingForSlot: (facilityId: string, time: string) => Booking | undefined
-  isBookingStart: (facilityId: string, time: string) => Booking | undefined
-  getBookingsAtSlot: (facilityId: string, timeSlot: string) => Booking[]
-  getOccupancyPercentage: (facilityId: string, timeSlot: string) => number
-  isMultiPartyFacility: (facilityType: string) => boolean
-  navigateDate: (direction: "prev" | "next") => void
-  language: string
-  convertISOToLocaleFormat: (isoDate: string) => string
+  onDeleteFacility: (facilityId: string) => void
+  getBookingsForFacility: (facilityId: string) => Booking[]
   t: TFunction
-  timeSlots: string[]
   isLoading?: boolean
   error?: unknown
 }
 
 export function FacilitiesView({
-  viewMode,
-  setViewMode,
   facilities,
-  facilitiesTypes,
-  bookings,
-  selectedDate,
-  onSelectedDateChange,
-  currentDate,
-  setCurrentDate,
-  timelineMode,
-  setTimelineMode,
   addFacilityOpen,
   setAddFacilityOpen,
-  dialogOpen,
-  setDialogOpen,
   editDialogOpen,
   setEditDialogOpen,
   editingFacility,
@@ -84,32 +52,18 @@ export function FacilitiesView({
   setBookingsDetailOpen,
   selectedSlotBookings,
   setSelectedSlotBookings,
-  newBooking,
-  setNewBooking,
-  clientSuggestions,
-  showClientSuggestions,
-  setShowClientSuggestions,
   onAddFacility,
   onSaveEdit,
-  onAddBooking,
   onEditFacility,
-  onClientNameChange,
-  onSelectClient,
-  getBookingForSlot,
-  isBookingStart,
-  getBookingsAtSlot,
-  getOccupancyPercentage,
-  isMultiPartyFacility,
-  navigateDate,
-  language,
-  convertISOToLocaleFormat,
+  onDeleteFacility,
+  getBookingsForFacility,
   t,
-  timeSlots,
   isLoading,
   error,
 }: FacilitiesViewProps) {
-  const handleShowBookingsDetail = (bookingsList: Booking[]) => {
-    setSelectedSlotBookings(bookingsList)
+  const handleShowBookingsDetail = (facilityId: string) => {
+    const facilityBookings = getBookingsForFacility(facilityId)
+    setSelectedSlotBookings(facilityBookings)
     setBookingsDetailOpen(true)
   }
 
@@ -119,94 +73,45 @@ export function FacilitiesView({
         <div className="px-8 py-4">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-2xl font-bold text-foreground">{t("admin.amenitiesManagement")}</h1>
-              <p className="text-sm text-muted-foreground">Administra los amenities y espacios del hotel</p>
+              <h1 className="text-2xl font-bold text-foreground">
+                {t("admin.amenitiesManagement")}
+              </h1>
+              <p className="text-sm text-muted-foreground">
+                {t("admin.configureNewAmenity")}
+              </p>
             </div>
-            <div className="flex gap-4 items-center ml-auto">
-              <div className="inline-flex h-10 items-center rounded-lg bg-gray-100 p-1 border border-gray-200">
+            <Dialog open={addFacilityOpen} onOpenChange={setAddFacilityOpen}>
+              <DialogTrigger asChild>
                 <button
-                  type="button"
-                  onClick={() => setViewMode("list")}
-                  className={`px-5 py-2 rounded-md font-medium text-sm transition-all ${viewMode === "list" ? "text-white shadow-md" : "text-gray-700 hover:text-gray-900"
-                    }`}
-                  style={viewMode === "list" ? { backgroundColor: "#394a63" } : {}}
+                  className="flex items-center justify-center w-10 h-10 rounded-full text-white shadow-md hover:shadow-lg transition-all duration-300 hover:scale-110 group relative"
+                  style={{ backgroundColor: "#1557F6" }}
+                  title={t("admin.addAmenity")}
                 >
-                  Lista
+                  <Plus className="w-5 h-5" />
+                  <span className="absolute top-full mt-2 px-2 py-1 bg-gray-900 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap">
+                    {t("admin.addAmenity")}
+                  </span>
                 </button>
-                <button
-                  type="button"
-                  onClick={() => setViewMode("timeline")}
-                  className={`px-5 py-2 rounded-md font-medium text-sm transition-all ${viewMode === "timeline" ? "text-white shadow-md" : "text-gray-700 hover:text-gray-900"
-                    }`}
-                  style={viewMode === "timeline" ? { backgroundColor: "#394a63" } : {}}
-                >
-                  Timeline
-                </button>
-              </div>
+              </DialogTrigger>
               <AddFacilityDialog
                 open={addFacilityOpen}
                 onOpenChange={setAddFacilityOpen}
                 onSubmit={onAddFacility}
-                facilitiesTypes={facilitiesTypes}
-                t={t}
-                trigger={
-                  <button
-                    className="flex items-center justify-center w-10 h-10 rounded-full bg-gradient-to-br from-primary to-primary/80 text-white shadow-md hover:shadow-lg transition-all duration-300 hover:scale-110 group relative"
-                    title={t("admin.addAmenity")}
-                  >
-                    <div className="relative flex items-center justify-center">
-                      <Plus className="w-5 h-5" />
-                      <span className="absolute text-base font-bold -bottom-0.5 -right-0.5 text-white drop-shadow-lg">+</span>
-                    </div>
-                    <span className="absolute top-full mt-2 px-2 py-1 bg-gray-900 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap">
-                      {t("admin.addAmenity")}
-                    </span>
-                  </button>
-                }
-              />
-              <button
-                type="button"
-                onClick={() => setDialogOpen(true)}
-                className="relative group w-10 h-10 rounded-full bg-primary hover:bg-primary/90 text-white flex items-center justify-center transition-all shadow-md hover:shadow-lg"
-                title={t("admin.addReservation")}
-              >
-                <div className="relative">
-                  <CalendarIcon className="w-5 h-5" />
-                  <span
-                    className="absolute -top-1 -right-1 bg-primary text-white text-xs font-bold w-4 h-4 rounded-full flex items-center justify-center"
-                    style={{ fontSize: "10px" }}
-                  >
-                    +
-                  </span>
-                </div>
-                <span className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-1.5 bg-gray-900 text-white text-xs rounded pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
-                  {t("admin.newReservation")}
-                </span>
-              </button>
-              <NewBookingDialog
-                open={dialogOpen}
-                onOpenChange={setDialogOpen}
-                facilities={facilities}
-                newBooking={newBooking}
-                onNewBookingChange={setNewBooking}
-                clientSuggestions={clientSuggestions}
-                showClientSuggestions={showClientSuggestions}
-                onClientNameChange={onClientNameChange}
-                onSelectClient={onSelectClient}
-                onSubmit={onAddBooking}
                 t={t}
               />
-            </div>
+            </Dialog>
           </div>
         </div>
       </header>
 
-      <div className="p-8 max-w-[1600px] mx-auto">
+      <div className="p-8 max-w-[1400px] mx-auto">
         {isLoading && (
           <p className="text-sm text-muted-foreground py-4">Cargando...</p>
         )}
         {error != null && (
-          <p className="text-sm text-destructive py-4">Error al cargar facilities.</p>
+          <p className="text-sm text-destructive py-4">
+            Error al cargar amenities.
+          </p>
         )}
         {!isLoading && error == null && (
           <>
@@ -215,47 +120,86 @@ export function FacilitiesView({
               onOpenChange={setEditDialogOpen}
               facility={editingFacility}
               onSubmit={onSaveEdit}
-              facilitiesTypes={facilitiesTypes}
               t={t}
             />
             <BookingsDetailDialog
               open={bookingsDetailOpen}
               onOpenChange={setBookingsDetailOpen}
               bookings={selectedSlotBookings}
-              facilities={facilities}
+              t={t}
             />
-            {viewMode === "list" && (
-              <FacilityList
-                facilities={facilities}
-                bookings={bookings}
-                selectedDate={selectedDate}
-                onSelectedDateChange={onSelectedDateChange}
-                onEditFacility={onEditFacility}
-                language={language}
-                convertISOToLocaleFormat={convertISOToLocaleFormat}
-                t={t}
-              />
-            )}
-            {viewMode === "timeline" && (
-              <FacilityTimeline
-                facilities={facilities}
-                timeSlots={timeSlots}
-                currentDate={currentDate}
-                timelineMode={timelineMode}
-                onTimelineModeChange={setTimelineMode}
-                onCurrentDateChange={setCurrentDate}
-                navigateDate={navigateDate}
-                getBookingForSlot={getBookingForSlot}
-                isBookingStart={isBookingStart}
-                getBookingsAtSlot={getBookingsAtSlot}
-                getOccupancyPercentage={getOccupancyPercentage}
-                isMultiPartyFacility={isMultiPartyFacility}
-                onShowBookingsDetail={handleShowBookingsDetail}
-                onEditFacility={onEditFacility}
-                language={language}
-                convertISOToLocaleFormat={convertISOToLocaleFormat}
-                t={t}
-              />
+
+            <div className="grid gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
+              {facilities.map((facility) => {
+                const Icon = facility.icon
+                return (
+                  <Card
+                    key={facility.id}
+                    className="hover:shadow-lg transition-shadow"
+                  >
+                    <div className="p-4 space-y-3">
+                      <div className="flex items-center justify-between gap-4">
+                        <div className="flex items-center gap-3 flex-1 min-w-0">
+                          <div
+                            className={`${facility.color} p-2 rounded-lg flex-shrink-0`}
+                          >
+                            <Icon className="w-5 h-5 text-white" />
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <h3 className="font-bold text-lg text-foreground truncate">
+                              {facility.name}
+                            </h3>
+                            <p className="text-sm text-muted-foreground capitalize truncate">
+                              {facility.type}
+                            </p>
+                          </div>
+                        </div>
+                        <div className="flex flex-col gap-2 items-end flex-shrink-0">
+                          <Badge
+                            variant="outline"
+                            className="text-xs whitespace-nowrap"
+                          >
+                            {facility.startTime} - {facility.endTime}
+                          </Badge>
+                          <div className="flex items-center gap-1 text-sm flex-shrink-0">
+                            <Users className="w-4 h-4 text-muted-foreground" />
+                            <p className="font-semibold">{facility.capacity}</p>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="flex justify-end gap-2">
+                        <Button
+                          variant="outline"
+                          size="icon"
+                          onClick={() => onEditFacility(facility)}
+                        >
+                          <Edit2 className="w-4 h-4" />
+                        </Button>
+                        <Button
+                          variant="outline"
+                          size="icon"
+                          className="text-destructive hover:text-destructive"
+                          onClick={() => onDeleteFacility(facility.id)}
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </Button>
+                      </div>
+                    </div>
+                  </Card>
+                )
+              })}
+            </div>
+
+            {facilities.length === 0 && (
+              <div className="flex flex-col items-center justify-center py-16">
+                <p className="text-lg font-medium text-muted-foreground">
+                  No hay amenities registrados
+                </p>
+                <p className="text-sm text-muted-foreground">
+                  Crea uno nuevo para comenzar
+                </p>
+              </div>
             )}
           </>
         )}

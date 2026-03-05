@@ -33,7 +33,7 @@ export const typeToIconAndColor: Record<string, { icon: LucideIcon; color: strin
 }
 
 export function mapApiFacilityToUi(f: ApiFacility): Facility {
-  const type = f.facilityType?.name ?? "fitness"
+  const type = (f.facilityType?.name ?? f.type ?? "fitness").toLowerCase()
   const { icon, color } = typeToIconAndColor[type] ?? { icon: LayoutGrid, color: "bg-gray-500" }
   return {
     id: f.id,
