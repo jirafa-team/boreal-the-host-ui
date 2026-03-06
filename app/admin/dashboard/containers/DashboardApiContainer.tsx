@@ -1,6 +1,6 @@
 "use client"
 
-import { useMemo, useState } from "react"
+import { useCallback, useMemo, useState } from "react"
 import { useParams } from "next/navigation"
 import { useSelector } from "react-redux"
 import type { RootState } from "@/store/store"
@@ -17,6 +17,9 @@ import { useGetRoomsQuery } from "@/app/admin/rooms/slice/roomSlice"
 import { useGetStaffQuery } from "@/app/admin/staff/slice/staffSlice"
 import { useGetFacilitiesQuery } from "@/app/admin/facilities/slice/facilitySlice"
 import { useGetReservationFacilityBookingsQuery } from "@/features/reservation-facility-booking/slices/reservationFacilityBookingSlice"
+import { useGetClientsQuery, mapClientApiToClient } from "@/app/admin/clients/slice/clientSlice"
+import { useCreateReservationMutation, useGetReservationsQuery } from "@/features/reservation/slices/reservationSlice"
+import { useToast } from "@/hooks/use-toast"
 import type { Facility as ApiFacility } from "@/interfaces/facility/Facility"
 import type { StaffMemberDisplay } from "@/interfaces/staff/StaffMemberDisplay"
 import type { ReservationFacilityBooking } from "@/interfaces/reservation-facility-booking/ReservationFacilityBooking"
@@ -32,7 +35,10 @@ import type {
   RoomStatus,
   StaffStatus,
   StaffDepartment,
+  RoomBookingClient,
+  RoomBookingFormPayload,
 } from "../components/types"
+import type { RoomReservationRange } from "../utils"
 import {
   generateDateColumns,
   getRoomStatusForDate,
@@ -189,10 +195,10 @@ export function DashboardApiContainer() {
   )
   const skip = dataSource !== "api"
 
-  const { data: roomsData, isLoading: roomsLoading } = useGetRoomsQuery(
-    undefined,
-    { skip }
-  )
+  const { data: roomsData, isLoading: roomsLoading, refetch: refetchRooms } =
+    useGetRoomsQuery(undefined, { skip })
+  const [createReservation] = useCreateReservationMutation()
+  const { toast } = useToast()
   const { data: staffData } = useGetStaffQuery(undefined, { skip })
   const { data: facilitiesData } = useGetFacilitiesQuery(undefined, {
     skip,
@@ -201,6 +207,48 @@ export function DashboardApiContainer() {
     undefined,
     { skip }
   )
+  const { data: clientsData } = useGetClientsQuery(
+    { page: 1, limit: 200 },
+    { skip }
+  )
+  const { data: reservationsData } = useGetReservationsQuery(
+    { page: 1, limit: 500 },
+    { skip }
+  )
+
+  const reservationsByRoomId = useMemo((): Record<string, RoomReservationRange[]> => {
+    const data = reservationsData?.data as { objects?: Array<{ roomId: string; checkIn: string; checkOut: string; status?: string }>; reservations?: Array<{ roomId: string; checkIn: string; checkOut: string; status?: string }> } | undefined
+    const raw = data?.objects ?? data?.reservations ?? []
+    const list = Array.isArray(raw) ? raw : []
+    const byRoom: Record<string, RoomReservationRange[]> = {}
+    for (const r of list) {
+      if (!r?.roomId || r.status === "cancelled") continue
+      const range: RoomReservationRange = {
+        checkIn: r.checkIn ?? "",
+        checkOut: r.checkOut ?? "",
+        status: r.status,
+      }
+      if (!byRoom[r.roomId]) byRoom[r.roomId] = []
+      byRoom[r.roomId].push(range)
+    }
+    return byRoom
+  }, [reservationsData?.data])
+
+  const roomBookingClients: RoomBookingClient[] = useMemo(() => {
+    const list = clientsData?.data?.objects ?? []
+    return (Array.isArray(list) ? list : []).map((d) => {
+      const c = mapClientApiToClient(d)
+      return {
+        id: c.id,
+        name: c.name,
+        email: c.email,
+        phone: c.phone ?? "-",
+        room: c.room ?? "-",
+        checkIn: c.checkIn ?? "-",
+        checkOut: c.checkOut ?? "-",
+      }
+    })
+  }, [clientsData?.data?.objects])
 
   const [activeTab, setActiveTab] = useState<DashboardTab>("rooms")
   const [timelineMode, setTimelineMode] = useState<"week" | "month">("week")
@@ -275,6 +323,12 @@ export function DashboardApiContainer() {
     [currentDate, timelineMode]
   )
 
+  const getRoomStatusForDateWithReservations = useCallback(
+    (room: Room, date: Date) =>
+      getRoomStatusForDate(room, date, reservationsByRoomId[room.id] ?? []),
+    [reservationsByRoomId]
+  )
+
   const getStatusLabel = (
     status: RoomStatus | "booked" | StaffStatus
   ): string => {
@@ -322,6 +376,36 @@ export function DashboardApiContainer() {
     [bookings]
   )
 
+  const handleCreateRoomBooking = async (payload: RoomBookingFormPayload) => {
+    if (!payload.clientId) {
+      toast({
+        title: "Error",
+        description: "Seleccione un cliente de la lista.",
+        variant: "destructive",
+      })
+      return
+    }
+    try {
+      await createReservation({
+        roomId: payload.roomId,
+        clientId: payload.clientId,
+        checkIn: payload.checkIn,
+        checkOut: payload.checkOut,
+      }).unwrap()
+      toast({
+        title: "Éxito",
+        description: "Reserva creada correctamente.",
+      })
+      refetchRooms()
+    } catch {
+      toast({
+        title: "Error",
+        description: "No se pudo crear la reserva.",
+        variant: "destructive",
+      })
+    }
+  }
+
   if (roomsLoading && activeTab === "rooms") {
     return (
       <div className="p-8">
@@ -366,7 +450,7 @@ export function DashboardApiContainer() {
       convertISOToLocaleFormat={convertISOToLocaleFormat}
       getStatusColor={getStatusColor}
       getStatusLabel={getStatusLabel}
-      getRoomStatusForDate={getRoomStatusForDate}
+      getRoomStatusForDate={getRoomStatusForDateWithReservations}
       getStatusText={getStatusText}
       getRequestStatusColor={getRequestStatusColor}
       getRequestStatusText={getRequestStatusText}
@@ -374,9 +458,9 @@ export function DashboardApiContainer() {
       language={language}
       orgId={orgId}
       rooms={rooms}
-      roomBookingClients={[]}
+      roomBookingClients={roomBookingClients}
       facilityBookingSuggestions={facilityBookingSuggestions}
-      onCreateRoomBooking={() => {}}
+      onCreateRoomBooking={handleCreateRoomBooking}
       onCreateMaintenanceActivity={() => {}}
       onAddFacilityBooking={() => {}}
     />

@@ -54,7 +54,10 @@ export const reservationApi = createApi({
       query: (id) => ({ url: `${ENDPOINTS.RESERVATION}/${id}`, method: 'GET', credentials: 'include' }),
       providesTags: (_, __, id) => [{ type: 'Reservations', id }],
     }),
-    createReservation: build.mutation<{ data: Reservation }, { roomId: string; checkIn: string; checkOut: string }>({
+    createReservation: build.mutation<
+      { data: Reservation },
+      { roomId: string; clientId: string; checkIn: string; checkOut: string }
+    >({
       query: (body) => ({ url: ENDPOINTS.RESERVATION, method: 'POST', body, credentials: 'include' }),
       invalidatesTags: ['Reservations'],
     }),

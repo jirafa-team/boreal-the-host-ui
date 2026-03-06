@@ -76,23 +76,9 @@ export function RoomsApiContainer() {
         room.number.toLowerCase().includes(searchTerm.toLowerCase()) ||
         room.type.toLowerCase().includes(searchTerm.toLowerCase()) ||
         (room.guest?.toLowerCase().includes(searchTerm.toLowerCase()) ?? false)
-      if (layoutMode === "grid") {
-        const selectedDateObj = new Date(selectedDate)
-        selectedDateObj.setHours(0, 0, 0, 0)
-        if (room.status === "maintenance") return matchesStatus && matchesSearch
-        if (room.checkIn && room.checkOut) {
-          const checkIn = new Date(room.checkIn)
-          const checkOut = new Date(room.checkOut)
-          checkIn.setHours(0, 0, 0, 0)
-          checkOut.setHours(0, 0, 0, 0)
-          if (selectedDateObj >= checkIn && selectedDateObj <= checkOut) return matchesStatus && matchesSearch
-        }
-        if (!room.checkIn || !room.checkOut) return matchesStatus && matchesSearch
-        return false
-      }
       return matchesStatus && matchesSearch
     })
-  }, [rooms, statusFilter, searchTerm, layoutMode, selectedDate])
+  }, [rooms, statusFilter, searchTerm])
 
   const stats: RoomStats = useMemo(
     () => ({

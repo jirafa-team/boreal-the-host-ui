@@ -104,6 +104,7 @@ export type RoomBookingClient = {
 export type RoomBookingFormPayload = {
   roomId: string
   clientName: string
+  clientId?: string
   people: number
   checkIn: string
   checkOut: string

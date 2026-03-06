@@ -69,21 +69,45 @@ export function isMultiPartyFacility(facilityType: string): boolean {
   )
 }
 
+/** Rango de una reserva para una habitación (origen: API de reservas) */
+export type RoomReservationRange = {
+  checkIn: string | Date
+  checkOut: string | Date
+  status?: string
+}
+
+function isDateInRange(date: Date, checkIn: string | Date, checkOut: string | Date): boolean {
+  const start = new Date(checkIn)
+  const end = new Date(checkOut)
+  const target = new Date(date)
+  target.setHours(0, 0, 0, 0)
+  start.setHours(0, 0, 0, 0)
+  end.setHours(0, 0, 0, 0)
+  return target >= start && target <= end
+}
+
+function reservationStatusToRoomStatus(apiStatus: string | undefined): RoomStatus {
+  if (apiStatus === "checked_in") return "occupied"
+  if (apiStatus === "checked_out" || apiStatus === "cancelled") return "available"
+  return "reserved"
+}
+
+/**
+ * Estado de la habitación en una fecha usando las reservas como fuente de verdad.
+ * Si se pasan reservas para la habitación, el rango (checkIn–checkOut) sale de ahí.
+ */
 export function getRoomStatusForDate(
   room: Room,
-  date: Date
+  date: Date,
+  roomReservations?: RoomReservationRange[]
 ): RoomStatus {
   if (room.status === "maintenance") return "maintenance"
-  if (room.checkIn && room.checkOut) {
-    const checkIn = new Date(room.checkIn)
-    const checkOut = new Date(room.checkOut)
-    const targetDate = new Date(date)
-    targetDate.setHours(0, 0, 0, 0)
-    checkIn.setHours(0, 0, 0, 0)
-    checkOut.setHours(0, 0, 0, 0)
-    if (targetDate >= checkIn && targetDate <= checkOut) {
-      return room.status
+  if (roomReservations?.length) {
+    for (const res of roomReservations) {
+      if (isDateInRange(date, res.checkIn, res.checkOut))
+        return reservationStatusToRoomStatus(res.status) ?? room.status
     }
+    return "available"
   }
   return "available"
 }

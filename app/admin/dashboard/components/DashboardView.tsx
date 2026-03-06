@@ -177,6 +177,7 @@ export function DashboardView({
   const [roomBookingRoomId, setRoomBookingRoomId] = useState("")
   const [roomBookingClientSearch, setRoomBookingClientSearch] = useState("")
   const [roomBookingClientName, setRoomBookingClientName] = useState("")
+  const [roomBookingClientId, setRoomBookingClientId] = useState("")
   const [roomBookingPeople, setRoomBookingPeople] = useState(1)
   const [roomBookingCheckIn, setRoomBookingCheckIn] = useState("")
   const [roomBookingCheckOut, setRoomBookingCheckOut] = useState("")
@@ -459,6 +460,7 @@ export function DashboardView({
                             onChange={(e) => {
                               setRoomBookingClientSearch(e.target.value)
                               setRoomBookingClientName(e.target.value)
+                              setRoomBookingClientId("")
                               setShowRoomClientSuggestions(true)
                             }}
                             onFocus={() => setShowRoomClientSuggestions(true)}
@@ -473,6 +475,7 @@ export function DashboardView({
                                     onClick={() => {
                                       setRoomBookingClientName(client.name)
                                       setRoomBookingClientSearch(client.name)
+                                      setRoomBookingClientId(client.id)
                                       setShowRoomClientSuggestions(false)
                                     }}
                                     className="w-full text-left px-4 py-2 hover:bg-muted border-b last:border-b-0 transition-colors"
@@ -539,16 +542,27 @@ export function DashboardView({
                       </div>
                       <Button
                         className="w-full"
+                        disabled={
+                          !roomBookingRoomId ||
+                          !roomBookingCheckIn ||
+                          !roomBookingCheckOut ||
+                          (roomBookingClients.length > 0
+                            ? !roomBookingClientId
+                            : !roomBookingClientName)
+                        }
                         onClick={() => {
-                          if (
+                          const canSubmit =
                             roomBookingRoomId &&
-                            roomBookingClientName &&
                             roomBookingCheckIn &&
-                            roomBookingCheckOut
-                          ) {
+                            roomBookingCheckOut &&
+                            (roomBookingClients.length > 0
+                              ? roomBookingClientId
+                              : roomBookingClientName)
+                          if (canSubmit) {
                             onCreateRoomBooking({
                               roomId: roomBookingRoomId,
                               clientName: roomBookingClientName,
+                              clientId: roomBookingClientId || undefined,
                               people: roomBookingPeople,
                               checkIn: roomBookingCheckIn,
                               checkOut: roomBookingCheckOut,
@@ -557,6 +571,7 @@ export function DashboardView({
                             setRoomBookingRoomId("")
                             setRoomBookingClientSearch("")
                             setRoomBookingClientName("")
+                            setRoomBookingClientId("")
                             setRoomBookingPeople(1)
                             setRoomBookingCheckIn("")
                             setRoomBookingCheckOut("")
