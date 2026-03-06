@@ -82,7 +82,7 @@ export function ClientsApiContainer() {
       let matchesKPIFilter = true
       if (clientsFilter === "active") matchesKPIFilter = client.status === "checked-in"
       else if (clientsFilter === "checkout") matchesKPIFilter = client.checkOut === today
-      else if (clientsFilter === "vip") matchesKPIFilter = false
+      else if (clientsFilter === "vip") matchesKPIFilter = client.vip === true
       return matchesSearch && matchesStatus && matchesKPIFilter
     })
   }, [displayedClients, searchTerm, statusFilter, clientsFilter])

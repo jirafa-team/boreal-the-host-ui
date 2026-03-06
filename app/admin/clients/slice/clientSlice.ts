@@ -19,7 +19,7 @@ export interface ClientApiDto {
   createdAt?: string
   updatedAt?: string
   user?: { id: string; firstName: string; lastName: string; email: string }
-  reservations?: Array<{ id: string; roomId: string; checkIn: string; checkOut: string; status: string }>
+  reservations?: Array<{ id: string; roomId: string; roomNumber?: string; checkIn: string; checkOut: string; status: string }>
 }
 
 export interface GetClientsResponse {
@@ -80,7 +80,7 @@ export function mapClientApiToClient(d: ClientApiDto): Client {
     name: name || "-",
     email: d.email,
     phone: d.phone ?? "-",
-    room: "-",
+    room: firstReservation?.roomNumber ?? "-",
     checkIn: toDateString(firstReservation?.checkIn) || "-",
     checkOut: toDateString(firstReservation?.checkOut) || "-",
     status: mapReservationStatusToClientStatus(firstReservation?.status ?? "pending"),
