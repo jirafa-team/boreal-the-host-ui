@@ -1,9 +1,13 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useMemo } from "react"
 import { useRouter } from "next/navigation"
 import { useSearchParams } from "next/navigation"
 import { Suspense } from "react"
+import { useSelector } from "react-redux"
+import type { RootState } from "@/store/store"
+import { useGetOrganizationsQuery } from "@/features/organization/slices/organizationSlice"
+import type { Organization as ApiOrganization } from "@/interfaces/organization/Organization"
 import {
   Building2,
   Calendar,
@@ -44,57 +48,21 @@ interface Organization {
   type: "hotel" | "event" | "both"
 }
 
-const mockOrganizations: Organization[] = [
-  {
-    id: "1",
-    name: "Hotel Premium Madrid",
-    location: "Madrid, España",
-    admin: "Carlos García",
-    totalRooms: 120,
-    activeClients: 89,
-    revenue: 245000,
-    status: "active",
-    createdAt: "2023-01-15",
-    logo: "/images/thehost-logo.png",
-    type: "hotel",
-  },
-  {
-    id: "2",
-    name: "Hotel Boutique Valencia",
-    location: "Valencia, España",
-    admin: "Ana Martínez",
-    totalRooms: 45,
-    activeClients: 32,
-    revenue: 87000,
-    status: "active",
-    createdAt: "2023-06-05",
-    type: "hotel",
-  },
-  {
-    id: "3",
-    name: "Grand Hotel Bilbao",
-    location: "Bilbao, España",
-    admin: "Laura Fernández",
-    totalRooms: 85,
-    activeClients: 67,
-    revenue: 156000,
-    status: "inactive",
-    createdAt: "2023-04-22",
-    type: "both",
-  },
-  {
-    id: "4",
-    name: "Resort Marbella",
-    location: "Marbella, España",
-    admin: "Juan Rodríguez",
-    totalRooms: 200,
-    activeClients: 156,
-    revenue: 412000,
-    status: "active",
-    createdAt: "2022-11-10",
-    type: "event",
-  },
-]
+function mapApiOrgToUi(o: ApiOrganization): Organization {
+  return {
+    id: o.id,
+    name: o.name,
+    location: (o as Record<string, unknown>).location as string ?? "",
+    admin: (o as Record<string, unknown>).admin as string ?? "",
+    totalRooms: ((o as Record<string, unknown>).totalRooms as number) ?? 0,
+    activeClients: ((o as Record<string, unknown>).activeClients as number) ?? 0,
+    revenue: ((o as Record<string, unknown>).revenue as number) ?? 0,
+    status: ((o as Record<string, unknown>).status as Organization["status"]) ?? "active",
+    createdAt: ((o as Record<string, unknown>).createdAt as string) ?? "",
+    logo: (o as Record<string, unknown>).logo as string | undefined,
+    type: ((o as Record<string, unknown>).type as Organization["type"]) ?? "hotel",
+  }
+}
 
 const getTypeBadge = (type: Organization["type"]) => {
   switch (type) {
@@ -115,11 +83,25 @@ const getTypeBadge = (type: Organization["type"]) => {
   }
 }
 
+const MOCK_ORGANIZATIONS_UI: Organization[] = [
+  { id: "1", name: "Hotel Premium Madrid", location: "Madrid, España", admin: "Carlos García", totalRooms: 120, activeClients: 89, revenue: 245000, status: "active", createdAt: "2023-01-15", logo: "/images/thehost-logo.png", type: "hotel" },
+  { id: "2", name: "Hotel Boutique Valencia", location: "Valencia, España", admin: "Ana Martínez", totalRooms: 45, activeClients: 32, revenue: 87000, status: "active", createdAt: "2023-06-05", type: "hotel" },
+  { id: "3", name: "Grand Hotel Bilbao", location: "Bilbao, España", admin: "Laura Fernández", totalRooms: 85, activeClients: 67, revenue: 156000, status: "inactive", createdAt: "2023-04-22", type: "both" },
+  { id: "4", name: "Resort Marbella", location: "Marbella, España", admin: "Juan Rodríguez", totalRooms: 200, activeClients: 156, revenue: 412000, status: "active", createdAt: "2022-11-10", type: "event" },
+]
+
 export default function SystemOrganizationsPage() {
   const router = useRouter()
   const searchParams = useSearchParams()
+  const dataSource = useSelector((state: RootState) => state.dataSource.dataSource)
+  const { data: apiData } = useGetOrganizationsQuery(undefined, { skip: dataSource !== "api" })
+
+  const organizations: Organization[] = useMemo(() => {
+    if (dataSource === "api") return (apiData?.data?.organizations ?? []).map(mapApiOrgToUi)
+    return MOCK_ORGANIZATIONS_UI
+  }, [dataSource, apiData])
+
   const [searchTerm, setSearchTerm] = useState(searchParams?.get("search") || "")
-  const [organizations] = useState<Organization[]>(mockOrganizations)
   const [typeFilter, setTypeFilter] = useState("all")
   const [showCurrencySettings, setShowCurrencySettings] = useState(false)
   const { currency, setCurrency, symbol, formatPrice } = useCurrency()

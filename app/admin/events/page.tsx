@@ -1,8 +1,10 @@
 "use client"
 
 import { useState } from "react"
+import { useSelector } from "react-redux"
 import { Calendar, Plus, Search, MapPin, Clock, Edit, Trash2, Eye, Users, CalendarPlus } from "lucide-react"
 import { Card } from "@/components/ui/card"
+import type { RootState } from "@/store/store"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
@@ -18,8 +20,9 @@ import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import Link from "next/link"
-import { useRouter } from "next/navigation"
+import { useRouter, useParams } from "next/navigation"
 import { useLanguage } from "@/lib/i18n-context"
+import { ROUTES } from "@/shared/types/routes"
 
 type Event = {
   id: number
@@ -48,6 +51,8 @@ type Person = {
 
 export default function EventsManagement() {
   const router = useRouter()
+  const params = useParams()
+  const orgId = params?.orgId as string | undefined
   const { t } = useLanguage()
   const [searchQuery, setSearchQuery] = useState("")
   const [selectedDate, setSelectedDate] = useState("")
@@ -222,6 +227,17 @@ export default function EventsManagement() {
       return matchesSearch && matchesDate && matchesLocation
     }
   )
+
+  const dataSource = useSelector((state: RootState) => state.dataSource.dataSource)
+  if (dataSource === "api") {
+    return (
+      <div className="p-8">
+        <Card className="p-6">
+          <p className="text-muted-foreground">Datos desde API: esta vista aún no está conectada.</p>
+        </Card>
+      </div>
+    )
+  }
 
   return (
     <>
@@ -508,7 +524,7 @@ export default function EventsManagement() {
                       <div className="flex gap-2">
                         <button
                           className="w-10 h-10 rounded-full bg-blue-600 hover:bg-blue-700 text-white flex items-center justify-center transition-colors"
-                          onClick={() => router.push(`/admin/events/${event.id}`)}
+                          onClick={() => router.push(orgId ? ROUTES.EVENT_DETAIL(orgId, event.id) : `/admin/events/${event.id}`)}
                           title="Ver detalles"
                         >
                           <Eye className="w-5 h-5" />
@@ -569,7 +585,7 @@ export default function EventsManagement() {
                             <div
                               key={event.id}
                               className="text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded cursor-pointer hover:bg-blue-200 truncate"
-                              onClick={() => router.push(`/admin/events/${event.id}`)}
+                              onClick={() => router.push(orgId ? ROUTES.EVENT_DETAIL(orgId, event.id) : `/admin/events/${event.id}`)}
                               title={event.name}
                             >
                               {event.name}

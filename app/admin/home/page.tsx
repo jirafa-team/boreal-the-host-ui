@@ -2,8 +2,9 @@
 
 import React from "react"
 
-import { useRouter } from "next/navigation"
+import { useRouter, useParams } from "next/navigation"
 import { useLanguage } from "@/lib/i18n-context"
+import { ROUTES } from "@/shared/types/routes"
 import {
   Hotel,
   Calendar,
@@ -44,6 +45,8 @@ const customColors = {
 
 export default function AdminHomePage() {
   const router = useRouter()
+  const params = useParams()
+  const orgId = params?.orgId as string | undefined
   const { t } = useLanguage()
 
   const gradientColors: { [key: string]: string } = {
@@ -70,44 +73,37 @@ export default function AdminHomePage() {
     {
       title: t("admin.general"),
       items: [
-        { href: "/admin/dashboard", label: t("admin.controlDashboard"), icon: BarChart3, color: "from-green-600 to-green-700" },
-        // { href: "/admin/sales-assistant", label: t("admin.salesAssistant"), icon: TrendingUp, color: "from-green-600 to-green-700" },
+        { href: orgId ? ROUTES.DASHBOARD(orgId) : "/admin/dashboard", label: t("admin.controlDashboard"), icon: BarChart3, color: "from-green-600 to-green-700" },
       ],
       columns: 2,
     },
     {
       title: t("admin.spaces"),
       items: [
-        { href: "/admin/rooms", label: t("admin.rooms"), icon: Hotel, color: "from-purple-600 to-purple-700" },
-        // { href: "/admin/space-builder", label: t("admin.spaceDesign"), icon: LayoutGrid, color: "from-indigo-600 to-indigo-700" },
-        { href: "/admin/facilities", label: "Amenities", icon: Building2, color: "from-orange-600 to-orange-700" },
+        { href: orgId ? ROUTES.ROOMS(orgId) : "/admin/rooms", label: t("admin.rooms"), icon: Hotel, color: "from-purple-600 to-purple-700" },
+        { href: orgId ? ROUTES.FACILITIES(orgId) : "/admin/facilities", label: "Amenities", icon: Building2, color: "from-orange-600 to-orange-700" },
       ],
       columns: 2,
     },
     {
       title: t("admin.services"),
       items: [
-        { href: "/admin/staff", label: "Personal", icon: Sparkles, color: "from-pink-600 to-pink-700" },
-        // { href: "/admin/events", label: t("admin.events"), icon: Calendar, color: "from-red-600 to-red-700" },
-        // { href: "/admin/tickets", label: t("admin.tickets"), icon: Ticket, color: "from-yellow-600 to-yellow-700" },
-        // { href: "/admin/pedidos", label: t("admin.orders"), icon: ShoppingBag, color: "pedidos-custom" },
+        { href: orgId ? ROUTES.STAFF(orgId) : "/admin/staff", label: "Personal", icon: Sparkles, color: "from-pink-600 to-pink-700" },
       ],
       columns: 2,
     },
     {
       title: t("admin.communication"),
       items: [
-        { href: "/admin/clients", label: t("admin.clients"), icon: Users, color: "clientes-custom" },
-        // { href: "/admin/notifications", label: t("admin.notifications"), icon: Bell, color: "notificaciones-custom" },
-        // { href: "/admin/recommendations", label: t("admin.recommendations"), icon: Compass, color: "recomendaciones-custom" },
+        { href: orgId ? ROUTES.CLIENTS(orgId) : "/admin/clients", label: t("admin.clients"), icon: Users, color: "clientes-custom" },
       ],
       columns: 3,
     },
     {
       title: t("admin.management"),
       items: [
-        { href: "/admin/users", label: "Usuarios", icon: UserCog, color: "from-slate-600 to-slate-700" },
-        { href: "/admin/settings", label: "Configuración", icon: Settings, color: "from-teal-600 to-teal-700" },
+        { href: orgId ? ROUTES.USERS(orgId) : "/admin/users", label: "Usuarios", icon: UserCog, color: "from-slate-600 to-slate-700" },
+        { href: orgId ? ROUTES.SETTINGS(orgId) : "/admin/settings", label: "Configuración", icon: Settings, color: "from-teal-600 to-teal-700" },
       ],
       columns: 2,
     },
@@ -119,7 +115,7 @@ export default function AdminHomePage() {
         {/* Agentic Mode Button */}
         <div className="mb-6 flex justify-end">
           <button
-            onClick={() => router.push("/admin/agentico")}
+            onClick={() => router.push(orgId ? ROUTES.AGENTICO(orgId) : "/admin/agentico")}
             className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white font-medium rounded-lg shadow-md hover:shadow-lg transition-all duration-300"
           >
             <Sparkles className="w-4 h-4" />

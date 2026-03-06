@@ -1,10 +1,12 @@
 "use client"
 
 import { DropdownMenuSeparator } from "@/components/ui/dropdown-menu"
-import { useRouter } from "next/navigation"
-
+import { useRouter, useParams } from "next/navigation"
+import { useSelector } from "react-redux"
 import { useState, Suspense } from "react"
+import type { RootState } from "@/store/store"
 import { useSearchParams } from "next/navigation"
+import { ROUTES } from "@/shared/types/routes"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -39,6 +41,8 @@ import {
 import Loading from "./loading"
 
 export default function NotificationsPage() {
+  const params = useParams()
+  const orgId = params?.orgId as string | undefined
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false)
   const [isCreateAutomationOpen, setIsCreateAutomationOpen] = useState(false)
   const [notificationTitle, setNotificationTitle] = useState("")
@@ -57,6 +61,7 @@ export default function NotificationsPage() {
   const [automationTemplate, setAutomationTemplate] = useState("")
   const searchParams = useSearchParams()
   const router = useRouter()
+  const notificationsLogHref = orgId ? ROUTES.NOTIFICATIONS_LOG(orgId) : "/admin/notifications/log"
 
   // Mock data para notificaciones enviadas
   const sentNotifications = [
@@ -282,6 +287,17 @@ export default function NotificationsPage() {
     setAutomationTemplate("")
   }
 
+  const dataSource = useSelector((state: RootState) => state.dataSource.dataSource)
+  if (dataSource === "api") {
+    return (
+      <div className="p-8">
+        <Card className="p-6">
+          <p className="text-muted-foreground">Datos desde API: esta vista aún no está conectada.</p>
+        </Card>
+      </div>
+    )
+  }
+
   return (
     <Suspense fallback={<Loading />}>
       <div className="p-6 max-w-7xl mx-auto space-y-6">
@@ -294,7 +310,7 @@ export default function NotificationsPage() {
           </div>
           <Button
             className="gap-2 bg-slate-600 hover:bg-slate-700 text-white"
-            onClick={() => router.push("/admin/notifications/log")}
+            onClick={() => router.push(notificationsLogHref)}
           >
             <Clock className="w-4 h-4" />
             Log de Notificaciones
