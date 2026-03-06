@@ -9,6 +9,7 @@ import {
 } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
 import type { NewRoomForm } from "./types"
+import { useGetRoomTypesQuery } from "@/features/taxonomy-room-type/slices/taxonomyRoomTypeSlice"
 
 type TFunction = (key: string) => string
 
@@ -39,6 +40,10 @@ export function CreateRoomDialog({
   onSubmit,
   t,
 }: CreateRoomDialogProps) {
+  const { data: roomTypesData } = useGetRoomTypesQuery();
+  const roomTypes: Array<{ id: string; name: string }> =
+    roomTypesData?.data ?? []
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-md">
@@ -73,11 +78,19 @@ export function CreateRoomDialog({
               }
               className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
             >
-              {ROOM_TYPES.map((type) => (
-                <option key={type} value={type}>
-                  {type}
-                </option>
-              ))}
+              {roomTypes ? (
+                roomTypes.map((type) => (
+                  <option key={type.id} value={type.id}>
+                    {type.name}
+                  </option>
+                ))
+              ) : (
+                ROOM_TYPES.map((type) => (
+                  <option key={type} value={type}>
+                    {type}
+                  </option>
+                ))
+              )}
             </select>
           </div>
           <div>

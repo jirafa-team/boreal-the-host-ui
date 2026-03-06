@@ -175,14 +175,11 @@ export function RoomsApiContainer() {
 
   const handleCreateRoom = React.useCallback(async () => {
     if (!newRoom.number.trim()) return
-    const roomType = roomTypes.find(
-      (rt: { id: string; name: string }) =>
-        rt.name === newRoom.type
-    )
+    console.log("Asdasdadsadadasdad", newRoom)
     try {
       await createRoom({
         number: newRoom.number,
-        roomTypeId: roomType?.id ?? "",
+        roomTypeId: newRoom.type,
         floor: newRoom.floor,
         capacity: newRoom.capacity,
       }).unwrap()
