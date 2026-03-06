@@ -60,9 +60,24 @@ export const authApi = createApi({
       }),
       invalidatesTags: ['UserContexts'],
     }),
+    validateUser: build.mutation<
+      { needsTermsAcceptance: boolean },
+      { token: string; termsAccepted?: boolean }
+    >({
+      query: (body) => ({
+        url: `/api${ENDPOINTS.AUTH.VALIDATE_USER}`,
+        method: 'POST',
+        body,
+      }),
+    }),
   }),
 });
 
 export const { updateUser, setCurrentOrganization, clearUser } = authSlice.actions;
-export const { useLoginMutation, useGetUserContextsQuery, useLogoutMutation } = authApi;
+export const {
+  useLoginMutation,
+  useGetUserContextsQuery,
+  useLogoutMutation,
+  useValidateUserMutation,
+} = authApi;
 export default authSlice.reducer;
