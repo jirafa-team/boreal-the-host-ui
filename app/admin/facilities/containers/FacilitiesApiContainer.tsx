@@ -126,6 +126,11 @@ export function FacilitiesApiContainer() {
     return []
   }, [])
 
+  const facilityTypeOptions = React.useMemo(
+    () => facilityTypes.map((ft) => ({ id: ft.id, name: ft.name })),
+    [facilityTypes]
+  )
+
   return (
     <FacilitiesView
       facilities={facilities}
@@ -145,6 +150,7 @@ export function FacilitiesApiContainer() {
       onDeleteFacility={handleDeleteFacility}
       getBookingsForFacility={getBookingsForFacility}
       t={t}
+      facilityTypeOptions={facilityTypeOptions}
       isLoading={isLoading}
       error={error}
     />

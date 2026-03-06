@@ -17,6 +17,7 @@ export const ENDPOINTS = {
   STAFF: '/staff',
   FACILITY: '/facility',
   ROOM: '/room',
+  CLIENT: '/client',
   ROLE: '/role',
   STAFF_TASK: '/staff-task',
   RESERVATION: '/reservation',

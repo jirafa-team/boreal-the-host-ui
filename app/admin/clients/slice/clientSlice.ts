@@ -1,5 +1,97 @@
 import { createSlice, type PayloadAction, type AnyAction } from "@reduxjs/toolkit"
+import { createApi } from "@reduxjs/toolkit/query/react"
+import { ENDPOINTS } from "@/shared/types/api"
+import { baseQueryWithOrg } from "@/store/baseQuery"
 import type { Client } from "../components/types"
+
+export interface ClientApiDto {
+  id: string
+  organizationId: string
+  firstName?: string
+  lastName?: string
+  name: string
+  email: string
+  phone?: string | null
+  nationality?: string | null
+  category: string
+  notes?: string | null
+  userId?: string | null
+  createdAt?: string
+  updatedAt?: string
+  user?: { id: string; firstName: string; lastName: string; email: string }
+  reservations?: Array<{ id: string; roomId: string; checkIn: string; checkOut: string; status: string }>
+}
+
+export interface GetClientsResponse {
+  objects: ClientApiDto[]
+  totalCount: number
+  currentPage: number
+  pageSize: number
+  totalPages: number
+  hasMore: boolean
+}
+
+function toDateString(value: string | undefined): string {
+  if (!value) return "-"
+  return value.includes("T") ? value.split("T")[0]! : value
+}
+
+function mapReservationStatusToClientStatus(apiStatus: string): Client["status"] {
+  switch (apiStatus) {
+    case "checked_in":
+      return "checked-in"
+    case "checked_out":
+    case "cancelled":
+      return "checked-out"
+    case "pending":
+    case "confirmed":
+    default:
+      return "reserved"
+  }
+}
+
+export function mapClientApiToClient(d: ClientApiDto): Client {
+  const hasReservations = d.reservations != null && d.reservations.length > 0
+  const firstReservation = d.reservations?.[0]
+  const name =
+    d.name ?? (d.firstName != null || d.lastName != null ? [d.firstName, d.lastName].filter(Boolean).join(" ") : "")
+
+  if (!hasReservations) {
+    return {
+      id: d.id,
+      name: name || "-",
+      email: d.email,
+      phone: d.phone ?? "-",
+      room: "-",
+      checkIn: "-",
+      checkOut: "-",
+      status: "no-reservation",
+      vip: d.category === "VIP",
+      nationality: d.nationality ?? "-",
+      guests: "-",
+      totalSpent: "-",
+      notes: d.notes ?? undefined,
+      category: (d.category as Client["category"]) ?? "Basic",
+    }
+  }
+
+  return {
+    id: d.id,
+    name: name || "-",
+    email: d.email,
+    phone: d.phone ?? "-",
+    room: "-",
+    checkIn: toDateString(firstReservation?.checkIn) || "-",
+    checkOut: toDateString(firstReservation?.checkOut) || "-",
+    status: mapReservationStatusToClientStatus(firstReservation?.status ?? "pending"),
+    vip: d.category === "VIP",
+    nationality: d.nationality ?? "-",
+    guests: "-",
+    totalSpent: "-",
+    notes: d.notes ?? undefined,
+    category: (d.category as Client["category"]) ?? "Basic",
+  }
+}
 
 interface ClientState {
   clients: Client[]
@@ -150,6 +242,84 @@ export const clientSlice = createSlice({
     },
   },
 })
+
+export const clientApi = createApi({
+  reducerPath: "clientApi",
+  baseQuery: baseQueryWithOrg,
+  tagTypes: ["Clients"],
+  endpoints: (build) => ({
+    getClients: build.query<
+      { data: GetClientsResponse },
+      { page?: number; limit?: number } | void
+    >({
+      query: (params) => ({
+        url: ENDPOINTS.CLIENT,
+        method: "GET",
+        params: params ?? { page: 1, limit: 100 },
+        credentials: "include",
+      }),
+      providesTags: ["Clients"],
+    }),
+    getClientById: build.query<{ data: ClientApiDto }, string>({
+      query: (id) => ({
+        url: `${ENDPOINTS.CLIENT}/${id}`,
+        method: "GET",
+        credentials: "include",
+      }),
+      providesTags: (_, __, id) => [{ type: "Clients", id }],
+    }),
+    createClient: build.mutation<
+      { data: ClientApiDto },
+      {
+        firstName: string
+        lastName: string
+        email: string
+        phone?: string | null
+        nationality?: string | null
+        category: string
+        notes?: string | null
+        createUserForClient?: boolean
+      }
+    >({
+      query: (body) => ({
+        url: ENDPOINTS.CLIENT,
+        method: "POST",
+        body,
+        credentials: "include",
+      }),
+      invalidatesTags: ["Clients"],
+    }),
+    updateClient: build.mutation<
+      { data: ClientApiDto },
+      { id: string; payload: Partial<ClientApiDto> }
+    >({
+      query: ({ id, payload }) => ({
+        url: `${ENDPOINTS.CLIENT}/${id}`,
+        method: "PATCH",
+        body: payload,
+        credentials: "include",
+      }),
+      invalidatesTags: (_, __, arg) =>
+        arg?.id ? [{ type: "Clients", id: arg.id }, "Clients"] : ["Clients"],
+    }),
+    deleteClient: build.mutation<{ data: { success: boolean } }, string>({
+      query: (id) => ({
+        url: `${ENDPOINTS.CLIENT}/${id}`,
+        method: "DELETE",
+        credentials: "include",
+      }),
+      invalidatesTags: ["Clients"],
+    }),
+  }),
+})
+
+export const {
+  useGetClientsQuery,
+  useGetClientByIdQuery,
+  useCreateClientMutation,
+  useUpdateClientMutation,
+  useDeleteClientMutation,
+} = clientApi
 
 export const { setClients } = clientSlice.actions
 

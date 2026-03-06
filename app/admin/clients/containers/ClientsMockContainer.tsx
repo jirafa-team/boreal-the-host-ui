@@ -11,7 +11,8 @@ import type { Client } from "@/app/admin/clients/components/types"
 import type { NewClientForm } from "@/app/admin/clients/components/ClientsView"
 
 const initialNewClient: NewClientForm = {
-  name: "",
+  firstName: "",
+  lastName: "",
   email: "",
   phone: "",
   room: "",
@@ -75,11 +76,12 @@ export function ClientsMockContainer() {
   }
 
   const handleAddClient = () => {
-    if (!newClient.name || !newClient.email) return
+    if (!newClient.firstName?.trim() || !newClient.lastName?.trim() || !newClient.email?.trim()) return
     const status: Client["status"] = newClient.status === "checkout" ? "checked-out" : "checked-in"
+    const fullName = [newClient.firstName.trim(), newClient.lastName.trim()].filter(Boolean).join(" ")
     const client: Client = {
       id: `client-${Date.now()}`,
-      name: newClient.name,
+      name: fullName,
       email: newClient.email,
       phone: newClient.phone,
       room: newClient.room || "-",

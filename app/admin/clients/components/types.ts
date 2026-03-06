@@ -6,7 +6,7 @@ export interface Guest {
   relationship: string
 }
 
-export type ClientStatus = "checked-in" | "checked-out" | "reserved"
+export type ClientStatus = "checked-in" | "checked-out" | "reserved" | "no-reservation"
 
 export interface Client {
   id: string

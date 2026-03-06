@@ -44,7 +44,8 @@ const NATIONALITY_OPTIONS = [
 ]
 
 export type NewClientForm = {
-  name: string
+  firstName: string
+  lastName: string
   email: string
   phone: string
   room: string
@@ -76,6 +77,7 @@ export type ClientsViewProps = {
   newClient: NewClientForm
   setNewClient: (updater: (prev: NewClientForm) => NewClientForm) => void
   onAddClient: () => void
+  onConfirmDeleteClient?: (clientId: string) => void
   orgId: string | undefined
   t: TFunction
   isLoading?: boolean
@@ -118,6 +120,7 @@ export function ClientsView({
   newClient,
   setNewClient,
   onAddClient,
+  onConfirmDeleteClient,
   orgId,
   t,
   isLoading,
@@ -140,6 +143,13 @@ export function ClientsView({
           <Badge className="bg-blue-500/10 text-blue-600 border-blue-500/20">
             <Clock className="w-3 h-3 mr-1" />
             {t("admin.reserved")}
+          </Badge>
+        )
+      case "no-reservation":
+        return (
+          <Badge className="bg-amber-500/10 text-amber-600 border-amber-500/20">
+            <UserCircle className="w-3 h-3 mr-1" />
+            Sin reserva
           </Badge>
         )
       case "checked-out":
@@ -528,12 +538,24 @@ export function ClientsView({
                   <label className="block text-sm font-medium text-gray-700 mb-2">Nombre</label>
                   <input
                     type="text"
-                    value={newClient.name}
-                    onChange={(e) => setNewClient((prev) => ({ ...prev, name: e.target.value }))}
+                    value={newClient.firstName}
+                    onChange={(e) => setNewClient((prev) => ({ ...prev, firstName: e.target.value }))}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    placeholder="Nombre completo"
+                    placeholder="Nombre"
                   />
                 </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Apellido</label>
+                  <input
+                    type="text"
+                    value={newClient.lastName}
+                    onChange={(e) => setNewClient((prev) => ({ ...prev, lastName: e.target.value }))}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    placeholder="Apellido"
+                  />
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">Email</label>
                   <input
@@ -674,7 +696,9 @@ export function ClientsView({
             <Button
               variant="destructive"
               onClick={() => {
-                // TODO: llamar API de eliminación cuando exista
+                if (clientToDelete?.id && onConfirmDeleteClient) {
+                  onConfirmDeleteClient(clientToDelete.id)
+                }
                 setClientToDelete(null)
               }}
             >

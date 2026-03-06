@@ -1,17 +1,24 @@
 "use client"
 
-import React, { useMemo, useState } from "react"
+import React, { useMemo, useState, useCallback } from "react"
 import { useParams } from "next/navigation"
 import { useSelector } from "react-redux"
 import type { RootState } from "@/store/store"
 import { useLanguage } from "@/lib/i18n-context"
-import { useGetReservationsWithDetailsQuery } from "@/features/reservation/slices/reservationSlice"
+import {
+  useGetClientsQuery,
+  useCreateClientMutation,
+  useDeleteClientMutation,
+  mapClientApiToClient,
+} from "@/app/admin/clients/slice/clientSlice"
 import { ClientsView } from "@/app/admin/clients/components/ClientsView"
-import type { Client, ClientStatus } from "@/app/admin/clients/components/types"
+import type { Client } from "@/app/admin/clients/components/types"
 import type { NewClientForm } from "@/app/admin/clients/components/ClientsView"
+import { useToast } from "@/hooks/use-toast"
 
 const initialNewClient: NewClientForm = {
-  name: "",
+  firstName: "",
+  lastName: "",
   email: "",
   phone: "",
   room: "",
@@ -25,95 +32,26 @@ const initialNewClient: NewClientForm = {
   createUserForClient: false,
 }
 
-type ReservationWithDetails = {
-  id?: string
-  userId?: string
-  checkIn?: string | Date
-  checkOut?: string | Date
-  status?: string
-  user?: {
-    id: string
-    firstName?: string
-    lastName?: string
-    email?: string
-    phoneNumber?: string
-  }
-  room?: {
-    id: string
-    number?: string
-    status?: string
-    checkIn?: string | Date | null
-    checkOut?: string | Date | null
-  }
-}
-
-function toISOString(d: string | Date | undefined | null): string {
-  if (d == null) return "-"
-  if (typeof d === "string") return d
-  try {
-    return new Date(d).toISOString().split("T")[0]
-  } catch {
-    return "-"
-  }
-}
-
-function mapReservationToClientStatus(
-  checkIn: string | undefined,
-  checkOut: string | undefined,
-  reservationStatus?: string
-): ClientStatus {
-  if (reservationStatus === "pending") return "reserved"
-  const today = new Date().toISOString().split("T")[0]
-  if (!checkOut || checkOut === "-") return "reserved"
-  if (checkOut < today) return "checked-out"
-  if (checkIn && checkIn <= today) return "checked-in"
-  return "reserved"
-}
-
-function mapReservationToClient(r: ReservationWithDetails): Client {
-  const user = r.user
-  const room = r.room
-  const checkIn = toISOString(r.checkIn)
-  const checkOut = toISOString(r.checkOut)
-  const name =
-    user?.firstName != null || user?.lastName != null
-      ? [user?.firstName ?? "", user?.lastName ?? ""].filter(Boolean).join(" ").trim()
-      : "-"
-
-  return {
-    id: user?.id ?? r.id ?? "",
-    reservationId: r.id,
-    name: name || "-",
-    email: user?.email ?? "-",
-    phone: user?.phoneNumber ?? "-",
-    room: room?.number ?? "-",
-    checkIn: checkIn || "-",
-    checkOut: checkOut || "-",
-    status: mapReservationToClientStatus(checkIn, checkOut, r.status),
-    vip: false,
-    nationality: "-",
-    guests: "-",
-    totalSpent: "-",
-  }
-}
-
 export function ClientsApiContainer() {
   const { t } = useLanguage()
+  const { toast } = useToast()
   const params = useParams()
   const orgId = params?.orgId as string | undefined
   const dataSource = useSelector((state: RootState) => state.dataSource.dataSource)
   const skip = dataSource !== "api"
 
-  const { data, isLoading, error } = useGetReservationsWithDetailsQuery(
-    { role: "Customer", limit: 100 },
+  const { data, isLoading, error } = useGetClientsQuery(
+    { page: 1, limit: 100 },
     { skip }
   )
 
+  const [createClient] = useCreateClientMutation()
+  const [deleteClient] = useDeleteClientMutation()
+
   const clients: Client[] = useMemo(() => {
-    const raw = data?.data as { objects?: ReservationWithDetails[] } | undefined
-    const list = raw?.objects ?? (data?.data as { reservations?: ReservationWithDetails[] })?.reservations ?? []
-    return (Array.isArray(list) ? list : []).map(mapReservationToClient)
-  }, [data?.data])
+    const list = data?.data?.objects ?? []
+    return (Array.isArray(list) ? list : []).map(mapClientApiToClient)
+  }, [data?.data?.objects])
 
   const [searchTerm, setSearchTerm] = useState("")
   const [statusFilter, setStatusFilter] = useState("all")
@@ -124,7 +62,10 @@ export function ClientsApiContainer() {
   const [newClient, setNewClient] = useState<NewClientForm>(initialNewClient)
 
   const activeClients = useMemo(
-    () => clients.filter((c) => c.status === "checked-in" || c.status === "reserved"),
+    () =>
+      clients.filter(
+        (c) => c.status === "checked-in" || c.status === "reserved" || c.status === "no-reservation"
+      ),
     [clients]
   )
   const historicalClients = useMemo(() => clients.filter((c) => c.status === "checked-out"), [clients])
@@ -150,10 +91,47 @@ export function ClientsApiContainer() {
     setExpandedClient((prev) => (prev === clientId ? null : clientId))
   }
 
-  const handleAddClient = () => {
-    setShowNewClientModal(false)
-    setNewClient(initialNewClient)
-  }
+  const handleAddClient = useCallback(async () => {
+    if (!newClient.firstName.trim() || !newClient.lastName.trim() || !newClient.email.trim()) return
+    try {
+      await createClient({
+        firstName: newClient.firstName.trim(),
+        lastName: newClient.lastName.trim(),
+        email: newClient.email.trim(),
+        phone: newClient.phone?.trim() || undefined,
+        nationality: newClient.nationality?.trim() || undefined,
+        category: newClient.category,
+        notes: newClient.notes?.trim() || undefined,
+        createUserForClient: newClient.createUserForClient ?? false,
+      }).unwrap()
+      setShowNewClientModal(false)
+      setNewClient(initialNewClient)
+      const displayName = [newClient.firstName, newClient.lastName].filter(Boolean).join(" ").trim()
+      toast({ title: "Éxito", description: `Cliente ${displayName || "creado"} creado correctamente.` })
+    } catch {
+      toast({
+        title: "Error",
+        description: "No se pudo crear el cliente.",
+        variant: "destructive",
+      })
+    }
+  }, [newClient, createClient, toast])
+
+  const handleDeleteClient = useCallback(
+    async (clientId: string) => {
+      try {
+        await deleteClient(clientId).unwrap()
+        toast({ title: "Éxito", description: "Cliente eliminado correctamente." })
+      } catch {
+        toast({
+          title: "Error",
+          description: "No se pudo eliminar el cliente.",
+          variant: "destructive",
+        })
+      }
+    },
+    [deleteClient, toast]
+  )
 
   return (
     <ClientsView
@@ -174,6 +152,7 @@ export function ClientsApiContainer() {
       newClient={newClient}
       setNewClient={setNewClient}
       onAddClient={handleAddClient}
+      onConfirmDeleteClient={handleDeleteClient}
       orgId={orgId}
       t={t}
       isLoading={isLoading}

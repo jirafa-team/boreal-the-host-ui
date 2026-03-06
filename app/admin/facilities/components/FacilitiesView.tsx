@@ -37,6 +37,7 @@ export type FacilitiesViewProps = {
   onDeleteFacility: (facilityId: string) => void
   getBookingsForFacility: (facilityId: string) => Booking[]
   t: TFunction
+  facilityTypeOptions?: { id: string; name: string }[]
   isLoading?: boolean
   error?: unknown
 }
@@ -58,6 +59,7 @@ export function FacilitiesView({
   onDeleteFacility,
   getBookingsForFacility,
   t,
+  facilityTypeOptions,
   isLoading,
   error,
 }: FacilitiesViewProps) {
@@ -98,6 +100,7 @@ export function FacilitiesView({
                 onOpenChange={setAddFacilityOpen}
                 onSubmit={onAddFacility}
                 t={t}
+                facilityTypeOptions={facilityTypeOptions}
               />
             </Dialog>
           </div>
@@ -121,6 +124,7 @@ export function FacilitiesView({
               facility={editingFacility}
               onSubmit={onSaveEdit}
               t={t}
+              facilityTypeOptions={facilityTypeOptions}
             />
             <BookingsDetailDialog
               open={bookingsDetailOpen}

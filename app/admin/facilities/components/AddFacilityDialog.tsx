@@ -8,14 +8,28 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 
 type TFunction = (key: string) => string
 
+const HARDCODED_TYPE_OPTIONS = [
+  { value: "fitness", labelKey: "admin.fitness" },
+  { value: "recreation", labelKey: "admin.recreation" },
+  { value: "wellness", labelKey: "admin.wellness" },
+  { value: "business", labelKey: "admin.business" },
+  { value: "dining", labelKey: "admin.dining" },
+] as const
+
 export type AddFacilityDialogProps = {
   open?: boolean
   onOpenChange?: (open: boolean) => void
   onSubmit: (e: React.FormEvent<HTMLFormElement>) => void
   t: TFunction
+  /** Cuando se provee (modo API), los tipos vienen de la taxonomía. Si no (modo mock), se usan los hardcodeados. */
+  facilityTypeOptions?: { id: string; name: string }[]
 }
 
-export function AddFacilityDialog({ onSubmit, t }: AddFacilityDialogProps) {
+export function AddFacilityDialog({ onSubmit, t, facilityTypeOptions }: AddFacilityDialogProps) {
+  const options = facilityTypeOptions?.length
+    ? facilityTypeOptions.map((ft) => ({ value: ft.id, label: ft.name }))
+    : HARDCODED_TYPE_OPTIONS.map((o) => ({ value: o.value, label: t(o.labelKey) }))
+
   return (
     <DialogContent className="max-w-md">
       <DialogHeader>
@@ -48,11 +62,11 @@ export function AddFacilityDialog({ onSubmit, t }: AddFacilityDialogProps) {
               <SelectValue placeholder={t("admin.selectType")} />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="fitness">{t("admin.fitness")}</SelectItem>
-              <SelectItem value="recreation">{t("admin.recreation")}</SelectItem>
-              <SelectItem value="wellness">{t("admin.wellness")}</SelectItem>
-              <SelectItem value="business">{t("admin.business")}</SelectItem>
-              <SelectItem value="dining">{t("admin.dining")}</SelectItem>
+              {options.map((opt) => (
+                <SelectItem key={opt.value} value={opt.value}>
+                  {opt.label}
+                </SelectItem>
+              ))}
             </SelectContent>
           </Select>
         </div>

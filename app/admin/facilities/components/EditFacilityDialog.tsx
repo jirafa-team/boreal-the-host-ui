@@ -15,12 +15,21 @@ import type { Facility } from "./types"
 
 type TFunction = (key: string) => string
 
+const HARDCODED_TYPE_OPTIONS = [
+  { value: "fitness", labelKey: "admin.fitness" },
+  { value: "recreation", labelKey: "admin.recreation" },
+  { value: "wellness", labelKey: "admin.wellness" },
+  { value: "business", labelKey: "admin.business" },
+  { value: "dining", labelKey: "admin.dining" },
+] as const
+
 export type EditFacilityDialogProps = {
   open: boolean
   onOpenChange: (open: boolean) => void
   facility: Facility | null
   onSubmit: (e: React.FormEvent<HTMLFormElement>) => void
   t: TFunction
+  facilityTypeOptions?: { id: string; name: string }[]
 }
 
 export function EditFacilityDialog({
@@ -29,7 +38,16 @@ export function EditFacilityDialog({
   facility,
   onSubmit,
   t,
+  facilityTypeOptions,
 }: EditFacilityDialogProps) {
+  const options = facilityTypeOptions?.length
+    ? facilityTypeOptions.map((ft) => ({ value: ft.id, label: ft.name }))
+    : HARDCODED_TYPE_OPTIONS.map((o) => ({ value: o.value, label: t(o.labelKey) }))
+  const typeDefaultValue =
+    facilityTypeOptions?.length && facility
+      ? facility.facilityType?.id ?? facility.type
+      : facility?.type ?? "fitness"
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-md">
@@ -49,16 +67,16 @@ export function EditFacilityDialog({
           </div>
           <div>
             <Label htmlFor="edit-type">{t("admin.amenityType")}</Label>
-            <Select name="type" defaultValue={facility?.type} required>
+            <Select name="type" defaultValue={typeDefaultValue} required>
               <SelectTrigger>
                 <SelectValue placeholder={t("admin.selectType")} />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="fitness">Fitness</SelectItem>
-                <SelectItem value="recreation">{t("admin.recreation")}</SelectItem>
-                <SelectItem value="wellness">{t("admin.wellness")}</SelectItem>
-                <SelectItem value="business">{t("admin.business")}</SelectItem>
-                <SelectItem value="dining">{t("admin.dining")}</SelectItem>
+                {options.map((opt) => (
+                  <SelectItem key={opt.value} value={opt.value}>
+                    {opt.label}
+                  </SelectItem>
+                ))}
               </SelectContent>
             </Select>
           </div>
