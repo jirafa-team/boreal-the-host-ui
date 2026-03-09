@@ -31,6 +31,7 @@ export default function HomePage() {
   const [registerPassword, setRegisterPassword] = useState("")
   const [registerConfirmPassword, setRegisterConfirmPassword] = useState("")
   const [isLoaded, setIsLoaded] = useState(false)
+  const [showEmailValidationMessage, setShowEmailValidationMessage] = useState(false)
   const router = useRouter()
   const dispatch = useDispatch()
   const [login, { isLoading: isLoginPending }] = useLoginMutation()
@@ -43,33 +44,61 @@ export default function HomePage() {
 
   const { language, setLanguage, t } = useLanguage()
 
-  const handleClientLogin = (e: React.FormEvent) => {
+  const handleClientLogin = async (e: React.FormEvent) => {
     e.preventDefault()
+    setLoginError(null)
+    setShowEmailValidationMessage(false)
 
-    // Usuarios predefinidos
-    const predefinedUsers = ["1", "2", "3"]
-    const isValidPredefined = predefinedUsers.includes(username)
-
-    // Si no es un usuario predefinido, validar en localStorage
-    if (!isValidPredefined) {
-      const users = JSON.parse(localStorage.getItem("users") || "[]")
-      const user = users.find((u: any) => u.username === username && u.password === password)
-
-      if (!user) {
-        alert(t("login.invalidUsername"))
-        return
+    if (dataSource === "api") {
+      try {
+        const result = await login({ email: username.trim(), password }).unwrap()
+        if ("requiresEmailValidation" in result && result.requiresEmailValidation) {
+          setShowEmailValidationMessage(true)
+          return
+        }
+        if ("token" in result && result.token) {
+          const decoded = jwtDecode<JWTPayload>(result.token)
+          dispatch(
+            updateUser({
+              user: {
+                email: decoded.email,
+                uuid: decoded.uuid,
+                firstName: decoded.firstName,
+                lastName: decoded.lastName ?? "",
+              },
+              isLoggedIn: true,
+            })
+          )
+          setIsLoading(true)
+          setTimeout(() => router.push("/client/checkin"), 800)
+        }
+      } catch (err) {
+        const error = err as { status?: number; data?: { message?: string } }
+        setLoginError(error?.data?.message ?? t("login.invalidCredentials"))
+        setPassword("")
       }
-
-      // Usuario registrado válido - guardar y redirigir
-      localStorage.setItem("currentUser", username)
-      setIsLoading(true)
-      setTimeout(() => {
-        router.push("/client/checkin")
-      }, 800)
       return
     }
 
-    // Usuario predefinido - guardar y redirigir según el usuario
+    // Modo mock: usuarios predefinidos o localStorage
+    const predefinedUsers = ["1", "2", "3"]
+    const isValidPredefined = predefinedUsers.includes(username)
+
+    if (!isValidPredefined) {
+      const users = JSON.parse(localStorage.getItem("users") || "[]")
+      const user = users.find((u: { username: string; password: string }) => u.username === username && u.password === password)
+
+      if (!user) {
+        setLoginError(t("login.invalidUsername"))
+        return
+      }
+
+      localStorage.setItem("currentUser", username)
+      setIsLoading(true)
+      setTimeout(() => router.push("/client/checkin"), 800)
+      return
+    }
+
     localStorage.setItem("currentUser", username)
     setIsLoading(true)
     setTimeout(() => {
@@ -105,8 +134,17 @@ export default function HomePage() {
     }
 
     try {
-      const { token } = await login({ email: adminUser, password: adminPassword }).unwrap()
-      const decoded = jwtDecode<JWTPayload>(token);
+      const result = await login({ email: adminUser, password: adminPassword }).unwrap()
+      if ("requiresEmailValidation" in result && result.requiresEmailValidation) {
+        setLoginError(result.message)
+        return
+      }
+      if (!("token" in result) || !result.token) {
+        setLoginError(t("login.invalidCredentials"))
+        return
+      }
+      const { token } = result
+      const decoded = jwtDecode<JWTPayload>(token)
 
       dispatch(
         updateUser({
@@ -114,7 +152,7 @@ export default function HomePage() {
             email: decoded.email,
             uuid: decoded.uuid,
             firstName: decoded.firstName,
-            lastName: decoded.lastName,
+            lastName: decoded.lastName ?? "",
           },
           isLoggedIn: true,
         })
@@ -294,8 +332,37 @@ export default function HomePage() {
 
             {/* Main card */}
             <div className="bg-white/95 backdrop-blur-lg rounded-3xl shadow-2xl p-8 space-y-6">
-              {!showRegister ? (
+              <div className="flex items-center justify-between gap-2 py-2 px-3 mb-2 rounded-lg bg-gray-100">
+                <span className="text-sm font-medium text-gray-700">
+                  {mockMode ? "MOCK" : "API"}
+                </span>
+                <Switch
+                  checked={mockMode}
+                  onCheckedChange={(checked) => dispatch(setDataSource(checked ? "mock" : "api"))}
+                />
+              </div>
+
+              {showEmailValidationMessage ? (
+                <div className="space-y-4">
+                  <p className="text-gray-700 text-center">
+                    {t("login.emailValidationSent")}
+                  </p>
+                  <Button
+                    type="button"
+                    onClick={() => {
+                      setShowEmailValidationMessage(false)
+                      setLoginError(null)
+                    }}
+                    className="w-full h-12 bg-white border-2 border-gray-300 text-gray-700 rounded-xl font-semibold hover:bg-gray-50"
+                  >
+                    {t("login.backToLogin")}
+                  </Button>
+                </div>
+              ) : !showRegister ? (
                 <>
+                  {loginError && (
+                    <p className="text-sm text-red-600 bg-red-50 px-3 py-2 rounded-lg">{loginError}</p>
+                  )}
                   <form onSubmit={handleClientLogin} className="space-y-4">
                     <div className="space-y-2">
                       <label className="text-sm font-medium text-gray-700">{t("login.username")}</label>
