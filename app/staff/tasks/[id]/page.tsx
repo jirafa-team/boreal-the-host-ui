@@ -1,92 +1,221 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { ChevronLeft, Play, Pause, X, CheckCircle2, Clock, MapPin, AlertCircle } from "lucide-react"
-import { useRouter, useParams } from "next/navigation"
+import { useState, useMemo } from "react";
+import { useRouter, useParams } from "next/navigation";
+import { useSelector } from "react-redux";
+import {
+  ChevronLeft,
+  Play,
+  Pause,
+  X,
+  CheckCircle2,
+  Clock,
+  MapPin,
+  AlertCircle,
+} from "lucide-react";
+import type { RootState } from "@/store/store";
+import {
+  useGetStaffTaskByIdQuery,
+  useUpdateStaffTaskMutation,
+} from "@/features/staff-task/slices/staffTaskSlice";
+
+type TaskDetailUi = {
+  id: string;
+  title: string;
+  category: string;
+  status: string;
+  priority: string;
+  time: string;
+  location: string;
+  description: string;
+  details: string;
+};
+
+function formatTime(isoDate: string | undefined): string {
+  if (!isoDate) return "—";
+  const d = new Date(isoDate);
+  const h = d.getHours();
+  const m = d.getMinutes();
+  const ampm = h >= 12 ? "PM" : "AM";
+  const h12 = h % 12 || 12;
+  return `${h12.toString().padStart(2, "0")}:${m.toString().padStart(2, "0")} ${ampm}`;
+}
+
+function toApiStatus(uiStatus: string): string {
+  if (uiStatus === "in-progress") return "in_progress";
+  return uiStatus;
+}
+
+function getStatusColor(status: string) {
+  switch (status) {
+    case "completed":
+      return "bg-green-100 text-green-800";
+    case "in-progress":
+    case "in_progress":
+      return "bg-blue-100 text-blue-800";
+    case "paused":
+      return "bg-orange-100 text-orange-800";
+    case "cancelled":
+      return "bg-red-100 text-red-800";
+    default:
+      return "bg-yellow-100 text-yellow-800";
+  }
+}
+
+function getStatusLabel(status: string) {
+  switch (status) {
+    case "completed":
+      return "Completada";
+    case "in-progress":
+    case "in_progress":
+      return "En Progreso";
+    case "paused":
+      return "Pausada";
+    case "cancelled":
+      return "Cancelada";
+    default:
+      return "Pendiente";
+  }
+}
+
+const MOCK_FALLBACK: TaskDetailUi = {
+  id: "",
+  title: "Tarea",
+  category: "General",
+  status: "pending",
+  priority: "high",
+  time: "09:00 AM",
+  location: "—",
+  description: "—",
+  details: "",
+};
 
 export default function TaskDetailPage() {
-  const router = useRouter()
-  const params = useParams()
-  const taskId = Number.parseInt(params.id as string)
+  const router = useRouter();
+  const params = useParams();
+  const dataSource = useSelector((state: RootState) => state.dataSource.dataSource);
+  const taskId = params.id as string;
 
-  const [task, setTask] = useState({
-    id: taskId,
-    title: "Limpiar Habitación 204",
-    category: "Limpieza",
-    status: "pending",
-    priority: "high",
-    time: "09:00 AM",
-    location: "Piso 2",
-    description: "Suite Premium - Cambiar sábanas y limpiar baño",
-    details:
-      "Tareas específicas: Cambiar sábanas del dormitorio, limpiar baño completo, pasar aspiradora, organizar amenities",
-  })
+  const [updateStaffTask] = useUpdateStaffTaskMutation();
+  const { data: apiData, isLoading, error } = useGetStaffTaskByIdQuery(taskId, {
+    skip: dataSource !== "api" || !taskId,
+  });
 
-  const [comment, setComment] = useState("")
-  const [commentError, setCommentError] = useState("")
+  const tasksFromSlice = useSelector((state: RootState) => state.staffTask.tasks);
+  const mockTask = useMemo(() => {
+    const t = tasksFromSlice.find((x) => String(x.id) === String(taskId));
+    if (!t) return null;
+    return {
+      id: String(t.id),
+      title: t.description,
+      category: "General",
+      status: (t.status as string) ?? "pending",
+      priority: "medium",
+      time: formatTime(t.scheduledStartAt),
+      location: "",
+      description: t.description,
+      details: "",
+    };
+  }, [tasksFromSlice, taskId]);
+
+  const [mockLocalTask, setMockLocalTask] = useState<TaskDetailUi | null>(null);
+  const [comment, setComment] = useState("");
+  const [commentError, setCommentError] = useState("");
+
+  const task: TaskDetailUi = useMemo(() => {
+    if (dataSource === "api") {
+      const t = apiData?.data;
+      if (!t) return MOCK_FALLBACK;
+      return {
+        id: t.id ?? "",
+        title: t.description ?? "",
+        category: "General",
+        status: (t.status as string) ?? "pending",
+        priority: "medium",
+        time: formatTime(t.scheduledStartAt),
+        location: "",
+        description: t.description ?? "",
+        details: "",
+      };
+    }
+    if (mockLocalTask) return mockLocalTask;
+    return mockTask ?? MOCK_FALLBACK;
+  }, [dataSource, apiData?.data, mockTask, mockLocalTask]);
 
   const validateComment = () => {
-    if (task.status === "in-progress") {
+    const s = task.status;
+    if (s === "in-progress" || s === "in_progress") {
       if (!comment.trim()) {
-        setCommentError("Por favor, escribe un comentario antes de completar o cancelar la tarea")
-        return false
+        setCommentError(
+          "Por favor, escribe un comentario antes de completar o cancelar la tarea"
+        );
+        return false;
       }
       if (comment.trim().length < 5) {
-        setCommentError("El comentario debe tener al menos 5 caracteres")
-        return false
+        setCommentError("El comentario debe tener al menos 5 caracteres");
+        return false;
       }
     }
-    setCommentError("")
-    return true
-  }
+    setCommentError("");
+    return true;
+  };
 
-  const handleStatusChange = (newStatus: string) => {
-    if ((newStatus === "completed" || newStatus === "cancelled") && task.status === "in-progress") {
-      if (!validateComment()) {
-        return
+  const handleStatusChange = async (newStatus: string) => {
+    if (
+      (newStatus === "completed" || newStatus === "cancelled") &&
+      (task.status === "in-progress" || task.status === "in_progress")
+    ) {
+      if (!validateComment()) return;
+    }
+    if (dataSource === "api" && taskId) {
+      try {
+        await updateStaffTask({
+          id: taskId,
+          payload: { status: toApiStatus(newStatus) },
+        }).unwrap();
+      } catch {
+        // error handled by mutation
       }
+    } else {
+      setMockLocalTask({
+        ...task,
+        status: newStatus,
+      });
     }
-    setTask({ ...task, status: newStatus })
-    setComment("")
-    setCommentError("")
+    setComment("");
+    setCommentError("");
+  };
+
+  if (dataSource === "api" && isLoading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <p className="text-gray-600">Cargando tarea...</p>
+      </div>
+    );
   }
 
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case "completed":
-        return "bg-green-100 text-green-800"
-      case "in-progress":
-        return "bg-blue-100 text-blue-800"
-      case "paused":
-        return "bg-orange-100 text-orange-800"
-      case "cancelled":
-        return "bg-red-100 text-red-800"
-      default:
-        return "bg-yellow-100 text-yellow-800"
-    }
-  }
-
-  const getStatusLabel = (status: string) => {
-    switch (status) {
-      case "completed":
-        return "Completada"
-      case "in-progress":
-        return "En Progreso"
-      case "paused":
-        return "Pausada"
-      case "cancelled":
-        return "Cancelada"
-      default:
-        return "Pendiente"
-    }
+  if (dataSource === "api" && error) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center gap-4 p-4">
+        <p className="text-red-600">Error al cargar la tarea.</p>
+        <button
+          onClick={() => router.back()}
+          className="px-4 py-2 bg-blue-600 text-white rounded-lg"
+        >
+          Volver
+        </button>
+      </div>
+    );
   }
 
   return (
     <div className="min-h-screen bg-gray-50 pb-20">
-      {/* Header */}
       <div className="bg-gradient-to-r from-blue-600 to-blue-700 text-white sticky top-0 z-50">
         <div className="max-w-md mx-auto px-4 py-4 flex items-center gap-4">
-          <button onClick={() => router.back()} className="p-2 hover:bg-blue-500 rounded-lg">
+          <button
+            onClick={() => router.back()}
+            className="p-2 hover:bg-blue-500 rounded-lg"
+          >
             <ChevronLeft className="w-6 h-6" />
           </button>
           <div className="flex-1">
@@ -96,13 +225,10 @@ export default function TaskDetailPage() {
         </div>
       </div>
 
-      {/* Task Details */}
       <div className="max-w-md mx-auto px-4 py-4 space-y-4">
-        {/* Action Buttons - Now at the top */}
         <div className="bg-white rounded-lg p-4 shadow-sm space-y-3">
           <h3 className="font-semibold text-gray-900">Acciones</h3>
           <div className="grid grid-cols-2 gap-2">
-            {/* Start Button */}
             {(task.status === "pending" || task.status === "paused") && (
               <button
                 onClick={() => handleStatusChange("in-progress")}
@@ -113,35 +239,39 @@ export default function TaskDetailPage() {
               </button>
             )}
 
-            {/* Pause Button */}
-            {task.status === "in-progress" && (
-              <button
-                onClick={() => handleStatusChange("paused")}
-                className="flex items-center justify-center gap-2 bg-orange-600 text-white py-3 rounded-lg font-semibold hover:bg-orange-700 transition-colors"
-              >
-                <Pause className="w-5 h-5" />
-                Pausar
-              </button>
-            )}
+            {(task.status === "in-progress" || task.status === "in_progress") &&
+              dataSource === "mock" && (
+                <button
+                  onClick={() => handleStatusChange("paused")}
+                  className="flex items-center justify-center gap-2 bg-orange-600 text-white py-3 rounded-lg font-semibold hover:bg-orange-700 transition-colors"
+                >
+                  <Pause className="w-5 h-5" />
+                  Pausar
+                </button>
+              )}
 
-            {/* Complete Button */}
             {task.status !== "completed" && task.status !== "cancelled" && (
               <button
                 onClick={() => handleStatusChange("completed")}
                 className="flex items-center justify-center gap-2 bg-green-600 text-white py-3 rounded-lg font-semibold hover:bg-green-700 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed"
-                disabled={task.status === "in-progress" && !comment.trim()}
+                disabled={
+                  (task.status === "in-progress" || task.status === "in_progress") &&
+                  !comment.trim()
+                }
               >
                 <CheckCircle2 className="w-5 h-5" />
                 Completar
               </button>
             )}
 
-            {/* Cancel Button */}
             {task.status !== "completed" && task.status !== "cancelled" && (
               <button
                 onClick={() => handleStatusChange("cancelled")}
                 className="flex items-center justify-center gap-2 bg-red-600 text-white py-3 rounded-lg font-semibold hover:bg-red-700 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed"
-                disabled={task.status === "in-progress" && !comment.trim()}
+                disabled={
+                  (task.status === "in-progress" || task.status === "in_progress") &&
+                  !comment.trim()
+                }
               >
                 <X className="w-5 h-5" />
                 Cancelar
@@ -150,11 +280,12 @@ export default function TaskDetailPage() {
           </div>
         </div>
 
-        {/* Status Card */}
         <div className="bg-white rounded-lg p-4 shadow-sm">
           <div className="flex items-center justify-between mb-4">
             <h2 className="font-semibold text-gray-900">Estado Actual</h2>
-            <span className={`px-3 py-1 rounded-full text-sm font-medium ${getStatusColor(task.status)}`}>
+            <span
+              className={`px-3 py-1 rounded-full text-sm font-medium ${getStatusColor(task.status)}`}
+            >
               {getStatusLabel(task.status)}
             </span>
           </div>
@@ -168,7 +299,6 @@ export default function TaskDetailPage() {
           </div>
         </div>
 
-        {/* Location & Time */}
         <div className="bg-white rounded-lg p-4 shadow-sm space-y-3">
           <div className="flex items-center gap-3">
             <MapPin className="w-5 h-5 text-blue-600" />
@@ -186,15 +316,17 @@ export default function TaskDetailPage() {
           </div>
         </div>
 
-        {/* Description */}
         <div className="bg-white rounded-lg p-4 shadow-sm">
           <h3 className="font-semibold text-gray-900 mb-2">Descripción</h3>
           <p className="text-gray-600 text-sm mb-3">{task.description}</p>
-          <p className="text-gray-700 text-sm border-l-4 border-blue-500 pl-3">{task.details}</p>
+          {task.details && (
+            <p className="text-gray-700 text-sm border-l-4 border-blue-500 pl-3">
+              {task.details}
+            </p>
+          )}
         </div>
 
-        {/* Comments Section - Only show when in-progress */}
-        {task.status === "in-progress" && (
+        {(task.status === "in-progress" || task.status === "in_progress") && (
           <div className="bg-white rounded-lg p-4 shadow-sm">
             <h3 className="font-semibold text-gray-900 mb-3">Comentarios de la Tarea</h3>
             <div className="space-y-3">
@@ -205,8 +337,8 @@ export default function TaskDetailPage() {
                 <textarea
                   value={comment}
                   onChange={(e) => {
-                    setComment(e.target.value)
-                    if (commentError) setCommentError("")
+                    setComment(e.target.value);
+                    if (commentError) setCommentError("");
                   }}
                   placeholder="Describe lo que has hecho, cualquier incidencia, o notas importantes sobre esta tarea..."
                   className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none ${
@@ -214,13 +346,17 @@ export default function TaskDetailPage() {
                   }`}
                   rows={4}
                 />
-                {commentError && <p className="text-red-600 text-sm mt-1">{commentError}</p>}
-                <p className="text-xs text-gray-500 mt-1">{comment.length} caracteres (mínimo 5)</p>
+                {commentError && (
+                  <p className="text-red-600 text-sm mt-1">{commentError}</p>
+                )}
+                <p className="text-xs text-gray-500 mt-1">
+                  {comment.length} caracteres (mínimo 5)
+                </p>
               </div>
             </div>
           </div>
         )}
       </div>
     </div>
-  )
+  );
 }
