@@ -67,6 +67,7 @@ export const translations = {
       checkOut: "Check-out",
       perNight: "por noche",
       completeCheckin: "Completar Check-in",
+      completeCheckInData: "Completar datos para check-in",
       noStays: "No tienes estadías registradas",
     },
     client: {
@@ -633,6 +634,7 @@ export const translations = {
       checkOut: "Check-out",
       perNight: "per night",
       completeCheckin: "Complete Check-in",
+      completeCheckInData: "Complete check-in data",
       noStays: "You have no stays registered",
     },
     client: {
@@ -1134,6 +1136,7 @@ export const translations = {
       checkOut: "Check-out",
       perNight: "por noite",
       completeCheckin: "Completar Check-in",
+      completeCheckInData: "Completar dados para check-in",
       noStays: "Você não tem estadias registradas",
     },
     client: {
