@@ -1,7 +1,8 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { useSearchParams } from "next/navigation"
+import { useSelector } from "react-redux"
+import type { RootState } from "@/store/store"
 import {
   Home,
   Calendar,
@@ -41,6 +42,74 @@ import { Badge } from "@/components/ui/badge"
 import Link from "next/link"
 import Image from "next/image"
 import { useRouter } from "next/navigation"
+import { ClientApiContainer } from "./containers/ClientApiContainer"
+import { ClientMockContainer } from "./containers/ClientMockContainer"
+
+export type ClientType = "normal" | "vip" | "future"
+
+export interface ClientUserData {
+  name: string
+  fullName: string
+  initials: string
+  email: string
+  room: string
+  roomType: string
+  phone: string
+  checkIn: string
+  checkOut: string
+  nights: number
+  daysUntilCheckIn?: number
+}
+
+const futureUserDataDefault: ClientUserData = {
+  name: "Ana",
+  fullName: "Ana García",
+  initials: "AG",
+  email: "ana.garcia@email.com",
+  room: "305",
+  roomType: "Deluxe",
+  phone: "+54 11 4567 8901",
+  checkIn: "5 Dic 2024",
+  checkOut: "10 Dic 2024",
+  nights: 5,
+  daysUntilCheckIn: 18,
+}
+
+const vipUserDataDefault: ClientUserData = {
+  name: "Isabella",
+  fullName: "Isabella Von Habsburg",
+  initials: "IV",
+  email: "isabella.von.habsburg@luxury.com",
+  room: "Penthouse 901",
+  roomType: "Presidential Suite",
+  phone: "+41 79 555 1234",
+  checkIn: "20 Nov 2024",
+  checkOut: "28 Nov 2024",
+  nights: 7,
+}
+
+const normalUserDataDefault: ClientUserData = {
+  name: "Carlos",
+  fullName: "Carlos Martínez",
+  initials: "CM",
+  email: "carlos.martinez@email.com",
+  room: "204",
+  roomType: "Suite Premium",
+  phone: "+34 612 345 678",
+  checkIn: "12 Nov 2024",
+  checkOut: "15 Nov 2024",
+  nights: 3,
+}
+
+export default function ClientPage() {
+  const dataSource = useSelector((state: RootState) => state.dataSource.dataSource)
+
+  if (dataSource === "api") {
+    return <ClientApiContainer />
+  }
+
+  return <ClientMockContainer />
+}
 
 const mockEvents = [
   {
@@ -174,18 +243,22 @@ const breakfastOccupancy = {
   "10:00 AM": { reserved: 5, capacity: 60 },
 }
 
-export default function ClientPage() {
-  const searchParamsHook = useSearchParams()
-  const clientType = searchParamsHook.get("type") || "normal"
+export function ClientExperienceView({
+  userData,
+  clientType,
+}: {
+  userData: ClientUserData
+  clientType: ClientType
+}) {
   const router = useRouter()
 
   // Calculate occupancy percentage and get color
   const getPoolOccupancyInfo = (time: string) => {
     const occupancy = poolOccupancy[time as keyof typeof poolOccupancy]
     if (!occupancy) return { percent: 0, color: "text-green-600", bgColor: "bg-green-100" }
-    
+
     const percent = Math.round((occupancy.reserved / occupancy.capacity) * 100)
-    
+
     if (percent <= 33) return { percent, color: "text-green-600", bgColor: "bg-green-100" }
     if (percent <= 66) return { percent, color: "text-amber-600", bgColor: "bg-amber-100" }
     return { percent, color: "text-red-600", bgColor: "bg-red-100" }
@@ -195,9 +268,9 @@ export default function ClientPage() {
   const getGymOccupancyInfo = (time: string) => {
     const occupancy = gymOccupancy[time as keyof typeof gymOccupancy]
     if (!occupancy) return { percent: 0, color: "text-green-600", bgColor: "bg-green-100" }
-    
+
     const percent = Math.round((occupancy.reserved / occupancy.capacity) * 100)
-    
+
     if (percent <= 33) return { percent, color: "text-green-600", bgColor: "bg-green-100" }
     if (percent <= 66) return { percent, color: "text-amber-600", bgColor: "bg-amber-100" }
     return { percent, color: "text-red-600", bgColor: "bg-red-100" }
@@ -207,55 +280,13 @@ export default function ClientPage() {
   const getBreakfastOccupancyInfo = (time: string) => {
     const occupancy = breakfastOccupancy[time as keyof typeof breakfastOccupancy]
     if (!occupancy) return { percent: 0, color: "text-green-600", bgColor: "bg-green-100" }
-    
+
     const percent = Math.round((occupancy.reserved / occupancy.capacity) * 100)
-    
+
     if (percent <= 33) return { percent, color: "text-green-600", bgColor: "bg-green-100" }
     if (percent <= 66) return { percent, color: "text-amber-600", bgColor: "bg-amber-100" }
     return { percent, color: "text-red-600", bgColor: "bg-red-100" }
   }
-
-  const futureUserData = {
-    name: "Ana",
-    fullName: "Ana García",
-    initials: "AG",
-    email: "ana.garcia@email.com",
-    room: "305",
-    roomType: "Deluxe",
-    phone: "+54 11 4567 8901",
-    checkIn: "5 Dic 2024",
-    checkOut: "10 Dic 2024",
-    nights: 5,
-    daysUntilCheckIn: 18,
-  }
-
-  const vipUserData = {
-    name: "Isabella",
-    fullName: "Isabella Von Habsburg",
-    initials: "IV",
-    email: "isabella.von.habsburg@luxury.com",
-    room: "Penthouse 901",
-    roomType: "Presidential Suite",
-    phone: "+41 79 555 1234",
-    checkIn: "20 Nov 2024",
-    checkOut: "28 Nov 2024",
-    nights: 7,
-  }
-
-  const normalUserData = {
-    name: "Carlos",
-    fullName: "Carlos Martínez",
-    initials: "CM",
-    email: "carlos.martinez@email.com",
-    room: "204",
-    roomType: "Suite Premium",
-    phone: "+34 612 345 678",
-    checkIn: "12 Nov 2024",
-    checkOut: "15 Nov 2024",
-    nights: 3,
-  }
-
-  const userData = clientType === "vip" ? vipUserData : clientType === "future" ? futureUserData : normalUserData
 
   const isVIP = clientType === "vip"
   const isFutureReservation = clientType === "future"
@@ -402,7 +433,7 @@ export default function ClientPage() {
           <div className="absolute top-0 right-0 w-96 h-96 bg-blue-400 rounded-full mix-blend-screen filter blur-3xl"></div>
           <div className="absolute bottom-0 left-0 w-96 h-96 bg-purple-400 rounded-full mix-blend-screen filter blur-3xl"></div>
         </div>
-        
+
         <div className="flex items-center justify-between gap-4 flex-wrap relative z-10">
           <div className="flex-1 relative z-10">
             <h1 className="text-3xl font-bold">Hola, {userData.name}</h1>
@@ -413,7 +444,7 @@ export default function ClientPage() {
               </p>
             )}
           </div>
-          
+
           {/* Tu Estancia Chip */}
           {!isFutureReservation && (
             <div className="flex items-center gap-4 bg-white/15 backdrop-blur-sm rounded-full px-4 py-2.5 border border-white/20 relative z-10">
@@ -439,7 +470,7 @@ export default function ClientPage() {
               </div>
             </div>
           )}
-          
+
           <div
             style={{ background: "linear-gradient(135deg, #6f65d0 0%, #67f1d0 100%)" }}
             className="w-14 h-14 rounded-full flex items-center justify-center shadow-lg p-[2px] relative z-10"
@@ -509,7 +540,7 @@ export default function ClientPage() {
                       <div className="absolute top-0 right-0 w-96 h-96 bg-violet-300 rounded-full mix-blend-screen filter blur-3xl"></div>
                       <div className="absolute bottom-0 left-0 w-96 h-96 bg-cyan-300 rounded-full mix-blend-screen filter blur-3xl"></div>
                     </div>
-                    
+
                     <div className="relative z-10">
                       <div className="flex items-center gap-2 mb-2">
                         <Clock className="h-5 w-5" />
@@ -562,7 +593,7 @@ export default function ClientPage() {
                 <div className="px-4 pt-4 pb-4 bg-white">
                   <Card
                     className="relative overflow-hidden cursor-pointer hover:shadow-lg transition-all h-32"
-                    onClick={() => {}} // DISABLED - Room Service functionality temporarily hidden
+                    onClick={() => { }} // DISABLED - Room Service functionality temporarily hidden
                   >
                     <Image src="/club-sandwich.jpg" alt="Room Service" fill className="object-cover" loading="eager" />
                     <div className="absolute inset-0 bg-gradient-to-r from-black/70 to-black/40" />
@@ -657,7 +688,7 @@ export default function ClientPage() {
                           <DialogTitle>Selecciona tu horario de desayuno</DialogTitle>
                           <DialogDescription>Elige el horario que más te convenga</DialogDescription>
                         </DialogHeader>
-                        
+
                         {/* Quantity Selector */}
                         <div className="bg-gray-100 rounded-lg p-4 mb-4">
                           <div className="flex items-center justify-between">
@@ -706,7 +737,7 @@ export default function ClientPage() {
                                     type="radio"
                                     name="breakfast-time"
                                     checked={breakfastTime === time}
-                                    onChange={() => {}}
+                                    onChange={() => { }}
                                     className="cursor-pointer"
                                   />
                                   <span className="font-medium">{time}</span>
@@ -1019,7 +1050,7 @@ export default function ClientPage() {
                 <div className="px-4 pb-4">
                   <Card
                     className="relative overflow-hidden cursor-pointer hover:shadow-lg transition-shadow"
-                    // onClick={() => router.push("/client/help-form")}
+                  // onClick={() => router.push("/client/help-form")}
                   >
                     <Image src="/hotel-concierge-help-desk.jpg" alt="Asistencia" fill className="object-cover" />
                     <div className="absolute inset-0 bg-gradient-to-r from-red-900/70 to-red-700/50" />
@@ -1330,7 +1361,7 @@ export default function ClientPage() {
 
                 <Card
                   className="relative overflow-hidden cursor-pointer hover:shadow-lg transition-all h-32"
-                  onClick={() => {}} // DISABLED - Room Service functionality temporarily hidden
+                  onClick={() => { }} // DISABLED - Room Service functionality temporarily hidden
                 >
                   <Image src="/club-sandwich.jpg" alt="Room Service" fill className="object-cover" />
                   <div className="absolute inset-0 bg-gradient-to-r from-black/70 to-black/40" />
@@ -1430,11 +1461,10 @@ export default function ClientPage() {
                           <p className="text-xs text-gray-500 mb-2">{order.date}</p>
                           <Badge
                             variant={order.status === "Entregado" ? "secondary" : "default"}
-                            className={`text-xs ${
-                              order.status === "Entregado"
-                                ? "bg-green-100 text-green-700 hover:bg-green-100"
-                                : "bg-yellow-100 text-yellow-700 hover:bg-yellow-100"
-                            }`}
+                            className={`text-xs ${order.status === "Entregado"
+                              ? "bg-green-100 text-green-700 hover:bg-green-100"
+                              : "bg-yellow-100 text-yellow-700 hover:bg-yellow-100"
+                              }`}
                           >
                             {order.status}
                           </Badge>
@@ -1695,9 +1725,8 @@ export default function ClientPage() {
         <div className="flex items-center justify-around px-2 py-2">
           <button
             onClick={() => setActiveTab("inicio")}
-            className={`flex flex-col items-center gap-1 px-4 py-2 rounded-xl transition-all ${
-              activeTab === "inicio" ? "text-primary bg-primary/10" : "text-muted-foreground hover:text-foreground"
-            }`}
+            className={`flex flex-col items-center gap-1 px-4 py-2 rounded-xl transition-all ${activeTab === "inicio" ? "text-primary bg-primary/10" : "text-muted-foreground hover:text-foreground"
+              }`}
           >
             <Home className="w-5 h-5" />
             <span className="text-xs font-medium">Inicio</span>
@@ -1734,18 +1763,16 @@ export default function ClientPage() {
           */}
           <button
             onClick={() => setActiveTab("perfil")}
-            className={`flex flex-col items-center gap-1 px-4 py-2 rounded-xl transition-all ${
-              activeTab === "perfil" ? "text-primary bg-primary/10" : "text-muted-foreground hover:text-foreground"
-            }`}
+            className={`flex flex-col items-center gap-1 px-4 py-2 rounded-xl transition-all ${activeTab === "perfil" ? "text-primary bg-primary/10" : "text-muted-foreground hover:text-foreground"
+              }`}
           >
             <User className="w-5 h-5" />
             <span className="text-xs font-medium">Perfil</span>
           </button>
           <button
             onClick={() => setActiveTab("calendario")}
-            className={`flex flex-col items-center gap-1 px-4 py-2 rounded-xl transition-all ${
-              activeTab === "calendario" ? "text-primary bg-primary/10" : "text-muted-foreground hover:text-foreground"
-            }`}
+            className={`flex flex-col items-center gap-1 px-4 py-2 rounded-xl transition-all ${activeTab === "calendario" ? "text-primary bg-primary/10" : "text-muted-foreground hover:text-foreground"
+              }`}
           >
             <CalendarDays className="w-5 h-5" />
             <span className="text-xs font-medium">Agenda</span>

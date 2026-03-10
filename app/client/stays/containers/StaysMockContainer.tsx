@@ -55,8 +55,12 @@ export function StaysMockContainer() {
     }
   }, [])
 
-  const handleStayClick = (stayId: number) => {
-    router.push(`/client/checkin?stayId=${stayId}`)
+  const handleStayClick = (stayId: number | string) => {
+    router.push("/client/checkin")
+  }
+
+  const handleAccessReservationClick = () => {
+    router.push("/client?type=normal")
   }
 
   const handleFirstStayCheckinClick = () => {
@@ -72,6 +76,7 @@ export function StaysMockContainer() {
       stays={MOCK_STAYS}
       userInitials={userInitials}
       onStayClick={handleStayClick}
+      onAccessReservationClick={handleAccessReservationClick}
       onFirstStayCheckinClick={handleFirstStayCheckinClick}
       t={t}
     />

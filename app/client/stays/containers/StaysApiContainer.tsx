@@ -62,6 +62,7 @@ export function StaysApiContainer() {
     const fromAuth = state.auth?.currentOrganization as { id?: string } | undefined
     return fromAuth?.id ?? undefined
   })
+  const [isRedirecting, setIsRedirecting] = useState(true)
 
   const { data: userContexts } = useGetUserContextsQuery(undefined, {
     skip: dataSource !== "api" || !!organizationId,
@@ -102,21 +103,55 @@ export function StaysApiContainer() {
     }
   }, [])
 
-  const handleStayClick = (stayId: number | string) => {
+  useEffect(() => {
+    if (!data || isLoading) return
+
     if (hasCompletedCheckIn) {
-      router.push(`/client/reservation-details?reservationId=${stayId}`)
-    } else {
-      router.push(`/client/checkin?stayId=${stayId}`)
+      const raw = data.reservations as ReservationWithDetails[]
+      const today = new Date()
+      today.setHours(0, 0, 0, 0)
+
+      const activeStay = raw.find((r) => {
+        const status = r.status?.toLowerCase()
+        if (status === "checked_in") return true
+        const checkIn = r.checkIn ? new Date(r.checkIn) : null
+        const checkOut = r.checkOut ? new Date(r.checkOut) : null
+        return checkIn && checkOut && checkIn <= today && checkOut > today
+      })
+
+      if (activeStay?.id) {
+        router.push(`/client?reservationId=${activeStay.id}`)
+        return
+      }
     }
+
+    setIsRedirecting(false)
+  }, [data, isLoading, hasCompletedCheckIn])
+
+  if (!isLoaded || isLoading || isRedirecting) return null
+
+  const handleStayClick = (stayId: number | string) => {
+    if (!hasCompletedCheckIn) {
+      router.push("/client/checkin")
+    } else {
+      router.push(`/client/reservation-details?reservationId=${stayId}`)
+    }
+  }
+
+  const handleAccessReservationClick = (stayId: number | string) => {
+    router.push(`/client?reservationId=${stayId}`)
+  }
+
+  const handleWaitingTripClick = (stayId: number | string) => {
+    router.push(`/client?reservationId=${stayId}`)
   }
 
   const handleFirstStayCheckinClick = () => {
     router.push("/client/checkin")
   }
 
-  if (!isLoaded) {
-    return null
-  }
+  // No renderizar nada mientras se evalúa la redirección
+  if (!isLoaded || isLoading) return null
 
   return (
     <StaysView
@@ -124,6 +159,8 @@ export function StaysApiContainer() {
       userInitials={userInitials}
       hasCompletedCheckIn={hasCompletedCheckIn}
       onStayClick={handleStayClick}
+      onAccessReservationClick={handleAccessReservationClick}
+      onWaitingTripClick={handleWaitingTripClick}
       onFirstStayCheckinClick={handleFirstStayCheckinClick}
       t={t}
       isLoading={isLoading}
