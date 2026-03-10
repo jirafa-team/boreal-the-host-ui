@@ -17,7 +17,7 @@ type TFunction = (key: string) => string
 export type StaysViewProps = {
   stays: Stay[]
   userInitials: string
-  onStayClick: (stayId: number) => void
+  onStayClick: (stayId: number | string) => void
   onFirstStayCheckinClick: () => void
   t: TFunction
   isLoading?: boolean
@@ -87,13 +87,13 @@ export function StaysView({
             </p>
           </div>
         )}
-        {error && !isLoading && (
+        {error != null && !isLoading ? (
           <div className="text-center py-16">
             <p className="text-red-400 text-lg">
               {t("common.error") || "Error al cargar las estadías"}
             </p>
           </div>
-        )}
+        ) : null}
         {!isLoading && !error && (
           <>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -131,13 +131,12 @@ export function StaysView({
                       <div className="absolute inset-0 bg-black/20" />
                       <div className="absolute top-3 right-3">
                         <span
-                          className={`px-3 py-1 rounded-full text-xs font-semibold ${
-                            stay.status === "Confirmada"
+                          className={`px-3 py-1 rounded-full text-xs font-semibold ${stay.status === "Confirmada"
                               ? "bg-green-500/30 text-green-300"
                               : stay.status === "Próxima"
                                 ? "bg-blue-500/30 text-blue-300"
                                 : "bg-yellow-500/30 text-yellow-300"
-                          }`}
+                            }`}
                         >
                           {stay.status}
                         </span>

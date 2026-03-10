@@ -1,5 +1,5 @@
 export type Stay = {
-  id: number
+  id: number | string
   hotelName: string
   roomName: string
   checkIn: string

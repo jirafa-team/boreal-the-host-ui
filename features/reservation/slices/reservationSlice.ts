@@ -50,6 +50,14 @@ export const reservationApi = createApi({
       }),
       providesTags: ['Reservations'],
     }),
+    getUserReservationContexts: build.query<unknown[], void>({
+      query: () => ({
+        url: ENDPOINTS.RESERVATION_USER_CONTEXTS,
+        method: 'GET',
+        credentials: 'include',
+      }),
+      providesTags: ['Reservations'],
+    }),
     getReservationById: build.query<{ data: Reservation }, string>({
       query: (id) => ({ url: `${ENDPOINTS.RESERVATION}/${id}`, method: 'GET', credentials: 'include' }),
       providesTags: (_, __, id) => [{ type: 'Reservations', id }],
@@ -80,6 +88,7 @@ export const { setReservations, setPage, setTotalPages } = reservationSlice.acti
 export const {
   useGetReservationsQuery,
   useGetReservationsWithDetailsQuery,
+  useGetUserReservationContextsQuery,
   useGetReservationByIdQuery,
   useCreateReservationMutation,
   useUpdateReservationMutation,

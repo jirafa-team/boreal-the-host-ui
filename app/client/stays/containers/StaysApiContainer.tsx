@@ -1,22 +1,102 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useMemo } from "react"
 import { useRouter } from "next/navigation"
+import { useSelector, useDispatch } from "react-redux"
+import type { RootState } from "@/store/store"
 import { useLanguage } from "@/lib/i18n-context"
+import { useGetUserReservationContextsQuery } from "@/features/reservation/slices/reservationSlice"
+import { useGetUserContextsQuery } from "@/features/auth/slices/authSlice"
+import { setCurrentOrganization } from "@/features/organization/slices/organizationSlice"
 import { StaysView } from "../components/StaysView"
 import type { Stay } from "../components/types"
 
+const PLACEHOLDER_STAY_IMAGE = "/placeholder.svg"
+
+interface ReservationWithDetails {
+  id?: string
+  code?: string
+  clientId?: string
+  roomId?: string
+  checkIn?: string
+  checkOut?: string
+  status?: string
+  user?: { firstName?: string; lastName?: string; email?: string }
+  room?: { id?: string; number?: string }
+}
+
+function formatDate(value: string | undefined): string {
+  if (!value) return ""
+  const d = new Date(value)
+  if (Number.isNaN(d.getTime())) return value
+  const y = d.getFullYear()
+  const m = String(d.getMonth() + 1).padStart(2, "0")
+  const day = String(d.getDate()).padStart(2, "0")
+  return `${y}-${m}-${day}`
+}
+
+function mapReservationStatus(apiStatus: string | undefined): string {
+  switch (apiStatus?.toLowerCase()) {
+    case "confirmed":
+    case "checked_in":
+      return "Confirmada"
+    case "pending":
+      return "Pendiente"
+    case "checked_out":
+      return "Finalizada"
+    case "cancelled":
+      return "Cancelada"
+    default:
+      return "Pendiente"
+  }
+}
+
+function mapReservationToStay(r: ReservationWithDetails): Stay {
+  return {
+    id: r.id ?? "",
+    hotelName: "Establecimiento",
+    roomName: r.room?.number ? `Habitación ${r.room.number}` : "—",
+    checkIn: formatDate(r.checkIn),
+    checkOut: formatDate(r.checkOut),
+    status: mapReservationStatus(r.status),
+    hotelImage: PLACEHOLDER_STAY_IMAGE,
+  }
+}
+
 export function StaysApiContainer() {
   const router = useRouter()
+  const dispatch = useDispatch()
   const { t } = useLanguage()
+  const dataSource = useSelector((state: RootState) => state.dataSource.dataSource)
+  const organizationId = useSelector((state: RootState) => {
+    const fromOrg = state.organization?.currentOrganizationId
+    if (fromOrg) return fromOrg
+    const fromAuth = state.auth?.currentOrganization as { id?: string } | undefined
+    return fromAuth?.id ?? undefined
+  })
+
+  const { data: userContexts } = useGetUserContextsQuery(undefined, {
+    skip: dataSource !== "api" || !!organizationId,
+  })
+
+  useEffect(() => {
+    if (dataSource !== "api" || organizationId || !userContexts?.length) return
+    const first = userContexts[0]
+    if (first?.organizationId) dispatch(setCurrentOrganization(first.organizationId))
+  }, [dataSource, organizationId, userContexts, dispatch])
+
+  const skipReservations = dataSource !== "api" || !organizationId
+  const { data, isLoading, error } = useGetUserReservationContextsQuery(undefined, {
+    skip: skipReservations,
+  })
+
   const [userInitials, setUserInitials] = useState<string>("")
   const [isLoaded, setIsLoaded] = useState(false)
 
-  // When stays API exists: useGetStaysQuery(undefined, { skip: dataSource !== "api" })
-  // Map response to Stay[] and pass isLoading, error to StaysView
-  const stays: Stay[] = []
-  const isLoading = false
-  const error = undefined
+  const stays: Stay[] = useMemo(() => {
+    const raw = (data ?? []) as ReservationWithDetails[]
+    return raw.map(mapReservationToStay)
+  }, [data])
 
   useEffect(() => {
     setIsLoaded(true)
@@ -31,7 +111,7 @@ export function StaysApiContainer() {
     }
   }, [])
 
-  const handleStayClick = (stayId: number) => {
+  const handleStayClick = (stayId: number | string) => {
     router.push(`/client/checkin?stayId=${stayId}`)
   }
 
