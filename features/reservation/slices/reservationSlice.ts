@@ -27,7 +27,7 @@ export const reservationSlice = createSlice({
 export const reservationApi = createApi({
   reducerPath: 'reservationApi',
   baseQuery: baseQueryWithOrg,
-  tagTypes: ['Reservations'],
+  tagTypes: ['Reservations', 'UserReservationContexts'],
   endpoints: (build) => ({
     getReservations: build.query<{ data: GetReservationsResponse }, { page?: number; limit?: number } | void>({
       query: (p) => ({
@@ -50,13 +50,16 @@ export const reservationApi = createApi({
       }),
       providesTags: ['Reservations'],
     }),
-    getUserReservationContexts: build.query<unknown[], void>({
+    getUserReservationContexts: build.query<
+      { reservations: unknown[]; checkInCompletedAt: string | null },
+      void
+    >({
       query: () => ({
         url: ENDPOINTS.RESERVATION_USER_CONTEXTS,
         method: 'GET',
         credentials: 'include',
       }),
-      providesTags: ['Reservations'],
+      providesTags: ['UserReservationContexts'],
     }),
     getReservationById: build.query<{ data: Reservation }, string>({
       query: (id) => ({ url: `${ENDPOINTS.RESERVATION}/${id}`, method: 'GET', credentials: 'include' }),
@@ -81,6 +84,26 @@ export const reservationApi = createApi({
       query: (id) => ({ url: `${ENDPOINTS.RESERVATION}/${id}`, method: 'DELETE', credentials: 'include' }),
       invalidatesTags: ['Reservations'],
     }),
+    completeCheckIn: build.mutation<
+      { data: unknown },
+      {
+        firstName: string;
+        lastName: string;
+        email: string;
+        phone?: string | null;
+        nationality?: string | null;
+        documentType?: string | null;
+        idNumber?: string | null;
+      }
+    >({
+      query: (body) => ({
+        url: ENDPOINTS.CLIENT_COMPLETE_CHECKIN,
+        method: 'POST',
+        body,
+        credentials: 'include',
+      }),
+      invalidatesTags: ['Reservations', 'UserReservationContexts'],
+    }),
   }),
 });
 
@@ -94,5 +117,6 @@ export const {
   useUpdateReservationMutation,
   useConfirmReservationMutation,
   useDeleteReservationMutation,
+  useCompleteCheckInMutation,
 } = reservationApi;
 export default reservationSlice.reducer;

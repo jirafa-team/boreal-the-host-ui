@@ -36,19 +36,7 @@ function formatDate(value: string | undefined): string {
 }
 
 function mapReservationStatus(apiStatus: string | undefined): string {
-  switch (apiStatus?.toLowerCase()) {
-    case "confirmed":
-    case "checked_in":
-      return "Confirmada"
-    case "pending":
-      return "Pendiente"
-    case "checked_out":
-      return "Finalizada"
-    case "cancelled":
-      return "Cancelada"
-    default:
-      return "Pendiente"
-  }
+  return apiStatus?.toLowerCase() ?? "pending"
 }
 
 function mapReservationToStay(r: ReservationWithDetails): Stay {
@@ -93,10 +81,13 @@ export function StaysApiContainer() {
   const [userInitials, setUserInitials] = useState<string>("")
   const [isLoaded, setIsLoaded] = useState(false)
 
+  const reservationsList = data?.reservations ?? []
+  const hasCompletedCheckIn = !!data?.checkInCompletedAt
+
   const stays: Stay[] = useMemo(() => {
-    const raw = (data ?? []) as ReservationWithDetails[]
+    const raw = reservationsList as ReservationWithDetails[]
     return raw.map(mapReservationToStay)
-  }, [data])
+  }, [reservationsList])
 
   useEffect(() => {
     setIsLoaded(true)
@@ -112,7 +103,11 @@ export function StaysApiContainer() {
   }, [])
 
   const handleStayClick = (stayId: number | string) => {
-    router.push(`/client/checkin?stayId=${stayId}`)
+    if (hasCompletedCheckIn) {
+      router.push(`/client/reservation-details?reservationId=${stayId}`)
+    } else {
+      router.push(`/client/checkin?stayId=${stayId}`)
+    }
   }
 
   const handleFirstStayCheckinClick = () => {
@@ -127,6 +122,7 @@ export function StaysApiContainer() {
     <StaysView
       stays={stays}
       userInitials={userInitials}
+      hasCompletedCheckIn={hasCompletedCheckIn}
       onStayClick={handleStayClick}
       onFirstStayCheckinClick={handleFirstStayCheckinClick}
       t={t}

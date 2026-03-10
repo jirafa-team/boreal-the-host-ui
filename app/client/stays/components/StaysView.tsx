@@ -17,6 +17,7 @@ type TFunction = (key: string) => string
 export type StaysViewProps = {
   stays: Stay[]
   userInitials: string
+  hasCompletedCheckIn?: boolean
   onStayClick: (stayId: number | string) => void
   onFirstStayCheckinClick: () => void
   t: TFunction
@@ -27,6 +28,7 @@ export type StaysViewProps = {
 export function StaysView({
   stays,
   userInitials,
+  hasCompletedCheckIn = false,
   onStayClick,
   onFirstStayCheckinClick,
   t,
@@ -37,6 +39,22 @@ export function StaysView({
   const dispatch = useDispatch()
   const dataSource = useSelector((state: RootState) => state.dataSource.dataSource)
   const mockMode = dataSource === "mock"
+
+  const getStatusLabel = (status: string): string => {
+    const normalized = status.toLowerCase()
+    switch (normalized) {
+      case "confirmed":
+        return "Confirmada"
+      case "checked_in":
+        return "En curso"
+      case "checked_out":
+        return "Finalizada"
+      case "cancelled":
+        return "Cancelada"
+      default:
+        return "Pendiente"
+    }
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 p-6">
@@ -96,95 +114,137 @@ export function StaysView({
         ) : null}
         {!isLoading && !error && (
           <>
+            {/* Completar datos para check-in: visible hasta que el usuario complete el formulario */}
+            {!hasCompletedCheckIn && (
+              <div className="mb-6">
+                <Button
+                  onClick={onFirstStayCheckinClick}
+                  className="w-full bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white font-semibold rounded-lg flex items-center justify-center gap-2 h-10"
+                >
+                  ⚠{" "}
+                  {t("stays.completeCheckInData") ||
+                    "Completar datos para check-in"}
+                </Button>
+              </div>
+            )}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {stays.map((stay, index) => (
-                <div key={stay.id} className="relative">
-                  {/* Check-in Button for First Stay */}
-                  {index === 0 && stay.status === "Confirmada" && (
-                    <div className="absolute -top-12 left-0 right-0 z-10">
-                      <Button
-                        onClick={(e) => {
-                          e.stopPropagation()
-                          onFirstStayCheckinClick()
-                        }}
-                        className="w-full bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white font-semibold rounded-lg flex items-center justify-center gap-2 h-10"
-                      >
-                        ⚠{" "}
-                        {t("stays.completeCheckInData") ||
-                          "Completar datos para check-in"}
-                      </Button>
-                    </div>
-                  )}
-                  <Card
-                    className="bg-slate-800/50 border-slate-700 overflow-hidden hover:shadow-xl hover:shadow-cyan-500/10 transition-all duration-300 cursor-pointer"
-                    onClick={() => onStayClick(stay.id)}
-                  >
-                    {/* Hotel Image */}
-                    <div className="relative h-48 bg-slate-700">
-                      <Image
-                        src={stay.hotelImage}
-                        alt={stay.hotelName}
-                        fill
-                        className="object-cover"
-                        loading="eager"
-                      />
-                      <div className="absolute inset-0 bg-black/20" />
-                      <div className="absolute top-3 right-3">
-                        <span
-                          className={`px-3 py-1 rounded-full text-xs font-semibold ${stay.status === "Confirmada"
-                              ? "bg-green-500/30 text-green-300"
-                              : stay.status === "Próxima"
-                                ? "bg-blue-500/30 text-blue-300"
-                                : "bg-yellow-500/30 text-yellow-300"
-                            }`}
-                        >
-                          {stay.status}
-                        </span>
-                      </div>
-                    </div>
+              {stays.map((stay) => {
+                const rawStatus = (stay.status || "").toLowerCase()
+                const now = new Date()
+                const today = new Date(now.getFullYear(), now.getMonth(), now.getDate())
+                const checkInDate = stay.checkIn ? new Date(stay.checkIn) : null
+                const checkOutDate = stay.checkOut ? new Date(stay.checkOut) : null
 
-                    <CardContent className="pt-6 space-y-4">
-                      {/* Hotel Name as Title */}
-                      <div>
-                        <h3 className="text-lg font-bold text-white">
-                          {stay.hotelName}
-                        </h3>
-                        <p className="text-sm text-slate-400 mt-1">
-                          {stay.roomName}
-                        </p>
-                      </div>
+                const isFinalized =
+                  rawStatus === "checked_out" ||
+                  (checkOutDate != null && checkOutDate < today)
 
-                      {/* Dates */}
-                      <div className="space-y-2 text-sm">
-                        <div className="flex justify-between text-slate-300">
-                          <span>
-                            {t("stays.checkIn") || "Check-in"}:
-                          </span>
-                          <span className="text-cyan-300 font-semibold">
-                            {stay.checkIn}
-                          </span>
-                        </div>
-                        <div className="flex justify-between text-slate-300">
-                          <span>
-                            {t("stays.checkOut") || "Check-out"}:
-                          </span>
-                          <span className="text-cyan-300 font-semibold">
-                            {stay.checkOut}
+                const isOngoing =
+                  rawStatus === "checked_in" ||
+                  (checkInDate != null &&
+                    checkOutDate != null &&
+                    checkInDate <= today &&
+                    checkOutDate >= today)
+
+                let buttonLabel: string | null = null
+
+                if (!isFinalized) {
+                  if (isOngoing) {
+                    buttonLabel = t("stays.accessReservation") || "Acceder a mi reserva"
+                  } else if (rawStatus === "confirmed" && hasCompletedCheckIn) {
+                    buttonLabel =
+                      t("stays.waitingTripStart") || "Esperando inicio de viaje! ⏳"
+                  } else {
+                    buttonLabel = t("stays.completeCheckin") || "Completar Check-in"
+                  }
+                }
+
+                const statusLabel = getStatusLabel(rawStatus)
+                const badgeClass =
+                  rawStatus === "checked_in"
+                    ? "bg-blue-500/30 text-blue-300"
+                    : rawStatus === "checked_out"
+                      ? "bg-yellow-500/30 text-yellow-300"
+                      : rawStatus === "cancelled"
+                        ? "bg-red-500/30 text-red-300"
+                        : "bg-green-500/30 text-green-300"
+
+                return (
+                  <div key={stay.id} className="relative">
+                    <Card
+                      className="bg-slate-800/50 border-slate-700 overflow-hidden hover:shadow-xl hover:shadow-cyan-500/10 transition-all duration-300 cursor-pointer"
+                      onClick={() => onStayClick(stay.id)}
+                    >
+                      {/* Hotel Image */}
+                      <div className="relative h-48 bg-slate-700">
+                        <Image
+                          src={stay.hotelImage}
+                          alt={stay.hotelName}
+                          fill
+                          className="object-cover"
+                          loading="eager"
+                        />
+                        <div className="absolute inset-0 bg-black/20" />
+                        <div className="absolute top-3 right-3">
+                          <span
+                            className={`px-3 py-1 rounded-full text-xs font-semibold ${badgeClass}`}
+                          >
+                            {statusLabel}
                           </span>
                         </div>
                       </div>
 
-                      {/* Button */}
-                      <div className="pt-4 border-t border-slate-600">
-                        <Button className="w-full bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600 text-white font-semibold rounded-lg flex items-center justify-center gap-2">
-                          {t("stays.completeCheckin") || "Completar Check-in"}
-                          <ArrowRight className="w-4 h-4" />
-                        </Button>
-                      </div>
-                    </CardContent>
-                  </Card>
-                </div>
-              ))}
+                      <CardContent className="pt-6 space-y-4">
+                        {/* Hotel Name as Title */}
+                        <div>
+                          <h3 className="text-lg font-bold text-white">
+                            {stay.hotelName}
+                          </h3>
+                          <p className="text-sm text-slate-400 mt-1">
+                            {stay.roomName}
+                          </p>
+                        </div>
+
+                        {/* Dates */}
+                        <div className="space-y-2 text-sm">
+                          <div className="flex justify-between text-slate-300">
+                            <span>
+                              {t("stays.checkIn") || "Check-in"}:
+                            </span>
+                            <span className="text-cyan-300 font-semibold">
+                              {stay.checkIn}
+                            </span>
+                          </div>
+                          <div className="flex justify-between text-slate-300">
+                            <span>
+                              {t("stays.checkOut") || "Check-out"}:
+                            </span>
+                            <span className="text-cyan-300 font-semibold">
+                              {stay.checkOut}
+                            </span>
+                          </div>
+                        </div>
+
+                        {/* Button */}
+                        {buttonLabel && (
+                          <div className="pt-4 border-t border-slate-600">
+                            <Button
+                              className="w-full bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600 text-white font-semibold rounded-lg flex items-center justify-center gap-2"
+                              onClick={(e) => {
+                                e.stopPropagation()
+                                onStayClick(stay.id)
+                              }}
+                            >
+                              {buttonLabel}
+                              <ArrowRight className="w-4 h-4" />
+                            </Button>
+                          </div>
+                        )}
+                      </CardContent>
+                    </Card>
+                  </div>
+                )
+              })}
             </div>
 
             {/* Empty State */}

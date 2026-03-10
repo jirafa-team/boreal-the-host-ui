@@ -8,12 +8,16 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
-import { useRouter } from "next/navigation"
+import { useRouter, useSearchParams } from "next/navigation"
 import { Eraser, Sparkles, Hotel, Car, Award as IdCard, Crown, Upload, X } from "lucide-react"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { useCompleteCheckInMutation } from "@/features/reservation/slices/reservationSlice"
 
 export default function CheckInPage() {
   const router = useRouter()
+  const searchParams = useSearchParams()
+  const stayId = searchParams.get("stayId")
+  const [completeCheckIn, { isLoading: isSubmitting, error: submitError }] = useCompleteCheckInMutation()
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
   const [isDrawing, setIsDrawing] = useState(false)
@@ -172,9 +176,26 @@ export default function CheckInPage() {
     }
   }
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    router.push(`/client?type=${clientType}`)
+    try {
+      await completeCheckIn({
+        firstName: formData.firstName.trim(),
+        lastName: formData.lastName.trim(),
+        email: formData.email.trim(),
+        phone: formData.phone.trim() || null,
+        nationality: formData.nationality.trim() || null,
+        documentType: formData.documentType.trim() || null,
+        idNumber: formData.idNumber.trim() || null,
+      }).unwrap()
+      if (stayId) {
+        router.push(`/client/reservation-details?reservationId=${stayId}`)
+      } else {
+        router.push("/client/stays")
+      }
+    } catch {
+      // Error is shown via submitError
+    }
   }
 
   const handleChange = (field: string, value: string | boolean) => {
@@ -459,14 +480,20 @@ export default function CheckInPage() {
               </div>
             </div>
 
+            {submitError != null && (
+              <p className="text-sm text-red-600 mt-2">
+                Error al completar el check-in. Intenta de nuevo.
+              </p>
+            )}
             <Button
               type="submit"
+              disabled={isSubmitting}
               className="w-full mt-6 text-white font-semibold"
               style={{
                 background: "linear-gradient(to right, #6f65d0, #67f1d0)",
               }}
             >
-              Completar Check-In
+              {isSubmitting ? "Enviando..." : "Completar Check-In"}
             </Button>
           </form>
 
