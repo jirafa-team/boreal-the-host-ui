@@ -24,9 +24,13 @@ export interface FacilityItem {
 }
 
 export interface FacilitySlot {
-    time: string
-    available: boolean
-    reserved: number
+    id: string
+    facilityId: string
+    startAt: string
+    endAt: string
+    currentOccupancy: number
+    occupationPercentage: number
+    status: string
     capacity: number
 }
 

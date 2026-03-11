@@ -4,6 +4,7 @@ import { ENDPOINTS } from '@/shared/types/api';
 import { baseQueryWithOrg } from '@/store/baseQuery';
 import type { Facility } from '@/interfaces/facility/Facility';
 import type { GetFacilitiesResponse } from '@/interfaces/facility/GetFacilitiesResponse';
+import { FacilitySlotResponse } from '@/interfaces/facility-slot/facility-slot-response';
 
 interface FacilityState {
   facilities: Facility[];
@@ -56,7 +57,7 @@ export const facilitySlice = createSlice({
 export const facilityApi = createApi({
   reducerPath: 'facilityApi',
   baseQuery: baseQueryWithOrg,
-  tagTypes: ['Facilities'],
+  tagTypes: ['Facilities', 'FacilitySlots'],
   endpoints: (build) => ({
     getFacilities: build.query<
       { data: GetFacilitiesResponse },
@@ -80,7 +81,7 @@ export const facilityApi = createApi({
     }),
     createFacility: build.mutation<
       { data: Facility },
-      { name: string; facilityTypeId: string; capacity: number; openTime: string; closeTime: string; [key: string]: unknown }
+      { name: string; facilityTypeId: string; capacity: number; openTime: string; closeTime: string;[key: string]: unknown }
     >({
       query: (body) => ({
         url: ENDPOINTS.FACILITY,
@@ -107,6 +108,14 @@ export const facilityApi = createApi({
       }),
       invalidatesTags: ['Facilities'],
     }),
+    getFacilitySlots: build.query<{ data: FacilitySlotResponse[] }, string>({
+      query: (id) => ({
+        url: `/facility/${id}/slots`,
+        method: 'GET',
+        credentials: 'include',
+      }),
+      providesTags: ['Facilities', 'FacilitySlots'],
+    }),
   }),
 });
 
@@ -126,6 +135,7 @@ export const {
   useCreateFacilityMutation,
   useUpdateFacilityMutation,
   useDeleteFacilityMutation,
+  useGetFacilitySlotsQuery
 } = facilityApi;
 
 export default facilitySlice.reducer;

@@ -8,9 +8,9 @@ import { useLanguage } from "@/lib/i18n-context"
 import { useGetUserReservationContextsQuery } from "@/features/reservation/slices/reservationSlice"
 import { useGetUserContextsQuery } from "@/features/auth/slices/authSlice"
 import { setCurrentOrganization } from "@/features/organization/slices/organizationSlice"
-import { useGetFacilitiesQuery } from "@/app/client/facilities/slice/facilitySlice"
 import { ClientExperienceView } from "../page"
-import type { ClientType, ClientUserData } from "../types"
+import type { ClientType, ClientUserData, FacilitySlot } from "../types"
+import { useGetFacilitiesQuery, useGetFacilitySlotsQuery } from "@/app/admin/facilities/slice/facilitySlice"
 
 interface ReservationWithDetails {
   id?: string
@@ -54,6 +54,8 @@ export function ClientApiContainer() {
   const dispatch = useDispatch()
   const { t } = useLanguage()
 
+  const [selectedFacilityId, setSelectedFacilityId] = useState<string | null>(null)
+
   const dataSource = useSelector((state: RootState) => state.dataSource.dataSource)
   const organizationId = useSelector((state: RootState) => {
     const fromOrg = state.organization?.currentOrganizationId
@@ -89,12 +91,19 @@ export function ClientApiContainer() {
     skip: !organizationId,
   })
 
+  const { data: slotsData, isLoading: slotsLoading } = useGetFacilitySlotsQuery(
+    selectedFacilityId!,
+    { skip: !selectedFacilityId || !organizationId }
+  )
+
+  const apiSlots = (slotsData?.data ?? []) as FacilitySlot[]
+
   const facilities = useMemo(() => {
     return (facilitiesData?.data?.objects ?? []).map((f) => ({
       id: f.id,
       name: f.name,
-      openTime: f.openTime,
-      closeTime: f.closeTime,
+      openTime: f.openTime ?? "",
+      closeTime: f.closeTime ?? "",
       capacity: f.capacity,
       image: undefined,
     }))
@@ -163,6 +172,9 @@ export function ClientApiContainer() {
       facilities={facilities}
       mockSlots={{}}
       events={[]}
+      onFacilitySelect={setSelectedFacilityId}
+      apiSlots={apiSlots}
+      slotsLoading={slotsLoading}
     />
   )
 }

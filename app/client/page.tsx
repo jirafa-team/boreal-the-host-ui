@@ -4,36 +4,14 @@ import { useState, useEffect } from "react"
 import { useSelector } from "react-redux"
 import type { RootState } from "@/store/store"
 import {
-  Home,
-  Calendar,
-  Bell,
-  User,
-  MapPin,
-  Clock,
-  Utensils,
-  ShoppingBag,
-  Coffee,
-  Crown,
-  ChevronRight,
-  MessageCircle,
-  Sparkles,
-  Car,
-  Pizza,
-  Dumbbell,
-  Waves,
-  UtensilsCrossed,
-  Users,
-  CalendarDays,
+  Home, Calendar, Bell, User, MapPin, Clock, Utensils, ShoppingBag,
+  Coffee, Crown, ChevronRight, MessageCircle, Sparkles, Car, Pizza,
+  Dumbbell, Waves, UtensilsCrossed, Users, CalendarDays,
 } from "lucide-react"
 import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
+  Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger,
 } from "@/components/ui/dialog"
 import { Badge } from "@/components/ui/badge"
 import Link from "next/link"
@@ -41,18 +19,13 @@ import Image from "next/image"
 import { useRouter } from "next/navigation"
 import { ClientApiContainer } from "./containers/ClientApiContainer"
 import { ClientMockContainer } from "./containers/ClientMockContainer"
-import { useGetFacilitySlotsQuery } from "@/app/client/facilities/slice/facilitySlice"
 import type { ClientType, ClientUserData, FacilityItem, FacilitySlot, ClientEvent } from "./types"
 
 export type { ClientType, ClientUserData }
 
 export default function ClientPage() {
   const dataSource = useSelector((state: RootState) => state.dataSource.dataSource)
-
-  if (dataSource === "api") {
-    return <ClientApiContainer />
-  }
-
+  if (dataSource === "api") return <ClientApiContainer />
   return <ClientMockContainer />
 }
 
@@ -63,6 +36,9 @@ export function ClientExperienceView({
   facilities = [],
   mockSlots = {},
   events = [],
+  onFacilitySelect,
+  apiSlots = [],
+  slotsLoading = false,
 }: {
   userData: ClientUserData
   clientType: ClientType
@@ -70,6 +46,9 @@ export function ClientExperienceView({
   facilities?: FacilityItem[]
   mockSlots?: Record<string, FacilitySlot[]>
   events?: ClientEvent[]
+  onFacilitySelect?: (id: string | null) => void
+  apiSlots?: FacilitySlot[]
+  slotsLoading?: boolean
 }) {
   const router = useRouter()
   const dataSource = useSelector((state: RootState) => state.dataSource.dataSource)
@@ -78,27 +57,23 @@ export function ClientExperienceView({
   const isFutureReservation = clientType === "future"
 
   const [activeTab, setActiveTab] = useState<"inicio" | "ordenes" | "eventos" | "avisos" | "perfil" | "calendario">("inicio")
-  const [selectedFacilityId, setSelectedFacilityId] = useState<string | null>(null)
+  const [localSelectedFacilityId, setLocalSelectedFacilityId] = useState<string | null>(null)
   const [activeFacilityDialog, setActiveFacilityDialog] = useState<string | null>(null)
   const [facilityPeople, setFacilityPeople] = useState(1)
   const [selectedTimes, setSelectedTimes] = useState<Record<string, string>>({})
   const [timeRemaining, setTimeRemaining] = useState({ hours: 0, minutes: 0, seconds: 0 })
 
-  const { data: slotsData, isLoading: slotsLoading } = useGetFacilitySlotsQuery(
-    selectedFacilityId!,
-    { skip: dataSource !== "api" || !selectedFacilityId }
-  )
-
-  const getSlotsForFacility = (facilityId: string): FacilitySlot[] => {
-    if (dataSource === "api") return (slotsData?.data ?? []) as FacilitySlot[]
-    return mockSlots[facilityId] ?? []
+  const handleFacilitySelect = (id: string | null) => {
+    if (dataSource === "api") {
+      onFacilitySelect?.(id)
+    } else {
+      setLocalSelectedFacilityId(id)
+    }
   }
 
-  const getOccupancyInfo = (slot: FacilitySlot) => {
-    const percent = Math.round((slot.reserved / slot.capacity) * 100)
-    if (percent <= 33) return { percent, color: "text-green-600", bgColor: "bg-green-100" }
-    if (percent <= 66) return { percent, color: "text-amber-600", bgColor: "bg-amber-100" }
-    return { percent, color: "text-red-600", bgColor: "bg-red-100" }
+  const getSlotsForFacility = (facilityId: string): FacilitySlot[] => {
+    if (dataSource === "api") return apiSlots
+    return mockSlots[facilityId] ?? []
   }
 
   const roomServiceOrders = [
@@ -218,7 +193,6 @@ export function ClientExperienceView({
         <main className="flex-1 pb-20 pt-4 px-4 max-w-2xl mx-auto w-full">
           <main className="pb-24 px-4 pt-6">
 
-            {/* TAB: INICIO */}
             {activeTab === "inicio" && (
               <div className="space-y-6">
 
@@ -311,7 +285,7 @@ export function ClientExperienceView({
                         open={activeFacilityDialog === facility.id}
                         onOpenChange={(open) => {
                           if (open) {
-                            setSelectedFacilityId(facility.id)
+                            handleFacilitySelect(facility.id)
                             setActiveFacilityDialog(facility.id)
                           } else {
                             setActiveFacilityDialog(null)
@@ -365,27 +339,42 @@ export function ClientExperienceView({
                           ) : (
                             <div className="space-y-2 py-2">
                               {getSlotsForFacility(facility.id).map((slot) => {
-                                const { percent, color, bgColor } = getOccupancyInfo(slot)
+                                const parseUTCTime = (iso: string) => {
+                                  const match = iso.match(/T(\d{2}):(\d{2})/)
+                                  return match ? `${match[1]}:${match[2]}` : "??:??"
+                                }
+                                const timeLabel = `${parseUTCTime(slot.startAt)} - ${parseUTCTime(slot.endAt)}`
+                                const percent = slot.occupationPercentage
+                                const color = percent <= 33 ? "text-green-600" : percent <= 66 ? "text-amber-600" : "text-red-600"
+                                const bgColor = percent <= 33 ? "bg-green-100" : percent <= 66 ? "bg-amber-100" : "bg-red-100"
                                 return (
                                   <div
-                                    key={slot.time}
+                                    key={slot.id}
                                     className="flex items-center justify-between p-3 rounded-lg hover:bg-accent cursor-pointer"
                                     onClick={() => {
-                                      setSelectedTimes((prev) => ({ ...prev, [facility.id]: slot.time }))
+                                      setSelectedTimes((prev) => ({ ...prev, [facility.id]: timeLabel }))
                                       setActiveFacilityDialog(null)
                                     }}
                                   >
                                     <div className="flex items-center gap-3">
-                                      <input type="radio" readOnly checked={selectedTimes[facility.id] === slot.time} className="cursor-pointer" />
-                                      <span className="font-medium">{slot.time}</span>
+                                      <input type="radio" readOnly checked={selectedTimes[facility.id] === timeLabel} className="cursor-pointer" />
+                                      <span className="font-medium">{timeLabel}</span>
                                     </div>
-                                    <div className={`flex items-center gap-2 px-2 py-1 rounded ${bgColor}`}>
-                                      <Users className={`w-3.5 h-3.5 ${color}`} />
-                                      <span className={`text-xs font-semibold ${color}`}>{percent}%</span>
+                                    <div className="flex items-center gap-2">
+                                      <div className={`flex items-center gap-1.5 px-2 py-1 rounded ${bgColor}`}>
+                                        <Users className={`w-3.5 h-3.5 ${color}`} />
+                                        <span className={`text-xs font-semibold ${color}`}>{slot.currentOccupancy}/{slot.capacity}</span>
+                                      </div>
+                                      <span className={`text-xs px-2 py-1 rounded-full font-medium ${slot.status === "available" ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700"}`}>
+                                        {slot.status === "available" ? "Disponible" : "Ocupado"}
+                                      </span>
                                     </div>
                                   </div>
                                 )
                               })}
+                              {getSlotsForFacility(facility.id).length === 0 && (
+                                <p className="text-center text-sm text-muted-foreground py-4">No hay horarios disponibles</p>
+                              )}
                             </div>
                           )}
                           <Button className="w-full mt-2" size="lg" onClick={() => setActiveFacilityDialog(null)}>
@@ -421,7 +410,6 @@ export function ClientExperienceView({
               </div>
             )}
 
-            {/* TAB: EVENTOS */}
             {activeTab === "eventos" && (
               <div className="pb-24 px-4 pt-6">
                 <h2 className="text-2xl font-bold mb-4">Eventos del Hotel</h2>
@@ -490,7 +478,6 @@ export function ClientExperienceView({
               </div>
             )}
 
-            {/* TAB: AVISOS */}
             {activeTab === "avisos" && (
               <div className="space-y-4">
                 <h2 className="text-xl font-bold text-foreground">Notificaciones</h2>
@@ -514,7 +501,6 @@ export function ClientExperienceView({
               </div>
             )}
 
-            {/* TAB: PERFIL */}
             {activeTab === "perfil" && (
               <div className="p-4">
                 <div className="space-y-4">
@@ -558,7 +544,6 @@ export function ClientExperienceView({
               </div>
             )}
 
-            {/* TAB: ORDENES */}
             {activeTab === "ordenes" && (
               <div className="pb-24 px-4 pt-6 space-y-4">
                 <h2 className="text-2xl font-bold mb-4">Mis Órdenes</h2>
@@ -679,7 +664,6 @@ export function ClientExperienceView({
               </div>
             )}
 
-            {/* TAB: CALENDARIO */}
             {activeTab === "calendario" && (
               <div className="space-y-6 px-4 pb-24">
                 <h2 className="text-2xl font-bold text-foreground">Mi Agenda</h2>
