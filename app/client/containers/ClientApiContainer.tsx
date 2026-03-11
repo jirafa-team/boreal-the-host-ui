@@ -8,7 +8,9 @@ import { useLanguage } from "@/lib/i18n-context"
 import { useGetUserReservationContextsQuery } from "@/features/reservation/slices/reservationSlice"
 import { useGetUserContextsQuery } from "@/features/auth/slices/authSlice"
 import { setCurrentOrganization } from "@/features/organization/slices/organizationSlice"
-import { ClientExperienceView, type ClientType, type ClientUserData } from "../page"
+import { useGetFacilitiesQuery } from "@/app/client/facilities/slice/facilitySlice"
+import { ClientExperienceView } from "../page"
+import type { ClientType, ClientUserData } from "../types"
 
 interface ReservationWithDetails {
   id?: string
@@ -83,6 +85,21 @@ export function ClientApiContainer() {
     skip: skipReservations,
   })
 
+  const { data: facilitiesData } = useGetFacilitiesQuery(undefined, {
+    skip: !organizationId,
+  })
+
+  const facilities = useMemo(() => {
+    return (facilitiesData?.data?.objects ?? []).map((f) => ({
+      id: f.id,
+      name: f.name,
+      openTime: f.openTime,
+      closeTime: f.closeTime,
+      capacity: f.capacity,
+      image: undefined,
+    }))
+  }, [facilitiesData])
+
   const reservationsList = (data?.reservations ?? []) as ReservationWithDetails[]
 
   const targetReservation = useMemo(() => {
@@ -138,5 +155,14 @@ export function ClientApiContainer() {
     return { userData, clientType }
   }, [targetReservation, userName, userInitials, authUser])
 
-  return <ClientExperienceView userData={userData} clientType={clientType} />
+  return (
+    <ClientExperienceView
+      userData={userData}
+      clientType={clientType}
+      organizationId={organizationId}
+      facilities={facilities}
+      mockSlots={{}}
+      events={[]}
+    />
+  )
 }

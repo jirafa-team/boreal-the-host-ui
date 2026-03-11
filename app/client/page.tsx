@@ -15,7 +15,6 @@ import {
   Coffee,
   Crown,
   ChevronRight,
-  AlertCircle,
   MessageCircle,
   Sparkles,
   Car,
@@ -36,70 +35,16 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog"
-import { Label } from "@/components/ui/label"
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Badge } from "@/components/ui/badge"
 import Link from "next/link"
 import Image from "next/image"
 import { useRouter } from "next/navigation"
 import { ClientApiContainer } from "./containers/ClientApiContainer"
 import { ClientMockContainer } from "./containers/ClientMockContainer"
+import { useGetFacilitySlotsQuery } from "@/app/client/facilities/slice/facilitySlice"
+import type { ClientType, ClientUserData, FacilityItem, FacilitySlot, ClientEvent } from "./types"
 
-export type ClientType = "normal" | "vip" | "future"
-
-export interface ClientUserData {
-  name: string
-  fullName: string
-  initials: string
-  email: string
-  room: string
-  roomType: string
-  phone: string
-  checkIn: string
-  checkOut: string
-  nights: number
-  daysUntilCheckIn?: number
-}
-
-const futureUserDataDefault: ClientUserData = {
-  name: "Ana",
-  fullName: "Ana García",
-  initials: "AG",
-  email: "ana.garcia@email.com",
-  room: "305",
-  roomType: "Deluxe",
-  phone: "+54 11 4567 8901",
-  checkIn: "5 Dic 2024",
-  checkOut: "10 Dic 2024",
-  nights: 5,
-  daysUntilCheckIn: 18,
-}
-
-const vipUserDataDefault: ClientUserData = {
-  name: "Isabella",
-  fullName: "Isabella Von Habsburg",
-  initials: "IV",
-  email: "isabella.von.habsburg@luxury.com",
-  room: "Penthouse 901",
-  roomType: "Presidential Suite",
-  phone: "+41 79 555 1234",
-  checkIn: "20 Nov 2024",
-  checkOut: "28 Nov 2024",
-  nights: 7,
-}
-
-const normalUserDataDefault: ClientUserData = {
-  name: "Carlos",
-  fullName: "Carlos Martínez",
-  initials: "CM",
-  email: "carlos.martinez@email.com",
-  room: "204",
-  roomType: "Suite Premium",
-  phone: "+34 612 345 678",
-  checkIn: "12 Nov 2024",
-  checkOut: "15 Nov 2024",
-  nights: 3,
-}
+export type { ClientType, ClientUserData }
 
 export default function ClientPage() {
   const dataSource = useSelector((state: RootState) => state.dataSource.dataSource)
@@ -111,294 +56,55 @@ export default function ClientPage() {
   return <ClientMockContainer />
 }
 
-const mockEvents = [
-  {
-    id: 1,
-    name: "Conferencia Anual Q1",
-    description: "Presentación de resultados del primer trimestre y estrategias futuras",
-    date: "2024-11-13",
-    time: "10:00",
-    location: "Salón Principal",
-    category: "conference",
-    registered: true,
-    image: "/business-conference-presentation.jpg",
-    attendees: 45,
-    duration: "2 horas",
-    color: "from-blue-500 to-purple-600",
-    gradient: "from-blue-500 to-purple-600",
-  },
-  {
-    id: 2,
-    name: "Cena de Gala",
-    description: "Cena formal con menú de autor y música en vivo",
-    date: "2024-11-14",
-    time: "20:00",
-    location: "Restaurante",
-    category: "dining",
-    registered: false,
-    image: "/elegant-gala-dinner-restaurant.jpg",
-    attendees: 60,
-    duration: "3 horas",
-    color: "from-amber-500 to-red-600",
-    gradient: "from-amber-500 to-red-600",
-  },
-  {
-    id: 3,
-    name: "Workshop de Innovación",
-    description: "Taller práctico sobre nuevas tecnologías y metodologías ágiles",
-    date: "2024-11-15",
-    time: "14:00",
-    location: "Sala de Conferencias B",
-    category: "workshop",
-    registered: false,
-    image: "/innovation-technology-workshop.jpg",
-    attendees: 30,
-    duration: "4 horas",
-    color: "from-green-500 to-teal-600",
-    gradient: "from-green-500 to-teal-600",
-  },
-]
-
-const clientEvents = [
-  {
-    id: 1,
-    name: "Conferencia Anual Q1",
-    description: "Presentación de resultados del primer trimestre y estrategias futuras",
-    date: "2024-11-13",
-    time: "10:00",
-    location: "Salón Principal",
-    category: "conference",
-    registered: true,
-    image: "/business-conference-presentation.jpg",
-    attendees: 45,
-    duration: "2 horas",
-    color: "from-blue-500 to-purple-600",
-    gradient: "from-blue-500 to-purple-600",
-  },
-  {
-    id: 2,
-    name: "Cena de Gala",
-    description: "Cena formal con menú de autor y música en vivo",
-    date: "2024-11-14",
-    time: "20:00",
-    location: "Restaurante",
-    category: "dining",
-    registered: false,
-    image: "/elegant-gala-dinner-restaurant.jpg",
-    attendees: 60,
-    duration: "3 horas",
-    color: "from-amber-500 to-red-600",
-    gradient: "from-amber-500 to-red-600",
-  },
-  {
-    id: 3,
-    name: "Workshop de Innovación",
-    description: "Taller práctico sobre nuevas tecnologías y metodologías ágiles",
-    date: "2024-11-15",
-    time: "14:00",
-    location: "Sala de Conferencias B",
-    category: "workshop",
-    registered: false,
-    image: "/innovation-technology-workshop.jpg",
-    attendees: 30,
-    duration: "4 horas",
-    color: "from-green-500 to-teal-600",
-    gradient: "from-green-500 to-teal-600",
-  },
-]
-
-// Mock data for pool occupancy by time slot
-const poolOccupancy = {
-  "9:00 AM": { reserved: 15, capacity: 50 },
-  "10:00 AM": { reserved: 8, capacity: 50 },
-  "11:00 AM": { reserved: 32, capacity: 50 },
-  "12:00 PM": { reserved: 42, capacity: 50 },
-  "3:00 PM": { reserved: 12, capacity: 50 },
-  "4:00 PM": { reserved: 28, capacity: 50 },
-  "5:00 PM": { reserved: 38, capacity: 50 },
-  "6:00 PM": { reserved: 45, capacity: 50 },
-}
-
-// Mock data for gym occupancy by time slot
-const gymOccupancy = {
-  "6:00 AM": { reserved: 20, capacity: 40 },
-  "7:00 AM": { reserved: 35, capacity: 40 },
-  "8:00 AM": { reserved: 38, capacity: 40 },
-  "9:00 AM": { reserved: 10, capacity: 40 },
-  "5:00 PM": { reserved: 32, capacity: 40 },
-  "6:00 PM": { reserved: 39, capacity: 40 },
-  "7:00 PM": { reserved: 25, capacity: 40 },
-  "8:00 PM": { reserved: 12, capacity: 40 },
-}
-
-// Mock data for breakfast occupancy by time slot
-const breakfastOccupancy = {
-  "6:30 AM": { reserved: 25, capacity: 60 },
-  "7:00 AM": { reserved: 42, capacity: 60 },
-  "7:30 AM": { reserved: 56, capacity: 60 },
-  "8:00 AM": { reserved: 48, capacity: 60 },
-  "8:30 AM": { reserved: 35, capacity: 60 },
-  "9:00 AM": { reserved: 18, capacity: 60 },
-  "9:30 AM": { reserved: 8, capacity: 60 },
-  "10:00 AM": { reserved: 5, capacity: 60 },
-}
-
 export function ClientExperienceView({
   userData,
   clientType,
+  organizationId,
+  facilities = [],
+  mockSlots = {},
+  events = [],
 }: {
   userData: ClientUserData
   clientType: ClientType
+  organizationId?: string
+  facilities?: FacilityItem[]
+  mockSlots?: Record<string, FacilitySlot[]>
+  events?: ClientEvent[]
 }) {
   const router = useRouter()
-
-  // Calculate occupancy percentage and get color
-  const getPoolOccupancyInfo = (time: string) => {
-    const occupancy = poolOccupancy[time as keyof typeof poolOccupancy]
-    if (!occupancy) return { percent: 0, color: "text-green-600", bgColor: "bg-green-100" }
-
-    const percent = Math.round((occupancy.reserved / occupancy.capacity) * 100)
-
-    if (percent <= 33) return { percent, color: "text-green-600", bgColor: "bg-green-100" }
-    if (percent <= 66) return { percent, color: "text-amber-600", bgColor: "bg-amber-100" }
-    return { percent, color: "text-red-600", bgColor: "bg-red-100" }
-  }
-
-  // Calculate occupancy percentage for gym and get color
-  const getGymOccupancyInfo = (time: string) => {
-    const occupancy = gymOccupancy[time as keyof typeof gymOccupancy]
-    if (!occupancy) return { percent: 0, color: "text-green-600", bgColor: "bg-green-100" }
-
-    const percent = Math.round((occupancy.reserved / occupancy.capacity) * 100)
-
-    if (percent <= 33) return { percent, color: "text-green-600", bgColor: "bg-green-100" }
-    if (percent <= 66) return { percent, color: "text-amber-600", bgColor: "bg-amber-100" }
-    return { percent, color: "text-red-600", bgColor: "bg-red-100" }
-  }
-
-  // Calculate occupancy percentage for breakfast and get color
-  const getBreakfastOccupancyInfo = (time: string) => {
-    const occupancy = breakfastOccupancy[time as keyof typeof breakfastOccupancy]
-    if (!occupancy) return { percent: 0, color: "text-green-600", bgColor: "bg-green-100" }
-
-    const percent = Math.round((occupancy.reserved / occupancy.capacity) * 100)
-
-    if (percent <= 33) return { percent, color: "text-green-600", bgColor: "bg-green-100" }
-    if (percent <= 66) return { percent, color: "text-amber-600", bgColor: "bg-amber-100" }
-    return { percent, color: "text-red-600", bgColor: "bg-red-100" }
-  }
+  const dataSource = useSelector((state: RootState) => state.dataSource.dataSource)
 
   const isVIP = clientType === "vip"
   const isFutureReservation = clientType === "future"
 
-  const [activeTab, setActiveTab] = useState<"inicio" | "ordenes" | "eventos" | "avisos" | "perfil" | "calendario">(
-    "inicio",
+  const [activeTab, setActiveTab] = useState<"inicio" | "ordenes" | "eventos" | "avisos" | "perfil" | "calendario">("inicio")
+  const [selectedFacilityId, setSelectedFacilityId] = useState<string | null>(null)
+  const [activeFacilityDialog, setActiveFacilityDialog] = useState<string | null>(null)
+  const [facilityPeople, setFacilityPeople] = useState(1)
+  const [selectedTimes, setSelectedTimes] = useState<Record<string, string>>({})
+  const [timeRemaining, setTimeRemaining] = useState({ hours: 0, minutes: 0, seconds: 0 })
+
+  const { data: slotsData, isLoading: slotsLoading } = useGetFacilitySlotsQuery(
+    selectedFacilityId!,
+    { skip: dataSource !== "api" || !selectedFacilityId }
   )
-  const [breakfastTime, setBreakfastTime] = useState("8:00 AM")
-  const [cleaningTime, setCleaningTime] = useState("")
-  const [cleaningReserved, setCleaningReserved] = useState(false)
-  const [roomServiceDialog, setRoomServiceDialog] = useState(false)
-  const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
-  const [gymTime, setGymTime] = useState("")
-  const [poolTime, setPoolTime] = useState("")
-  const [showGymDialog, setShowGymDialog] = useState(false)
-  const [poolDialogOpen, setPoolDialogOpen] = useState(false)
 
-  const [showTaxiDialog, setShowTaxiDialog] = useState(false)
-  const [taxiDestination, setTaxiDestination] = useState("")
-  const [taxiDateTime, setTaxiDateTime] = useState("")
-  const [showBreakfastDialog, setShowBreakfastDialog] = useState(false)
-  const [cleaningDialogOpen, setCleaningDialogOpen] = useState(false)
-  const [selectedEvent, setSelectedEvent] = useState<number | null>(null)
-  const [breakfastPeople, setBreakfastPeople] = useState(1)
-  const [gymPeople, setGymPeople] = useState(1)
-  const [poolPeople, setPoolPeople] = useState(1)
-
-  const [timeRemaining, setTimeRemaining] = useState({
-    hours: 0,
-    minutes: 0,
-    seconds: 0,
-  })
-
-  const roomServiceOrders = [
-    {
-      id: 1,
-      date: "15 Ene 2025 - 20:30",
-      items: "Desayuno Continental, Café Latte",
-      total: "€15.50",
-      status: "Entregado",
-    },
-    {
-      id: 2,
-      date: "16 Ene 2025 - 14:15",
-      items: "Hamburguesa Premium, Coca-Cola",
-      total: "€18.00",
-      status: "Entregado",
-    },
-    {
-      id: 3,
-      date: "16 Ene 2025 - 19:45",
-      items: "Ensalada César, Agua Mineral",
-      total: "€16.50",
-      status: "En Preparación",
-    },
-  ]
-
-  const roomServiceCategories = [
-    { id: "breakfast", name: "Desayuno", icon: Coffee, color: "bg-amber-500" },
-    { id: "lunch", name: "Almuerzo", icon: Utensils, color: "bg-orange-500" },
-    { id: "dinner", name: "Cena", icon: Utensils, color: "bg-red-500" },
-    { id: "drinks", name: "Bebidas", icon: ShoppingBag, color: "bg-blue-500" },
-    { id: "snacks", name: "Snacks", icon: ShoppingBag, color: "bg-green-500" },
-  ]
-
-  const menuItems = {
-    breakfast: [
-      { name: "Desayuno Continental", price: "€12", description: "Café, zumo, croissant, tostadas" },
-      { name: "Desayuno Americano", price: "€18", description: "Huevos, bacon, salchichas, tostadas" },
-      { name: "Desayuno Saludable", price: "€15", description: "Yogurt, frutas, granola, smoothie" },
-    ],
-    lunch: [
-      { name: "Ensalada César", price: "€14", description: "Pollo, lechuga romana, parmesano" },
-      { name: "Hamburguesa Premium", price: "€16", description: "Carne angus, queso, papas fritas" },
-      { name: "Pasta Carbonara", price: "€15", description: "Pasta fresca, panceta, parmesano" },
-    ],
-    drinks: [
-      { name: "Vino Tinto", price: "€8", description: "Copa de vino de la casa" },
-      { name: "Cerveza", price: "€5", description: "Cerveza local o importada" },
-      { name: "Cóctel Especial", price: "€12", description: "Cóctel del día" },
-    ],
+  const getSlotsForFacility = (facilityId: string): FacilitySlot[] => {
+    if (dataSource === "api") return (slotsData?.data ?? []) as FacilitySlot[]
+    return mockSlots[facilityId] ?? []
   }
 
-  const cityRecommendations = [
-    {
-      name: "Museo Nacional",
-      category: "Cultura",
-      distance: "1.2 km",
-      description: "Arte contemporáneo y exposiciones históricas",
-      rating: "4.8",
-    },
-    {
-      name: "Restaurante La Pérgola",
-      category: "Gastronomía",
-      distance: "800 m",
-      description: "Cocina mediterránea con estrella Michelin",
-      rating: "4.9",
-    },
-    {
-      name: "Parque Central",
-      category: "Naturaleza",
-      distance: "2.5 km",
-      description: "Amplias zonas verdes y lago artificial",
-      rating: "4.7",
-    },
-    {
-      name: "Teatro Principal",
-      category: "Entretenimiento",
-      distance: "1.5 km",
-      description: "Espectáculos y obras de teatro en vivo",
-      rating: "4.6",
-    },
+  const getOccupancyInfo = (slot: FacilitySlot) => {
+    const percent = Math.round((slot.reserved / slot.capacity) * 100)
+    if (percent <= 33) return { percent, color: "text-green-600", bgColor: "bg-green-100" }
+    if (percent <= 66) return { percent, color: "text-amber-600", bgColor: "bg-amber-100" }
+    return { percent, color: "text-red-600", bgColor: "bg-red-100" }
+  }
+
+  const roomServiceOrders = [
+    { id: 1, date: "15 Ene 2025 - 20:30", items: "Desayuno Continental, Café Latte", total: "€15.50", status: "Entregado" },
+    { id: 2, date: "16 Ene 2025 - 14:15", items: "Hamburguesa Premium, Coca-Cola", total: "€18.00", status: "Entregado" },
+    { id: 3, date: "16 Ene 2025 - 19:45", items: "Ensalada César, Agua Mineral", total: "€16.50", status: "En Preparación" },
   ]
 
   useEffect(() => {
@@ -407,33 +113,28 @@ export function ClientExperienceView({
       const tomorrow = new Date(now)
       tomorrow.setDate(tomorrow.getDate() + 1)
       tomorrow.setHours(8, 0, 0, 0)
-
       const diff = tomorrow.getTime() - now.getTime()
-
       if (diff > 0) {
-        const hours = Math.floor(diff / (1000 * 60 * 60))
-        const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60))
-        const seconds = Math.floor((diff % (1000 * 60)) / 1000)
-
-        setTimeRemaining({ hours, minutes, seconds })
+        setTimeRemaining({
+          hours: Math.floor(diff / (1000 * 60 * 60)),
+          minutes: Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60)),
+          seconds: Math.floor((diff % (1000 * 60)) / 1000),
+        })
       }
     }
-
     calculateTimeRemaining()
     const interval = setInterval(calculateTimeRemaining, 1000)
-
     return () => clearInterval(interval)
   }, [])
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">
+      {/* HEADER */}
       <div className="p-4 text-white sticky top-0 z-10 relative overflow-hidden" style={{ background: "linear-gradient(135deg, #0f172a 0%, #1e3a8a 50%, #581c87 100%)" }}>
-        {/* Radial gradient overlays for subtle effects */}
         <div className="absolute inset-0 opacity-20 pointer-events-none">
           <div className="absolute top-0 right-0 w-96 h-96 bg-blue-400 rounded-full mix-blend-screen filter blur-3xl"></div>
           <div className="absolute bottom-0 left-0 w-96 h-96 bg-purple-400 rounded-full mix-blend-screen filter blur-3xl"></div>
         </div>
-
         <div className="flex items-center justify-between gap-4 flex-wrap relative z-10">
           <div className="flex-1 relative z-10">
             <h1 className="text-3xl font-bold">Hola, {userData.name}</h1>
@@ -444,8 +145,6 @@ export function ClientExperienceView({
               </p>
             )}
           </div>
-
-          {/* Tu Estancia Chip */}
           {!isFutureReservation && (
             <div className="flex items-center gap-4 bg-white/15 backdrop-blur-sm rounded-full px-4 py-2.5 border border-white/20 relative z-10">
               <div className="flex items-center gap-2">
@@ -461,26 +160,21 @@ export function ClientExperienceView({
                   <p className="text-2xl font-bold text-white">{userData.nights}</p>
                   <p className="text-xs opacity-80 font-medium">noches</p>
                 </div>
-                <Button
-                  size="sm"
-                  className="bg-violet-800 text-white hover:bg-violet-900 font-semibold px-3 h-8 rounded-full"
-                >
+                <Button size="sm" className="bg-violet-800 text-white hover:bg-violet-900 font-semibold px-3 h-8 rounded-full">
                   Extender
                 </Button>
               </div>
             </div>
           )}
-
-          <div
-            style={{ background: "linear-gradient(135deg, #6f65d0 0%, #67f1d0 100%)" }}
-            className="w-14 h-14 rounded-full flex items-center justify-center shadow-lg p-[2px] relative z-10"
-          >
+          <div style={{ background: "linear-gradient(135deg, #6f65d0 0%, #67f1d0 100%)" }} className="w-14 h-14 rounded-full flex items-center justify-center shadow-lg p-[2px] relative z-10">
             <div className="w-full h-full bg-[#233b64] rounded-full flex items-center justify-center">
               <span className="text-2xl font-bold text-white">{userData.initials}</span>
             </div>
           </div>
         </div>
       </div>
+
+      {/* FUTURE VIEW */}
       {isFutureReservation ? (
         <div className="p-4 pb-20 flex-1">
           <div className="p-[1px] rounded-2xl" style={{ background: "linear-gradient(135deg, #6f65d0, #67f1d0)" }}>
@@ -492,14 +186,10 @@ export function ClientExperienceView({
                   <p className="text-lg font-semibold text-white">{userData.checkIn}</p>
                 </div>
               </div>
-
               <div className="mb-8 py-6 border-y border-white/20">
-                <p className="text-8xl font-bold text-white mb-3" style={{ lineHeight: 1 }}>
-                  {userData.daysUntilCheckIn}
-                </p>
+                <p className="text-8xl font-bold text-white mb-3" style={{ lineHeight: 1 }}>{userData.daysUntilCheckIn}</p>
                 <p className="text-xl text-white/90 font-medium">días para tu llegada</p>
               </div>
-
               <div className="grid grid-cols-3 gap-4 mb-8">
                 <div className="bg-white/10 rounded-xl p-4">
                   <p className="text-3xl font-bold text-white mb-1">{userData.nights}</p>
@@ -514,13 +204,9 @@ export function ClientExperienceView({
                   <p className="text-xs text-white/80">Tipo</p>
                 </div>
               </div>
-
               <div className="mt-6">
                 <Link href="/client/reservation-details">
-                  <Button
-                    size="lg"
-                    className="w-full bg-gradient-to-r from-[#6f65d0] to-[#67f1d0] text-white border-0 hover:opacity-90"
-                  >
+                  <Button size="lg" className="w-full bg-gradient-to-r from-[#6f65d0] to-[#67f1d0] text-white border-0 hover:opacity-90">
                     Ver Detalles de Reserva
                   </Button>
                 </Link>
@@ -531,16 +217,18 @@ export function ClientExperienceView({
       ) : (
         <main className="flex-1 pb-20 pt-4 px-4 max-w-2xl mx-auto w-full">
           <main className="pb-24 px-4 pt-6">
+
+            {/* TAB: INICIO */}
             {activeTab === "inicio" && (
               <div className="space-y-6">
+
+                {/* Countdown */}
                 <div className="px-4 pt-4">
                   <div className="relative overflow-hidden rounded-xl p-4 text-white" style={{ background: "linear-gradient(135deg, #581c87 0%, #6d28d9 50%, #0369a1 100%)" }}>
-                    {/* Radial gradient overlays for subtle metallic effects */}
                     <div className="absolute inset-0 opacity-20 pointer-events-none">
                       <div className="absolute top-0 right-0 w-96 h-96 bg-violet-300 rounded-full mix-blend-screen filter blur-3xl"></div>
                       <div className="absolute bottom-0 left-0 w-96 h-96 bg-cyan-300 rounded-full mix-blend-screen filter blur-3xl"></div>
                     </div>
-
                     <div className="relative z-10">
                       <div className="flex items-center gap-2 mb-2">
                         <Clock className="h-5 w-5" />
@@ -565,6 +253,7 @@ export function ClientExperienceView({
                   </div>
                 </div>
 
+                {/* Servicios Destacados */}
                 <div className="px-4 pt-4">
                   <h3 className="text-2xl font-bold text-black px-1 mb-3">Servicios Destacados</h3>
                   <div className="flex gap-3 overflow-x-auto snap-x snap-mandatory scrollbar-hide">
@@ -576,11 +265,7 @@ export function ClientExperienceView({
                       { name: "Tour Ciudad", time: "10AM - 5PM", image: "/city-tour-bus.jpg" },
                     ].map((service) => (
                       <div key={service.name} className="min-w-[264px] snap-start relative rounded-lg overflow-hidden">
-                        <img
-                          src={service.image || "/placeholder.svg"}
-                          alt={service.name}
-                          className="w-full h-40 object-cover"
-                        />
+                        <img src={service.image || "/placeholder.svg"} alt={service.name} className="w-full h-40 object-cover" />
                         <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/80 to-transparent p-3">
                           <p className="text-white font-semibold">{service.name}</p>
                           <p className="text-white/90 text-sm">{service.time}</p>
@@ -590,11 +275,9 @@ export function ClientExperienceView({
                   </div>
                 </div>
 
+                {/* Room Service Card */}
                 <div className="px-4 pt-4 pb-4 bg-white">
-                  <Card
-                    className="relative overflow-hidden cursor-pointer hover:shadow-lg transition-all h-32"
-                    onClick={() => { }} // DISABLED - Room Service functionality temporarily hidden
-                  >
+                  <Card className="relative overflow-hidden cursor-pointer hover:shadow-lg transition-all h-32" onClick={() => { }}>
                     <Image src="/club-sandwich.jpg" alt="Room Service" fill className="object-cover" loading="eager" />
                     <div className="absolute inset-0 bg-gradient-to-r from-black/70 to-black/40" />
                     <div className="absolute inset-0 flex items-center justify-between px-6">
@@ -615,443 +298,108 @@ export function ClientExperienceView({
                   </Card>
                 </div>
 
-                {/* HIDDEN - Room service order Pizza Margherita temporarily disabled
-                <div className="mx-4 bg-white rounded-lg shadow-sm border border-orange-300 p-4">
-                  <div className="mb-3">
-                    <div className="flex items-center justify-between mb-1">
-                      <h4 className="font-semibold text-gray-900">Pizza Margherita</h4>
-                      <span className="inline-flex items-center gap-1 bg-amber-500 text-white text-xs px-2 py-0.5 rounded-full font-medium">
-                        <Clock className="w-3 h-3" />
-                        En preparación
-                      </span>
-                    </div>
-                    <p className="text-sm text-gray-600 mb-3">Tamaño: Grande • Extra queso</p>
-                    <div className="flex justify-center">
-                      <div className="inline-flex items-center gap-2 bg-gradient-to-r from-[#11AFBE] to-[#773CCA] text-white text-sm px-4 py-2 rounded-full font-semibold">
-                        <Clock className="w-4 h-4" />
-                        Llega entre 19:30 - 19:50
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                */}
-
+                {/* Reserva de Facilities */}
                 <div className="px-4 pt-4 pb-2 bg-white">
                   <h2 className="text-2xl font-bold text-black">Reserva</h2>
                 </div>
 
                 <div className="px-4 pb-4 bg-white">
                   <div className="grid grid-cols-2 gap-3">
-                    <Dialog open={showBreakfastDialog} onOpenChange={setShowBreakfastDialog}>
-                      <DialogTrigger asChild>
-                        <Card className="overflow-hidden flex flex-col p-0 cursor-pointer hover:shadow-lg transition-all">
-                          <div className="h-32 relative">
-                            <img
-                              src="/images/hotel-breakfast-buffet.jpg"
-                              alt="Desayuno"
-                              className="w-full h-full object-cover block"
-                            />
-                            <div
-                              className="text-white text-xs font-medium px-2 py-1 rounded-full shadow-sm absolute top-2 right-2"
-                              style={{ backgroundColor: "#773CCA" }}
-                            >
-                              7AM - 11AM
-                            </div>
-                          </div>
-                          <div className="bg-white text-black flex flex-col gap-2 p-3">
-                            <p className="text-lg font-bold">Desayuno</p>
-                            {breakfastTime ? (
-                              <div className="flex items-center gap-2">
-                                <div
-                                  className="text-white text-xs font-medium px-3 py-1 rounded-full"
-                                  style={{ backgroundColor: "#11AFBF" }}
-                                >
-                                  {breakfastTime}
-                                </div>
+                    {facilities.map((facility) => (
+                      <Dialog
+                        key={facility.id}
+                        open={activeFacilityDialog === facility.id}
+                        onOpenChange={(open) => {
+                          if (open) {
+                            setSelectedFacilityId(facility.id)
+                            setActiveFacilityDialog(facility.id)
+                          } else {
+                            setActiveFacilityDialog(null)
+                          }
+                        }}
+                      >
+                        <DialogTrigger asChild>
+                          <Card className="overflow-hidden flex flex-col p-0 cursor-pointer hover:shadow-lg transition-all">
+                            <div className="h-32 relative">
+                              <img
+                                src={facility.image || "/placeholder.svg"}
+                                alt={facility.name}
+                                className="w-full h-full object-cover block"
+                              />
+                              <div className="text-white text-xs font-medium px-2 py-1 rounded-full shadow-sm absolute top-2 right-2" style={{ backgroundColor: "#773CCA" }}>
+                                {facility.openTime} - {facility.closeTime}
                               </div>
-                            ) : (
-                              <div className="flex items-center gap-2">
-                                <div
-                                  className="text-white text-xs font-medium px-3 py-1 rounded-full flex items-center gap-1"
-                                  style={{ backgroundColor: "#11AFBF" }}
-                                >
+                            </div>
+                            <div className="bg-white text-black flex flex-col gap-2 p-3">
+                              <p className="text-lg font-bold">{facility.name}</p>
+                              {selectedTimes[facility.id] ? (
+                                <div className="text-white text-xs font-medium px-3 py-1 rounded-full w-fit" style={{ backgroundColor: "#11AFBF" }}>
+                                  {selectedTimes[facility.id]}
+                                </div>
+                              ) : (
+                                <div className="text-white text-xs font-medium px-3 py-1 rounded-full flex items-center gap-1 w-fit" style={{ backgroundColor: "#11AFBF" }}>
                                   <Clock className="w-3.5 h-3.5" />
                                   Sin reservar
                                 </div>
+                              )}
+                            </div>
+                          </Card>
+                        </DialogTrigger>
+                        <DialogContent className="sm:max-w-md">
+                          <DialogHeader>
+                            <DialogTitle>Reservar {facility.name}</DialogTitle>
+                            <DialogDescription>Selecciona el horario para {facility.name.toLowerCase()}</DialogDescription>
+                          </DialogHeader>
+                          <div className="bg-gray-100 rounded-lg p-4 mb-4">
+                            <div className="flex items-center justify-between">
+                              <span className="font-medium text-gray-700">Personas</span>
+                              <div className="flex items-center gap-4">
+                                <button onClick={() => setFacilityPeople(Math.max(1, facilityPeople - 1))} className="w-10 h-10 rounded-full bg-white border border-gray-300 flex items-center justify-center font-bold text-lg hover:bg-gray-50">−</button>
+                                <span className="text-2xl font-bold w-8 text-center">{facilityPeople}</span>
+                                <button onClick={() => setFacilityPeople(facilityPeople + 1)} className="w-10 h-10 rounded-full bg-white border border-gray-300 flex items-center justify-center font-bold text-lg hover:bg-gray-50">+</button>
                               </div>
-                            )}
-                          </div>
-                        </Card>
-                      </DialogTrigger>
-                      <DialogContent>
-                        <DialogHeader>
-                          <DialogTitle>Selecciona tu horario de desayuno</DialogTitle>
-                          <DialogDescription>Elige el horario que más te convenga</DialogDescription>
-                        </DialogHeader>
-
-                        {/* Quantity Selector */}
-                        <div className="bg-gray-100 rounded-lg p-4 mb-4">
-                          <div className="flex items-center justify-between">
-                            <span className="font-medium text-gray-700">Personas</span>
-                            <div className="flex items-center gap-4">
-                              <button
-                                onClick={() => setBreakfastPeople(Math.max(1, breakfastPeople - 1))}
-                                className="w-10 h-10 rounded-full bg-white border border-gray-300 flex items-center justify-center font-bold text-lg hover:bg-gray-50"
-                              >
-                                −
-                              </button>
-                              <span className="text-2xl font-bold w-8 text-center">{breakfastPeople}</span>
-                              <button
-                                onClick={() => setBreakfastPeople(breakfastPeople + 1)}
-                                className="w-10 h-10 rounded-full bg-white border border-gray-300 flex items-center justify-center font-bold text-lg hover:bg-gray-50"
-                              >
-                                +
-                              </button>
                             </div>
                           </div>
-                        </div>
-
-                        <div className="grid grid-cols-2 gap-3 py-4">
-                          {[
-                            "6:30 AM",
-                            "7:00 AM",
-                            "7:30 AM",
-                            "8:00 AM",
-                            "8:30 AM",
-                            "9:00 AM",
-                            "9:30 AM",
-                            "10:00 AM",
-                          ].map((time) => {
-                            const { percent, color, bgColor } = getBreakfastOccupancyInfo(time)
-                            return (
-                              <div
-                                key={time}
-                                className="flex items-center justify-between space-x-3 p-3 rounded-lg hover:bg-accent cursor-pointer border border-transparent hover:border-gray-300"
-                                onClick={() => {
-                                  setBreakfastTime(time)
-                                  setShowBreakfastDialog(false)
-                                }}
-                              >
-                                <div className="flex items-center space-x-3 flex-1">
-                                  <input
-                                    type="radio"
-                                    name="breakfast-time"
-                                    checked={breakfastTime === time}
-                                    onChange={() => { }}
-                                    className="cursor-pointer"
-                                  />
-                                  <span className="font-medium">{time}</span>
-                                </div>
-                                <div className={`flex items-center gap-2 px-2 py-1 rounded ${bgColor}`}>
-                                  <Users className={`w-3.5 h-3.5 ${color}`} />
-                                  <span className={`text-xs font-semibold ${color}`}>{percent}%</span>
-                                </div>
-                              </div>
-                            )
-                          })}
-                        </div>
-                      </DialogContent>
-                    </Dialog>
-
-                    <Dialog open={cleaningDialogOpen} onOpenChange={setCleaningDialogOpen}>
-                      <DialogTrigger asChild>
-                        <Card className="overflow-hidden flex flex-col p-0 cursor-pointer hover:shadow-lg transition-all">
-                          <div className="h-32 relative">
-                            <img
-                              src="/images/hotel-room-cleaning.jpg"
-                              alt="Limpieza"
-                              className="w-full h-full object-cover block"
-                            />
-                            <div
-                              className="text-white text-xs font-medium px-2 py-1 rounded-full shadow-sm absolute top-2 right-2"
-                              style={{ backgroundColor: "#773CCA" }}
-                            >
-                              9AM - 5PM
-                            </div>
-                          </div>
-                          <div className="bg-white text-black flex flex-col gap-2 p-3">
-                            <p className="text-lg font-bold">Limpieza</p>
-                            {cleaningTime ? (
-                              <div className="flex items-center gap-2">
-                                <div className="bg-gradient-to-r from-[#6f65d0] to-[#67f1d0] text-white text-xs font-medium px-3 py-1 rounded-full">
-                                  {cleaningTime}
-                                </div>
-                              </div>
-                            ) : (
-                              <div className="flex items-center gap-2">
-                                <div
-                                  className="text-white text-xs font-medium px-3 py-1 rounded-full flex items-center gap-1"
-                                  style={{ backgroundColor: "#11AFBF" }}
-                                >
-                                  <Clock className="w-3.5 h-3.5" />
-                                  Sin reservar
-                                </div>
-                              </div>
-                            )}
-                          </div>
-                        </Card>
-                      </DialogTrigger>
-                      <DialogContent className="sm:max-w-md">
-                        <DialogHeader>
-                          <DialogTitle>Servicio de Limpieza</DialogTitle>
-                          <DialogDescription>
-                            Selecciona el horario preferido para la limpieza de tu habitación
-                          </DialogDescription>
-                        </DialogHeader>
-                        <div className="space-y-4 py-4">
-                          <RadioGroup value={cleaningTime} onValueChange={setCleaningTime}>
-                            {[
-                              "9:00 AM",
-                              "10:00 AM",
-                              "11:00 AM",
-                              "12:00 PM",
-                              "1:00 PM",
-                              "2:00 PM",
-                              "3:00 PM",
-                              "No hoy",
-                            ].map((time) => (
-                              <div
-                                key={time}
-                                className="flex items-center space-x-3 p-3 rounded-lg hover:bg-accent cursor-pointer"
-                              >
-                                <RadioGroupItem value={time} id={`clean-${time}`} />
-                                <Label htmlFor={`clean-${time}`} className="flex-1 cursor-pointer font-medium">
-                                  {time}
-                                </Label>
-                              </div>
-                            ))}
-                          </RadioGroup>
-                        </div>
-                        <Button
-                          className="w-full"
-                          size="lg"
-                          onClick={() => {
-                            setCleaningReserved(true)
-                            setCleaningDialogOpen(false)
-                          }}
-                        >
-                          Confirmar Horario
-                        </Button>
-                      </DialogContent>
-                    </Dialog>
-
-                    <Dialog open={showGymDialog} onOpenChange={setShowGymDialog}>
-                      <DialogTrigger asChild>
-                        <Card className="overflow-hidden flex flex-col p-0 cursor-pointer hover:shadow-lg transition-all">
-                          <div className="h-32 relative">
-                            <img
-                              src="/images/modern-hotel-gym.jpg"
-                              alt="Gimnasio"
-                              className="w-full h-full object-cover block"
-                            />
-                            <div
-                              className="text-white text-xs font-medium px-2 py-1 rounded-full shadow-sm absolute top-2 right-2"
-                              style={{ backgroundColor: "#773CCA" }}
-                            >
-                              6AM - 11PM
-                            </div>
-                          </div>
-                          <div className="bg-white text-black flex flex-col gap-2 p-3">
-                            <p className="text-lg font-bold">Gimnasio</p>
-                            {gymTime ? (
-                              <div className="flex items-center gap-2">
-                                <div className="bg-gradient-to-r from-[#6f65d0] to-[#67f1d0] text-white text-xs font-medium px-3 py-1 rounded-full">
-                                  {gymTime}
-                                </div>
-                              </div>
-                            ) : (
-                              <div className="flex items-center gap-2">
-                                <div
-                                  className="text-white text-xs font-medium px-3 py-1 rounded-full flex items-center gap-1"
-                                  style={{ backgroundColor: "#11AFBF" }}
-                                >
-                                  <Clock className="w-3.5 h-3.5" />
-                                  Sin reservar
-                                </div>
-                              </div>
-                            )}
-                          </div>
-                        </Card>
-                      </DialogTrigger>
-                      <DialogContent className="sm:max-w-md">
-                        <DialogHeader>
-                          <DialogTitle>Reservar Gimnasio</DialogTitle>
-                          <DialogDescription>Selecciona el horario para tu sesión de entrenamiento</DialogDescription>
-                        </DialogHeader>
-
-                        {/* Quantity Selector */}
-                        <div className="bg-gray-100 rounded-lg p-4 mb-4">
-                          <div className="flex items-center justify-between">
-                            <span className="font-medium text-gray-700">Personas</span>
-                            <div className="flex items-center gap-4">
-                              <button
-                                onClick={() => setGymPeople(Math.max(1, gymPeople - 1))}
-                                className="w-10 h-10 rounded-full bg-white border border-gray-300 flex items-center justify-center font-bold text-lg hover:bg-gray-50"
-                              >
-                                −
-                              </button>
-                              <span className="text-2xl font-bold w-8 text-center">{gymPeople}</span>
-                              <button
-                                onClick={() => setGymPeople(gymPeople + 1)}
-                                className="w-10 h-10 rounded-full bg-white border border-gray-300 flex items-center justify-center font-bold text-lg hover:bg-gray-50"
-                              >
-                                +
-                              </button>
-                            </div>
-                          </div>
-                        </div>
-
-                        <div className="space-y-4 py-4">
-                          <RadioGroup value={gymTime} onValueChange={setGymTime}>
-                            {[
-                              "6:00 AM",
-                              "7:00 AM",
-                              "8:00 AM",
-                              "9:00 AM",
-                              "5:00 PM",
-                              "6:00 PM",
-                              "7:00 PM",
-                              "8:00 PM",
-                            ].map((time) => {
-                              const { percent, color, bgColor } = getGymOccupancyInfo(time)
-                              return (
-                                <div
-                                  key={time}
-                                  className="flex items-center justify-between space-x-3 p-3 rounded-lg hover:bg-accent cursor-pointer"
-                                >
-                                  <div className="flex items-center space-x-3 flex-1">
-                                    <RadioGroupItem value={time} id={`gym-${time}`} />
-                                    <Label htmlFor={`gym-${time}`} className="flex-1 cursor-pointer font-medium">
-                                      {time}
-                                    </Label>
+                          {slotsLoading && dataSource === "api" ? (
+                            <p className="text-center text-sm text-muted-foreground py-4">Cargando horarios...</p>
+                          ) : (
+                            <div className="space-y-2 py-2">
+                              {getSlotsForFacility(facility.id).map((slot) => {
+                                const { percent, color, bgColor } = getOccupancyInfo(slot)
+                                return (
+                                  <div
+                                    key={slot.time}
+                                    className="flex items-center justify-between p-3 rounded-lg hover:bg-accent cursor-pointer"
+                                    onClick={() => {
+                                      setSelectedTimes((prev) => ({ ...prev, [facility.id]: slot.time }))
+                                      setActiveFacilityDialog(null)
+                                    }}
+                                  >
+                                    <div className="flex items-center gap-3">
+                                      <input type="radio" readOnly checked={selectedTimes[facility.id] === slot.time} className="cursor-pointer" />
+                                      <span className="font-medium">{slot.time}</span>
+                                    </div>
+                                    <div className={`flex items-center gap-2 px-2 py-1 rounded ${bgColor}`}>
+                                      <Users className={`w-3.5 h-3.5 ${color}`} />
+                                      <span className={`text-xs font-semibold ${color}`}>{percent}%</span>
+                                    </div>
                                   </div>
-                                  <div className={`flex items-center gap-2 px-2 py-1 rounded ${bgColor}`}>
-                                    <Users className={`w-3.5 h-3.5 ${color}`} />
-                                    <span className={`text-xs font-semibold ${color}`}>{percent}%</span>
-                                  </div>
-                                </div>
-                              )
-                            })}
-                          </RadioGroup>
-                        </div>
-                        <Button className="w-full" size="lg" onClick={() => setShowGymDialog(false)}>
-                          Confirmar Reserva
-                        </Button>
-                      </DialogContent>
-                    </Dialog>
-
-                    <Dialog open={poolDialogOpen} onOpenChange={setPoolDialogOpen}>
-                      <DialogTrigger asChild>
-                        <Card className="overflow-hidden flex flex-col p-0 cursor-pointer hover:shadow-lg transition-all">
-                          <div className="h-32 relative">
-                            <img
-                              src="/images/luxury-hotel-pool.jpg"
-                              alt="Piscina"
-                              className="w-full h-full object-cover block"
-                            />
-                            <div
-                              className="text-white text-xs font-medium px-2 py-1 rounded-full shadow-sm absolute top-2 right-2"
-                              style={{ backgroundColor: "#773CCA" }}
-                            >
-                              9AM - 7PM
+                                )
+                              })}
                             </div>
-                          </div>
-                          <div className="bg-white text-black flex flex-col gap-2 p-3">
-                            <p className="text-lg font-bold">Piscina</p>
-                            {poolTime ? (
-                              <div className="flex items-center gap-2">
-                                <div className="bg-gradient-to-r from-[#6f65d0] to-[#67f1d0] text-white text-xs font-medium px-3 py-1 rounded-full">
-                                  {poolTime}
-                                </div>
-                              </div>
-                            ) : (
-                              <div className="flex items-center gap-2">
-                                <div
-                                  className="text-white text-xs font-medium px-3 py-1 rounded-full flex items-center gap-1"
-                                  style={{ backgroundColor: "#11AFBF" }}
-                                >
-                                  <Clock className="w-3.5 h-3.5" />
-                                  Sin reservar
-                                </div>
-                              </div>
-                            )}
-                          </div>
-                        </Card>
-                      </DialogTrigger>
-                      <DialogContent className="sm:max-w-md">
-                        <DialogHeader>
-                          <DialogTitle>Reservar Piscina</DialogTitle>
-                          <DialogDescription>Selecciona el horario para disfrutar de la piscina</DialogDescription>
-                        </DialogHeader>
-
-                        {/* Quantity Selector */}
-                        <div className="bg-gray-100 rounded-lg p-4 mb-4">
-                          <div className="flex items-center justify-between">
-                            <span className="font-medium text-gray-700">Personas</span>
-                            <div className="flex items-center gap-4">
-                              <button
-                                onClick={() => setPoolPeople(Math.max(1, poolPeople - 1))}
-                                className="w-10 h-10 rounded-full bg-white border border-gray-300 flex items-center justify-center font-bold text-lg hover:bg-gray-50"
-                              >
-                                −
-                              </button>
-                              <span className="text-2xl font-bold w-8 text-center">{poolPeople}</span>
-                              <button
-                                onClick={() => setPoolPeople(poolPeople + 1)}
-                                className="w-10 h-10 rounded-full bg-white border border-gray-300 flex items-center justify-center font-bold text-lg hover:bg-gray-50"
-                              >
-                                +
-                              </button>
-                            </div>
-                          </div>
-                        </div>
-
-                        <div className="space-y-4 py-4">
-                          <RadioGroup value={poolTime} onValueChange={setPoolTime}>
-                            {[
-                              "9:00 AM",
-                              "10:00 AM",
-                              "11:00 AM",
-                              "12:00 PM",
-                              "3:00 PM",
-                              "4:00 PM",
-                              "5:00 PM",
-                              "6:00 PM",
-                            ].map((time) => {
-                              const { percent, color, bgColor } = getPoolOccupancyInfo(time)
-                              return (
-                                <div
-                                  key={time}
-                                  className="flex items-center justify-between space-x-3 p-3 rounded-lg hover:bg-accent cursor-pointer"
-                                >
-                                  <div className="flex items-center space-x-3 flex-1">
-                                    <RadioGroupItem value={time} id={`pool-${time}`} />
-                                    <Label htmlFor={`pool-${time}`} className="flex-1 cursor-pointer font-medium">
-                                      {time}
-                                    </Label>
-                                  </div>
-                                  <div className={`flex items-center gap-2 px-2 py-1 rounded ${bgColor}`}>
-                                    <Users className={`w-3.5 h-3.5 ${color}`} />
-                                    <span className={`text-xs font-semibold ${color}`}>{percent}%</span>
-                                  </div>
-                                </div>
-                              )
-                            })}
-                          </RadioGroup>
-                        </div>
-                        <Button className="w-full" size="lg" onClick={() => setPoolDialogOpen(false)}>
-                          Confirmar Reserva
-                        </Button>
-                      </DialogContent>
-                    </Dialog>
+                          )}
+                          <Button className="w-full mt-2" size="lg" onClick={() => setActiveFacilityDialog(null)}>
+                            Confirmar Reserva
+                          </Button>
+                        </DialogContent>
+                      </Dialog>
+                    ))}
                   </div>
                 </div>
 
+                {/* Ayuda */}
                 <div className="px-4 pb-4">
-                  <Card
-                    className="relative overflow-hidden cursor-pointer hover:shadow-lg transition-shadow"
-                  // onClick={() => router.push("/client/help-form")}
-                  >
+                  <Card className="relative overflow-hidden cursor-pointer hover:shadow-lg transition-shadow">
                     <Image src="/hotel-concierge-help-desk.jpg" alt="Asistencia" fill className="object-cover" />
                     <div className="absolute inset-0 bg-gradient-to-r from-red-900/70 to-red-700/50" />
                     <div className="relative h-full flex items-center justify-between p-5">
@@ -1070,147 +418,27 @@ export function ClientExperienceView({
                     </div>
                   </Card>
                 </div>
-
-                {/* HIDDEN - Second Necesitas Ayuda section temporarily disabled
-                <div className="px-4 pt-4 pb-4 bg-white">
-                  <Card
-                    className="relative overflow-hidden cursor-pointer hover:shadow-lg transition-all h-32"
-                    onClick={() => {
-                      router.push("/client/help-form")
-                    }}
-                  >
-                    <Image src="/hotel-concierge-help-desk.jpg" alt="Ayuda" fill className="object-cover" />
-                    <div className="absolute inset-0 bg-gradient-to-r from-red-900/70 to-red-700/50" />
-                    <div className="absolute inset-0 flex items-center justify-between px-6">
-                      <div className="flex items-center gap-4">
-                        <div className="bg-white/20 backdrop-blur-sm p-3 rounded-full">
-                          <MessageCircle className="w-8 h-8 text-white" />
-                        </div>
-                        <div>
-                          <h3 className="text-xl font-bold text-white mb-2">¿Necesitas Ayuda?</h3>
-                          <div className="inline-flex items-center gap-1.5 bg-white/20 backdrop-blur-sm text-white text-xs px-3 py-1 rounded-full">
-                            <span>Estamos aquí para ti</span>
-                          </div>
-                        </div>
-                      </div>
-                      <ChevronRight className="w-8 h-8 text-white" />
-                    </div>
-                  </Card>
-                </div>
-                */}
-
-                {/* HIDDEN - Ciudad y Recomendaciones section temporarily disabled
-                <div className="px-4 pt-4 pb-2 bg-white">
-                  <h2 className="text-2xl font-bold text-black">Ciudad</h2>
-                </div>
-
-                <div className="px-4 pb-4 bg-white">
-                  <div className="grid grid-cols-2 gap-3">
-                    <Dialog>
-                      <DialogTrigger asChild>
-                        <Card className="relative overflow-hidden cursor-pointer hover:shadow-lg transition-all h-40">
-                          <Image
-                            src="/hotel-interior-map-modern.jpg"
-                            alt="Mapa del Hotel"
-                            fill
-                            className="object-cover"
-                          />
-                          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
-                          <div className="absolute bottom-0 left-0 right-0 p-4 text-white">
-                            <p className="text-sm font-bold">Mapa</p>
-                            <p className="text-xs opacity-90">Hotel</p>
-                          </div>
-                        </Card>
-                      </DialogTrigger>
-                      <DialogContent className="sm:max-w-2xl">
-                        <DialogHeader>
-                          <DialogTitle>Mapa del Hotel</DialogTitle>
-                          <DialogDescription>Explora las instalaciones y servicios del hotel</DialogDescription>
-                        </DialogHeader>
-                        <div className="py-4">
-                          <div className="bg-muted rounded-lg p-8 min-h-[400px] relative overflow-hidden">
-                            <div className="absolute inset-0 flex items-center justify-center">
-                              <div className="text-center space-y-6 w-full px-6">
-                                <div className="bg-background rounded-xl p-4 shadow-md">
-                                  <h4 className="font-bold text-sm mb-3">Planta Baja</h4>
-                                  <div className="grid grid-cols-3 gap-2 text-xs">
-                                    <div className="bg-blue-100 dark:bg-blue-950 p-2 rounded">Recepción</div>
-                                    <div className="bg-orange-100 dark:bg-orange-950 p-2 rounded">Restaurante</div>
-                                    <div className="bg-green-100 dark:bg-green-950 p-2 rounded">Lobby</div>
-                                  </div>
-                                </div>
-
-                                <div className="bg-background rounded-xl p-4 shadow-md">
-                                  <h4 className="font-bold text-sm mb-3">Primer Piso</h4>
-                                  <div className="grid grid-cols-3 gap-2 text-xs">
-                                    <div className="bg-red-100 dark:bg-red-950 p-2 rounded">Gimnasio</div>
-                                    <div className="bg-cyan-100 dark:bg-cyan-950 p-2 rounded">Piscina</div>
-                                    <div className="bg-purple-100 dark:bg-purple-950 p-2 rounded">Spa</div>
-                                  </div>
-                                </div>
-
-                                <div className="bg-background rounded-xl p-4 shadow-md">
-                                  <h4 className="font-bold text-sm mb-3">Pisos 2-5</h4>
-                                  <div className="grid grid-cols-2 gap-2 text-xs">
-                                    <div className="bg-primary/10 p-2 rounded">Habitaciones</div>
-                                    <div className="bg-primary/20 p-2 rounded border-2 border-primary">
-                                      Tu Habitación (204)
-                                    </div>
-                                  </div>
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      </DialogContent>
-                    </Dialog>
-
-                    <Link href="/client/recommendations">
-                      <Card className="relative overflow-hidden cursor-pointer hover:shadow-lg transition-all h-40">
-                        <Image
-                          src="/beautiful-city-landmarks-attractions.jpg"
-                          alt="Visitas Ciudad"
-                          fill
-                          className="object-cover"
-                        />
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
-                        <div className="absolute bottom-0 left-0 right-0 p-4 text-white">
-                          <p className="text-sm font-bold">Visitas</p>
-                          <p className="text-xs opacity-90">Ciudad</p>
-                        </div>
-                      </Card>
-                    </Link>
-                  </div>
-                </div>
-                */}
               </div>
             )}
 
+            {/* TAB: EVENTOS */}
             {activeTab === "eventos" && (
               <div className="pb-24 px-4 pt-6">
                 <h2 className="text-2xl font-bold mb-4">Eventos del Hotel</h2>
                 <div className="space-y-4">
-                  {clientEvents.map((event) => {
+                  {events.map((event) => {
                     const eventDate = new Date(event.date)
                     const day = eventDate.getDate()
                     const month = eventDate.toLocaleDateString("es-ES", { month: "short" }).toUpperCase()
-
                     return (
                       <Link key={event.id} href={`/client/event/${event.id}`}>
                         <Card className="overflow-hidden cursor-pointer hover:shadow-lg transition-shadow">
                           <div className="relative h-48">
-                            <Image
-                              src={event.image || "/placeholder.svg"}
-                              alt={event.name}
-                              fill
-                              className="object-cover"
-                            />
+                            <Image src={event.image || "/placeholder.svg"} alt={event.name} fill className="object-cover" />
                             <div className={`absolute inset-0 bg-gradient-to-br ${event.gradient} opacity-50`} />
                             <div className="absolute top-3 right-3">
                               {event.registered ? (
-                                <Badge className="bg-white/90 text-[#773CCA] hover:bg-white shadow-lg">
-                                  ✓ Registrado
-                                </Badge>
+                                <Badge className="bg-white/90 text-[#773CCA] hover:bg-white shadow-lg">✓ Registrado</Badge>
                               ) : (
                                 <Badge className="bg-white/90 text-gray-700 hover:bg-white shadow-lg">Disponible</Badge>
                               )}
@@ -1221,22 +449,20 @@ export function ClientExperienceView({
                             </div>
                           </div>
                           <div className="p-4 space-y-3">
-                            <div className="flex items-center justify-between">
-                              <div className="flex items-center gap-4">
-                                <div className="bg-gradient-to-br from-[#11AFBE] to-[#773CCA] rounded-xl p-3 text-white text-center min-w-[60px]">
-                                  <p className="text-xs font-semibold uppercase">{month}</p>
-                                  <p className="text-2xl font-bold leading-none">{day}</p>
+                            <div className="flex items-center gap-4">
+                              <div className="bg-gradient-to-br from-[#11AFBE] to-[#773CCA] rounded-xl p-3 text-white text-center min-w-[60px]">
+                                <p className="text-xs font-semibold uppercase">{month}</p>
+                                <p className="text-2xl font-bold leading-none">{day}</p>
+                              </div>
+                              <div className="space-y-1">
+                                <div className="flex items-center gap-1.5 text-gray-600">
+                                  <Clock className="w-4 h-4" />
+                                  <span className="text-sm font-medium">{event.time}</span>
+                                  <span className="text-xs text-gray-400">• {event.duration}</span>
                                 </div>
-                                <div className="space-y-1">
-                                  <div className="flex items-center gap-1.5 text-gray-600">
-                                    <Clock className="w-4 h-4" />
-                                    <span className="text-sm font-medium">{event.time}</span>
-                                    <span className="text-xs text-gray-400">• {event.duration}</span>
-                                  </div>
-                                  <div className="flex items-center gap-1.5 text-gray-600">
-                                    <MapPin className="w-4 h-4" />
-                                    <span className="text-sm">{event.location}</span>
-                                  </div>
+                                <div className="flex items-center gap-1.5 text-gray-600">
+                                  <MapPin className="w-4 h-4" />
+                                  <span className="text-sm">{event.location}</span>
                                 </div>
                               </div>
                             </div>
@@ -1244,24 +470,14 @@ export function ClientExperienceView({
                               <div className="flex items-center gap-2">
                                 <div className="flex -space-x-2">
                                   {[1, 2, 3].map((i) => (
-                                    <div
-                                      key={i}
-                                      className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-400 to-purple-500 border-2 border-white flex items-center justify-center text-white text-xs font-semibold"
-                                    >
+                                    <div key={i} className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-400 to-purple-500 border-2 border-white flex items-center justify-center text-white text-xs font-semibold">
                                       {String.fromCharCode(64 + i)}
                                     </div>
                                   ))}
                                 </div>
                                 <span className="text-xs text-gray-500 font-medium">{event.attendees} asistentes</span>
                               </div>
-                              <Button
-                                size="sm"
-                                className="bg-gradient-to-r from-[#11AFBE] to-[#773CCA] text-white hover:opacity-90"
-                                onClick={(e) => {
-                                  e.preventDefault()
-                                  e.stopPropagation()
-                                }}
-                              >
+                              <Button size="sm" className="bg-gradient-to-r from-[#11AFBE] to-[#773CCA] text-white hover:opacity-90" onClick={(e) => { e.preventDefault(); e.stopPropagation() }}>
                                 {event.registered ? "Ver detalles" : "Registrarse"}
                               </Button>
                             </div>
@@ -1274,24 +490,14 @@ export function ClientExperienceView({
               </div>
             )}
 
+            {/* TAB: AVISOS */}
             {activeTab === "avisos" && (
               <div className="space-y-4">
                 <h2 className="text-xl font-bold text-foreground">Notificaciones</h2>
                 <div className="space-y-3">
                   {[
-                    {
-                      title: "Bienvenida",
-                      message: "Gracias por hospedarte con nosotros",
-                      time: "Hace 1 día",
-                      read: true,
-                    },
-                    {
-                      title: "Nuevo evento disponible",
-                      message: "Workshop de Innovación - 15 Nov",
-                      time: "Hace 2 horas",
-                      read: false,
-                    },
-                    // { title: "Room service", message: "Tu pedido está en camino", time: "Hace 30 min", read: false }, // HIDDEN - Room service notifications temporarily disabled
+                    { title: "Bienvenida", message: "Gracias por hospedarte con nosotros", time: "Hace 1 día", read: true },
+                    { title: "Nuevo evento disponible", message: "Workshop de Innovación - 15 Nov", time: "Hace 2 horas", read: false },
                   ].map((notif, idx) => (
                     <Card key={idx} className={`p-4 ${!notif.read ? "bg-primary/5 border-primary/20" : ""}`}>
                       <div className="flex items-start justify-between">
@@ -1307,6 +513,8 @@ export function ClientExperienceView({
                 </div>
               </div>
             )}
+
+            {/* TAB: PERFIL */}
             {activeTab === "perfil" && (
               <div className="p-4">
                 <div className="space-y-4">
@@ -1328,9 +536,7 @@ export function ClientExperienceView({
                     <div className="space-y-3">
                       <div className="flex justify-between py-3 border-b border-border">
                         <span className="text-sm text-muted-foreground">Habitación</span>
-                        <span className="text-sm font-medium text-foreground">
-                          {userData.room} - {userData.roomType}
-                        </span>
+                        <span className="text-sm font-medium text-foreground">{userData.room} - {userData.roomType}</span>
                       </div>
                       <div className="flex justify-between py-3 border-b border-border">
                         <span className="text-sm text-muted-foreground">Check-in</span>
@@ -1345,24 +551,18 @@ export function ClientExperienceView({
                         <span className="text-sm font-medium text-foreground">{userData.phone}</span>
                       </div>
                     </div>
-                    <Button variant="outline" className="w-full mt-6 bg-transparent">
-                      Editar Perfil
-                    </Button>
-                    <Button variant="destructive" className="w-full mt-3" onClick={() => router.push("/")}>
-                      Cerrar Sesión
-                    </Button>
+                    <Button variant="outline" className="w-full mt-6 bg-transparent">Editar Perfil</Button>
+                    <Button variant="destructive" className="w-full mt-3" onClick={() => router.push("/")}>Cerrar Sesión</Button>
                   </Card>
                 </div>
               </div>
             )}
+
+            {/* TAB: ORDENES */}
             {activeTab === "ordenes" && (
               <div className="pb-24 px-4 pt-6 space-y-4">
                 <h2 className="text-2xl font-bold mb-4">Mis Órdenes</h2>
-
-                <Card
-                  className="relative overflow-hidden cursor-pointer hover:shadow-lg transition-all h-32"
-                  onClick={() => { }} // DISABLED - Room Service functionality temporarily hidden
-                >
+                <Card className="relative overflow-hidden cursor-pointer hover:shadow-lg transition-all h-32" onClick={() => { }}>
                   <Image src="/club-sandwich.jpg" alt="Room Service" fill className="object-cover" />
                   <div className="absolute inset-0 bg-gradient-to-r from-black/70 to-black/40" />
                   <div className="absolute inset-0 flex items-center justify-between px-6">
@@ -1381,7 +581,6 @@ export function ClientExperienceView({
                     <ChevronRight className="w-8 h-8 text-white" />
                   </div>
                 </Card>
-
                 <div className="bg-white rounded-lg p-4 shadow-sm border border-orange-200">
                   <div className="flex items-start gap-3">
                     <div className="bg-[#773CCA] p-2.5 rounded-full">
@@ -1402,35 +601,8 @@ export function ClientExperienceView({
                     </div>
                   </div>
                 </div>
-
-                <div>
-                  <h3 className="text-lg font-semibold text-foreground mb-3">Servicios Disponibles</h3>
-                  <div className="flex gap-3 overflow-x-auto snap-x snap-mandatory scrollbar-hide">
-                    {[
-                      { name: "Spa & Masajes", time: "9AM - 9PM", image: "/luxury-spa-massage.png" },
-                      { name: "Taxi", time: "24/7", image: "/luxury-taxi-car-service.jpg" },
-                      { name: "Cabalgata", time: "8AM - 6PM", image: "/horse-riding-tour.jpg" },
-                      { name: "Tour Ciudad", time: "10AM - 5PM", image: "/city-tour-bus.jpg" },
-                      { name: "Room Service", time: "24/7", image: "/images/untitled-20design-20-283-29.png" },
-                    ].map((service) => (
-                      <div key={service.name} className="min-w-[264px] snap-start relative rounded-lg overflow-hidden">
-                        <img
-                          src={service.image || "/placeholder.svg"}
-                          alt={service.name}
-                          className="w-full h-40 object-cover"
-                        />
-                        <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/80 to-transparent p-3">
-                          <p className="text-white font-semibold">{service.name}</p>
-                          <p className="text-white/90 text-sm">{service.time}</p>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
                 <div className="space-y-3">
                   <h3 className="text-lg font-semibold text-foreground mt-4">Historial de Solicitudes</h3>
-
                   <div className="bg-white rounded-xl p-4 shadow-sm">
                     <div className="flex gap-3">
                       <div className="w-12 h-12 rounded-full bg-gradient-to-r from-[#6f65d0] to-[#67f1d0] flex items-center justify-center flex-shrink-0">
@@ -1446,8 +618,7 @@ export function ClientExperienceView({
                       </div>
                     </div>
                   </div>
-
-                  {roomServiceOrders.map((order, index) => (
+                  {roomServiceOrders.map((order) => (
                     <div key={order.id} className="bg-white rounded-xl p-4 shadow-sm">
                       <div className="flex gap-3">
                         <div className="w-12 h-12 rounded-full bg-orange-500 flex items-center justify-center flex-shrink-0">
@@ -1459,20 +630,13 @@ export function ClientExperienceView({
                             <span className="text-base font-bold text-[#11AFBF] whitespace-nowrap">{order.total}</span>
                           </div>
                           <p className="text-xs text-gray-500 mb-2">{order.date}</p>
-                          <Badge
-                            variant={order.status === "Entregado" ? "secondary" : "default"}
-                            className={`text-xs ${order.status === "Entregado"
-                              ? "bg-green-100 text-green-700 hover:bg-green-100"
-                              : "bg-yellow-100 text-yellow-700 hover:bg-yellow-100"
-                              }`}
-                          >
+                          <Badge className={`text-xs ${order.status === "Entregado" ? "bg-green-100 text-green-700 hover:bg-green-100" : "bg-yellow-100 text-yellow-700 hover:bg-yellow-100"}`}>
                             {order.status}
                           </Badge>
                         </div>
                       </div>
                     </div>
                   ))}
-
                   <div className="bg-white rounded-xl p-4 shadow-sm">
                     <div className="flex gap-3">
                       <div className="w-12 h-12 rounded-full bg-blue-500 flex items-center justify-center flex-shrink-0">
@@ -1488,7 +652,6 @@ export function ClientExperienceView({
                       </div>
                     </div>
                   </div>
-
                   <div className="bg-white rounded-xl p-4 shadow-sm">
                     <div className="flex gap-3">
                       <div className="w-12 h-12 rounded-full bg-teal-500 flex items-center justify-center flex-shrink-0">
@@ -1496,9 +659,7 @@ export function ClientExperienceView({
                       </div>
                       <div className="flex-1 min-w-0">
                         <div className="flex items-start justify-between gap-2 mb-1">
-                          <p className="text-base font-semibold text-gray-900 leading-tight">
-                            Tour de Cabalgata - 2 personas
-                          </p>
+                          <p className="text-base font-semibold text-gray-900 leading-tight">Tour de Cabalgata - 2 personas</p>
                           <span className="text-base font-bold text-[#11AFBF] whitespace-nowrap">$120.00</span>
                         </div>
                         <p className="text-xs text-gray-500 mb-2">15 Dic, 14:00</p>
@@ -1507,213 +668,80 @@ export function ClientExperienceView({
                     </div>
                   </div>
                 </div>
-
                 <div className="bg-[#11AFBF] rounded-xl p-4 mt-4">
                   <div className="flex justify-between items-center">
                     <span className="text-base font-bold text-white">Total Acumulado</span>
                     <span className="text-2xl font-bold text-white">
-                      €
-                      {(
-                        roomServiceOrders.reduce((sum, order) => {
-                          const price = Number.parseFloat(order.total.replace(/[€$]/g, ""))
-                          return sum + price
-                        }, 0) +
-                        45.0 +
-                        120.0 +
-                        22.0
-                      ).toFixed(2)}
+                      €{(roomServiceOrders.reduce((sum, o) => sum + Number.parseFloat(o.total.replace(/[€$]/g, "")), 0) + 45 + 120 + 22).toFixed(2)}
                     </span>
                   </div>
                 </div>
               </div>
             )}
+
+            {/* TAB: CALENDARIO */}
             {activeTab === "calendario" && (
               <div className="space-y-6 px-4 pb-24">
                 <h2 className="text-2xl font-bold text-foreground">Mi Agenda</h2>
-
-                {/* Hoy */}
                 <div className="space-y-3">
                   <div className="flex items-center gap-2">
                     <div className="w-1 h-6 bg-[#11AFBF] rounded-full" />
-                    <h3 className="text-lg font-semibold">
-                      Hoy - {new Date().toLocaleDateString("es-ES", { weekday: "long", day: "numeric", month: "long" })}
-                    </h3>
+                    <h3 className="text-lg font-semibold">Hoy - {new Date().toLocaleDateString("es-ES", { weekday: "long", day: "numeric", month: "long" })}</h3>
                   </div>
-
                   <div className="space-y-2">
-                    {/* Desayuno */}
-                    <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-100">
-                      <div className="flex items-start justify-between">
+                    {[
+                      { time: "08:00", icon: <Coffee className="w-5 h-5 text-[#773CCA]" />, title: "Desayuno", sub: "Restaurante Principal", badge: "Confirmado", badgeColor: "bg-[#11AFBF]" },
+                      { time: "10:00", icon: <Sparkles className="w-5 h-5 text-[#773CCA]" />, title: "Servicio de Limpieza", sub: "Habitación 305", badge: "Programado", badgeColor: "bg-[#11AFBF]" },
+                      { time: "18:00", icon: <Dumbbell className="w-5 h-5 text-[#773CCA]" />, title: "Gimnasio", sub: "Centro de Fitness - Piso 2", badge: "Reservado", badgeColor: "bg-[#11AFBF]" },
+                    ].map((item) => (
+                      <div key={item.time} className="bg-white rounded-xl p-4 shadow-sm border border-gray-100">
                         <div className="flex gap-3">
-                          <div className="flex flex-col items-center">
-                            <span className="text-sm font-semibold text-[#773CCA]">08:00</span>
-                            <div className="w-px h-full bg-[#773CCA] mt-1" />
-                          </div>
+                          <span className="text-sm font-semibold text-[#773CCA] w-12 shrink-0">{item.time}</span>
                           <div className="flex-1">
-                            <div className="flex items-center gap-2 mb-1">
-                              <Coffee className="w-5 h-5 text-[#773CCA]" />
-                              <h4 className="font-semibold">Desayuno</h4>
-                            </div>
-                            <p className="text-sm text-muted-foreground">Restaurante Principal</p>
-                            <span className="inline-block mt-2 px-3 py-1 text-xs font-medium bg-[#11AFBF] text-white rounded-full">
-                              Confirmado
-                            </span>
+                            <div className="flex items-center gap-2 mb-1">{item.icon}<h4 className="font-semibold">{item.title}</h4></div>
+                            <p className="text-sm text-muted-foreground">{item.sub}</p>
+                            <span className={`inline-block mt-2 px-3 py-1 text-xs font-medium ${item.badgeColor} text-white rounded-full`}>{item.badge}</span>
                           </div>
                         </div>
                       </div>
-                    </div>
-
-                    {/* Limpieza */}
-                    <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-100">
-                      <div className="flex items-start justify-between">
-                        <div className="flex gap-3">
-                          <div className="flex flex-col items-center">
-                            <span className="text-sm font-semibold text-[#773CCA]">10:00</span>
-                            <div className="w-px h-full bg-[#773CCA] mt-1" />
-                          </div>
-                          <div className="flex-1">
-                            <div className="flex items-center gap-2 mb-1">
-                              <Sparkles className="w-5 h-5 text-[#773CCA]" />
-                              <h4 className="font-semibold">Servicio de Limpieza</h4>
-                            </div>
-                            <p className="text-sm text-muted-foreground">Habitaci��n 305</p>
-                            <span className="inline-block mt-2 px-3 py-1 text-xs font-medium bg-[#11AFBF] text-white rounded-full">
-                              Programado
-                            </span>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Gimnasio */}
-                    <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-100">
-                      <div className="flex items-start justify-between">
-                        <div className="flex gap-3">
-                          <div className="flex flex-col items-center">
-                            <span className="text-sm font-semibold text-[#773CCA]">18:00</span>
-                            <div className="w-px h-full bg-[#773CCA] mt-1" />
-                          </div>
-                          <div className="flex-1">
-                            <div className="flex items-center gap-2 mb-1">
-                              <Dumbbell className="w-5 h-5 text-[#773CCA]" />
-                              <h4 className="font-semibold">Gimnasio</h4>
-                            </div>
-                            <p className="text-sm text-muted-foreground">Centro de Fitness - Piso 2</p>
-                            <span className="inline-block mt-2 px-3 py-1 text-xs font-medium bg-[#11AFBF] text-white rounded-full">
-                              Reservado
-                            </span>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Pizza en camino */}
+                    ))}
                     <div className="bg-white rounded-xl p-4 shadow-sm border-2 border-orange-300">
-                      <div className="flex items-start justify-between">
-                        <div className="flex gap-3">
-                          <div className="flex flex-col items-center">
-                            <span className="text-sm font-semibold text-orange-600">19:30</span>
-                            <div className="w-px h-full bg-orange-400 mt-1" />
-                          </div>
-                          <div className="flex-1">
-                            <div className="flex items-center gap-2 mb-1">
-                              <UtensilsCrossed className="w-5 h-5 text-orange-600" />
-                              <h4 className="font-semibold">Pizza Margherita</h4>
-                            </div>
-                            <p className="text-sm text-muted-foreground">Room Service - Entrega a habitación</p>
-                            <div className="flex items-center gap-2 mt-2">
-                              <span className="inline-block px-3 py-1 text-xs font-medium bg-yellow-500 text-white rounded-full">
-                                En Preparación
-                              </span>
-                              <span className="text-xs text-orange-600 font-medium">Llega: 19:30 - 19:50</span>
-                            </div>
+                      <div className="flex gap-3">
+                        <span className="text-sm font-semibold text-orange-600 w-12 shrink-0">19:30</span>
+                        <div className="flex-1">
+                          <div className="flex items-center gap-2 mb-1"><UtensilsCrossed className="w-5 h-5 text-orange-600" /><h4 className="font-semibold">Pizza Margherita</h4></div>
+                          <p className="text-sm text-muted-foreground">Room Service - Entrega a habitación</p>
+                          <div className="flex items-center gap-2 mt-2">
+                            <span className="inline-block px-3 py-1 text-xs font-medium bg-yellow-500 text-white rounded-full">En Preparación</span>
+                            <span className="text-xs text-orange-600 font-medium">Llega: 19:30 - 19:50</span>
                           </div>
                         </div>
                       </div>
                     </div>
                   </div>
                 </div>
-
-                {/* Mañana */}
                 <div className="space-y-3">
                   <div className="flex items-center gap-2">
                     <div className="w-1 h-6 bg-gray-400 rounded-full" />
-                    <h3 className="text-lg font-semibold">
-                      Mañana -{" "}
-                      {new Date(Date.now() + 86400000).toLocaleDateString("es-ES", {
-                        weekday: "long",
-                        day: "numeric",
-                        month: "long",
-                      })}
-                    </h3>
+                    <h3 className="text-lg font-semibold">Mañana - {new Date(Date.now() + 86400000).toLocaleDateString("es-ES", { weekday: "long", day: "numeric", month: "long" })}</h3>
                   </div>
-
                   <div className="space-y-2">
-                    {/* Conferencia */}
-                    <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-100">
-                      <div className="flex items-start justify-between">
+                    {[
+                      { time: "08:00", icon: <Coffee className="w-5 h-5 text-[#773CCA]" />, title: "Desayuno", sub: "Restaurante Principal", badge: "Confirmado", badgeColor: "bg-[#11AFBF]" },
+                      { time: "10:00", icon: <Users className="w-5 h-5 text-[#773CCA]" />, title: "Conferencia Anual Q1", sub: "Salón Principal - 4 horas", badge: "Registrado", badgeColor: "bg-[#773CCA]" },
+                      { time: "15:00", icon: <Waves className="w-5 h-5 text-[#773CCA]" />, title: "Piscina", sub: "Terraza - Piso 8", badge: "Reservado", badgeColor: "bg-[#11AFBF]" },
+                    ].map((item) => (
+                      <div key={item.time} className="bg-white rounded-xl p-4 shadow-sm border border-gray-100">
                         <div className="flex gap-3">
-                          <div className="flex flex-col items-center">
-                            <span className="text-sm font-semibold text-[#773CCA]">10:00</span>
-                            <div className="w-px h-full bg-[#773CCA] mt-1" />
-                          </div>
+                          <span className="text-sm font-semibold text-[#773CCA] w-12 shrink-0">{item.time}</span>
                           <div className="flex-1">
-                            <div className="flex items-center gap-2 mb-1">
-                              <Users className="w-5 h-5 text-[#773CCA]" />
-                              <h4 className="font-semibold">Conferencia Anual Q1</h4>
-                            </div>
-                            <p className="text-sm text-muted-foreground">Salón Principal - 4 horas</p>
-                            <span className="inline-block mt-2 px-3 py-1 text-xs font-medium bg-[#773CCA] text-white rounded-full">
-                              Registrado
-                            </span>
+                            <div className="flex items-center gap-2 mb-1">{item.icon}<h4 className="font-semibold">{item.title}</h4></div>
+                            <p className="text-sm text-muted-foreground">{item.sub}</p>
+                            <span className={`inline-block mt-2 px-3 py-1 text-xs font-medium ${item.badgeColor} text-white rounded-full`}>{item.badge}</span>
                           </div>
                         </div>
                       </div>
-                    </div>
-
-                    {/* Desayuno */}
-                    <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-100">
-                      <div className="flex items-start justify-between">
-                        <div className="flex gap-3">
-                          <div className="flex flex-col items-center">
-                            <span className="text-sm font-semibold text-[#773CCA]">08:00</span>
-                            <div className="w-px h-full bg-[#773CCA] mt-1" />
-                          </div>
-                          <div className="flex-1">
-                            <div className="flex items-center gap-2 mb-1">
-                              <Coffee className="w-5 h-5 text-[#773CCA]" />
-                              <h4 className="font-semibold">Desayuno</h4>
-                            </div>
-                            <p className="text-sm text-muted-foreground">Restaurante Principal</p>
-                            <span className="inline-block mt-2 px-3 py-1 text-xs font-medium bg-[#11AFBF] text-white rounded-full">
-                              Confirmado
-                            </span>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Piscina */}
-                    <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-100">
-                      <div className="flex items-start justify-between">
-                        <div className="flex gap-3">
-                          <div className="flex flex-col items-center">
-                            <span className="text-sm font-semibold text-[#773CCA]">15:00</span>
-                            <div className="w-px h-full bg-[#773CCA] mt-1" />
-                          </div>
-                          <div className="flex-1">
-                            <div className="flex items-center gap-2 mb-1">
-                              <Waves className="w-5 h-5 text-[#773CCA]" />
-                              <h4 className="font-semibold">Piscina</h4>
-                            </div>
-                            <p className="text-sm text-muted-foreground">Terraza - Piso 8</p>
-                            <span className="inline-block mt-2 px-3 py-1 text-xs font-medium bg-[#11AFBF] text-white rounded-full">
-                              Reservado
-                            </span>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
+                    ))}
                   </div>
                 </div>
               </div>
@@ -1721,59 +749,19 @@ export function ClientExperienceView({
           </main>
         </main>
       )}
+
+      {/* NAV */}
       <nav className="fixed bottom-0 left-0 right-0 bg-card/95 backdrop-blur-lg border-t border-border shadow-lg">
         <div className="flex items-center justify-around px-2 py-2">
-          <button
-            onClick={() => setActiveTab("inicio")}
-            className={`flex flex-col items-center gap-1 px-4 py-2 rounded-xl transition-all ${activeTab === "inicio" ? "text-primary bg-primary/10" : "text-muted-foreground hover:text-foreground"
-              }`}
-          >
+          <button onClick={() => setActiveTab("inicio")} className={`flex flex-col items-center gap-1 px-4 py-2 rounded-xl transition-all ${activeTab === "inicio" ? "text-primary bg-primary/10" : "text-muted-foreground hover:text-foreground"}`}>
             <Home className="w-5 h-5" />
             <span className="text-xs font-medium">Inicio</span>
           </button>
-          {/* HIDDEN - Órdenes, Eventos, and Avisos menu items temporarily disabled
-          <button
-            onClick={() => setActiveTab("ordenes")}
-            className={`flex flex-col items-center gap-1 px-4 py-2 rounded-xl transition-all ${
-              activeTab === "ordenes" ? "text-primary bg-primary/10" : "text-muted-foreground hover:text-foreground"
-            }`}
-          >
-            <Utensils className="w-5 h-5" />
-            <span className="text-xs font-medium">Órdenes</span>
-          </button>
-          <button
-            onClick={() => setActiveTab("eventos")}
-            className={`flex flex-col items-center gap-1 px-4 py-2 rounded-xl transition-all ${
-              activeTab === "eventos" ? "text-primary bg-primary/10" : "text-muted-foreground hover:text-foreground"
-            }`}
-          >
-            <Calendar className="w-5 h-5" />
-            <span className="text-xs font-medium">Eventos</span>
-          </button>
-          <button
-            onClick={() => setActiveTab("avisos")}
-            className={`flex flex-col items-center gap-1 px-4 py-2 rounded-xl transition-all relative ${
-              activeTab === "avisos" ? "text-primary bg-primary/10" : "text-muted-foreground hover:text-foreground"
-            }`}
-          >
-            <Bell className="w-5 h-5" />
-            <span className="text-xs font-medium">Avisos</span>
-            <div className="absolute top-1 right-3 w-2 h-2 bg-destructive rounded-full animate-pulse" />
-          </button>
-          */}
-          <button
-            onClick={() => setActiveTab("perfil")}
-            className={`flex flex-col items-center gap-1 px-4 py-2 rounded-xl transition-all ${activeTab === "perfil" ? "text-primary bg-primary/10" : "text-muted-foreground hover:text-foreground"
-              }`}
-          >
+          <button onClick={() => setActiveTab("perfil")} className={`flex flex-col items-center gap-1 px-4 py-2 rounded-xl transition-all ${activeTab === "perfil" ? "text-primary bg-primary/10" : "text-muted-foreground hover:text-foreground"}`}>
             <User className="w-5 h-5" />
             <span className="text-xs font-medium">Perfil</span>
           </button>
-          <button
-            onClick={() => setActiveTab("calendario")}
-            className={`flex flex-col items-center gap-1 px-4 py-2 rounded-xl transition-all ${activeTab === "calendario" ? "text-primary bg-primary/10" : "text-muted-foreground hover:text-foreground"
-              }`}
-          >
+          <button onClick={() => setActiveTab("calendario")} className={`flex flex-col items-center gap-1 px-4 py-2 rounded-xl transition-all ${activeTab === "calendario" ? "text-primary bg-primary/10" : "text-muted-foreground hover:text-foreground"}`}>
             <CalendarDays className="w-5 h-5" />
             <span className="text-xs font-medium">Agenda</span>
           </button>
