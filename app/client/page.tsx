@@ -39,6 +39,7 @@ export function ClientExperienceView({
   onFacilitySelect,
   apiSlots = [],
   slotsLoading = false,
+  onCreateBooking
 }: {
   userData: ClientUserData
   clientType: ClientType
@@ -49,6 +50,11 @@ export function ClientExperienceView({
   onFacilitySelect?: (id: string | null) => void
   apiSlots?: FacilitySlot[]
   slotsLoading?: boolean
+  onCreateBooking?: (
+    facilityId: string,
+    slotId: string,
+    people: number
+  ) => Promise<void>
 }) {
   const router = useRouter()
   const dataSource = useSelector((state: RootState) => state.dataSource.dataSource)
@@ -59,6 +65,7 @@ export function ClientExperienceView({
   const [activeTab, setActiveTab] = useState<"inicio" | "ordenes" | "eventos" | "avisos" | "perfil" | "calendario">("inicio")
   const [localSelectedFacilityId, setLocalSelectedFacilityId] = useState<string | null>(null)
   const [activeFacilityDialog, setActiveFacilityDialog] = useState<string | null>(null)
+  const [selectedSlotId, setSelectedSlotId] = useState<string | null>(null)
   const [facilityPeople, setFacilityPeople] = useState(1)
   const [selectedTimes, setSelectedTimes] = useState<Record<string, string>>({})
   const [timeRemaining, setTimeRemaining] = useState({ hours: 0, minutes: 0, seconds: 0 })
@@ -328,9 +335,27 @@ export function ClientExperienceView({
                             <div className="flex items-center justify-between">
                               <span className="font-medium text-gray-700">Personas</span>
                               <div className="flex items-center gap-4">
-                                <button onClick={() => setFacilityPeople(Math.max(1, facilityPeople - 1))} className="w-10 h-10 rounded-full bg-white border border-gray-300 flex items-center justify-center font-bold text-lg hover:bg-gray-50">−</button>
-                                <span className="text-2xl font-bold w-8 text-center">{facilityPeople}</span>
-                                <button onClick={() => setFacilityPeople(facilityPeople + 1)} className="w-10 h-10 rounded-full bg-white border border-gray-300 flex items-center justify-center font-bold text-lg hover:bg-gray-50">+</button>
+                                <button
+                                  disabled={facilityPeople === 1}
+                                  onClick={() => setFacilityPeople(Math.max(1, facilityPeople - 1))}
+                                  className="w-10 h-10 rounded-full bg-white border border-gray-300 flex items-center justify-center font-bold text-lg hover:bg-gray-50 disabled:opacity-50"
+                                >
+                                  −
+                                </button>
+
+                                <span className="text-xl font-semibold w-6 text-center">
+                                  {facilityPeople}
+                                </span>
+
+                                <button
+                                  disabled={facilityPeople === userData.roomCapacity}
+                                  onClick={() =>
+                                    setFacilityPeople(Math.min(userData.roomCapacity, facilityPeople + 1))
+                                  }
+                                  className="w-10 h-10 rounded-full bg-white border border-gray-300 flex items-center justify-center font-bold text-lg hover:bg-gray-50 disabled:opacity-50"
+                                >
+                                  +
+                                </button>
                               </div>
                             </div>
                           </div>
@@ -339,6 +364,7 @@ export function ClientExperienceView({
                           ) : (
                             <div className="space-y-2 py-2">
                               {getSlotsForFacility(facility.id).map((slot) => {
+                                console.log(slot)
                                 const parseUTCTime = (iso: string) => {
                                   const match = iso.match(/T(\d{2}):(\d{2})/)
                                   return match ? `${match[1]}:${match[2]}` : "??:??"
@@ -354,6 +380,7 @@ export function ClientExperienceView({
                                     onClick={() => {
                                       setSelectedTimes((prev) => ({ ...prev, [facility.id]: timeLabel }))
                                       setActiveFacilityDialog(null)
+                                      setSelectedSlotId(slot.id)
                                     }}
                                   >
                                     <div className="flex items-center gap-3">
@@ -365,8 +392,8 @@ export function ClientExperienceView({
                                         <Users className={`w-3.5 h-3.5 ${color}`} />
                                         <span className={`text-xs font-semibold ${color}`}>{slot.currentOccupancy}/{slot.capacity}</span>
                                       </div>
-                                      <span className={`text-xs px-2 py-1 rounded-full font-medium ${slot.status === "available" ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700"}`}>
-                                        {slot.status === "available" ? "Disponible" : "Ocupado"}
+                                      <span className={`text-xs px-2 py-1 rounded-full font-medium ${bgColor} ${color}`}>
+                                        {percent}%
                                       </span>
                                     </div>
                                   </div>
@@ -377,7 +404,22 @@ export function ClientExperienceView({
                               )}
                             </div>
                           )}
-                          <Button className="w-full mt-2" size="lg" onClick={() => setActiveFacilityDialog(null)}>
+                          <Button
+                            className="w-full mt-2"
+                            size="lg"
+                            disabled={!selectedSlotId}
+                            onClick={async () => {
+                              if (!selectedSlotId || !onCreateBooking) return
+
+                              await onCreateBooking(
+                                facility.id,
+                                selectedSlotId,
+                                facilityPeople
+                              )
+
+                              setActiveFacilityDialog(null)
+                            }}
+                          >
                             Confirmar Reserva
                           </Button>
                         </DialogContent>

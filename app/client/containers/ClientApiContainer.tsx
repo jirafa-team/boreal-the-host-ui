@@ -11,12 +11,14 @@ import { setCurrentOrganization } from "@/features/organization/slices/organizat
 import { ClientExperienceView } from "../page"
 import type { ClientType, ClientUserData, FacilitySlot } from "../types"
 import { useGetFacilitiesQuery, useGetFacilitySlotsQuery } from "@/app/admin/facilities/slice/facilitySlice"
+import { useCreateReservationFacilityBookingMutation } from "@/features/reservation-facility-booking/slices/reservationFacilityBookingSlice"
 
 interface ReservationWithDetails {
   id?: string
   checkIn?: string
   checkOut?: string
   status?: string
+  capaxity?: number;
   room?: { id?: string; number?: string; name?: string; type?: string }
   user?: { firstName?: string; lastName?: string; email?: string; phone?: string }
 }
@@ -55,6 +57,7 @@ export function ClientApiContainer() {
   const { t } = useLanguage()
 
   const [selectedFacilityId, setSelectedFacilityId] = useState<string | null>(null)
+  const [createReservationFacilityBooking] = useCreateReservationFacilityBookingMutation();
 
   const dataSource = useSelector((state: RootState) => state.dataSource.dataSource)
   const organizationId = useSelector((state: RootState) => {
@@ -126,6 +129,7 @@ export function ClientApiContainer() {
           email: authUser?.email ?? "",
           room: "",
           roomType: "",
+          roomCapacity: 0,
           phone: "",
           checkIn: "",
           checkOut: "",
@@ -154,6 +158,7 @@ export function ClientApiContainer() {
       email: authUser?.email ?? targetReservation.user?.email ?? "",
       room: targetReservation.room?.number ?? targetReservation.room?.name ?? "",
       roomType: targetReservation.room?.type ?? "Habitación",
+      roomCapacity: targetReservation.room.capacity,
       phone: targetReservation.user?.phone ?? "",
       checkIn: formatDisplayDate(checkInStr),
       checkOut: formatDisplayDate(checkOutStr),
@@ -163,6 +168,21 @@ export function ClientApiContainer() {
 
     return { userData, clientType }
   }, [targetReservation, userName, userInitials, authUser])
+
+  const handleCreateBooking = async (
+    facilityId: string,
+    slotId: string,
+    people: number
+  ) => {
+    if (!reservationId) return
+
+    await createReservationFacilityBooking({
+      reservationId,
+      facilityId,
+      amenityShiftSlotId: slotId,
+      numberOfPeople: people,
+    }).unwrap()
+  }
 
   return (
     <ClientExperienceView
@@ -175,6 +195,7 @@ export function ClientApiContainer() {
       onFacilitySelect={setSelectedFacilityId}
       apiSlots={apiSlots}
       slotsLoading={slotsLoading}
+      onCreateBooking={handleCreateBooking}
     />
   )
 }

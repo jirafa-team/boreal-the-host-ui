@@ -7,6 +7,7 @@ export interface ClientUserData {
     email: string
     room: string
     roomType: string
+    roomCapacity: number;
     phone: string
     checkIn: string
     checkOut: string
