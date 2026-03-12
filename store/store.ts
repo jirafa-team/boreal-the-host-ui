@@ -15,6 +15,7 @@ import taxonomyDepartmentReducer, { taxonomyDepartmentApi } from '@/features/tax
 import taxonomyEventCategoryReducer, { taxonomyEventCategoryApi } from '@/features/taxonomy-event-category/slices/taxonomyEventCategorySlice';
 import taxonomyFacilityTypeReducer, { taxonomyFacilityTypeApi } from '@/features/taxonomy-facility-type/slices/taxonomyFacilityTypeSlice';
 import taxonomyRoomTypeReducer, { taxonomyRoomTypeApi } from '@/features/taxonomy-room-type/slices/taxonomyRoomTypeSlice';
+import { taxonomyStaffTypeApi } from '@/features/taxonomy-staff-type copy/slices/taxonomyStaffTypeSlice';
 
 export const store = configureStore({
   reducer: {
@@ -49,6 +50,7 @@ export const store = configureStore({
     [taxonomyEventCategoryApi.reducerPath]: taxonomyEventCategoryApi.reducer,
     [taxonomyFacilityTypeApi.reducerPath]: taxonomyFacilityTypeApi.reducer,
     [taxonomyRoomTypeApi.reducerPath]: taxonomyRoomTypeApi.reducer,
+    [taxonomyStaffTypeApi.reducerPath]: taxonomyStaffTypeApi.reducer
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware().concat(
@@ -67,6 +69,7 @@ export const store = configureStore({
       taxonomyEventCategoryApi.middleware,
       taxonomyFacilityTypeApi.middleware,
       taxonomyRoomTypeApi.middleware,
+      taxonomyStaffTypeApi.middleware,
     ),
 });
 

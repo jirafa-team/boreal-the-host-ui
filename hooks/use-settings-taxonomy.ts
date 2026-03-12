@@ -188,7 +188,6 @@ export function useSettingsApi() {
     }
 
     return {
-
         departments,
         amenities,
         roomTypes,
