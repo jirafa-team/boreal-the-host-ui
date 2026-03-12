@@ -173,22 +173,22 @@ export interface SettingsViewProps {
   handleSaveRecommendationEdit: () => void
   handleCancelRecommendationEdit: () => void
   setDeletingRecommendationId: (id: number | string | null) => void
-  filteredClientCategories: SettingsItem[]
-  clientCategories: SettingsItem[]
-  isCreatingClientCategory: boolean
-  setIsCreatingClientCategory: (v: boolean) => void
-  newClientCategoryName: string
-  setNewClientCategoryName: (v: string) => void
-  editingClientCategoryId: number | string | null
-  editingClientCategoryName: string
-  setEditingClientCategoryName: (v: string) => void
-  deletingClientCategoryId: number | string | null
-  toggleClientCategory: (id: number | string) => void
-  deleteClientCategory: (id: number | string) => void
-  handleDeleteClientCategoryClick: (id: number | string) => void
-  handleSaveNewClientCategory: () => void
-  handleEditClientCategoryStart: (id: number | string, name: string) => void
-  handleSaveClientCategoryEdit: () => void
-  handleCancelClientCategoryEdit: () => void
-  setDeletingClientCategoryId: (id: number | string | null) => void
+  filteredClientCategories?: SettingsItem[]
+  clientCategories?: SettingsItem[]
+  isCreatingClientCategory?: boolean
+  setIsCreatingClientCategory?: (v: boolean) => void
+  newClientCategoryName?: string
+  setNewClientCategoryName?: (v: string) => void
+  editingClientCategoryId?: number | string | null
+  editingClientCategoryName?: string
+  setEditingClientCategoryName?: (v: string) => void
+  deletingClientCategoryId?: number | string | null
+  toggleClientCategory?: (id: number | string) => void
+  deleteClientCategory?: (id: number | string) => void
+  handleDeleteClientCategoryClick?: (id: number | string) => void
+  handleSaveNewClientCategory?: () => void
+  handleEditClientCategoryStart?: (id: number | string, name: string) => void
+  handleSaveClientCategoryEdit?: () => void
+  handleCancelClientCategoryEdit?: () => void
+  setDeletingClientCategoryId?: (id: number | string | null) => void
 }

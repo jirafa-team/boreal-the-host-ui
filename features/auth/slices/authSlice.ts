@@ -38,7 +38,10 @@ export const authApi = createApi({
   baseQuery: authBaseQuery,
   tagTypes: ['UserContexts'],
   endpoints: (build) => ({
-    login: build.mutation<{ token: string }, { email: string; password: string }>({
+    login: build.mutation<
+      { token: string } | { requiresEmailValidation: true; message: string },
+      { email: string; password: string }
+    >({
       query: (body) => ({
         url: `/api${ENDPOINTS.AUTH.LOGIN}`,
         method: 'POST',

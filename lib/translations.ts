@@ -26,6 +26,7 @@ export const translations = {
       contactUs: "Contacta a nuestro equipo",
       continueWithGoogle: "Continuar con Google",
       backToLogin: "Volver al Login",
+      emailValidationSent: "Te hemos enviado un enlace a tu correo para activar tu cuenta. Revisa tu bandeja de entrada (y la carpeta de spam).",
     },
     register: {
       register: "Registrarse",
@@ -66,6 +67,9 @@ export const translations = {
       checkOut: "Check-out",
       perNight: "por noche",
       completeCheckin: "Completar Check-in",
+      completeCheckInData: "Completar datos para check-in",
+      accessReservation: "Acceder a mi reserva",
+      waitingTripStart: "Esperando inicio de viaje! ⏳",
       noStays: "No tienes estadías registradas",
     },
     client: {
@@ -591,6 +595,7 @@ export const translations = {
       contactUs: "Contact our team",
       continueWithGoogle: "Continue with Google",
       backToLogin: "Back to Login",
+      emailValidationSent: "We have sent you a link to your email to activate your account. Check your inbox (and spam folder).",
     },
     register: {
       register: "Sign Up",
@@ -631,6 +636,9 @@ export const translations = {
       checkOut: "Check-out",
       perNight: "per night",
       completeCheckin: "Complete Check-in",
+      completeCheckInData: "Complete check-in data",
+      accessReservation: "Access my reservation",
+      waitingTripStart: "Waiting for trip start! ⏳",
       noStays: "You have no stays registered",
     },
     client: {
@@ -1091,6 +1099,7 @@ export const translations = {
       contactUs: "Contacte nosso time",
       continueWithGoogle: "Continuar com Google",
       backToLogin: "Voltar ao Login",
+      emailValidationSent: "Enviamos um link para seu e-mail para ativar sua conta. Verifique sua caixa de entrada (e a pasta de spam).",
     },
     register: {
       register: "Registrar-se",
@@ -1131,6 +1140,9 @@ export const translations = {
       checkOut: "Check-out",
       perNight: "por noite",
       completeCheckin: "Completar Check-in",
+      completeCheckInData: "Completar dados para check-in",
+      accessReservation: "Acessar minha reserva",
+      waitingTripStart: "Aguardando início da viagem! ⏳",
       noStays: "Você não tem estadias registradas",
     },
     client: {

@@ -1,59 +1,30 @@
 'use client'
 
 import { useState } from 'react'
-import { useSelector } from 'react-redux'
-import type { RootState } from '@/store/store'
 import { SettingsView } from '../components/SettingsView'
-import type { SettingsItem } from '../components/types'
-import { useGetDepartmentsQuery, useCreateDepartmentMutation, useUpdateDepartmentMutation, useDeleteDepartmentMutation } from '@/features/taxonomy-department/slices/taxonomyDepartmentSlice'
-import { useGetFacilityTypesQuery, useCreateFacilityTypeMutation, useUpdateFacilityTypeMutation, useDeleteFacilityTypeMutation } from '@/features/taxonomy-facility-type/slices/taxonomyFacilityTypeSlice'
-import { useGetRoomTypesQuery, useCreateRoomTypeMutation, useUpdateRoomTypeMutation, useDeleteRoomTypeMutation } from '@/features/taxonomy-room-type/slices/taxonomyRoomTypeSlice'
-import { useGetEventCategoriesQuery, useCreateEventCategoryMutation, useUpdateEventCategoryMutation, useDeleteEventCategoryMutation } from '@/features/taxonomy-event-category/slices/taxonomyEventCategorySlice'
-
-function mapTaxonomyToSettingsItem(item: { id: string; name: string; active?: boolean }): SettingsItem {
-  const active = item.active !== false
-  return {
-    id: item.id,
-    name: item.name,
-    description: '',
-    status: active ? 'Activo' : 'Inactivo',
-    active,
-  }
-}
-
-const EMPTY_ITEMS: SettingsItem[] = []
+import { useSettingsApi } from '@/hooks/use-settings-taxonomy'
 
 export function SettingsApiContainer() {
-  const dataSource = useSelector((state: RootState) => state.dataSource.dataSource)
-  const skip = dataSource !== 'api'
 
-  const { data: departmentsData } = useGetDepartmentsQuery(undefined, { skip })
-  const { data: facilityTypesData } = useGetFacilityTypesQuery(undefined, { skip })
-  const { data: roomTypesData } = useGetRoomTypesQuery(undefined, { skip })
-  const { data: eventCategoriesData } = useGetEventCategoriesQuery(undefined, { skip })
-
-  const [createDepartment] = useCreateDepartmentMutation()
-  const [updateDepartment] = useUpdateDepartmentMutation()
-  const [deleteDepartmentApi] = useDeleteDepartmentMutation()
-  const [createFacilityType] = useCreateFacilityTypeMutation()
-  const [updateFacilityType] = useUpdateFacilityTypeMutation()
-  const [deleteFacilityType] = useDeleteFacilityTypeMutation()
-  const [createRoomType] = useCreateRoomTypeMutation()
-  const [updateRoomType] = useUpdateRoomTypeMutation()
-  const [deleteRoomTypeApi] = useDeleteRoomTypeMutation()
-  const [createEventCategory] = useCreateEventCategoryMutation()
-  const [updateEventCategory] = useUpdateEventCategoryMutation()
-  const [deleteEventCategoryApi] = useDeleteEventCategoryMutation()
-
-  const departments: SettingsItem[] = departmentsData?.data ? departmentsData.data.map(mapTaxonomyToSettingsItem) : EMPTY_ITEMS
-  const amenities: SettingsItem[] = facilityTypesData?.data ? facilityTypesData.data.map(mapTaxonomyToSettingsItem) : EMPTY_ITEMS
-  const roomTypes: SettingsItem[] = roomTypesData?.data ? roomTypesData.data.map(mapTaxonomyToSettingsItem) : EMPTY_ITEMS
-  const eventTypes: SettingsItem[] = eventCategoriesData?.data ? eventCategoriesData.data.map(mapTaxonomyToSettingsItem) : EMPTY_ITEMS
-  const floors = EMPTY_ITEMS
-  const shifts = EMPTY_ITEMS
-  const eventSpaces = EMPTY_ITEMS
-  const recommendationCategories = EMPTY_ITEMS
-  const clientCategories = EMPTY_ITEMS
+  const {
+    departments,
+    amenities,
+    roomTypes,
+    eventTypes,
+    filterItems,
+    createDepartmentHandler,
+    updateDepartmentHandler,
+    deleteDepartmentHandler,
+    createAmenityHandler,
+    updateAmenityHandler,
+    deleteAmenityHandler,
+    createRoomTypeHandler,
+    updateRoomTypeHandler,
+    deleteRoomTypeHandler,
+    createEventTypeHandler,
+    updateEventTypeHandler,
+    deleteEventTypeHandler,
+  } = useSettingsApi()
 
   const [selectedCard, setSelectedCard] = useState('Departamentos')
   const [searchTerm, setSearchTerm] = useState('')
@@ -61,217 +32,328 @@ export function SettingsApiContainer() {
   const [habitacionesTab, setHabitacionesTab] = useState<'tipos' | 'pisos'>('tipos')
   const [eventosTab, setEventosTab] = useState<'tipos' | 'espacios'>('tipos')
 
+  // Departments UI state
   const [isCreating, setIsCreating] = useState(false)
   const [newDeptName, setNewDeptName] = useState('')
   const [editingId, setEditingId] = useState<number | string | null>(null)
   const [editingName, setEditingName] = useState('')
   const [deletingId, setDeletingId] = useState<number | string | null>(null)
 
+  // Amenities UI state
   const [isCreatingAmenity, setIsCreatingAmenity] = useState(false)
   const [newAmenityName, setNewAmenityName] = useState('')
   const [editingAmenityId, setEditingAmenityId] = useState<number | string | null>(null)
   const [editingAmenityName, setEditingAmenityName] = useState('')
   const [deletingAmenityId, setDeletingAmenityId] = useState<number | string | null>(null)
 
+  // Room types UI state
   const [isCreatingRoom, setIsCreatingRoom] = useState(false)
   const [newRoomName, setNewRoomName] = useState('')
   const [editingRoomId, setEditingRoomId] = useState<number | string | null>(null)
   const [editingRoomName, setEditingRoomName] = useState('')
   const [deletingRoomId, setDeletingRoomId] = useState<number | string | null>(null)
 
-  const [isCreatingFloor, setIsCreatingFloor] = useState(false)
-  const [newFloorName, setNewFloorName] = useState('')
-  const [editingFloorId, setEditingFloorId] = useState<number | string | null>(null)
-  const [editingFloorName, setEditingFloorName] = useState('')
-  const [deletingFloorId, setDeletingFloorId] = useState<number | string | null>(null)
-
-  const [isCreatingShift, setIsCreatingShift] = useState(false)
-  const [newShiftName, setNewShiftName] = useState('')
-  const [editingShiftId, setEditingShiftId] = useState<number | string | null>(null)
-  const [editingShiftName, setEditingShiftName] = useState('')
-  const [deletingShiftId, setDeletingShiftId] = useState<number | string | null>(null)
-
+  // Event types UI state
   const [isCreatingEventType, setIsCreatingEventType] = useState(false)
   const [newEventTypeName, setNewEventTypeName] = useState('')
   const [editingEventTypeId, setEditingEventTypeId] = useState<number | string | null>(null)
   const [editingEventTypeName, setEditingEventTypeName] = useState('')
   const [deletingEventTypeId, setDeletingEventTypeId] = useState<number | string | null>(null)
 
+  // Local-only state (no API yet)
+  const [floors, setFloors] = useState<{ id: number; name: string; description: string; status: string; active: boolean }[]>([])
+  const [isCreatingFloor, setIsCreatingFloor] = useState(false)
+  const [newFloorName, setNewFloorName] = useState('')
+  const [editingFloorId, setEditingFloorId] = useState<number | string | null>(null)
+  const [editingFloorName, setEditingFloorName] = useState('')
+  const [deletingFloorId, setDeletingFloorId] = useState<number | string | null>(null)
+
+  const [shifts, setShifts] = useState<{ id: number; name: string; description: string; status: string; active: boolean }[]>([])
+  const [isCreatingShift, setIsCreatingShift] = useState(false)
+  const [newShiftName, setNewShiftName] = useState('')
+  const [editingShiftId, setEditingShiftId] = useState<number | string | null>(null)
+  const [editingShiftName, setEditingShiftName] = useState('')
+  const [deletingShiftId, setDeletingShiftId] = useState<number | string | null>(null)
+
+  const [eventSpaces, setEventSpaces] = useState<{ id: number; name: string; description: string; status: string; active: boolean }[]>([])
   const [isCreatingEventSpace, setIsCreatingEventSpace] = useState(false)
   const [newEventSpaceName, setNewEventSpaceName] = useState('')
   const [editingEventSpaceId, setEditingEventSpaceId] = useState<number | string | null>(null)
   const [editingEventSpaceName, setEditingEventSpaceName] = useState('')
   const [deletingEventSpaceId, setDeletingEventSpaceId] = useState<number | string | null>(null)
 
+  const [recommendationCategories, setRecommendationCategories] = useState<{ id: number; name: string; description: string; status: string; active: boolean }[]>([])
   const [isCreatingRecommendation, setIsCreatingRecommendation] = useState(false)
   const [newRecommendationName, setNewRecommendationName] = useState('')
   const [editingRecommendationId, setEditingRecommendationId] = useState<number | string | null>(null)
   const [editingRecommendationName, setEditingRecommendationName] = useState('')
   const [deletingRecommendationId, setDeletingRecommendationId] = useState<number | string | null>(null)
 
-  const [isCreatingClientCategory, setIsCreatingClientCategory] = useState(false)
-  const [newClientCategoryName, setNewClientCategoryName] = useState('')
-  const [editingClientCategoryId, setEditingClientCategoryId] = useState<number | string | null>(null)
-  const [editingClientCategoryName, setEditingClientCategoryName] = useState('')
-  const [deletingClientCategoryId, setDeletingClientCategoryId] = useState<number | string | null>(null)
+  // Filtered lists
+  const filteredDepartments = filterItems(departments, searchTerm, searchStatus)
+  const filteredAmenities = filterItems(amenities, searchTerm, searchStatus)
+  const filteredRoomTypes = filterItems(roomTypes, searchTerm, searchStatus)
+  const filteredEventTypes = filterItems(eventTypes, searchTerm, searchStatus)
+  const filteredFloors = filterItems(floors, searchTerm, searchStatus)
+  const filteredShifts = filterItems(shifts, searchTerm, searchStatus)
+  const filteredEventSpaces = filterItems(eventSpaces, searchTerm, searchStatus)
+  const filteredRecommendations = filterItems(recommendationCategories, searchTerm, searchStatus)
 
-  const filterItems = (items: SettingsItem[]) =>
-    items.filter((item) => {
-      const matchesSearch = item.name.toLowerCase().includes(searchTerm.toLowerCase())
-      const matchesStatus = searchStatus === 'all' || (searchStatus === 'activo' ? item.active : !item.active)
-      return matchesSearch && matchesStatus
-    })
-
-  const filteredDepartments = filterItems(departments)
-  const filteredAmenities = filterItems(amenities)
-  const filteredRoomTypes = filterItems(roomTypes)
-  const filteredFloors = filterItems(floors)
-  const filteredShifts = filterItems(shifts)
-  const filteredEventTypes = filterItems(eventTypes)
-  const filteredEventSpaces = filterItems(eventSpaces)
-  const filteredRecommendations = filterItems(recommendationCategories)
-  const filteredClientCategories = filterItems(clientCategories)
-
-  const noop = () => {}
-  const noopId = (_id: number | string) => {}
-  const noopIdName = (_id: number | string, _name: string) => {}
-
+  // Department handlers
   const handleSaveNewDepartment = async () => {
-    if (!newDeptName.trim()) return
-    try {
-      await createDepartment({ name: newDeptName.trim() }).unwrap()
+    if (newDeptName.trim()) {
+      await createDepartmentHandler(newDeptName.trim())
       setNewDeptName('')
       setIsCreating(false)
-    } catch {
-      // Error handled by RTK Query
     }
   }
+
+  const handleEditStart = (id: number | string, name: string) => {
+    setEditingId(id)
+    setEditingName(name)
+  }
+
   const handleSaveEdit = async () => {
-    if (!editingName.trim() || editingId == null) return
-    try {
-      await updateDepartment({ id: String(editingId), payload: { name: editingName.trim() } }).unwrap()
+    if (editingName.trim() && editingId !== null) {
+      await updateDepartmentHandler(editingId as string, { name: editingName })
       setEditingId(null)
       setEditingName('')
-    } catch {
-      // Error handled by RTK Query
-    }
-  }
-  const deleteDepartment = async (id: number | string) => {
-    try {
-      await deleteDepartmentApi(String(id)).unwrap()
-      setDeletingId(null)
-    } catch {
-      // Error handled by RTK Query
     }
   }
 
+  const handleCancelEdit = () => {
+    setEditingId(null)
+    setEditingName('')
+  }
+
+  const handleDeleteClick = (id: number | string) => {
+    setDeletingId(id)
+  }
+
+  const deleteDepartment = async (id: number | string) => {
+    await deleteDepartmentHandler(id as string)
+    setDeletingId(null)
+  }
+
+  const toggleDepartment = async (id: number | string) => {
+    const dept = departments.find(d => d.id === id)
+    if (dept) {
+      await updateDepartmentHandler(id as string, { active: !dept.active })
+    }
+  }
+
+  // Amenity handlers
   const handleSaveNewAmenity = async () => {
-    if (!newAmenityName.trim()) return
-    try {
-      await createFacilityType({ name: newAmenityName.trim() }).unwrap()
+    if (newAmenityName.trim()) {
+      await createAmenityHandler(newAmenityName.trim())
       setNewAmenityName('')
       setIsCreatingAmenity(false)
-    } catch {
-      // Error handled by RTK Query
     }
   }
+
+  const handleEditAmenityStart = (id: number | string, name: string) => {
+    setEditingAmenityId(id)
+    setEditingAmenityName(name)
+  }
+
   const handleSaveAmenityEdit = async () => {
-    if (!editingAmenityName.trim() || editingAmenityId == null) return
-    try {
-      await updateFacilityType({ id: String(editingAmenityId), payload: { name: editingAmenityName.trim() } }).unwrap()
+    if (editingAmenityName.trim() && editingAmenityId !== null) {
+      await updateAmenityHandler(editingAmenityId as string, { name: editingAmenityName })
       setEditingAmenityId(null)
       setEditingAmenityName('')
-    } catch {
-      // Error handled by RTK Query
-    }
-  }
-  const deleteAmenity = async (id: number | string) => {
-    try {
-      await deleteFacilityType(String(id)).unwrap()
-      setDeletingAmenityId(null)
-    } catch {
-      // Error handled by RTK Query
     }
   }
 
+  const handleCancelAmenityEdit = () => {
+    setEditingAmenityId(null)
+    setEditingAmenityName('')
+  }
+
+  const handleDeleteAmenityClick = (id: number | string) => {
+    setDeletingAmenityId(id)
+  }
+
+  const deleteAmenity = async (id: number | string) => {
+    await deleteAmenityHandler(id as string)
+    setDeletingAmenityId(null)
+  }
+
+  const toggleAmenity = async (id: number | string) => {
+    const amenity = amenities.find(a => a.id === id)
+    if (amenity) {
+      await updateAmenityHandler(id as string, { active: !amenity.active })
+    }
+  }
+
+  // Room type handlers
   const handleSaveNewRoomType = async () => {
-    if (!newRoomName.trim()) return
-    try {
-      await createRoomType({ name: newRoomName.trim() }).unwrap()
+    if (newRoomName.trim()) {
+      await createRoomTypeHandler(newRoomName.trim())
       setNewRoomName('')
       setIsCreatingRoom(false)
-    } catch {
-      // Error handled by RTK Query
     }
   }
+
+  const handleEditRoomStart = (id: number | string, name: string) => {
+    setEditingRoomId(id)
+    setEditingRoomName(name)
+  }
+
   const handleSaveRoomEdit = async () => {
-    if (!editingRoomName.trim() || editingRoomId == null) return
-    try {
-      await updateRoomType({ id: String(editingRoomId), payload: { name: editingRoomName.trim() } }).unwrap()
+    if (editingRoomName.trim() && editingRoomId !== null) {
+      await updateRoomTypeHandler(editingRoomId as string, { name: editingRoomName })
       setEditingRoomId(null)
       setEditingRoomName('')
-    } catch {
-      // Error handled by RTK Query
-    }
-  }
-  const deleteRoomType = async (id: number | string) => {
-    try {
-      await deleteRoomTypeApi(String(id)).unwrap()
-      setDeletingRoomId(null)
-    } catch {
-      // Error handled by RTK Query
     }
   }
 
+  const handleCancelRoomEdit = () => {
+    setEditingRoomId(null)
+    setEditingRoomName('')
+  }
+
+  const handleDeleteRoomClick = (id: number | string) => {
+    setDeletingRoomId(id)
+  }
+
+  const deleteRoomType = async (id: number | string) => {
+    await deleteRoomTypeHandler(id as string)
+    setDeletingRoomId(null)
+  }
+
+  const toggleRoomType = async (id: number | string) => {
+    const room = roomTypes.find(r => r.id === id)
+    if (room) {
+      await updateRoomTypeHandler(id as string, { active: !room.active })
+    }
+  }
+
+  // Event type handlers
   const handleSaveNewEventType = async () => {
-    if (!newEventTypeName.trim()) return
-    try {
-      await createEventCategory({ name: newEventTypeName.trim() }).unwrap()
+    if (newEventTypeName.trim()) {
+      await createEventTypeHandler(newEventTypeName.trim())
       setNewEventTypeName('')
       setIsCreatingEventType(false)
-    } catch {
-      // Error handled by RTK Query
-    }
-  }
-  const handleSaveEventTypeEdit = async () => {
-    if (!editingEventTypeName.trim() || editingEventTypeId == null) return
-    try {
-      await updateEventCategory({ id: String(editingEventTypeId), payload: { name: editingEventTypeName.trim() } }).unwrap()
-      setEditingEventTypeId(null)
-      setEditingEventTypeName('')
-    } catch {
-      // Error handled by RTK Query
-    }
-  }
-  const deleteEventType = async (id: number | string) => {
-    try {
-      await deleteEventCategoryApi(String(id)).unwrap()
-      setDeletingEventTypeId(null)
-    } catch {
-      // Error handled by RTK Query
     }
   }
 
-  const toggleDepartment = (id: number | string) => {
-    const item = departments.find((d) => d.id === id || d.id === String(id))
-    if (!item) return
-    updateDepartment({ id: String(id), payload: { active: !item.active } }).catch(() => {})
+  const handleEditEventTypeStart = (id: number | string, name: string) => {
+    setEditingEventTypeId(id)
+    setEditingEventTypeName(name)
   }
-  const toggleAmenity = (id: number | string) => {
-    const item = amenities.find((a) => a.id === id || a.id === String(id))
-    if (!item) return
-    updateFacilityType({ id: String(id), payload: { active: !item.active } }).catch(() => {})
+
+  const handleSaveEventTypeEdit = async () => {
+    if (editingEventTypeName.trim() && editingEventTypeId !== null) {
+      await updateEventTypeHandler(editingEventTypeId as string, { name: editingEventTypeName })
+      setEditingEventTypeId(null)
+      setEditingEventTypeName('')
+    }
   }
-  const toggleRoomType = (id: number | string) => {
-    const item = roomTypes.find((r) => r.id === id || r.id === String(id))
-    if (!item) return
-    updateRoomType({ id: String(id), payload: { active: !item.active } }).catch(() => {})
+
+  const handleCancelEventTypeEdit = () => {
+    setEditingEventTypeId(null)
+    setEditingEventTypeName('')
   }
-  const toggleEventType = (id: number | string) => {
-    const item = eventTypes.find((e) => e.id === id || e.id === String(id))
-    if (!item) return
-    updateEventCategory({ id: String(id), payload: { active: !item.active } }).catch(() => {})
+
+  const handleDeleteEventTypeClick = (id: number | string) => {
+    setDeletingEventTypeId(id)
   }
+
+  const deleteEventType = async (id: number | string) => {
+    await deleteEventTypeHandler(id as string)
+    setDeletingEventTypeId(null)
+  }
+
+  const toggleEventType = async (id: number | string) => {
+    const eventType = eventTypes.find(e => e.id === id)
+    if (eventType) {
+      await updateEventTypeHandler(id as string, { active: !eventType.active })
+    }
+  }
+
+  // Floor handlers (local only)
+  const handleSaveNewFloor = () => {
+    if (newFloorName.trim()) {
+      const newId = Math.max(...floors.map(f => f.id), 0) + 1
+      setFloors([{ id: newId, name: newFloorName, description: '', status: 'Activo', active: true }, ...floors])
+      setNewFloorName('')
+      setIsCreatingFloor(false)
+    }
+  }
+  const handleEditFloorStart = (id: number | string, name: string) => { setEditingFloorId(id); setEditingFloorName(name) }
+  const handleSaveFloorEdit = () => {
+    if (editingFloorName.trim() && editingFloorId !== null) {
+      setFloors(floors.map(f => f.id === editingFloorId ? { ...f, name: editingFloorName } : f))
+      setEditingFloorId(null); setEditingFloorName('')
+    }
+  }
+  const handleCancelFloorEdit = () => { setEditingFloorId(null); setEditingFloorName('') }
+  const handleDeleteFloorClick = (id: number | string) => { setDeletingFloorId(id) }
+  const deleteFloor = (id: number | string) => { setFloors(floors.filter(f => f.id !== id)); setDeletingFloorId(null) }
+  const toggleFloor = (id: number | string) => { setFloors(floors.map(f => f.id === id ? { ...f, active: !f.active, status: !f.active ? 'Activo' : 'Inactivo' } : f)) }
+
+  // Shift handlers (local only)
+  const handleSaveNewShift = () => {
+    if (newShiftName.trim()) {
+      const newId = Math.max(...shifts.map(s => s.id), 0) + 1
+      setShifts([{ id: newId, name: newShiftName, description: '', status: 'Activo', active: true }, ...shifts])
+      setNewShiftName('')
+      setIsCreatingShift(false)
+    }
+  }
+  const handleEditShiftStart = (id: number | string, name: string) => { setEditingShiftId(id); setEditingShiftName(name) }
+  const handleSaveShiftEdit = () => {
+    if (editingShiftName.trim() && editingShiftId !== null) {
+      setShifts(shifts.map(s => s.id === editingShiftId ? { ...s, name: editingShiftName } : s))
+      setEditingShiftId(null); setEditingShiftName('')
+    }
+  }
+  const handleCancelShiftEdit = () => { setEditingShiftId(null); setEditingShiftName('') }
+  const handleDeleteShiftClick = (id: number | string) => { setDeletingShiftId(id) }
+  const deleteShift = (id: number | string) => { setShifts(shifts.filter(s => s.id !== id)); setDeletingShiftId(null) }
+  const toggleShift = (id: number | string) => { setShifts(shifts.map(s => s.id === id ? { ...s, active: !s.active, status: !s.active ? 'Activo' : 'Inactivo' } : s)) }
+
+  // Event space handlers (local only)
+  const handleSaveNewEventSpace = () => {
+    if (newEventSpaceName.trim()) {
+      const newId = Math.max(...eventSpaces.map(e => e.id), 0) + 1
+      setEventSpaces([{ id: newId, name: newEventSpaceName, description: '', status: 'Activo', active: true }, ...eventSpaces])
+      setNewEventSpaceName('')
+      setIsCreatingEventSpace(false)
+    }
+  }
+  const handleEditEventSpaceStart = (id: number | string, name: string) => { setEditingEventSpaceId(id); setEditingEventSpaceName(name) }
+  const handleSaveEventSpaceEdit = () => {
+    if (editingEventSpaceName.trim() && editingEventSpaceId !== null) {
+      setEventSpaces(eventSpaces.map(e => e.id === editingEventSpaceId ? { ...e, name: editingEventSpaceName } : e))
+      setEditingEventSpaceId(null); setEditingEventSpaceName('')
+    }
+  }
+  const handleCancelEventSpaceEdit = () => { setEditingEventSpaceId(null); setEditingEventSpaceName('') }
+  const handleDeleteEventSpaceClick = (id: number | string) => { setDeletingEventSpaceId(id) }
+  const deleteEventSpace = (id: number | string) => { setEventSpaces(eventSpaces.filter(e => e.id !== id)); setDeletingEventSpaceId(null) }
+  const toggleEventSpace = (id: number | string) => { setEventSpaces(eventSpaces.map(e => e.id === id ? { ...e, active: !e.active, status: !e.active ? 'Activo' : 'Inactivo' } : e)) }
+
+  // Recommendation handlers (local only)
+  const handleSaveNewRecommendation = () => {
+    if (newRecommendationName.trim()) {
+      const newId = Math.max(...recommendationCategories.map(r => r.id), 0) + 1
+      setRecommendationCategories([{ id: newId, name: newRecommendationName, description: '', status: 'Activo', active: true }, ...recommendationCategories])
+      setNewRecommendationName('')
+      setIsCreatingRecommendation(false)
+    }
+  }
+  const handleEditRecommendationStart = (id: number | string, name: string) => { setEditingRecommendationId(id); setEditingRecommendationName(name) }
+  const handleSaveRecommendationEdit = () => {
+    if (editingRecommendationName.trim() && editingRecommendationId !== null) {
+      setRecommendationCategories(recommendationCategories.map(r => r.id === editingRecommendationId ? { ...r, name: editingRecommendationName } : r))
+      setEditingRecommendationId(null); setEditingRecommendationName('')
+    }
+  }
+  const handleCancelRecommendationEdit = () => { setEditingRecommendationId(null); setEditingRecommendationName('') }
+  const handleDeleteRecommendationClick = (id: number | string) => { setDeletingRecommendationId(id) }
+  const deleteRecommendation = (id: number | string) => { setRecommendationCategories(recommendationCategories.filter(r => r.id !== id)); setDeletingRecommendationId(null) }
+  const toggleRecommendation = (id: number | string) => { setRecommendationCategories(recommendationCategories.map(r => r.id === id ? { ...r, active: !r.active, status: !r.active ? 'Activo' : 'Inactivo' } : r)) }
 
   return (
     <SettingsView
@@ -285,6 +367,7 @@ export function SettingsApiContainer() {
       setHabitacionesTab={setHabitacionesTab}
       eventosTab={eventosTab}
       setEventosTab={setEventosTab}
+
       filteredDepartments={filteredDepartments}
       departments={departments}
       isCreating={isCreating}
@@ -295,20 +378,15 @@ export function SettingsApiContainer() {
       editingName={editingName}
       setEditingName={setEditingName}
       deletingId={deletingId}
+      setDeletingId={setDeletingId}
       toggleDepartment={toggleDepartment}
       deleteDepartment={deleteDepartment}
-      handleDeleteClick={setDeletingId}
+      handleDeleteClick={handleDeleteClick}
       handleSaveNewDepartment={handleSaveNewDepartment}
-      handleEditStart={(id, name) => {
-        setEditingId(id)
-        setEditingName(name)
-      }}
+      handleEditStart={handleEditStart}
       handleSaveEdit={handleSaveEdit}
-      handleCancelEdit={() => {
-        setEditingId(null)
-        setEditingName('')
-      }}
-      setDeletingId={setDeletingId}
+      handleCancelEdit={handleCancelEdit}
+
       filteredAmenities={filteredAmenities}
       amenities={amenities}
       isCreatingAmenity={isCreatingAmenity}
@@ -319,20 +397,15 @@ export function SettingsApiContainer() {
       editingAmenityName={editingAmenityName}
       setEditingAmenityName={setEditingAmenityName}
       deletingAmenityId={deletingAmenityId}
+      setDeletingAmenityId={setDeletingAmenityId}
       toggleAmenity={toggleAmenity}
       deleteAmenity={deleteAmenity}
-      handleDeleteAmenityClick={setDeletingAmenityId}
+      handleDeleteAmenityClick={handleDeleteAmenityClick}
       handleSaveNewAmenity={handleSaveNewAmenity}
-      handleEditAmenityStart={(id, name) => {
-        setEditingAmenityId(id)
-        setEditingAmenityName(name)
-      }}
+      handleEditAmenityStart={handleEditAmenityStart}
       handleSaveAmenityEdit={handleSaveAmenityEdit}
-      handleCancelAmenityEdit={() => {
-        setEditingAmenityId(null)
-        setEditingAmenityName('')
-      }}
-      setDeletingAmenityId={setDeletingAmenityId}
+      handleCancelAmenityEdit={handleCancelAmenityEdit}
+
       filteredRoomTypes={filteredRoomTypes}
       roomTypes={roomTypes}
       isCreatingRoom={isCreatingRoom}
@@ -343,20 +416,15 @@ export function SettingsApiContainer() {
       editingRoomName={editingRoomName}
       setEditingRoomName={setEditingRoomName}
       deletingRoomId={deletingRoomId}
+      setDeletingRoomId={setDeletingRoomId}
       toggleRoomType={toggleRoomType}
       deleteRoomType={deleteRoomType}
-      handleDeleteRoomClick={setDeletingRoomId}
+      handleDeleteRoomClick={handleDeleteRoomClick}
       handleSaveNewRoomType={handleSaveNewRoomType}
-      handleEditRoomStart={(id, name) => {
-        setEditingRoomId(id)
-        setEditingRoomName(name)
-      }}
+      handleEditRoomStart={handleEditRoomStart}
       handleSaveRoomEdit={handleSaveRoomEdit}
-      handleCancelRoomEdit={() => {
-        setEditingRoomId(null)
-        setEditingRoomName('')
-      }}
-      setDeletingRoomId={setDeletingRoomId}
+      handleCancelRoomEdit={handleCancelRoomEdit}
+
       filteredFloors={filteredFloors}
       floors={floors}
       isCreatingFloor={isCreatingFloor}
@@ -367,14 +435,15 @@ export function SettingsApiContainer() {
       editingFloorName={editingFloorName}
       setEditingFloorName={setEditingFloorName}
       deletingFloorId={deletingFloorId}
-      toggleFloor={noopId}
-      deleteFloor={noopId}
-      handleDeleteFloorClick={noopId}
-      handleSaveNewFloor={noop}
-      handleEditFloorStart={noopIdName}
-      handleSaveFloorEdit={noop}
-      handleCancelFloorEdit={noop}
       setDeletingFloorId={setDeletingFloorId}
+      toggleFloor={toggleFloor}
+      deleteFloor={deleteFloor}
+      handleDeleteFloorClick={handleDeleteFloorClick}
+      handleSaveNewFloor={handleSaveNewFloor}
+      handleEditFloorStart={handleEditFloorStart}
+      handleSaveFloorEdit={handleSaveFloorEdit}
+      handleCancelFloorEdit={handleCancelFloorEdit}
+
       filteredShifts={filteredShifts}
       shifts={shifts}
       isCreatingShift={isCreatingShift}
@@ -385,14 +454,15 @@ export function SettingsApiContainer() {
       editingShiftName={editingShiftName}
       setEditingShiftName={setEditingShiftName}
       deletingShiftId={deletingShiftId}
-      toggleShift={noopId}
-      deleteShift={noopId}
-      handleDeleteShiftClick={noopId}
-      handleSaveNewShift={noop}
-      handleEditShiftStart={noopIdName}
-      handleSaveShiftEdit={noop}
-      handleCancelShiftEdit={noop}
       setDeletingShiftId={setDeletingShiftId}
+      toggleShift={toggleShift}
+      deleteShift={deleteShift}
+      handleDeleteShiftClick={handleDeleteShiftClick}
+      handleSaveNewShift={handleSaveNewShift}
+      handleEditShiftStart={handleEditShiftStart}
+      handleSaveShiftEdit={handleSaveShiftEdit}
+      handleCancelShiftEdit={handleCancelShiftEdit}
+
       filteredEventTypes={filteredEventTypes}
       eventTypes={eventTypes}
       isCreatingEventType={isCreatingEventType}
@@ -403,20 +473,15 @@ export function SettingsApiContainer() {
       editingEventTypeName={editingEventTypeName}
       setEditingEventTypeName={setEditingEventTypeName}
       deletingEventTypeId={deletingEventTypeId}
+      setDeletingEventTypeId={setDeletingEventTypeId}
       toggleEventType={toggleEventType}
       deleteEventType={deleteEventType}
-      handleDeleteEventTypeClick={setDeletingEventTypeId}
+      handleDeleteEventTypeClick={handleDeleteEventTypeClick}
       handleSaveNewEventType={handleSaveNewEventType}
-      handleEditEventTypeStart={(id, name) => {
-        setEditingEventTypeId(id)
-        setEditingEventTypeName(name)
-      }}
+      handleEditEventTypeStart={handleEditEventTypeStart}
       handleSaveEventTypeEdit={handleSaveEventTypeEdit}
-      handleCancelEventTypeEdit={() => {
-        setEditingEventTypeId(null)
-        setEditingEventTypeName('')
-      }}
-      setDeletingEventTypeId={setDeletingEventTypeId}
+      handleCancelEventTypeEdit={handleCancelEventTypeEdit}
+
       filteredEventSpaces={filteredEventSpaces}
       eventSpaces={eventSpaces}
       isCreatingEventSpace={isCreatingEventSpace}
@@ -427,14 +492,15 @@ export function SettingsApiContainer() {
       editingEventSpaceName={editingEventSpaceName}
       setEditingEventSpaceName={setEditingEventSpaceName}
       deletingEventSpaceId={deletingEventSpaceId}
-      toggleEventSpace={noopId}
-      deleteEventSpace={noopId}
-      handleDeleteEventSpaceClick={noopId}
-      handleSaveNewEventSpace={noop}
-      handleEditEventSpaceStart={noopIdName}
-      handleSaveEventSpaceEdit={noop}
-      handleCancelEventSpaceEdit={noop}
       setDeletingEventSpaceId={setDeletingEventSpaceId}
+      toggleEventSpace={toggleEventSpace}
+      deleteEventSpace={deleteEventSpace}
+      handleDeleteEventSpaceClick={handleDeleteEventSpaceClick}
+      handleSaveNewEventSpace={handleSaveNewEventSpace}
+      handleEditEventSpaceStart={handleEditEventSpaceStart}
+      handleSaveEventSpaceEdit={handleSaveEventSpaceEdit}
+      handleCancelEventSpaceEdit={handleCancelEventSpaceEdit}
+
       filteredRecommendations={filteredRecommendations}
       recommendationCategories={recommendationCategories}
       isCreatingRecommendation={isCreatingRecommendation}
@@ -445,32 +511,14 @@ export function SettingsApiContainer() {
       editingRecommendationName={editingRecommendationName}
       setEditingRecommendationName={setEditingRecommendationName}
       deletingRecommendationId={deletingRecommendationId}
-      toggleRecommendation={noopId}
-      deleteRecommendation={noopId}
-      handleDeleteRecommendationClick={noopId}
-      handleSaveNewRecommendation={noop}
-      handleEditRecommendationStart={noopIdName}
-      handleSaveRecommendationEdit={noop}
-      handleCancelRecommendationEdit={noop}
       setDeletingRecommendationId={setDeletingRecommendationId}
-      filteredClientCategories={filteredClientCategories}
-      clientCategories={clientCategories}
-      isCreatingClientCategory={isCreatingClientCategory}
-      setIsCreatingClientCategory={setIsCreatingClientCategory}
-      newClientCategoryName={newClientCategoryName}
-      setNewClientCategoryName={setNewClientCategoryName}
-      editingClientCategoryId={editingClientCategoryId}
-      editingClientCategoryName={editingClientCategoryName}
-      setEditingClientCategoryName={setEditingClientCategoryName}
-      deletingClientCategoryId={deletingClientCategoryId}
-      toggleClientCategory={noopId}
-      deleteClientCategory={noopId}
-      handleDeleteClientCategoryClick={noopId}
-      handleSaveNewClientCategory={noop}
-      handleEditClientCategoryStart={noopIdName}
-      handleSaveClientCategoryEdit={noop}
-      handleCancelClientCategoryEdit={noop}
-      setDeletingClientCategoryId={setDeletingClientCategoryId}
+      toggleRecommendation={toggleRecommendation}
+      deleteRecommendation={deleteRecommendation}
+      handleDeleteRecommendationClick={handleDeleteRecommendationClick}
+      handleSaveNewRecommendation={handleSaveNewRecommendation}
+      handleEditRecommendationStart={handleEditRecommendationStart}
+      handleSaveRecommendationEdit={handleSaveRecommendationEdit}
+      handleCancelRecommendationEdit={handleCancelRecommendationEdit}
     />
   )
 }

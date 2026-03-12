@@ -227,10 +227,17 @@ export function DashboardView({
       staffMembers.filter((m) => m.department === "Mantenimiento"),
     [staffMembers]
   )
+  console.log("staffMembers", staffMembers)
+  console.log(maintenanceStaffMembers)
 
   const availableRooms = useMemo(
     () => rooms.filter((r) => r.status === "available"),
     [rooms]
+  )
+
+  const selectedRoom = useMemo(
+    () => rooms.find((r) => r.id === roomBookingRoomId),
+    [rooms, roomBookingRoomId]
   )
 
   return (
@@ -256,11 +263,10 @@ export function DashboardView({
           <div className="flex gap-2 flex-wrap">
             <button
               onClick={() => setActiveTab("rooms")}
-              className={`group relative overflow-hidden rounded-lg px-5 py-2 text-white transition-all duration-300 text-xs font-medium ${
-                activeTab === "rooms"
-                  ? "bg-gradient-to-br from-purple-600 to-purple-700 shadow-lg scale-105 ring-2 ring-white ring-opacity-50"
-                  : "bg-gradient-to-br from-purple-600 to-purple-700 opacity-60 hover:opacity-75 shadow-sm hover:shadow-md hover:scale-105"
-              }`}
+              className={`group relative overflow-hidden rounded-lg px-5 py-2 text-white transition-all duration-300 text-xs font-medium ${activeTab === "rooms"
+                ? "bg-gradient-to-br from-purple-600 to-purple-700 shadow-lg scale-105 ring-2 ring-white ring-opacity-50"
+                : "bg-gradient-to-br from-purple-600 to-purple-700 opacity-60 hover:opacity-75 shadow-sm hover:shadow-md hover:scale-105"
+                }`}
             >
               <div className="absolute top-0 right-0 w-12 h-12 bg-white opacity-10 rounded-full -mr-6 -mt-6" />
               <Hotel className="w-4 h-4 inline mr-2 relative z-10" />
@@ -268,11 +274,10 @@ export function DashboardView({
             </button>
             <button
               onClick={() => setActiveTab("staff")}
-              className={`group relative overflow-hidden rounded-lg px-5 py-2 text-white transition-all duration-300 text-xs font-medium ${
-                activeTab === "staff"
-                  ? "bg-gradient-to-br from-lime-600 to-lime-700 shadow-lg scale-105 ring-2 ring-white ring-opacity-50"
-                  : "bg-gradient-to-br from-lime-600 to-lime-700 opacity-60 hover:opacity-75 shadow-sm hover:shadow-md hover:scale-105"
-              }`}
+              className={`group relative overflow-hidden rounded-lg px-5 py-2 text-white transition-all duration-300 text-xs font-medium ${activeTab === "staff"
+                ? "bg-gradient-to-br from-lime-600 to-lime-700 shadow-lg scale-105 ring-2 ring-white ring-opacity-50"
+                : "bg-gradient-to-br from-lime-600 to-lime-700 opacity-60 hover:opacity-75 shadow-sm hover:shadow-md hover:scale-105"
+                }`}
             >
               <div className="absolute top-0 right-0 w-12 h-12 bg-white opacity-10 rounded-full -mr-6 -mt-6" />
               <Users className="w-4 h-4 inline mr-2 relative z-10" />
@@ -280,11 +285,10 @@ export function DashboardView({
             </button>
             <button
               onClick={() => setActiveTab("facilities")}
-              className={`group relative overflow-hidden rounded-lg px-5 py-2 text-white transition-all duration-300 text-xs font-medium ${
-                activeTab === "facilities"
-                  ? "bg-gradient-to-br from-orange-600 to-orange-700 shadow-lg scale-105 ring-2 ring-white ring-opacity-50"
-                  : "bg-gradient-to-br from-orange-600 to-orange-700 opacity-60 hover:opacity-75 shadow-sm hover:shadow-md hover:scale-105"
-              }`}
+              className={`group relative overflow-hidden rounded-lg px-5 py-2 text-white transition-all duration-300 text-xs font-medium ${activeTab === "facilities"
+                ? "bg-gradient-to-br from-orange-600 to-orange-700 shadow-lg scale-105 ring-2 ring-white ring-opacity-50"
+                : "bg-gradient-to-br from-orange-600 to-orange-700 opacity-60 hover:opacity-75 shadow-sm hover:shadow-md hover:scale-105"
+                }`}
             >
               <div className="absolute top-0 right-0 w-12 h-12 bg-white opacity-10 rounded-full -mr-6 -mt-6" />
               <Building2 className="w-4 h-4 inline mr-2 relative z-10" />
@@ -292,11 +296,10 @@ export function DashboardView({
             </button>
             <button
               onClick={() => setActiveTab("checkouts")}
-              className={`group relative overflow-hidden rounded-lg px-5 py-2 text-white transition-all duration-300 text-xs font-medium ${
-                activeTab === "checkouts"
-                  ? "bg-gradient-to-br from-red-600 to-red-700 shadow-lg scale-105 ring-2 ring-white ring-opacity-50"
-                  : "bg-gradient-to-br from-red-600 to-red-700 opacity-60 hover:opacity-75 shadow-sm hover:shadow-md hover:scale-105"
-              }`}
+              className={`group relative overflow-hidden rounded-lg px-5 py-2 text-white transition-all duration-300 text-xs font-medium ${activeTab === "checkouts"
+                ? "bg-gradient-to-br from-red-600 to-red-700 shadow-lg scale-105 ring-2 ring-white ring-opacity-50"
+                : "bg-gradient-to-br from-red-600 to-red-700 opacity-60 hover:opacity-75 shadow-sm hover:shadow-md hover:scale-105"
+                }`}
             >
               <div className="absolute top-0 right-0 w-12 h-12 bg-white opacity-10 rounded-full -mr-6 -mt-6" />
               <CheckCircle2 className="w-4 h-4 inline mr-2 relative z-10" />
@@ -344,16 +347,14 @@ export function DashboardView({
                     onClick={() =>
                       setTimelineMode(timelineMode === "week" ? "month" : "week")
                     }
-                    className={`relative inline-flex h-8 w-14 items-center rounded-full transition-colors ${
-                      timelineMode === "month" ? "bg-lime-600" : "bg-gray-300"
-                    }`}
+                    className={`relative inline-flex h-8 w-14 items-center rounded-full transition-colors ${timelineMode === "month" ? "bg-lime-600" : "bg-gray-300"
+                      }`}
                   >
                     <span
-                      className={`inline-block h-6 w-6 transform rounded-full bg-white transition-transform ${
-                        timelineMode === "month"
-                          ? "translate-x-7"
-                          : "translate-x-1"
-                      }`}
+                      className={`inline-block h-6 w-6 transform rounded-full bg-white transition-transform ${timelineMode === "month"
+                        ? "translate-x-7"
+                        : "translate-x-1"
+                        }`}
                     />
                   </button>
                   <span
@@ -498,23 +499,39 @@ export function DashboardView({
                         </div>
                       </div>
                       <div>
-                        <Label htmlFor="people-count">Cantidad de Personas</Label>
+                        <Label htmlFor="people-count">
+                          Cantidad de Personas {selectedRoom && `(máx ${selectedRoom.capacity})`}
+                        </Label>
+
                         <Input
                           id="people-count"
                           type="number"
                           min={1}
-                          max={10}
+                          max={selectedRoom?.capacity ?? 1}
                           value={roomBookingPeople}
-                          onChange={(e) =>
-                            setRoomBookingPeople(
-                              Math.min(
-                                10,
-                                Math.max(1, parseInt(e.target.value, 10) || 1)
-                              )
+                          onChange={(e) => {
+                            const value = parseInt(e.target.value, 10) || 1
+
+                            if (!selectedRoom) {
+                              setRoomBookingPeople(value)
+                              return
+                            }
+
+                            const clampedValue = Math.min(
+                              selectedRoom.capacity,
+                              Math.max(1, value)
                             )
-                          }
+
+                            setRoomBookingPeople(clampedValue)
+                          }}
                           placeholder="Número de personas"
                         />
+
+                        {selectedRoom && (
+                          <p className="text-xs text-muted-foreground mt-1">
+                            Capacidad máxima: {selectedRoom.capacity} personas
+                          </p>
+                        )}
                       </div>
                       <div className="grid grid-cols-2 gap-4">
                         <div>
@@ -634,15 +651,14 @@ export function DashboardView({
                         return (
                           <div
                             key={idx}
-                            className={`${timelineMode === "week" ? "w-24" : "w-12"} h-12 rounded flex-shrink-0 ${
-                              status === "available"
-                                ? "bg-green-100 border border-green-200"
-                                : status === "occupied"
-                                  ? "bg-red-100 border border-red-200"
-                                  : status === "reserved"
-                                    ? "bg-blue-100 border border-blue-200"
-                                    : "bg-yellow-100 border border-yellow-200"
-                            } flex items-center justify-center group relative cursor-pointer hover:shadow-md transition-shadow`}
+                            className={`${timelineMode === "week" ? "w-24" : "w-12"} h-12 rounded flex-shrink-0 ${status === "available"
+                              ? "bg-green-100 border border-green-200"
+                              : status === "occupied"
+                                ? "bg-red-100 border border-red-200"
+                                : status === "reserved"
+                                  ? "bg-blue-100 border border-blue-200"
+                                  : "bg-yellow-100 border border-yellow-200"
+                              } flex items-center justify-center group relative cursor-pointer hover:shadow-md transition-shadow`}
                           >
                             {status !== "available" && (
                               <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
@@ -1391,11 +1407,10 @@ export function DashboardView({
                                 }}
                               >
                                 <div
-                                  className={`absolute inset-2 rounded-lg ${
-                                    bookingAtStart.status === "confirmed"
-                                      ? "bg-gradient-to-br from-green-500/30 to-green-600/20 border-2 border-green-500"
-                                      : "bg-gradient-to-br from-amber-500/30 to-amber-600/20 border-2 border-amber-500"
-                                  } p-3 flex flex-col justify-center hover:shadow-lg transition-all cursor-pointer hover:scale-[1.02] min-h-[72px]`}
+                                  className={`absolute inset-2 rounded-lg ${bookingAtStart.status === "confirmed"
+                                    ? "bg-gradient-to-br from-green-500/30 to-green-600/20 border-2 border-green-500"
+                                    : "bg-gradient-to-br from-amber-500/30 to-amber-600/20 border-2 border-amber-500"
+                                    } p-3 flex flex-col justify-center hover:shadow-lg transition-all cursor-pointer hover:scale-[1.02] min-h-[72px]`}
                                   onClick={() =>
                                     slotBookings.length > 0 &&
                                     onShowBookingsDetail(slotBookings)
@@ -1439,13 +1454,12 @@ export function DashboardView({
                                   {slotBookings.length > 0 && (
                                     <div className="mt-2 w-full bg-black/10 rounded-full h-1.5">
                                       <div
-                                        className={`h-1.5 rounded-full transition-all ${
-                                          occupancy > 80
-                                            ? "bg-red-500"
-                                            : occupancy > 50
-                                              ? "bg-amber-500"
-                                              : "bg-green-500"
-                                        }`}
+                                        className={`h-1.5 rounded-full transition-all ${occupancy > 80
+                                          ? "bg-red-500"
+                                          : occupancy > 50
+                                            ? "bg-amber-500"
+                                            : "bg-green-500"
+                                          }`}
                                         style={{ width: `${occupancy}%` }}
                                       />
                                     </div>
@@ -1531,13 +1545,12 @@ export function DashboardView({
                                     </p>
                                     <div className="w-full bg-black/10 rounded-full h-2">
                                       <div
-                                        className={`h-2 rounded-full transition-all ${
-                                          occupancyAtTime > 80
-                                            ? "bg-red-500"
-                                            : occupancyAtTime > 50
-                                              ? "bg-amber-500"
-                                              : "bg-green-500"
-                                        }`}
+                                        className={`h-2 rounded-full transition-all ${occupancyAtTime > 80
+                                          ? "bg-red-500"
+                                          : occupancyAtTime > 50
+                                            ? "bg-amber-500"
+                                            : "bg-green-500"
+                                          }`}
                                         style={{
                                           width: `${occupancyAtTime}%`,
                                         }}
@@ -1681,9 +1694,9 @@ export function DashboardView({
                             router.push(
                               orgId
                                 ? ROUTES.CLIENT_DETAIL(
-                                    orgId,
-                                    String(checkout.id)
-                                  )
+                                  orgId,
+                                  String(checkout.id)
+                                )
                                 : `/admin/clients/${checkout.id}`
                             )
                           }
@@ -1706,11 +1719,10 @@ export function DashboardView({
                       </td>
                       <td className="px-4 py-3 text-center">
                         <span
-                          className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${
-                            checkout.status === "completed"
-                              ? "bg-green-100 text-green-800"
-                              : "bg-orange-100 text-orange-800"
-                          }`}
+                          className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${checkout.status === "completed"
+                            ? "bg-green-100 text-green-800"
+                            : "bg-orange-100 text-orange-800"
+                            }`}
                         >
                           {checkout.status === "completed"
                             ? "Completado"

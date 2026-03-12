@@ -2,20 +2,92 @@
 
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
-import { ArrowLeft, Calendar, MapPin, User, CreditCard, ChevronLeft, ChevronRight } from "lucide-react"
+import { ArrowLeft, Calendar, MapPin, User, ChevronLeft, ChevronRight } from "lucide-react"
 import Link from "next/link"
 import Image from "next/image"
-import { useState } from "react"
+import { useState, useMemo } from "react"
+import { useSearchParams } from "next/navigation"
+import { useSelector } from "react-redux"
+import type { RootState } from "@/store/store"
+import { useGetUserReservationContextsQuery } from "@/features/reservation/slices/reservationSlice"
+
+const roomImages = [
+  "/luxury-deluxe-hotel-room-with-king-bed-and-modern-.jpg",
+  "/hotel-room-bathroom-with-marble-and-elegant-fixtur.jpg",
+  "/hotel-room-balcony-with-city-view-and-comfortable-.jpg",
+  "/hotel-room-workspace-desk-and-amenities.jpg",
+]
+
+const DEFAULT_AMENITIES = [
+  "WiFi gratuito",
+  "Desayuno incluido",
+  "Acceso al gimnasio",
+  "Piscina",
+  "Room service 24/7",
+  "Servicio de limpieza diario",
+]
+
+function formatDisplayDate(value: string | Date | undefined): string {
+  if (!value) return "—"
+  const d = new Date(value)
+  if (Number.isNaN(d.getTime())) return "—"
+  return d.toLocaleDateString("es-ES", { day: "numeric", month: "short", year: "numeric" })
+}
 
 export default function ReservationDetailsPage() {
   const [currentImageIndex, setCurrentImageIndex] = useState(0)
+  const searchParams = useSearchParams()
+  const reservationId = searchParams.get("reservationId")
+  const organizationId = useSelector((state: RootState) => state.organization?.currentOrganizationId ?? state.auth?.currentOrganization?.id)
+  const { data, isLoading } = useGetUserReservationContextsQuery(undefined, {
+    skip: !organizationId || !reservationId,
+  })
 
-  const roomImages = [
-    "/luxury-deluxe-hotel-room-with-king-bed-and-modern-.jpg",
-    "/hotel-room-bathroom-with-marble-and-elegant-fixtur.jpg",
-    "/hotel-room-balcony-with-city-view-and-comfortable-.jpg",
-    "/hotel-room-workspace-desk-and-amenities.jpg",
-  ]
+  const reservation = useMemo(() => {
+    const list = (data?.reservations ?? []) as Array<{
+      id?: string
+      code?: string
+      checkIn?: string | Date
+      checkOut?: string | Date
+      status?: string
+      room?: { number?: string }
+      user?: { firstName?: string; lastName?: string; email?: string; phoneNumber?: string }
+    }>
+    return reservationId ? list.find((r) => String(r.id) === String(reservationId)) : null
+  }, [data?.reservations, reservationId])
+
+  const reservationData = useMemo(() => {
+    if (!reservation) {
+      return {
+        confirmationCode: "—",
+        guestName: "—",
+        email: "—",
+        phone: "—",
+        checkIn: "—",
+        checkOut: "—",
+        nights: 0,
+        room: "—",
+        roomType: "Habitación",
+        amenities: DEFAULT_AMENITIES,
+      }
+    }
+    const checkIn = reservation.checkIn ? new Date(reservation.checkIn) : null
+    const checkOut = reservation.checkOut ? new Date(reservation.checkOut) : null
+    const nights = checkIn && checkOut ? Math.max(0, Math.ceil((checkOut.getTime() - checkIn.getTime()) / (1000 * 60 * 60 * 24))) : 0
+    const guestName = [reservation.user?.firstName, reservation.user?.lastName].filter(Boolean).join(" ") || "—"
+    return {
+      confirmationCode: reservation.code ?? reservation.id ?? "—",
+      guestName,
+      email: reservation.user?.email ?? "—",
+      phone: reservation.user?.phoneNumber ?? "—",
+      checkIn: formatDisplayDate(reservation.checkIn),
+      checkOut: formatDisplayDate(reservation.checkOut),
+      nights,
+      room: reservation.room?.number ?? "—",
+      roomType: "Habitación",
+      amenities: DEFAULT_AMENITIES,
+    }
+  }, [reservation])
 
   const nextImage = () => {
     setCurrentImageIndex((prev) => (prev + 1) % roomImages.length)
@@ -25,31 +97,42 @@ export default function ReservationDetailsPage() {
     setCurrentImageIndex((prev) => (prev - 1 + roomImages.length) % roomImages.length)
   }
 
-  const reservationData = {
-    confirmationCode: "HT2024-7845",
-    guestName: "Carlos Martínez",
-    email: "carlos.martinez@email.com",
-    phone: "+54 11 4567-8900",
-    checkIn: "15 Dic, 2024",
-    checkOut: "18 Dic, 2024",
-    nights: 3,
-    room: "305",
-    roomType: "Deluxe Suite",
-    guests: 2,
-    bedType: "King Size",
-    price: "$450",
-    pricePerNight: "$150",
-    paymentMethod: "Tarjeta de Crédito •••• 4532",
-    paymentStatus: "Pagado",
-    specialRequests: "Vista al mar, piso alto",
-    amenities: [
-      "WiFi gratuito",
-      "Desayuno incluido",
-      "Acceso al gimnasio",
-      "Piscina",
-      "Room service 24/7",
-      "Servicio de limpieza diario",
-    ],
+  if (!reservationId) {
+    return (
+      <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: "#233b64" }}>
+        <div className="text-white text-center">
+          <p className="text-lg">No se especificó reserva.</p>
+          <Link href="/client/stays">
+            <Button variant="outline" className="mt-4 text-white border-white hover:bg-white/10">
+              Volver a estadías
+            </Button>
+          </Link>
+        </div>
+      </div>
+    )
+  }
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: "#233b64" }}>
+        <p className="text-white text-lg">Cargando...</p>
+      </div>
+    )
+  }
+
+  if (!reservation) {
+    return (
+      <div className="min-h-screen flex items-center justify-center" style={{ backgroundColor: "#233b64" }}>
+        <div className="text-white text-center">
+          <p className="text-lg">Reserva no encontrada.</p>
+          <Link href="/client/stays">
+            <Button variant="outline" className="mt-4 text-white border-white hover:bg-white/10">
+              Volver a estadías
+            </Button>
+          </Link>
+        </div>
+      </div>
+    )
   }
 
   return (
@@ -57,7 +140,7 @@ export default function ReservationDetailsPage() {
       {/* Header */}
       <div className="sticky top-0 z-10 p-4 text-white" style={{ backgroundColor: "#233b64" }}>
         <div className="flex items-center gap-4">
-          <Link href="/client?type=future">
+          <Link href="/client/stays">
             <Button variant="ghost" size="icon" className="text-white hover:bg-white/10">
               <ArrowLeft className="w-6 h-6" />
             </Button>
@@ -156,14 +239,12 @@ export default function ReservationDetailsPage() {
               <span className="text-gray-600">Check-out</span>
               <span className="font-semibold">{reservationData.checkOut}</span>
             </div>
-            <div className="flex justify-between">
-              <span className="text-gray-600">Noches</span>
-              <span className="font-semibold">{reservationData.nights} noches</span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-gray-600">Huéspedes</span>
-              <span className="font-semibold">{reservationData.guests} personas</span>
-            </div>
+            {reservationData.nights > 0 && (
+              <div className="flex justify-between">
+                <span className="text-gray-600">Noches</span>
+                <span className="font-semibold">{reservationData.nights} noches</span>
+              </div>
+            )}
           </div>
         </Card>
 
@@ -182,14 +263,6 @@ export default function ReservationDetailsPage() {
               <span className="text-gray-600">Tipo</span>
               <span className="font-semibold">{reservationData.roomType}</span>
             </div>
-            <div className="flex justify-between">
-              <span className="text-gray-600">Cama</span>
-              <span className="font-semibold">{reservationData.bedType}</span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-gray-600">Solicitudes</span>
-              <span className="font-medium text-sm text-right">{reservationData.specialRequests}</span>
-            </div>
           </div>
         </Card>
 
@@ -203,36 +276,6 @@ export default function ReservationDetailsPage() {
                 <span>{amenity}</span>
               </div>
             ))}
-          </div>
-        </Card>
-
-        {/* Payment Information */}
-        <Card className="p-6 bg-white">
-          <h2 className="text-lg font-bold mb-4 flex items-center gap-2">
-            <CreditCard className="w-5 h-5" />
-            Información de Pago
-          </h2>
-          <div className="space-y-3">
-            <div className="flex justify-between">
-              <span className="text-gray-600">Precio por noche</span>
-              <span className="font-medium">{reservationData.pricePerNight}</span>
-            </div>
-            <div className="flex justify-between">
-              <span className="text-gray-600">Total ({reservationData.nights} noches)</span>
-              <span className="font-bold text-lg">{reservationData.price}</span>
-            </div>
-            <div className="pt-3 border-t">
-              <div className="flex justify-between">
-                <span className="text-gray-600">Método de pago</span>
-                <span className="font-medium text-sm">{reservationData.paymentMethod}</span>
-              </div>
-              <div className="flex justify-between mt-2">
-                <span className="text-gray-600">Estado</span>
-                <span className="inline-block px-3 py-1 rounded-full text-xs font-semibold bg-green-100 text-green-700">
-                  {reservationData.paymentStatus}
-                </span>
-              </div>
-            </div>
           </div>
         </Card>
 

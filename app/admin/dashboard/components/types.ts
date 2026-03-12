@@ -9,6 +9,7 @@ export type Room = {
   type: string
   floor: number
   status: RoomStatus
+  capacity: number;
   guest?: string
   checkIn?: string
   checkOut?: string
