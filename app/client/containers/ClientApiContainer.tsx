@@ -11,15 +11,23 @@ import { setCurrentOrganization } from "@/features/organization/slices/organizat
 import { ClientExperienceView } from "../page"
 import type { ClientType, ClientUserData, FacilitySlot } from "../types"
 import { useGetFacilitiesQuery, useGetFacilitySlotsQuery } from "@/app/admin/facilities/slice/facilitySlice"
-import { useCreateReservationFacilityBookingMutation } from "@/features/reservation-facility-booking/slices/reservationFacilityBookingSlice"
+import {
+  useCreateReservationFacilityBookingMutation,
+  useGetAllBookingsByReservationQuery,
+} from "@/features/reservation-facility-booking/slices/reservationFacilityBookingSlice"
 
 interface ReservationWithDetails {
   id?: string
   checkIn?: string
   checkOut?: string
   status?: string
-  capaxity?: number;
-  room?: { id?: string; number?: string; name?: string; type?: string }
+  room?: {
+    id?: string
+    number?: string
+    name?: string
+    type?: string
+    capacity?: number
+  }
   user?: { firstName?: string; lastName?: string; email?: string; phone?: string }
 }
 
@@ -57,7 +65,7 @@ export function ClientApiContainer() {
   const { t } = useLanguage()
 
   const [selectedFacilityId, setSelectedFacilityId] = useState<string | null>(null)
-  const [createReservationFacilityBooking] = useCreateReservationFacilityBookingMutation();
+  const [createReservationFacilityBooking] = useCreateReservationFacilityBookingMutation()
 
   const dataSource = useSelector((state: RootState) => state.dataSource.dataSource)
   const organizationId = useSelector((state: RootState) => {
@@ -94,10 +102,40 @@ export function ClientApiContainer() {
     skip: !organizationId,
   })
 
-  const { data: slotsData, isLoading: slotsLoading } = useGetFacilitySlotsQuery(
+  const { data: slotsData, isLoading: slotsLoading, refetch: refetchSlots } = useGetFacilitySlotsQuery(
     selectedFacilityId!,
     { skip: !selectedFacilityId || !organizationId }
   )
+
+  const reservationsList = (data?.reservations ?? []) as ReservationWithDetails[]
+
+  const targetReservation = useMemo(() => {
+    if (!reservationId) return reservationsList[0]
+    return reservationsList.find((r) => r.id === reservationId) ?? reservationsList[0]
+  }, [reservationsList, reservationId])
+
+  const activeReservationId = targetReservation?.id
+
+  const { data: existingBookingsData } = useGetAllBookingsByReservationQuery(
+    activeReservationId!,
+    { skip: !activeReservationId }
+  )
+
+  const confirmedBookings = useMemo((): Record<string, string> => {
+    const map: Record<string, string> = {}
+    const bookings = existingBookingsData?.data ?? []
+    for (const booking of bookings) {
+      const start = booking.amenityShiftSlot?.startAt
+      const end = booking.amenityShiftSlot?.endAt
+      if (!start || !end) continue
+      const parseUTC = (iso: string) => {
+        const match = iso.match(/T(\d{2}):(\d{2})/)
+        return match ? `${match[1]}:${match[2]}` : "??:??"
+      }
+      map[booking.facilityId] = `${parseUTC(start)} - ${parseUTC(end)}`
+    }
+    return map
+  }, [existingBookingsData])
 
   const apiSlots = (slotsData?.data ?? []) as FacilitySlot[]
 
@@ -111,13 +149,6 @@ export function ClientApiContainer() {
       image: undefined,
     }))
   }, [facilitiesData])
-
-  const reservationsList = (data?.reservations ?? []) as ReservationWithDetails[]
-
-  const targetReservation = useMemo(() => {
-    if (!reservationId) return reservationsList[0]
-    return reservationsList.find((r) => r.id === reservationId) ?? reservationsList[0]
-  }, [reservationsList, reservationId])
 
   const { userData, clientType } = useMemo((): { userData: ClientUserData; clientType: ClientType } => {
     if (!targetReservation) {
@@ -158,7 +189,7 @@ export function ClientApiContainer() {
       email: authUser?.email ?? targetReservation.user?.email ?? "",
       room: targetReservation.room?.number ?? targetReservation.room?.name ?? "",
       roomType: targetReservation.room?.type ?? "Habitación",
-      roomCapacity: targetReservation.room.capacity,
+      roomCapacity: targetReservation.room?.capacity ?? 0,
       phone: targetReservation.user?.phone ?? "",
       checkIn: formatDisplayDate(checkInStr),
       checkOut: formatDisplayDate(checkOutStr),
@@ -174,14 +205,14 @@ export function ClientApiContainer() {
     slotId: string,
     people: number
   ) => {
-    if (!reservationId) return
-
+    if (!activeReservationId) return
     await createReservationFacilityBooking({
-      reservationId,
+      reservationId: activeReservationId,
       facilityId,
       amenityShiftSlotId: slotId,
       numberOfPeople: people,
     }).unwrap()
+    if (selectedFacilityId) refetchSlots()
   }
 
   return (
@@ -196,6 +227,7 @@ export function ClientApiContainer() {
       apiSlots={apiSlots}
       slotsLoading={slotsLoading}
       onCreateBooking={handleCreateBooking}
+      confirmedBookings={confirmedBookings}
     />
   )
 }

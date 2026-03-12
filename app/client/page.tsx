@@ -39,7 +39,8 @@ export function ClientExperienceView({
   onFacilitySelect,
   apiSlots = [],
   slotsLoading = false,
-  onCreateBooking
+  onCreateBooking,
+  confirmedBookings = {},
 }: {
   userData: ClientUserData
   clientType: ClientType
@@ -50,11 +51,8 @@ export function ClientExperienceView({
   onFacilitySelect?: (id: string | null) => void
   apiSlots?: FacilitySlot[]
   slotsLoading?: boolean
-  onCreateBooking?: (
-    facilityId: string,
-    slotId: string,
-    people: number
-  ) => Promise<void>
+  onCreateBooking?: (facilityId: string, slotId: string, people: number) => Promise<void>
+  confirmedBookings?: Record<string, string>
 }) {
   const router = useRouter()
   const dataSource = useSelector((state: RootState) => state.dataSource.dataSource)
@@ -286,145 +284,147 @@ export function ClientExperienceView({
 
                 <div className="px-4 pb-4 bg-white">
                   <div className="grid grid-cols-2 gap-3">
-                    {facilities.map((facility) => (
-                      <Dialog
-                        key={facility.id}
-                        open={activeFacilityDialog === facility.id}
-                        onOpenChange={(open) => {
-                          if (open) {
-                            handleFacilitySelect(facility.id)
-                            setActiveFacilityDialog(facility.id)
-                          } else {
-                            setActiveFacilityDialog(null)
-                          }
-                        }}
-                      >
-                        <DialogTrigger asChild>
-                          <Card className="overflow-hidden flex flex-col p-0 cursor-pointer hover:shadow-lg transition-all">
-                            <div className="h-32 relative">
-                              <img
-                                src={facility.image || "/placeholder.svg"}
-                                alt={facility.name}
-                                className="w-full h-full object-cover block"
-                              />
-                              <div className="text-white text-xs font-medium px-2 py-1 rounded-full shadow-sm absolute top-2 right-2" style={{ backgroundColor: "#773CCA" }}>
-                                {facility.openTime} - {facility.closeTime}
-                              </div>
-                            </div>
-                            <div className="bg-white text-black flex flex-col gap-2 p-3">
-                              <p className="text-lg font-bold">{facility.name}</p>
-                              {selectedTimes[facility.id] ? (
-                                <div className="text-white text-xs font-medium px-3 py-1 rounded-full w-fit" style={{ backgroundColor: "#11AFBF" }}>
-                                  {selectedTimes[facility.id]}
-                                </div>
-                              ) : (
-                                <div className="text-white text-xs font-medium px-3 py-1 rounded-full flex items-center gap-1 w-fit" style={{ backgroundColor: "#11AFBF" }}>
-                                  <Clock className="w-3.5 h-3.5" />
-                                  Sin reservar
-                                </div>
-                              )}
-                            </div>
-                          </Card>
-                        </DialogTrigger>
-                        <DialogContent className="sm:max-w-md">
-                          <DialogHeader>
-                            <DialogTitle>Reservar {facility.name}</DialogTitle>
-                            <DialogDescription>Selecciona el horario para {facility.name.toLowerCase()}</DialogDescription>
-                          </DialogHeader>
-                          <div className="bg-gray-100 rounded-lg p-4 mb-4">
-                            <div className="flex items-center justify-between">
-                              <span className="font-medium text-gray-700">Personas</span>
-                              <div className="flex items-center gap-4">
-                                <button
-                                  disabled={facilityPeople === 1}
-                                  onClick={() => setFacilityPeople(Math.max(1, facilityPeople - 1))}
-                                  className="w-10 h-10 rounded-full bg-white border border-gray-300 flex items-center justify-center font-bold text-lg hover:bg-gray-50 disabled:opacity-50"
-                                >
-                                  −
-                                </button>
-
-                                <span className="text-xl font-semibold w-6 text-center">
-                                  {facilityPeople}
-                                </span>
-
-                                <button
-                                  disabled={facilityPeople === userData.roomCapacity}
-                                  onClick={() =>
-                                    setFacilityPeople(Math.min(userData.roomCapacity, facilityPeople + 1))
-                                  }
-                                  className="w-10 h-10 rounded-full bg-white border border-gray-300 flex items-center justify-center font-bold text-lg hover:bg-gray-50 disabled:opacity-50"
-                                >
-                                  +
-                                </button>
-                              </div>
-                            </div>
-                          </div>
-                          {slotsLoading && dataSource === "api" ? (
-                            <p className="text-center text-sm text-muted-foreground py-4">Cargando horarios...</p>
-                          ) : (
-                            <div className="space-y-2 py-2">
-                              {getSlotsForFacility(facility.id).map((slot) => {
-                                console.log(slot)
-                                const parseUTCTime = (iso: string) => {
-                                  const match = iso.match(/T(\d{2}):(\d{2})/)
-                                  return match ? `${match[1]}:${match[2]}` : "??:??"
-                                }
-                                const timeLabel = `${parseUTCTime(slot.startAt)} - ${parseUTCTime(slot.endAt)}`
-                                const percent = slot.occupationPercentage
-                                const color = percent <= 33 ? "text-green-600" : percent <= 66 ? "text-amber-600" : "text-red-600"
-                                const bgColor = percent <= 33 ? "bg-green-100" : percent <= 66 ? "bg-amber-100" : "bg-red-100"
-                                return (
-                                  <div
-                                    key={slot.id}
-                                    className="flex items-center justify-between p-3 rounded-lg hover:bg-accent cursor-pointer"
-                                    onClick={() => {
-                                      setSelectedTimes((prev) => ({ ...prev, [facility.id]: timeLabel }))
-                                      setActiveFacilityDialog(null)
-                                      setSelectedSlotId(slot.id)
-                                    }}
-                                  >
-                                    <div className="flex items-center gap-3">
-                                      <input type="radio" readOnly checked={selectedTimes[facility.id] === timeLabel} className="cursor-pointer" />
-                                      <span className="font-medium">{timeLabel}</span>
-                                    </div>
-                                    <div className="flex items-center gap-2">
-                                      <div className={`flex items-center gap-1.5 px-2 py-1 rounded ${bgColor}`}>
-                                        <Users className={`w-3.5 h-3.5 ${color}`} />
-                                        <span className={`text-xs font-semibold ${color}`}>{slot.currentOccupancy}/{slot.capacity}</span>
-                                      </div>
-                                      <span className={`text-xs px-2 py-1 rounded-full font-medium ${bgColor} ${color}`}>
-                                        {percent}%
-                                      </span>
-                                    </div>
-                                  </div>
-                                )
-                              })}
-                              {getSlotsForFacility(facility.id).length === 0 && (
-                                <p className="text-center text-sm text-muted-foreground py-4">No hay horarios disponibles</p>
-                              )}
-                            </div>
-                          )}
-                          <Button
-                            className="w-full mt-2"
-                            size="lg"
-                            disabled={!selectedSlotId}
-                            onClick={async () => {
-                              if (!selectedSlotId || !onCreateBooking) return
-
-                              await onCreateBooking(
-                                facility.id,
-                                selectedSlotId,
-                                facilityPeople
-                              )
-
+                    {facilities.map((facility) => {
+                      const isConfirmed = !!confirmedBookings[facility.id]
+                      return (
+                        <Dialog
+                          key={facility.id}
+                          open={activeFacilityDialog === facility.id}
+                          onOpenChange={(open) => {
+                            if (isConfirmed) return  // bloqueado si ya tiene reserva
+                            if (open) {
+                              handleFacilitySelect(facility.id)
+                              setActiveFacilityDialog(facility.id)
+                            } else {
                               setActiveFacilityDialog(null)
-                            }}
-                          >
-                            Confirmar Reserva
-                          </Button>
-                        </DialogContent>
-                      </Dialog>
-                    ))}
+                            }
+                          }}
+                        >
+                          <DialogTrigger asChild>
+                            <Card className={`overflow-hidden flex flex-col p-0 transition-all ${isConfirmed ? "cursor-default opacity-90" : "cursor-pointer hover:shadow-lg"
+                              }`}>
+                              <div className="h-32 relative">
+                                <img
+                                  src={facility.image || "/placeholder.svg"}
+                                  alt={facility.name}
+                                  className="w-full h-full object-cover block"
+                                />
+                                <div className="text-white text-xs font-medium px-2 py-1 rounded-full shadow-sm absolute top-2 right-2" style={{ backgroundColor: "#773CCA" }}>
+                                  {facility.openTime} - {facility.closeTime}
+                                </div>
+                                {isConfirmed && (
+                                  <div className="absolute inset-0 bg-black/20 flex items-center justify-center">
+                                    <span className="bg-green-500 text-white text-xs font-bold px-3 py-1 rounded-full">
+                                      ✓ Reservado
+                                    </span>
+                                  </div>
+                                )}
+                              </div>
+                              <div className="bg-white text-black flex flex-col gap-2 p-3">
+                                <p className="text-lg font-bold">{facility.name}</p>
+                                {isConfirmed ? (
+                                  <div className="text-white text-xs font-medium px-3 py-1 rounded-full flex items-center gap-1 w-fit bg-green-500">
+                                    ✓ {confirmedBookings[facility.id]}
+                                  </div>
+                                ) : selectedTimes[facility.id] ? (
+                                  <div className="text-white text-xs font-medium px-3 py-1 rounded-full w-fit" style={{ backgroundColor: "#11AFBF" }}>
+                                    {selectedTimes[facility.id]}
+                                  </div>
+                                ) : (
+                                  <div className="text-white text-xs font-medium px-3 py-1 rounded-full flex items-center gap-1 w-fit" style={{ backgroundColor: "#11AFBF" }}>
+                                    <Clock className="w-3.5 h-3.5" />
+                                    Sin reservar
+                                  </div>
+                                )}
+                              </div>
+                            </Card>
+                          </DialogTrigger>
+                          <DialogContent className="sm:max-w-md">
+                            <DialogHeader>
+                              <DialogTitle>Reservar {facility.name}</DialogTitle>
+                              <DialogDescription>Selecciona el horario para {facility.name.toLowerCase()}</DialogDescription>
+                            </DialogHeader>
+                            <div className="bg-gray-100 rounded-lg p-4 mb-4">
+                              <div className="flex items-center justify-between">
+                                <span className="font-medium text-gray-700">Personas</span>
+                                <div className="flex items-center gap-4">
+                                  <button
+                                    disabled={facilityPeople === 1}
+                                    onClick={() => setFacilityPeople(Math.max(1, facilityPeople - 1))}
+                                    className="w-10 h-10 rounded-full bg-white border border-gray-300 flex items-center justify-center font-bold text-lg hover:bg-gray-50 disabled:opacity-50"
+                                  >
+                                    −
+                                  </button>
+                                  <span className="text-xl font-semibold w-6 text-center">{facilityPeople}</span>
+                                  <button
+                                    disabled={facilityPeople === userData.roomCapacity}
+                                    onClick={() => setFacilityPeople(Math.min(userData.roomCapacity, facilityPeople + 1))}
+                                    className="w-10 h-10 rounded-full bg-white border border-gray-300 flex items-center justify-center font-bold text-lg hover:bg-gray-50 disabled:opacity-50"
+                                  >
+                                    +
+                                  </button>
+                                </div>
+                              </div>
+                            </div>
+                            {slotsLoading && dataSource === "api" ? (
+                              <p className="text-center text-sm text-muted-foreground py-4">Cargando horarios...</p>
+                            ) : (
+                              <div className="space-y-2 py-2">
+                                {getSlotsForFacility(facility.id).map((slot) => {
+                                  const parseUTCTime = (iso: string) => {
+                                    const match = iso.match(/T(\d{2}):(\d{2})/)
+                                    return match ? `${match[1]}:${match[2]}` : "??:??"
+                                  }
+                                  const timeLabel = `${parseUTCTime(slot.startAt)} - ${parseUTCTime(slot.endAt)}`
+                                  const percent = slot.occupationPercentage
+                                  const color = percent <= 33 ? "text-green-600" : percent <= 66 ? "text-amber-600" : "text-red-600"
+                                  const bgColor = percent <= 33 ? "bg-green-100" : percent <= 66 ? "bg-amber-100" : "bg-red-100"
+                                  return (
+                                    <div
+                                      key={slot.id}
+                                      className="flex items-center justify-between p-3 rounded-lg hover:bg-accent cursor-pointer"
+                                      onClick={() => {
+                                        setSelectedTimes((prev) => ({ ...prev, [facility.id]: timeLabel }))
+                                        setSelectedSlotId(slot.id)
+                                      }}
+                                    >
+                                      <div className="flex items-center gap-3">
+                                        <input type="radio" readOnly checked={selectedTimes[facility.id] === timeLabel} className="cursor-pointer" />
+                                        <span className="font-medium">{timeLabel}</span>
+                                      </div>
+                                      <div className="flex items-center gap-2">
+                                        <div className={`flex items-center gap-1.5 px-2 py-1 rounded ${bgColor}`}>
+                                          <Users className={`w-3.5 h-3.5 ${color}`} />
+                                          <span className={`text-xs font-semibold ${color}`}>{slot.currentOccupancy}/{slot.capacity}</span>
+                                        </div>
+                                        <span className={`text-xs px-2 py-1 rounded-full font-medium ${bgColor} ${color}`}>
+                                          {percent}%
+                                        </span>
+                                      </div>
+                                    </div>
+                                  )
+                                })}
+                                {getSlotsForFacility(facility.id).length === 0 && (
+                                  <p className="text-center text-sm text-muted-foreground py-4">No hay horarios disponibles</p>
+                                )}
+                              </div>
+                            )}
+                            <Button
+                              className="w-full mt-2"
+                              size="lg"
+                              disabled={!selectedSlotId}
+                              onClick={async () => {
+                                if (!selectedSlotId || !onCreateBooking) return
+                                await onCreateBooking(facility.id, selectedSlotId, facilityPeople)
+                                setActiveFacilityDialog(null)
+                              }}
+                            >
+                              Confirmar Reserva
+                            </Button>
+                          </DialogContent>
+                        </Dialog>
+                      )
+                    })}
                   </div>
                 </div>
 
