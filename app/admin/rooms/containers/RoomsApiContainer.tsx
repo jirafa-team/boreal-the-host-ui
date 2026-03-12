@@ -17,7 +17,7 @@ import type { Room, RoomStatus, NewRoomForm, RoomStats, DateColumn } from "../co
 
 const initialNewRoom: NewRoomForm = {
   number: "",
-  type: "Individual",
+  type: "",
   floor: 1,
   capacity: 1,
 }
@@ -161,7 +161,7 @@ export function RoomsApiContainer() {
 
   const handleCreateRoom = React.useCallback(async () => {
     if (!newRoom.number.trim()) return
-    console.log("Asdasdadsadadasdad", newRoom)
+
     try {
       await createRoom({
         number: newRoom.number,
