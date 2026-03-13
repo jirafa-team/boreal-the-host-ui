@@ -73,6 +73,23 @@ export const authApi = createApi({
         body,
       }),
     }),
+    register: build.mutation<
+      { status: string; isResend: boolean },
+      {
+        firstName: string;
+        lastName: string;
+        email: string;
+        password: string;
+        termsAccepted: boolean;
+        organizationName?: string;
+      }
+    >({
+      query: (body) => ({
+        url: `/api${ENDPOINTS.AUTH.REGISTER}`,
+        method: 'POST',
+        body,
+      }),
+    }),
   }),
 });
 
@@ -82,5 +99,6 @@ export const {
   useGetUserContextsQuery,
   useLogoutMutation,
   useValidateUserMutation,
+  useRegisterMutation,
 } = authApi;
 export default authSlice.reducer;

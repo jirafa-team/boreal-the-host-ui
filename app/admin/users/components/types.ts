@@ -35,6 +35,7 @@ export type NewUserForm = Partial<
   status?: User["status"]
   phone?: string
   password?: string
+  departmentId?: string
   permissions?: UserPermissions
 }
 

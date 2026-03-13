@@ -20,6 +20,8 @@ export type StaffMemberView = {
   avatar: string;
   tasksToday: number;
   maxCapacity: number;
+  totalTasks: number;
+  completedTasks: number;
 };
 
 export type NewStaffForm = {
@@ -27,10 +29,12 @@ export type NewStaffForm = {
   email: string;
   department: StaffDepartment | string;
   shift: string;
+  password: string;
 };
 
 export type NewTaskForm = {
   description: string;
   priority: "normal" | "urgent";
   deliveryTime: string;
+  scheduledStartAt: string;
 };

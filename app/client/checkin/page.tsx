@@ -202,17 +202,6 @@ export default function CheckInPage() {
     setFormData((prev) => ({ ...prev, [field]: value }))
   }
 
-  const handleDniPhotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0]
-    if (file) {
-      const reader = new FileReader()
-      reader.onloadend = () => {
-        setDniPhoto(reader.result as string)
-      }
-      reader.readAsDataURL(file)
-    }
-  }
-
   const handleDocumentChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
     if (file) {
@@ -222,13 +211,6 @@ export default function CheckInPage() {
 
   const removeDocument = () => {
     setDocumentFile(null)
-  }
-
-  const removeDniPhoto = () => {
-    setDniPhoto(null)
-    if (fileInputRef.current) {
-      fileInputRef.current.value = ""
-    }
   }
 
   return (

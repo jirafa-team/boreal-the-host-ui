@@ -223,12 +223,9 @@ export function DashboardView({
   )
 
   const maintenanceStaffMembers = useMemo(
-    () =>
-      staffMembers.filter((m) => m.department === "Mantenimiento"),
+    () => staffMembers,
     [staffMembers]
   )
-  console.log("staffMembers", staffMembers)
-  console.log(maintenanceStaffMembers)
 
   const availableRooms = useMemo(
     () => rooms.filter((r) => r.status === "available"),

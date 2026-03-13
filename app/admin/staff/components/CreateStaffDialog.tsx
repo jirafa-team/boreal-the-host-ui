@@ -27,6 +27,8 @@ export type CreateStaffDialogProps = {
   onNewStaffChange: (updater: (prev: NewStaffForm) => NewStaffForm) => void;
   onSubmit: () => void;
   t: TFunction;
+  loading: boolean;
+  departments?: Array<{ id: string; name: string }>;
 };
 
 export function CreateStaffDialog({
@@ -36,6 +38,8 @@ export function CreateStaffDialog({
   onNewStaffChange,
   onSubmit,
   t,
+  loading,
+  departments,
 }: CreateStaffDialogProps) {
   return (
     <DialogContent className="max-w-md">
@@ -73,6 +77,21 @@ export function CreateStaffDialog({
           />
         </div>
         <div>
+          <Label htmlFor="password" className="text-sm font-medium">
+            Contraseña
+          </Label>
+          <Input
+            id="password"
+            type="password"
+            placeholder="Contraseña para el usuario"
+            value={newStaff.password}
+            onChange={(e) =>
+              onNewStaffChange((prev) => ({ ...prev, password: e.target.value }))
+            }
+            className="mt-2"
+          />
+        </div>
+        <div>
           <Label htmlFor="department" className="text-sm font-medium">
             {t('admin.department')}
           </Label>
@@ -86,13 +105,21 @@ export function CreateStaffDialog({
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="Limpieza">{t('admin.cleaning')}</SelectItem>
-              <SelectItem value="Mantenimiento">
-                {t('admin.maintenance')}
-              </SelectItem>
-              <SelectItem value="Seguridad">{t('admin.security')}</SelectItem>
-              <SelectItem value="Recepción">{t('admin.reception')}</SelectItem>
-              <SelectItem value="Servicio">{t('admin.service')}</SelectItem>
+              {departments && departments.length > 0 ? (
+                departments.map((d) => (
+                  <SelectItem key={d.id} value={d.name}>
+                    {d.name}
+                  </SelectItem>
+                ))
+              ) : (
+                <>
+                  <SelectItem value="Limpieza">{t('admin.cleaning')}</SelectItem>
+                  <SelectItem value="Mantenimiento">{t('admin.maintenance')}</SelectItem>
+                  <SelectItem value="Seguridad">{t('admin.security')}</SelectItem>
+                  <SelectItem value="Recepción">{t('admin.reception')}</SelectItem>
+                  <SelectItem value="Servicio">{t('admin.service')}</SelectItem>
+                </>
+              )}
             </SelectContent>
           </Select>
         </div>
@@ -121,8 +148,8 @@ export function CreateStaffDialog({
         <Button variant="outline" onClick={() => onOpenChange(false)}>
           {t('admin.cancel')}
         </Button>
-        <Button onClick={onSubmit} className="bg-blue-600 hover:bg-blue-700">
-          {t('admin.registerStaff')}
+        <Button onClick={onSubmit} className="bg-blue-600 hover:bg-blue-700" disabled={loading}>
+          {loading ? 'Creando..' : t('admin.registerStaff')}
         </Button>
       </div>
     </DialogContent>

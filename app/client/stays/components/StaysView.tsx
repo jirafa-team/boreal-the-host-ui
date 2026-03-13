@@ -123,7 +123,7 @@ export function StaysView({
         ) : null}
         {!isLoading && !error && (
           <>
-            {!hasCompletedCheckIn && (
+            {!hasCompletedCheckIn && stays.length > 0 && (
               <div className="mb-6">
                 <Button
                   onClick={onFirstStayCheckinClick}
@@ -153,13 +153,13 @@ export function StaysView({
                 let buttonLabel: string | null = null
 
                 if (isFinalized) {
-                  buttonLabel = null
-                } else if (isOngoing) {
-                  buttonLabel = accessReservationLabel
-                } else if (isFuture && hasCompletedCheckIn) {
-                  buttonLabel = t("stays.waitingTripStart") || "Esperando inicio de viaje! ⏳"
+                  buttonLabel = t("stays.finalized") || "Finalizada"
                 } else if (!hasCompletedCheckIn) {
                   buttonLabel = t("stays.completeCheckin") || "Completar Check-in"
+                } else if (isOngoing) {
+                  buttonLabel = accessReservationLabel
+                } else if (isFuture) {
+                  buttonLabel = t("stays.waitingTripStart") || "Esperando inicio de viaje! ⏳"
                 } else {
                   buttonLabel = accessReservationLabel
                 }
@@ -215,23 +215,34 @@ export function StaysView({
 
                         {buttonLabel && (
                           <div className="pt-4 border-t border-slate-600">
-                            <Button
-                              className="w-full bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600 text-white font-semibold rounded-lg flex items-center justify-center gap-2"
-                              onClick={(e) => {
-                                e.stopPropagation()
-                                const waitingLabel = t("stays.waitingTripStart") || "Esperando inicio de viaje! ⏳"
-                                if (buttonLabel === accessReservationLabel && onAccessReservationClick) {
-                                  onAccessReservationClick(stay.id)
-                                } else if (buttonLabel === waitingLabel && onWaitingTripClick) {
-                                  onWaitingTripClick(stay.id)
-                                } else {
-                                  onStayClick(stay.id)
-                                }
-                              }}
-                            >
-                              {buttonLabel}
-                              <ArrowRight className="w-4 h-4" />
-                            </Button>
+                            {isFinalized ? (
+                              <Button
+                                disabled
+                                className="w-full bg-slate-600 text-slate-400 font-semibold rounded-lg flex items-center justify-center gap-2 cursor-not-allowed opacity-60"
+                              >
+                                {buttonLabel}
+                              </Button>
+                            ) : (
+                              <Button
+                                className="w-full bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600 text-white font-semibold rounded-lg flex items-center justify-center gap-2"
+                                onClick={(e) => {
+                                  e.stopPropagation()
+                                  const waitingLabel = t("stays.waitingTripStart") || "Esperando inicio de viaje! ⏳"
+                                  if (!hasCompletedCheckIn) {
+                                    onFirstStayCheckinClick()
+                                  } else if (buttonLabel === accessReservationLabel && onAccessReservationClick) {
+                                    onAccessReservationClick(stay.id)
+                                  } else if (buttonLabel === waitingLabel && onWaitingTripClick) {
+                                    onWaitingTripClick(stay.id)
+                                  } else {
+                                    onStayClick(stay.id)
+                                  }
+                                }}
+                              >
+                                {buttonLabel}
+                                <ArrowRight className="w-4 h-4" />
+                              </Button>
+                            )}
                           </div>
                         )}
                       </CardContent>

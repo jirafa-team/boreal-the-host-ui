@@ -37,7 +37,9 @@ export type UsersViewProps = {
   onSave: () => void
   t: TFunction
   roles?: Array<{ id: string; name: string }>
+  departments?: Array<{ id: string; name: string }>
   isLoading?: boolean
+  isSaving?: boolean
   error?: unknown
 }
 
@@ -61,7 +63,9 @@ export function UsersView({
   onSave,
   t,
   roles,
+  departments,
   isLoading,
+  isSaving,
   error,
 }: UsersViewProps) {
   return (
@@ -149,8 +153,10 @@ export function UsersView({
         formData={formData}
         setFormData={setFormData}
         onSave={onSave}
+        isSaving={isSaving}
         t={t}
         roles={roles}
+        departments={departments}
       />
     </div>
   )

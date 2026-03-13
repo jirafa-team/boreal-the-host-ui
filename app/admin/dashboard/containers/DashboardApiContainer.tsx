@@ -19,6 +19,7 @@ import { useGetFacilitiesQuery } from "@/app/admin/facilities/slice/facilitySlic
 import { useGetReservationFacilityBookingsQuery } from "@/features/reservation-facility-booking/slices/reservationFacilityBookingSlice"
 import { useGetClientsQuery, mapClientApiToClient } from "@/app/admin/clients/slice/clientSlice"
 import { useCreateReservationMutation, useGetReservationsQuery } from "@/features/reservation/slices/reservationSlice"
+import { useCreateStaffTaskMutation } from "@/features/staff-task/slices/staffTaskSlice"
 import { useToast } from "@/hooks/use-toast"
 import type { Facility as ApiFacility } from "@/interfaces/facility/Facility"
 import type { StaffMemberDisplay } from "@/interfaces/staff/StaffMemberDisplay"
@@ -37,6 +38,7 @@ import type {
   StaffDepartment,
   RoomBookingClient,
   RoomBookingFormPayload,
+  MaintenanceActivityFormPayload,
 } from "../components/types"
 import type { RoomReservationRange } from "../utils"
 import {
@@ -86,7 +88,6 @@ function getInitials(name: string): string {
 
 function mapStaffDisplayToMember(
   d: StaffMemberDisplay,
-  index: number
 ): StaffMember {
   const emp = d.employee
   const workStatus = emp?.workStatus ?? "available"
@@ -105,7 +106,7 @@ function mapStaffDisplayToMember(
   const department = validDepts.includes(dept) ? dept : "Recepción"
 
   return {
-    id: index + 1,
+    id: d.id,
     name:
       (d.name ?? [d.firstName, d.lastName].filter(Boolean).join(" ")) || "—",
     avatar: getInitials(d.name ?? d.firstName ?? "U"),
@@ -198,6 +199,7 @@ export function DashboardApiContainer() {
   const { data: roomsData, isLoading: roomsLoading, refetch: refetchRooms } =
     useGetRoomsQuery(undefined, { skip })
   const [createReservation] = useCreateReservationMutation()
+  const [createStaffTask] = useCreateStaffTaskMutation()
   const { toast } = useToast()
   const { data: staffData } = useGetStaffQuery(undefined, { skip })
   const { data: facilitiesData } = useGetFacilitiesQuery(undefined, {
@@ -376,6 +378,29 @@ export function DashboardApiContainer() {
     [bookings]
   )
 
+  const handleCreateMaintenanceActivity = useCallback(
+    async (payload: MaintenanceActivityFormPayload) => {
+      console.log(payload.assignedStaffId)
+      try {
+        await createStaffTask({
+          userId: payload.assignedStaffId,
+          scheduledStartAt: new Date(
+            `${payload.scheduledDate}T${payload.scheduledTime}`
+          ).toISOString(),
+          description: payload.description,
+        }).unwrap()
+        toast({ title: "Éxito", description: "Tarea creada correctamente." })
+      } catch {
+        toast({
+          title: "Error",
+          description: "No se pudo crear la tarea.",
+          variant: "destructive",
+        })
+      }
+    },
+    [createStaffTask, toast]
+  )
+
   const handleCreateRoomBooking = async (payload: RoomBookingFormPayload) => {
     if (!payload.clientId) {
       toast({
@@ -445,7 +470,7 @@ export function DashboardApiContainer() {
       checkoutsCompletedCount={checkoutsCompletedCount}
       checkoutsPendingCount={checkoutsPendingCount}
       onCompleteCheckout={handleCompleteCheckout}
-      onShowBookingsDetail={() => {}}
+      onShowBookingsDetail={() => { }}
       navigateDate={navigateDate}
       convertISOToLocaleFormat={convertISOToLocaleFormat}
       getStatusColor={getStatusColor}
@@ -461,8 +486,8 @@ export function DashboardApiContainer() {
       roomBookingClients={roomBookingClients}
       facilityBookingSuggestions={facilityBookingSuggestions}
       onCreateRoomBooking={handleCreateRoomBooking}
-      onCreateMaintenanceActivity={() => {}}
-      onAddFacilityBooking={() => {}}
+      onCreateMaintenanceActivity={handleCreateMaintenanceActivity}
+      onAddFacilityBooking={() => { }}
     />
   )
 }

@@ -10,6 +10,7 @@ import {
   useDeleteUserMutation,
 } from "@/app/admin/users/slice/userSlice"
 import { useGetRolesQuery } from "@/features/role/slices/roleSlice"
+import { useGetDepartmentsQuery } from "@/features/taxonomy-department/slices/taxonomyDepartmentSlice"
 import { useLanguage } from "@/lib/i18n-context"
 import { useToast } from "@/hooks/use-toast"
 import { Badge } from "@/components/ui/badge"
@@ -28,6 +29,7 @@ const initialFormData: NewUserForm = {
   status: "active",
   phone: "",
   password: "",
+  departmentId: "",
   permissions: {
     canManageRooms: false,
     canManageClients: false,
@@ -46,10 +48,14 @@ export function UsersApiContainer() {
 
   const { data: apiData, isLoading, error } = useGetUsersQuery(undefined, { skip })
   const { data: rolesData } = useGetRolesQuery(undefined, { skip })
+  const { data: departmentsData } = useGetDepartmentsQuery(undefined, { skip })
+  const departments = departmentsData?.data ?? []
 
   const [createUser] = useCreateUserMutation()
   const [updateUser] = useUpdateUserMutation()
   const [deleteUser] = useDeleteUserMutation()
+
+  const [loading, setLoading] = useState<boolean>(false);
 
   const rolesList = rolesData?.data?.objects ?? []
 
@@ -176,6 +182,7 @@ export function UsersApiContainer() {
   )
 
   const handleSave = useCallback(async () => {
+    setLoading(true)
     try {
       if (editingUser) {
         const basePayload: Record<string, unknown> = {
@@ -188,6 +195,7 @@ export function UsersApiContainer() {
         const payload = {
           ...basePayload,
           ...(formData.roleId ? { roleIds: [formData.roleId] } : {}),
+          ...(formData.departmentId ? { departmentId: formData.departmentId } : {}),
         }
         await updateUser({ id: editingUser.id, payload }).unwrap()
         toast({ title: "Éxito", description: t("admin.userUpdated") ?? "Usuario actualizado correctamente." })
@@ -212,6 +220,7 @@ export function UsersApiContainer() {
           email: formData.email.trim(),
           roleName,
           password: formData.password?.trim() || undefined,
+          ...(formData.departmentId ? { departmentId: formData.departmentId } : {}),
         }).unwrap()
         toast({ title: "Éxito", description: t("admin.userCreated") ?? "Usuario creado correctamente." })
       }
@@ -224,6 +233,8 @@ export function UsersApiContainer() {
         description: t("admin.errorSavingUser") ?? "No se pudo guardar el usuario.",
         variant: "destructive",
       })
+    } finally {
+      setLoading(false)
     }
   }, [editingUser, formData, rolesList, updateUser, createUser, toast, t])
 
@@ -265,7 +276,9 @@ export function UsersApiContainer() {
       onSave={handleSave}
       t={t}
       roles={rolesList}
+      departments={departments}
       isLoading={isLoading}
+      isSaving={loading}
       error={error}
     />
   )

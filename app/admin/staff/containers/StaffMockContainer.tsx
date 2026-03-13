@@ -16,6 +16,14 @@ import type {
 import { useLanguage } from '@/lib/i18n-context';
 import { SHIFT_TO_SCHEDULE } from '@/app/admin/staff/constants';
 
+const MOCK_DEPARTMENTS = [
+  { id: '1', name: 'Limpieza' },
+  { id: '2', name: 'Mantenimiento' },
+  { id: '3', name: 'Seguridad' },
+  { id: '4', name: 'Recepción' },
+  { id: '5', name: 'Servicio' },
+];
+
 const initialNewStaff: NewStaffForm = {
   name: '',
   email: '',
@@ -126,6 +134,7 @@ export function StaffMockContainer() {
       onAddStaff={handleAddStaff}
       onAssignTask={handleAssignTask}
       t={t}
+      departments={MOCK_DEPARTMENTS}
     />
   );
 }

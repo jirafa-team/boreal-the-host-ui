@@ -30,8 +30,10 @@ export type UserDialogProps = {
   formData: NewUserForm
   setFormData: (data: NewUserForm | ((prev: NewUserForm) => NewUserForm)) => void
   onSave: () => void
+  isSaving?: boolean
   t: TFunction
   roles?: Array<{ id: string; name: string }>
+  departments?: Array<{ id: string; name: string }>
 }
 
 const defaultPermissions = {
@@ -50,8 +52,10 @@ export function UserDialog({
   formData,
   setFormData,
   onSave,
+  isSaving,
   t,
   roles,
+  departments,
 }: UserDialogProps) {
   const permissions = formData.permissions ?? defaultPermissions
   const useRoleIdSelect = roles != null && roles.length > 0
@@ -123,6 +127,28 @@ export function UserDialog({
                 />
               </div>
             </div>
+
+            {departments && departments.length > 0 && (
+              <div className="space-y-2">
+                <Label htmlFor="departmentId">{t("admin.department")}</Label>
+                <Select
+                  key={editingUser?.id ?? "new-dept"}
+                  value={formData.departmentId && departments.some((d) => d.id === formData.departmentId) ? formData.departmentId : ""}
+                  onValueChange={(value) => setFormData({ ...formData, departmentId: value })}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder={t("admin.department")} />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {departments.map((d) => (
+                      <SelectItem key={d.id} value={d.id}>
+                        {d.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            )}
 
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
@@ -222,8 +248,8 @@ export function UserDialog({
           <Button variant="outline" onClick={() => onOpenChange(false)} className="bg-transparent">
             {t("admin.cancel")}
           </Button>
-          <Button onClick={onSave} className="bg-blue-600 hover:bg-blue-700">
-            {t("admin.save")}
+          <Button onClick={onSave} disabled={isSaving} className="bg-blue-600 hover:bg-blue-700">
+            {isSaving ? "Guardando..." : t("admin.save")}
           </Button>
         </DialogFooter>
       </DialogContent>
