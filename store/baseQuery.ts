@@ -22,7 +22,6 @@ export const baseQueryWithOrg: BaseQueryFn<
     organizationId = state.organization?.currentOrganizationId ?? state.auth?.currentOrganization?.id ?? undefined;
   }
 
-  let url: string;
   let modifiedArgs: string | FetchArgs;
 
   const path = typeof args === 'string' ? args : args.url;

@@ -62,7 +62,7 @@ export function StaysApiContainer() {
     const fromAuth = state.auth?.currentOrganization as { id?: string } | undefined
     return fromAuth?.id ?? undefined
   })
-  const [isRedirecting, setIsRedirecting] = useState(true)
+  const [isRedirecting, setIsRedirecting] = useState(false)
 
   const { data: userContexts } = useGetUserContextsQuery(undefined, {
     skip: dataSource !== "api" || !!organizationId,
@@ -143,7 +143,7 @@ export function StaysApiContainer() {
   }
 
   const handleWaitingTripClick = (stayId: number | string) => {
-    router.push(`/client?reservationId=${stayId}`)
+    router.push(`/client/reservation-details?reservationId=${stayId}`)
   }
 
   const handleFirstStayCheckinClick = () => {

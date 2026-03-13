@@ -106,12 +106,29 @@ export function AssignTaskDialog({
               className="mt-2"
             />
           </div>
+          <div>
+            <Label htmlFor="scheduledStartAt" className="text-sm font-medium">
+              {t('admin.scheduledDate')}
+            </Label>
+            <Input
+              id="scheduledStartAt"
+              type="datetime-local"
+              value={newTask.scheduledStartAt}
+              onChange={(e) =>
+                onNewTaskChange((prev) => ({
+                  ...prev,
+                  scheduledStartAt: e.target.value,
+                }))
+              }
+              className="mt-2"
+            />
+          </div>
         </div>
         <div className="flex justify-end gap-2">
           <Button variant="outline" onClick={() => onOpenChange(false)}>
             {t('admin.cancel')}
           </Button>
-          <Button onClick={onSubmit} className="bg-amber-600 hover:bg-amber-700">
+          <Button type='button' onClick={onSubmit} className="bg-amber-600 hover:bg-amber-700">
             {t('admin.create')}
           </Button>
         </div>

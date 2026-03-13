@@ -33,6 +33,8 @@ export type StaffViewProps = {
   onShowAddDialogChange: (open: boolean) => void;
   showAssignTaskDialog: boolean;
   onShowAssignTaskDialogChange: (open: boolean) => void;
+  staffForTask: StaffMemberView | null;
+  onOpenAssignTask: () => void;
   newStaff: NewStaffForm;
   onNewStaffChange: (updater: (prev: NewStaffForm) => NewStaffForm) => void;
   newTask: NewTaskForm;
@@ -40,6 +42,8 @@ export type StaffViewProps = {
   onAddStaff: () => void;
   onAssignTask: () => void;
   t: TFunction;
+  loading?: boolean;
+  departments?: Array<{ id: string; name: string }>;
 };
 
 function getStatusColor(status: string): string {
@@ -67,6 +71,8 @@ export function StaffView({
   onShowAddDialogChange,
   showAssignTaskDialog,
   onShowAssignTaskDialogChange,
+  staffForTask,
+  onOpenAssignTask,
   newStaff,
   onNewStaffChange,
   newTask,
@@ -74,6 +80,8 @@ export function StaffView({
   onAddStaff,
   onAssignTask,
   t,
+  loading,
+  departments,
 }: StaffViewProps) {
   const getStatusText = (status: string) => {
     switch (status) {
@@ -124,6 +132,8 @@ export function StaffView({
               onNewStaffChange={onNewStaffChange}
               onSubmit={onAddStaff}
               t={t}
+              loading={loading}
+              departments={departments}
             />
           </Dialog>
         </div>
@@ -192,14 +202,14 @@ export function StaffView({
                           {t('admin.tasksToday')}
                         </span>
                         <span className="font-semibold text-foreground">
-                          {member.tasksToday} / {member.maxCapacity}
+                          {member.completedTasks} / {member.totalTasks}
                         </span>
                       </div>
                       <div className="w-full bg-muted rounded-full h-2 mt-2">
                         <div
                           className="bg-primary rounded-full h-2 transition-all"
                           style={{
-                            width: `${(member.tasksToday / member.maxCapacity) * 100}%`,
+                            width: `${member.totalTasks > 0 ? (member.completedTasks / member.totalTasks) * 100 : 0}%`,
                           }}
                         />
                       </div>
@@ -264,7 +274,7 @@ export function StaffView({
                 </div>
               </div>
               <Button
-                onClick={() => onShowAssignTaskDialogChange(true)}
+                onClick={onOpenAssignTask}
                 className="w-full bg-amber-600 hover:bg-amber-700"
               >
                 <CheckSquare className="w-4 h-4 mr-2" />
@@ -275,17 +285,15 @@ export function StaffView({
         </Dialog>
       )}
 
-      {selectedStaff && (
-        <AssignTaskDialog
-          open={showAssignTaskDialog}
-          onOpenChange={onShowAssignTaskDialogChange}
-          selectedStaffName={selectedStaff.name}
-          newTask={newTask}
-          onNewTaskChange={onNewTaskChange}
-          onSubmit={onAssignTask}
-          t={t}
-        />
-      )}
+      <AssignTaskDialog
+        open={showAssignTaskDialog}
+        onOpenChange={onShowAssignTaskDialogChange}
+        selectedStaffName={staffForTask?.name ?? ''}
+        newTask={newTask}
+        onNewTaskChange={onNewTaskChange}
+        onSubmit={onAssignTask}
+        t={t}
+      />
     </div>
   );
 }

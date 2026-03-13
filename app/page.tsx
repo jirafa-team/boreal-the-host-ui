@@ -14,27 +14,38 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { BorealLoadingBar } from "@/components/boreal-loading-bar"
 import type { RootState } from "@/store/store"
 import { setDataSource } from "@/store/slices/dataSourceSlice"
-import { updateUser, useLoginMutation } from "@/features/auth/slices/authSlice"
+import { updateUser, useLoginMutation, useRegisterMutation } from "@/features/auth/slices/authSlice"
 import { jwtDecode } from "jwt-decode"
 import { JWTPayload } from "@/interfaces"
 
 export default function HomePage() {
+  // Login state
   const [username, setUsername] = useState("")
   const [password, setPassword] = useState("")
+  const [loginError, setLoginError] = useState<string | null>(null)
+  const [isLoading, setIsLoading] = useState(false)
+  const [showEmailValidationMessage, setShowEmailValidationMessage] = useState(false)
+
+  // Admin login state
   const [showAdminLogin, setShowAdminLogin] = useState(false)
   const [adminUser, setAdminUser] = useState("")
   const [adminPassword, setAdminPassword] = useState("")
-  const [isLoading, setIsLoading] = useState(false)
-  const [loginError, setLoginError] = useState<string | null>(null)
+
+  // Register state
   const [showRegister, setShowRegister] = useState(false)
-  const [registerUsername, setRegisterUsername] = useState("")
+  const [showRegisterSuccess, setShowRegisterSuccess] = useState(false)
+  const [registerFirstName, setRegisterFirstName] = useState("")
+  const [registerLastName, setRegisterLastName] = useState("")
+  const [registerEmail, setRegisterEmail] = useState("")
   const [registerPassword, setRegisterPassword] = useState("")
   const [registerConfirmPassword, setRegisterConfirmPassword] = useState("")
+  const [registerTermsAccepted, setRegisterTermsAccepted] = useState(false)
+
   const [isLoaded, setIsLoaded] = useState(false)
-  const [showEmailValidationMessage, setShowEmailValidationMessage] = useState(false)
   const router = useRouter()
   const dispatch = useDispatch()
   const [login, { isLoading: isLoginPending }] = useLoginMutation()
+  const [register, { isLoading: isRegisterPending }] = useRegisterMutation()
   const dataSource = useSelector((state: RootState) => state.dataSource.dataSource)
   const mockMode = dataSource === "mock"
 
@@ -43,6 +54,8 @@ export default function HomePage() {
   }, [])
 
   const { language, setLanguage, t } = useLanguage()
+
+  // ─── Login handlers ────────────────────────────────────────────────────────
 
   const handleClientLogin = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -86,7 +99,7 @@ export default function HomePage() {
 
     if (!isValidPredefined) {
       const users = JSON.parse(localStorage.getItem("users") || "[]")
-      const user = users.find((u: { username: string; password: string }) => u.username === username && u.password === password)
+      const user = users.find((u: { email: string; password: string }) => u.email === username && u.password === password)
 
       if (!user) {
         setLoginError(t("login.invalidUsername"))
@@ -166,59 +179,99 @@ export default function HomePage() {
     }
   }
 
-  const handleRegister = (e: React.FormEvent) => {
+  // ─── Register handler ──────────────────────────────────────────────────────
+
+  const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault()
+    setLoginError(null)
 
-    // Validación de username vacío
-    if (!registerUsername.trim()) {
-      alert(t("register.usernameMissing"))
+    // Validaciones comunes
+    if (!registerFirstName.trim()) {
+      setLoginError(t("register.firstNameMissing"))
       return
     }
-
-    // Validación de username reservado
-    if (registerUsername === "1" || registerUsername === "2" || registerUsername === "3" || registerUsername === "system") {
-      alert(t("register.usernameReserved"))
+    if (!registerLastName.trim()) {
+      setLoginError(t("register.lastNameMissing"))
       return
     }
-
-    // Validación de password vacío
+    if (!registerEmail.trim()) {
+      setLoginError(t("register.emailMissing"))
+      return
+    }
     if (!registerPassword) {
-      alert(t("register.passwordMissing"))
+      setLoginError(t("register.passwordMissing"))
       return
     }
-
-    // Validación de longitud mínima
-    if (registerPassword.length < 6) {
-      alert(t("register.passwordTooShort"))
-      return
-    }
-
-    // Validación de confirmación de password
     if (registerPassword !== registerConfirmPassword) {
-      alert(t("register.passwordMismatch"))
+      setLoginError(t("register.passwordMismatch"))
       return
     }
 
-    // Validación de usuario ya existente
+    if (dataSource === "api") {
+      // Validación de policy de contraseña para el API
+      const passwordPolicy = /^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,25}$/
+      if (!passwordPolicy.test(registerPassword)) {
+        setLoginError(t("register.passwordPolicy"))
+        return
+      }
+      if (!registerTermsAccepted) {
+        setLoginError(t("register.mustAcceptTerms"))
+        return
+      }
+      try {
+        await register({
+          firstName: registerFirstName.trim(),
+          lastName: registerLastName.trim(),
+          email: registerEmail.trim(),
+          password: registerPassword,
+          termsAccepted: true,
+        }).unwrap()
+        setShowRegisterSuccess(true)
+      } catch (err) {
+        const error = err as { status?: number; data?: { message?: string } }
+        setLoginError(error?.data?.message ?? t("login.invalidCredentials"))
+      }
+      return
+    }
+
+    // Modo mock
+    if (registerPassword.length < 6) {
+      setLoginError(t("register.passwordTooShort"))
+      return
+    }
+
     const users = JSON.parse(localStorage.getItem("users") || "[]")
-    if (users.some((u: any) => u.username === registerUsername)) {
-      alert(t("register.usernameExists"))
+    if (users.some((u: { email: string }) => u.email === registerEmail.trim())) {
+      setLoginError(t("register.emailExists"))
       return
     }
 
-    // Registro exitoso
-    users.push({ username: registerUsername, password: registerPassword })
+    users.push({
+      firstName: registerFirstName.trim(),
+      lastName: registerLastName.trim(),
+      email: registerEmail.trim(),
+      password: registerPassword,
+    })
     localStorage.setItem("users", JSON.stringify(users))
+    localStorage.setItem("currentUser", registerEmail.trim())
 
-    // Guardar usuario logueado
-    localStorage.setItem("currentUser", registerUsername)
-
-    // Redirigir a stays
     setIsLoading(true)
-    setTimeout(() => {
-      router.push("/client/stays")
-    }, 800)
+    setTimeout(() => router.push("/client/stays"), 800)
   }
+
+  const resetRegisterForm = () => {
+    setShowRegister(false)
+    setShowRegisterSuccess(false)
+    setRegisterFirstName("")
+    setRegisterLastName("")
+    setRegisterEmail("")
+    setRegisterPassword("")
+    setRegisterConfirmPassword("")
+    setRegisterTermsAccepted(false)
+    setLoginError(null)
+  }
+
+  // ─── Language options ──────────────────────────────────────────────────────
 
   const languages = [
     { code: "es", name: "Español", flag: "🇪🇸" },
@@ -256,11 +309,12 @@ export default function HomePage() {
 
       {/* Content */}
       <div className="relative z-10 max-w-md w-full">
-        {isLoading || isLoginPending ? (
+        {isLoading || isLoginPending || isRegisterPending ? (
           <div className="bg-white/95 backdrop-blur-lg rounded-3xl shadow-2xl p-12 flex flex-col items-center justify-center min-h-96">
             <BorealLoadingBar />
           </div>
         ) : showAdminLogin && isLoaded ? (
+          /* ─── Admin login ─── */
           <div className="bg-white/95 backdrop-blur-lg rounded-3xl shadow-2xl p-8 space-y-6">
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-2xl font-bold text-gray-800">{t("login.adminAccess")}</h2>
@@ -333,16 +387,26 @@ export default function HomePage() {
             {/* Main card */}
             <div className="bg-white/95 backdrop-blur-lg rounded-3xl shadow-2xl p-8 space-y-6">
               <div className="flex items-center justify-between gap-2 py-2 px-3 mb-2 rounded-lg bg-gray-100">
-                <span className="text-sm font-medium text-gray-700">
-                  {mockMode ? "MOCK" : "API"}
-                </span>
-                <Switch
-                  checked={mockMode}
-                  onCheckedChange={(checked) => dispatch(setDataSource(checked ? "mock" : "api"))}
-                />
+                {isLoaded ? (
+                  <>
+                    <span className="text-sm font-medium text-gray-700">
+                      {mockMode ? "MOCK" : "API"}
+                    </span>
+                    <Switch
+                      checked={mockMode}
+                      onCheckedChange={(checked) => dispatch(setDataSource(checked ? "mock" : "api"))}
+                    />
+                  </>
+                ) : (
+                  <>
+                    <span className="text-sm font-medium text-gray-700">API</span>
+                    <Switch checked={false} onCheckedChange={() => {}} />
+                  </>
+                )}
               </div>
 
               {showEmailValidationMessage ? (
+                /* ─── Email validation notice (post-login) ─── */
                 <div className="space-y-4">
                   <p className="text-gray-700 text-center">
                     {t("login.emailValidationSent")}
@@ -359,6 +423,7 @@ export default function HomePage() {
                   </Button>
                 </div>
               ) : !showRegister ? (
+                /* ─── Client login ─── */
                 <>
                   {loginError && (
                     <p className="text-sm text-red-600 bg-red-50 px-3 py-2 rounded-lg">{loginError}</p>
@@ -388,7 +453,7 @@ export default function HomePage() {
 
                     <Button
                       type="submit"
-                      className="w-full h-12 bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 text-white px-6 py-3.5 rounded-xl font-semibold hover:from-blue-600 hover:to-cyan-600 transition-all shadow-md"
+                      className="w-full h-12 bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 text-white px-6 py-3.5 rounded-xl font-semibold transition-all shadow-md"
                       disabled={!username || !password}
                     >
                       {t("common.continue")}
@@ -434,22 +499,61 @@ export default function HomePage() {
                     </button>
                   </div>
                 </>
+              ) : showRegisterSuccess ? (
+                /* ─── Register success (API mode) ─── */
+                <div className="space-y-4 text-center">
+                  <p className="text-gray-700">{t("register.registerSuccess")}</p>
+                  <Button
+                    type="button"
+                    onClick={resetRegisterForm}
+                    className="w-full h-12 bg-white border-2 border-gray-300 text-gray-700 rounded-xl font-semibold hover:bg-gray-50"
+                  >
+                    {t("login.backToLogin")}
+                  </Button>
+                </div>
               ) : (
+                /* ─── Register form ─── */
                 <>
                   <h2 className="text-2xl font-bold text-gray-900 text-center">{t("register.registerTitle")}</h2>
 
                   <form onSubmit={handleRegister} className="space-y-4">
+                    {/* Fila 1: Nombre + Apellido */}
+                    <div className="flex gap-3">
+                      <div className="flex-1 space-y-2">
+                        <label className="text-sm font-medium text-gray-700">{t("register.firstName")}</label>
+                        <Input
+                          type="text"
+                          placeholder={t("register.enterFirstName")}
+                          value={registerFirstName}
+                          onChange={(e) => setRegisterFirstName(e.target.value)}
+                          className="w-full h-12 px-4 border-2 border-gray-200 focus:border-blue-500 rounded-xl"
+                        />
+                      </div>
+                      <div className="flex-1 space-y-2">
+                        <label className="text-sm font-medium text-gray-700">{t("register.lastName")}</label>
+                        <Input
+                          type="text"
+                          placeholder={t("register.enterLastName")}
+                          value={registerLastName}
+                          onChange={(e) => setRegisterLastName(e.target.value)}
+                          className="w-full h-12 px-4 border-2 border-gray-200 focus:border-blue-500 rounded-xl"
+                        />
+                      </div>
+                    </div>
+
+                    {/* Fila 2: Email */}
                     <div className="space-y-2">
-                      <label className="text-sm font-medium text-gray-700">{t("register.username")}</label>
+                      <label className="text-sm font-medium text-gray-700">{t("register.email")}</label>
                       <Input
-                        type="text"
-                        placeholder={t("register.enterUsername")}
-                        value={registerUsername}
-                        onChange={(e) => setRegisterUsername(e.target.value)}
+                        type="email"
+                        placeholder={t("register.enterEmail")}
+                        value={registerEmail}
+                        onChange={(e) => setRegisterEmail(e.target.value)}
                         className="w-full h-12 px-4 border-2 border-gray-200 focus:border-blue-500 rounded-xl"
                       />
                     </div>
 
+                    {/* Fila 3: Password */}
                     <div className="space-y-2">
                       <label className="text-sm font-medium text-gray-700">{t("register.password")}</label>
                       <Input
@@ -459,35 +563,61 @@ export default function HomePage() {
                         onChange={(e) => setRegisterPassword(e.target.value)}
                         className="w-full h-12 px-4 border-2 border-gray-200 focus:border-blue-500 rounded-xl"
                       />
+                      {!mockMode && (
+                        <p className="text-xs text-gray-500">{t("register.passwordPolicy")}</p>
+                      )}
                     </div>
 
+                    {/* Fila 4: Confirmar Password */}
                     <div className="space-y-2">
                       <label className="text-sm font-medium text-gray-700">{t("register.confirmPassword")}</label>
                       <Input
                         type="password"
-                        placeholder={t("register.confirmPassword")}
+                        placeholder={t("register.enterConfirmPassword")}
                         value={registerConfirmPassword}
                         onChange={(e) => setRegisterConfirmPassword(e.target.value)}
                         className="w-full h-12 px-4 border-2 border-gray-200 focus:border-blue-500 rounded-xl"
                       />
                     </div>
 
+                    {/* Terms (solo API) */}
+                    {!mockMode && (
+                      <div className="flex items-center gap-2">
+                        <input
+                          id="terms"
+                          type="checkbox"
+                          checked={registerTermsAccepted}
+                          onChange={(e) => setRegisterTermsAccepted(e.target.checked)}
+                          className="w-4 h-4 rounded border-gray-300 accent-blue-600"
+                        />
+                        <label htmlFor="terms" className="text-sm text-gray-600 cursor-pointer">
+                          {t("register.termsAccepted")}
+                        </label>
+                      </div>
+                    )}
+
+                    {loginError && (
+                      <p className="text-sm text-red-600 bg-red-50 px-3 py-2 rounded-lg">{loginError}</p>
+                    )}
+
                     <Button
                       type="submit"
                       className="w-full h-12 bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 text-white rounded-xl font-semibold transition-all shadow-md"
-                      disabled={!registerUsername || !registerPassword || !registerConfirmPassword}
+                      disabled={
+                        !registerFirstName ||
+                        !registerLastName ||
+                        !registerEmail ||
+                        !registerPassword ||
+                        !registerConfirmPassword ||
+                        (!mockMode && !registerTermsAccepted)
+                      }
                     >
                       {t("register.createAccount")}
                     </Button>
 
                     <Button
                       type="button"
-                      onClick={() => {
-                        setShowRegister(false)
-                        setRegisterUsername("")
-                        setRegisterPassword("")
-                        setRegisterConfirmPassword("")
-                      }}
+                      onClick={resetRegisterForm}
                       className="w-full h-12 bg-gray-100 text-gray-700 hover:bg-gray-200 rounded-xl font-semibold transition-all"
                     >
                       {t("login.backToLogin")}
@@ -497,7 +627,7 @@ export default function HomePage() {
               )}
             </div>
 
-            {/* Footer text */}
+            {/* Footer */}
             <p className="text-center text-white/80 text-sm mt-6">
               <span>{t("login.needHelpPrefix")} </span>
               <a

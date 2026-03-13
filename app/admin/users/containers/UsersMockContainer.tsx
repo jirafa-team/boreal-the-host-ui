@@ -13,6 +13,14 @@ import { UsersView } from "../components/UsersView"
 import type { User, NewUserForm } from "../components/types"
 import { mapApiUserToUi } from "../components/types"
 
+const MOCK_DEPARTMENTS = [
+  { id: '1', name: 'Limpieza' },
+  { id: '2', name: 'Mantenimiento' },
+  { id: '3', name: 'Seguridad' },
+  { id: '4', name: 'Recepción' },
+  { id: '5', name: 'Servicio' },
+]
+
 const initialFormData: NewUserForm = {
   firstName: "",
   lastName: "",
@@ -210,6 +218,7 @@ export function UsersMockContainer() {
       setFormData={setFormData}
       onSave={handleSave}
       t={t}
+      departments={MOCK_DEPARTMENTS}
     />
   )
 }

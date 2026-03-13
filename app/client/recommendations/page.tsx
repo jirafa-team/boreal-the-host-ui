@@ -159,77 +159,77 @@ export default function RecommendationsPage() {
               {/* Description */}
               <p className="text-sm text-muted-foreground">{place.description}</p>
 
-                {/* Details */}
-                <div className="bg-muted/50 rounded-lg p-3 space-y-2 text-xs">
-                  <div className="flex items-start gap-2">
-                    <span className="font-semibold text-foreground min-w-16">Dirección:</span>
-                    <span className="text-muted-foreground">{place.address}</span>
-                  </div>
-                  <div className="flex items-start gap-2">
-                    <span className="font-semibold text-foreground min-w-16">Horario:</span>
-                    <span className="text-muted-foreground">{place.hours}</span>
-                  </div>
+              {/* Details */}
+              <div className="bg-muted/50 rounded-lg p-3 space-y-2 text-xs">
+                <div className="flex items-start gap-2">
+                  <span className="font-semibold text-foreground min-w-16">Dirección:</span>
+                  <span className="text-muted-foreground">{place.address}</span>
                 </div>
+                <div className="flex items-start gap-2">
+                  <span className="font-semibold text-foreground min-w-16">Horario:</span>
+                  <span className="text-muted-foreground">{place.hours}</span>
+                </div>
+              </div>
 
-                {/* Discount - Removed since it's now in header */}
+              {/* Discount - Removed since it's now in header */}
 
-                {/* Actions */}
-                <div className="flex gap-3 pt-2">
-                  <Dialog>
-                    <DialogTrigger asChild>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        className="flex-1 gap-2 bg-transparent"
-                        onClick={() => setSelectedQR(place)}
-                      >
-                        <QrCode className="w-4 h-4" />
-                        Generar QR
-                      </Button>
-                    </DialogTrigger>
-                    <DialogContent className="sm:max-w-md">
-                      <DialogHeader>
-                        <DialogTitle>Código QR - {selectedQR?.name}</DialogTitle>
-                        <DialogDescription>
-                          Escanea este código en el establecimiento para aplicar tu descuento
-                        </DialogDescription>
-                      </DialogHeader>
-                      <div className="flex flex-col items-center gap-4 py-6">
-                        <div className="bg-white p-4 rounded-lg border-2 border-foreground">
-                          {/* Placeholder para QR - En producción usarías una librería como qrcode.react */}
-                          <div className="w-48 h-48 bg-gradient-to-br from-primary to-primary/50 rounded flex items-center justify-center text-white text-center">
-                            <div className="space-y-2">
-                              <QrCode className="w-12 h-12 mx-auto" />
-                              <p className="text-xs font-semibold">{selectedQR?.name}</p>
-                              <p className="text-[10px] opacity-80">{selectedQR?.discount}</p>
-                            </div>
+              {/* Actions */}
+              <div className="flex gap-3 pt-2">
+                <Dialog>
+                  <DialogTrigger asChild>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="flex-1 gap-2 bg-transparent"
+                      onClick={() => setSelectedQR(place)}
+                    >
+                      <QrCode className="w-4 h-4" />
+                      Generar QR
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent className="sm:max-w-md">
+                    <DialogHeader>
+                      <DialogTitle>Código QR - {selectedQR?.name}</DialogTitle>
+                      <DialogDescription>
+                        Escanea este código en el establecimiento para aplicar tu descuento
+                      </DialogDescription>
+                    </DialogHeader>
+                    <div className="flex flex-col items-center gap-4 py-6">
+                      <div className="bg-white p-4 rounded-lg border-2 border-foreground">
+                        {/* Placeholder para QR - En producción usarías una librería como qrcode.react */}
+                        <div className="w-48 h-48 bg-gradient-to-br from-primary to-primary/50 rounded flex items-center justify-center text-white text-center">
+                          <div className="space-y-2">
+                            <QrCode className="w-12 h-12 mx-auto" />
+                            <p className="text-xs font-semibold">{selectedQR?.name}</p>
+                            <p className="text-[10px] opacity-80">{selectedQR?.discount}</p>
                           </div>
                         </div>
-                        <div className="text-center space-y-2">
-                          <p className="text-sm font-semibold text-foreground">ID: QR-{selectedQR?.id}-{new Date().getTime()}</p>
-                          <p className="text-xs text-muted-foreground">Válido por 24 horas</p>
-                        </div>
                       </div>
-                      <Button
-                        onClick={() => selectedQR && downloadQR(selectedQR)}
-                        className="w-full gap-2"
-                      >
-                        <Download className="w-4 h-4" />
-                        Descargar QR
-                      </Button>
-                    </DialogContent>
-                  </Dialog>
+                      <div className="text-center space-y-2">
+                        <p className="text-sm font-semibold text-foreground">ID: QR-{selectedQR?.id}-{new Date().getTime()}</p>
+                        <p className="text-xs text-muted-foreground">Válido por 24 horas</p>
+                      </div>
+                    </div>
+                    <Button
+                      onClick={() => selectedQR && downloadQR(selectedQR)}
+                      className="w-full gap-2"
+                    >
+                      <Download className="w-4 h-4" />
+                      Descargar QR
+                    </Button>
+                  </DialogContent>
+                </Dialog>
 
-                  <Button 
-                    variant="default" 
-                    size="sm" 
-                    className="flex-1 gap-2"
-                    onClick={() => window.location.href = `tel:${place.phone}`}
-                  >
-                    <Phone className="w-4 h-4" />
-                    Llamar
-                  </Button>
-                </div>
+                <Button
+                  variant="default"
+                  size="sm"
+                  className="flex-1 gap-2"
+                  onClick={() => window.location.href = `tel:${place.phone}`}
+                >
+                  <Phone className="w-4 h-4" />
+                  Llamar
+                </Button>
+              </div>
             </Card>
           ))}
         </div>

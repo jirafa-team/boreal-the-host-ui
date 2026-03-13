@@ -45,7 +45,7 @@ export type StaffDepartment =
   | "Servicio"
 
 export type StaffMember = {
-  id: number
+  id: string
   name: string
   avatar: string
   department: StaffDepartment

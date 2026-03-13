@@ -48,5 +48,7 @@ export function staffDisplayToView(d: StaffMemberDisplay): StaffMemberView {
     avatar: getInitials(d.name),
     tasksToday: d.employee?.tasksToday ?? 0,
     maxCapacity: d.employee?.maxCapacity ?? 8,
+    totalTasks: d.employee?.totalTasks ?? 0,
+    completedTasks: d.employee?.completedTasks ?? 0,
   };
 }
