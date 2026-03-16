@@ -1,7 +1,7 @@
 "use client"
 
 import { useSearchParams } from "next/navigation"
-import { ClientExperienceView } from "../page"
+import { ClientExperienceView } from "../ClientExperienceView"
 import type { ClientType, ClientUserData, FacilityItem, FacilitySlot, ClientEvent } from "../types"
 
 const futureUserData: ClientUserData = {
