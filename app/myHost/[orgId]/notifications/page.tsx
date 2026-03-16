@@ -1,2 +1,2 @@
-import AdminNotifications from "@/app/admin/notifications/page"
-export default AdminNotifications
+import NotificationsView from "@/app/admin/notifications/NotificationsView"
+export default NotificationsView

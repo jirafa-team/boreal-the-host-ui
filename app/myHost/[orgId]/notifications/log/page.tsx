@@ -1,2 +1,2 @@
-import AdminNotificationsLog from "@/app/admin/notifications/log/page"
-export default AdminNotificationsLog
+import NotificationsLogView from "@/app/admin/notifications/log/NotificationsLogView"
+export default NotificationsLogView

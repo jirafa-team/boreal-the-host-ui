@@ -1,2 +1,2 @@
-import AdminAgentico from "@/app/admin/agentico/page"
-export default AdminAgentico
+import AgenticoView from "@/app/admin/agentico/AgenticoView"
+export default AgenticoView

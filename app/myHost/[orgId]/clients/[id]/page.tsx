@@ -1,2 +1,2 @@
-import AdminClientDetail from "@/app/admin/clients/[id]/page"
-export default AdminClientDetail
+import ClientDetailView from "@/app/admin/clients/[id]/ClientDetailView"
+export default ClientDetailView

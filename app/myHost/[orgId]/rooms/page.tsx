@@ -1,2 +1,15 @@
-import AdminRooms from "@/app/admin/rooms/page"
-export default AdminRooms
+"use client"
+
+import { useSelector } from "react-redux"
+import type { RootState } from "@/store/store"
+import { RoomsApiContainer } from "@/app/admin/rooms/containers/RoomsApiContainer"
+import { RoomsMockContainer } from "@/app/admin/rooms/containers/RoomsMockContainer"
+
+export default function RoomsManagement() {
+  const dataSource = useSelector((state: RootState) => state.dataSource.dataSource)
+
+  if (dataSource === "api") {
+    return <RoomsApiContainer />
+  }
+  return <RoomsMockContainer />
+}
