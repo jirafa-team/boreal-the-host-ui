@@ -1,2 +1,2 @@
-import AdminHome from "@/app/admin/home/page"
-export default AdminHome
+import HomeView from "@/app/admin/home/HomeView"
+export default HomeView

@@ -1,2 +1,2 @@
-import AdminEvents from "@/app/admin/events/page"
-export default AdminEvents
+import EventsView from "@/app/admin/events/EventsView"
+export default EventsView
