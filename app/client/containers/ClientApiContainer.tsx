@@ -8,7 +8,7 @@ import { useLanguage } from "@/lib/i18n-context"
 import { useGetUserReservationContextsQuery } from "@/features/reservation/slices/reservationSlice"
 import { useGetUserContextsQuery } from "@/features/auth/slices/authSlice"
 import { setCurrentOrganization } from "@/features/organization/slices/organizationSlice"
-import { ClientExperienceView } from "../page"
+import { ClientExperienceView } from "../ClientExperienceView"
 import type { ClientType, ClientUserData, FacilitySlot } from "../types"
 import { useGetFacilitiesQuery, useGetFacilitySlotsQuery } from "@/app/admin/facilities/slice/facilitySlice"
 import {
