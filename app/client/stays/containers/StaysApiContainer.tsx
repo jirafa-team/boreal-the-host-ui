@@ -143,7 +143,8 @@ export function StaysApiContainer() {
   }
 
   const handleWaitingTripClick = (stayId: number | string) => {
-    router.push(`/client/reservation-details?reservationId=${stayId}`)
+    console.log("AA")
+    router.push(`/client?reservationId=${stayId}`)
   }
 
   const handleFirstStayCheckinClick = () => {
