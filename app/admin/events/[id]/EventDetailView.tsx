@@ -12,6 +12,7 @@ import { Input } from "@/components/ui/input"
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import React, { useState } from 'react'
 import Loading from './loading'
+import { useUserTimeZone } from "@/hooks/useUserTimeZone"
 
 type Event = {
   id: number
@@ -44,6 +45,7 @@ export default function EventDetailPage() {
   const params = useParams()
   const router = useRouter()
   const searchParams = useSearchParams()
+  const { formatDate } = useUserTimeZone()
   const eventId = Number(params.id)
   const [searchQuery, setSearchQuery] = useState("")
   const [addGuestDialogOpen, setAddGuestDialogOpen] = useState(false)
@@ -232,12 +234,7 @@ export default function EventDetailPage() {
                 <div>
                   <p className="text-sm text-muted-foreground">Fecha</p>
                   <p className="font-medium text-foreground">
-                    {new Date(event.date).toLocaleDateString("es-ES", {
-                      weekday: "long",
-                      year: "numeric",
-                      month: "long",
-                      day: "numeric",
-                    })}
+                    {formatDate(event.date)}
                   </p>
                 </div>
               </div>

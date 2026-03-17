@@ -3,6 +3,7 @@
 import { useLanguage } from "@/lib/i18n-context"
 import React, { useEffect } from "react"
 import { useDispatch, useSelector } from "react-redux"
+import { useUserTimeZone } from "@/hooks/useUserTimeZone"
 import type { RootState } from "@/store/store"
 import { loadMockFacilities, setFacilities } from "@/app/admin/facilities/slice/facilitySlice"
 import { FacilitiesView } from "../components/FacilitiesView"
@@ -26,6 +27,7 @@ const MOCK_BOOKINGS: Booking[] = [
 
 export function FacilitiesMockContainer() {
   const { t } = useLanguage()
+  const { toUtcTime } = useUserTimeZone()
   const dispatch = useDispatch()
   const dataSource = useSelector((state: RootState) => state.dataSource.dataSource)
   const facilitiesFromSlice = useSelector((state: RootState) => state.facility.facilities)
@@ -84,8 +86,8 @@ export function FacilitiesMockContainer() {
         name: formData.get("name") as string,
         type,
         capacity: Number.parseInt(formData.get("capacity") as string),
-        startTime: formData.get("startTime") as string,
-        endTime: formData.get("endTime") as string,
+        startTime: toUtcTime(formData.get("startTime") as string),
+        endTime: toUtcTime(formData.get("endTime") as string),
         icon,
         color,
       }
@@ -110,8 +112,8 @@ export function FacilitiesMockContainer() {
         name: formData.get("name") as string,
         type: formData.get("type") as string,
         capacity: Number.parseInt(formData.get("capacity") as string),
-        startTime: formData.get("startTime") as string,
-        endTime: formData.get("endTime") as string,
+        startTime: toUtcTime(formData.get("startTime") as string),
+        endTime: toUtcTime(formData.get("endTime") as string),
       }
       setFacilitiesForMock(
         facilities.map((f) => (f.id === editingFacility.id ? updatedFacility : f))

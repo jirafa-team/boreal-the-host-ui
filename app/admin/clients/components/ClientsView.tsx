@@ -31,6 +31,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { Card, CardContent } from "@/components/ui/card"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import type { Client, ClientStatus } from "./types"
+import { useUserTimeZone } from "@/hooks/useUserTimeZone"
 
 type TFunction = (key: string) => string
 
@@ -84,13 +85,6 @@ export type ClientsViewProps = {
   error?: unknown
 }
 
-function formatDate(iso: string): string {
-  if (!iso || iso === "-") return "-"
-  const parts = iso.split("-")
-  if (parts.length !== 3) return iso
-  return `${parts[2]}/${parts[1]}/${parts[0]}`
-}
-
 function displaySpent(value: number | string): string {
   if (value === "-" || value === undefined || value === null) return "-"
   if (typeof value === "number") return `$${value}`
@@ -127,6 +121,7 @@ export function ClientsView({
   error,
 }: ClientsViewProps) {
   const router = useRouter()
+  const { formatDate } = useUserTimeZone()
   const [clientToDelete, setClientToDelete] = useState<Client | null>(null)
 
   const getStatusBadge = (status: ClientStatus) => {

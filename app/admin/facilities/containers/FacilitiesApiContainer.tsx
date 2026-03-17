@@ -3,6 +3,7 @@
 import { useLanguage } from "@/lib/i18n-context"
 import React from "react"
 import { useSelector } from "react-redux"
+import { useUserTimeZone } from "@/hooks/useUserTimeZone"
 import type { RootState } from "@/store/store"
 import {
   useGetFacilitiesQuery,
@@ -16,6 +17,7 @@ import { useGetFacilityTypesQuery } from "@/features/taxonomy-facility-type/slic
 
 export function FacilitiesApiContainer() {
   const { t } = useLanguage()
+  const { toUtcTime } = useUserTimeZone()
   const dataSource = useSelector((state: RootState) => state.dataSource.dataSource)
   const skip = dataSource !== "api"
 
@@ -63,8 +65,8 @@ export function FacilitiesApiContainer() {
           name: formData.get("name") as string,
           facilityTypeId,
           capacity: Number(formData.get("capacity")),
-          openTime: formData.get("startTime") as string,
-          closeTime: formData.get("endTime") as string,
+          openTime: toUtcTime(formData.get("startTime") as string),
+          closeTime: toUtcTime(formData.get("endTime") as string),
         }).unwrap()
         setAddFacilityOpen(false)
       } catch {
@@ -93,8 +95,8 @@ export function FacilitiesApiContainer() {
             name: formData.get("name") as string,
             facilityTypeId,
             capacity: Number(formData.get("capacity")),
-            openTime: formData.get("startTime") as string,
-            closeTime: formData.get("endTime") as string,
+            openTime: toUtcTime(formData.get("startTime") as string),
+            closeTime: toUtcTime(formData.get("endTime") as string),
           },
         }).unwrap()
         setEditDialogOpen(false)

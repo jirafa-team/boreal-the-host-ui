@@ -2,6 +2,7 @@
 
 import { Button } from "@/components/ui/button"
 import { ChevronLeft, ChevronRight, Calendar } from "lucide-react"
+import { useUserTimeZone } from "@/hooks/useUserTimeZone"
 import type { Booking, Facility } from "./types"
 import { TIME_SLOTS } from "./types"
 
@@ -46,6 +47,7 @@ export function FacilityTimeline({
   convertISOToLocaleFormat,
   t,
 }: FacilityTimelineProps) {
+  const { formatTime } = useUserTimeZone()
   return (
     <>
       <div className="mb-6 flex gap-2 justify-between items-center flex-wrap">
@@ -128,7 +130,7 @@ export function FacilityTimeline({
                       <p className="text-xs text-muted-foreground capitalize">{facility.type}</p>
                       <p className="text-xs text-muted-foreground mt-0.5">Cap. {facility.capacity}</p>
                       <p className="text-xs text-muted-foreground mt-0.5">
-                        {facility.startTime} - {facility.endTime}
+                        {formatTime(facility.startTime)} - {formatTime(facility.endTime)}
                       </p>
                     </div>
                     <Button

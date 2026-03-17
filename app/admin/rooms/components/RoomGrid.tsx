@@ -3,6 +3,7 @@
 import { Card } from "@/components/ui/card"
 import { Calendar, Users } from "lucide-react"
 import type { Room, RoomStatus } from "./types"
+import { useUserTimeZone } from "@/hooks/useUserTimeZone"
 
 type TFunction = (key: string) => string
 
@@ -35,6 +36,7 @@ const statusIconColor: Record<RoomStatus, string> = {
 }
 
 export function RoomGrid({ rooms, onEditRoom, getStatusLabel, t }: RoomGridProps) {
+  const { formatDate } = useUserTimeZone()
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
       {rooms.map((room) => {
@@ -94,11 +96,11 @@ export function RoomGrid({ rooms, onEditRoom, getStatusLabel, t }: RoomGridProps
                       />
                     </div>
                     <span className="text-muted-foreground">
-                      {new Date(room.checkIn).toLocaleDateString("es-ES")}
+                      {formatDate(room.checkIn)}
                     </span>
                     <span className="text-muted-foreground">→</span>
                     <span className="text-muted-foreground">
-                      {new Date(room.checkOut).toLocaleDateString("es-ES")}
+                      {formatDate(room.checkOut)}
                     </span>
                   </div>
                 )}

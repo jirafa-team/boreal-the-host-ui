@@ -5,6 +5,7 @@ import { useParams } from "next/navigation"
 import { useSelector } from "react-redux"
 import type { RootState } from "@/store/store"
 import { useLanguage } from "@/lib/i18n-context"
+import { useUserTimeZone } from "@/hooks/useUserTimeZone"
 import {
   Dumbbell,
   Waves,
@@ -189,6 +190,7 @@ function getTasksForTimeSlot(): CleaningRequest[] {
 
 export function DashboardApiContainer() {
   const { t, language } = useLanguage()
+  const { formatDate } = useUserTimeZone()
   const params = useParams()
   const orgId = params?.orgId as string | undefined
   const dataSource = useSelector(
@@ -358,13 +360,7 @@ export function DashboardApiContainer() {
     setCurrentDate(newDate)
   }
 
-  const convertISOToLocaleFormat = (isoDate: string): string => {
-    const [year, month, day] = isoDate.split("-")
-    if (language === "es" || language === "pt") {
-      return `${day}/${month}/${year}`
-    }
-    return `${month}/${day}/${year}`
-  }
+  const convertISOToLocaleFormat = (isoDate: string): string => formatDate(isoDate)
 
   const handleCompleteCheckout = () => {
     // No-op in API mode; checkouts not yet integrated

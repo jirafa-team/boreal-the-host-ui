@@ -23,6 +23,7 @@ import Link from "next/link"
 import { useRouter, useParams } from "next/navigation"
 import { useLanguage } from "@/lib/i18n-context"
 import { ROUTES } from "@/shared/types/routes"
+import { useUserTimeZone } from "@/hooks/useUserTimeZone"
 
 type Event = {
   id: number
@@ -228,6 +229,7 @@ export default function EventsManagement() {
     }
   )
 
+  const { formatDate } = useUserTimeZone()
   const dataSource = useSelector((state: RootState) => state.dataSource.dataSource)
   if (dataSource === "api") {
     return (
@@ -477,10 +479,7 @@ export default function EventsManagement() {
                       </Badge>
                       <Badge className="bg-sky-100 hover:bg-sky-200 text-black text-xs font-bold gap-1.5 flex items-center">
                         <Calendar className="w-3.5 h-3.5" />
-                        {new Date(event.date).toLocaleDateString("es-ES", {
-                          month: "short",
-                          day: "numeric",
-                        })}
+                        {formatDate(event.date)}
                         <span className="text-black/70">•</span>
                         <Clock className="w-3.5 h-3.5" />
                         {event.time}

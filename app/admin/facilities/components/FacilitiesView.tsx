@@ -12,6 +12,7 @@ import {
   DialogDescription,
 } from "@/components/ui/dialog"
 import { Plus, Edit2, Trash2, Users } from "lucide-react"
+import { useUserTimeZone } from "@/hooks/useUserTimeZone"
 import { AddFacilityDialog } from "./AddFacilityDialog"
 import { BookingsDetailDialog } from "./BookingsDetailDialog"
 import { EditFacilityDialog } from "./EditFacilityDialog"
@@ -63,6 +64,8 @@ export function FacilitiesView({
   isLoading,
   error,
 }: FacilitiesViewProps) {
+  const { formatTime } = useUserTimeZone()
+
   const handleShowBookingsDetail = (facilityId: string) => {
     const facilityBookings = getBookingsForFacility(facilityId)
     setSelectedSlotBookings(facilityBookings)
@@ -163,7 +166,7 @@ export function FacilitiesView({
                             variant="outline"
                             className="text-xs whitespace-nowrap"
                           >
-                            {facility.startTime} - {facility.endTime}
+                            {formatTime(facility.startTime)} - {formatTime(facility.endTime)}
                           </Badge>
                           <div className="flex items-center gap-1 text-sm flex-shrink-0">
                             <Users className="w-4 h-4 text-muted-foreground" />

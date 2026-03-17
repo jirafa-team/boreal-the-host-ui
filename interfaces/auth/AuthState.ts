@@ -6,4 +6,6 @@ export interface AuthState {
   isLoggedIn: boolean;
   role: string | null;
   currentOrganization: CurrentOrganization | undefined;
+  timezone?: string;
+  dateFormat?: string;
 }
