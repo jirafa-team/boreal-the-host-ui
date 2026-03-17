@@ -5,6 +5,7 @@ import { useParams } from "next/navigation"
 import { useSelector } from "react-redux"
 import type { RootState } from "@/store/store"
 import { useLanguage } from "@/lib/i18n-context"
+import moment from "moment-timezone"
 import { useUserTimeZone } from "@/hooks/useUserTimeZone"
 import {
   Dumbbell,
@@ -190,7 +191,7 @@ function getTasksForTimeSlot(): CleaningRequest[] {
 
 export function DashboardApiContainer() {
   const { t, language } = useLanguage()
-  const { formatDate } = useUserTimeZone()
+  const { formatDate, timezone } = useUserTimeZone()
   const params = useParams()
   const orgId = params?.orgId as string | undefined
   const dataSource = useSelector(
@@ -410,8 +411,8 @@ export function DashboardApiContainer() {
       await createReservation({
         roomId: payload.roomId,
         clientId: payload.clientId,
-        checkIn: payload.checkIn,
-        checkOut: payload.checkOut,
+        checkIn: moment.tz(payload.checkIn, 'YYYY-MM-DD', timezone).startOf('day').toISOString(),
+        checkOut: moment.tz(payload.checkOut, 'YYYY-MM-DD', timezone).startOf('day').toISOString(),
       }).unwrap()
       toast({
         title: "Éxito",
