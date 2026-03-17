@@ -231,6 +231,7 @@ export function ClientApiContainer() {
       slotsLoading={slotsLoading}
       onCreateBooking={handleCreateBooking}
       confirmedBookings={confirmedBookings}
+      agendaBookings={existingBookingsData?.data ?? []}
     />
   )
 }
