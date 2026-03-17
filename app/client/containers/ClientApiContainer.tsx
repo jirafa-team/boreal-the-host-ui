@@ -80,9 +80,6 @@ export function ClientApiContainer() {
     email?: string
   } | undefined)
 
-  const userName = authUser?.firstName || "Huésped"
-  const userInitials = `${authUser?.firstName?.charAt(0) || ""}${authUser?.lastName?.charAt(0) || ""}`.toUpperCase() || "H"
-
   const { data: userContexts } = useGetUserContextsQuery(undefined, {
     skip: dataSource !== "api" || !!organizationId,
   })
@@ -151,13 +148,19 @@ export function ClientApiContainer() {
   }, [facilitiesData])
 
   const { userData, clientType } = useMemo((): { userData: ClientUserData; clientType: ClientType } => {
+    const firstName = authUser?.firstName || targetReservation?.user?.firstName || ""
+    const lastName = authUser?.lastName || targetReservation?.user?.lastName || ""
+    const email = authUser?.email || targetReservation?.user?.email || ""
+    const derivedName = firstName || "Huésped"
+    const derivedInitials = `${firstName.charAt(0)}${lastName.charAt(0)}`.toUpperCase() || "H"
+
     if (!targetReservation) {
       return {
         userData: {
-          name: userName,
-          fullName: userName,
-          initials: userInitials,
-          email: authUser?.email ?? "",
+          name: derivedName,
+          fullName: derivedName,
+          initials: derivedInitials,
+          email,
           room: "",
           roomType: "",
           roomCapacity: 0,
@@ -183,10 +186,10 @@ export function ClientApiContainer() {
     const clientType: ClientType = isFuture ? "future" : "normal"
 
     const userData: ClientUserData = {
-      name: userName,
-      fullName: `${authUser?.firstName ?? ""} ${authUser?.lastName ?? ""}`.trim() || userName,
-      initials: userInitials,
-      email: authUser?.email ?? targetReservation.user?.email ?? "",
+      name: derivedName,
+      fullName: `${firstName} ${lastName}`.trim() || derivedName,
+      initials: derivedInitials,
+      email,
       room: targetReservation.room?.number ?? targetReservation.room?.name ?? "",
       roomType: targetReservation.room?.type ?? "Habitación",
       roomCapacity: targetReservation.room?.capacity ?? 0,
@@ -198,7 +201,7 @@ export function ClientApiContainer() {
     }
 
     return { userData, clientType }
-  }, [targetReservation, userName, userInitials, authUser])
+  }, [targetReservation, authUser])
 
   const handleCreateBooking = async (
     facilityId: string,
