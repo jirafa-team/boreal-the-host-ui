@@ -1,3 +1,5 @@
+import type { StaffScheduleEntry } from './StaffSchedule';
+
 export interface StaffMemberDisplay {
   id: string;
   name: string;
@@ -22,5 +24,6 @@ export interface StaffMemberDisplay {
     maxCapacity?: number;
     totalTasks?: number;
     completedTasks?: number;
+    schedule?: StaffScheduleEntry[];
   };
 }

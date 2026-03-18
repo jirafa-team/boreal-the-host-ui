@@ -7,6 +7,7 @@ import { ENDPOINTS } from '@/shared/types/api';
 import { baseQueryWithOrg } from '@/store/baseQuery';
 import type { GetStaffResponse } from '@/interfaces/staff/GetStaffResponse';
 import type { StaffStatsByDepartment } from '@/interfaces/staff/StaffStatsByDepartment';
+import type { StaffScheduleEntry, StaffWeeklySchedule } from '@/interfaces/staff/StaffSchedule';
 
 interface StaffState {
   staff: UserWithOptionalStaff[];
@@ -124,6 +125,26 @@ export const staffApi = createApi({
       }),
       invalidatesTags: ['Staff'],
     }),
+    getStaffSchedule: build.query<{ data: StaffWeeklySchedule }, string>({
+      query: (id) => ({
+        url: `${ENDPOINTS.STAFF}/${id}/schedule`,
+        method: 'GET',
+        credentials: 'include',
+      }),
+      providesTags: ['Staff'],
+    }),
+    upsertStaffSchedule: build.mutation<
+      void,
+      { id: string; schedule: StaffScheduleEntry[] }
+    >({
+      query: ({ id, schedule }) => ({
+        url: `${ENDPOINTS.STAFF}/${id}/schedule`,
+        method: 'PUT',
+        body: { schedule },
+        credentials: 'include',
+      }),
+      invalidatesTags: ['Staff'],
+    }),
   }),
 });
 
@@ -143,6 +164,8 @@ export const {
   useGetStaffStatsQuery,
   useDeleteStaffMutation,
   useUpdateStaffMutation,
+  useGetStaffScheduleQuery,
+  useUpsertStaffScheduleMutation,
 } = staffApi;
 
 export function loadMockStaff() {

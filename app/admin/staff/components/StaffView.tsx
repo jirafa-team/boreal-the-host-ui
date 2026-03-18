@@ -14,10 +14,11 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog';
-import { Plus, CheckSquare } from 'lucide-react';
+import { Plus, CheckSquare, Clock } from 'lucide-react';
 import type { StaffMemberView, NewStaffForm, NewTaskForm } from './types';
 import { CreateStaffDialog } from './CreateStaffDialog';
 import { AssignTaskDialog } from './AssignTaskDialog';
+import { StaffScheduleEditor } from './StaffScheduleEditor';
 
 type TFunction = (key: string) => string;
 
@@ -44,6 +45,11 @@ export type StaffViewProps = {
   t: TFunction;
   loading?: boolean;
   departments?: Array<{ id: string; name: string }>;
+  showScheduleEditor?: boolean;
+  scheduleStaffId?: string | null;
+  scheduleStaffName?: string;
+  onOpenScheduleEditor?: (staffId: string, staffName: string) => void;
+  onCloseScheduleEditor?: (open: boolean) => void;
 };
 
 function getStatusColor(status: string): string {
@@ -82,6 +88,11 @@ export function StaffView({
   t,
   loading,
   departments,
+  showScheduleEditor,
+  scheduleStaffId,
+  scheduleStaffName,
+  onOpenScheduleEditor,
+  onCloseScheduleEditor,
 }: StaffViewProps) {
   const getStatusText = (status: string) => {
     switch (status) {
@@ -273,13 +284,28 @@ export function StaffView({
                   </span>
                 </div>
               </div>
-              <Button
-                onClick={onOpenAssignTask}
-                className="w-full bg-amber-600 hover:bg-amber-700"
-              >
-                <CheckSquare className="w-4 h-4 mr-2" />
-                {t('admin.createActivity')}
-              </Button>
+              <div className="flex gap-2">
+                <Button
+                  onClick={() => {
+                    if (onOpenScheduleEditor && selectedStaff) {
+                      onSelectedStaffChange(null);
+                      onOpenScheduleEditor(selectedStaff.id, selectedStaff.name);
+                    }
+                  }}
+                  variant="outline"
+                  className="flex-1"
+                >
+                  <Clock className="w-4 h-4 mr-2" />
+                  Horario
+                </Button>
+                <Button
+                  onClick={onOpenAssignTask}
+                  className="flex-1 bg-amber-600 hover:bg-amber-700"
+                >
+                  <CheckSquare className="w-4 h-4 mr-2" />
+                  {t('admin.createActivity')}
+                </Button>
+              </div>
             </div>
           </DialogContent>
         </Dialog>
@@ -294,6 +320,15 @@ export function StaffView({
         onSubmit={onAssignTask}
         t={t}
       />
+
+      {onCloseScheduleEditor && (
+        <StaffScheduleEditor
+          staffId={scheduleStaffId ?? null}
+          staffName={scheduleStaffName}
+          open={!!showScheduleEditor}
+          onOpenChange={onCloseScheduleEditor}
+        />
+      )}
     </div>
   );
 }
