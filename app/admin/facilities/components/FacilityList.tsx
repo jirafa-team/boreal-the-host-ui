@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Clock, Users, Calendar } from "lucide-react"
+import { useUserTimeZone } from "@/hooks/useUserTimeZone"
 import type { Booking, Facility } from "./types"
 
 type TFunction = (key: string) => string
@@ -29,6 +30,7 @@ export function FacilityList({
   convertISOToLocaleFormat,
   t,
 }: FacilityListProps) {
+  const { formatTime } = useUserTimeZone()
   return (
     <>
       <div className="mb-6 p-4 bg-white rounded-lg border border-gray-200">
@@ -69,7 +71,7 @@ export function FacilityList({
               <div className="absolute top-6 right-6 space-y-2 flex flex-col items-end">
                 <Badge className="bg-sky-100 hover:bg-sky-200 text-black text-xs font-bold px-3 py-1.5 shrink-0 border-sky-200">
                   <Clock className="w-3 h-3 mr-1" />
-                  {facility.startTime} - {facility.endTime}
+                  {formatTime(facility.startTime)} - {formatTime(facility.endTime)}
                 </Badge>
                 <div className="flex items-center gap-2 text-sm">
                   <Users className="w-4 h-4 text-muted-foreground" />

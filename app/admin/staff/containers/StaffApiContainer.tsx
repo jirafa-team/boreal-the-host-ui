@@ -54,6 +54,9 @@ export function StaffApiContainer() {
   const [showAssignTaskDialog, setShowAssignTaskDialog] = useState(false);
   const [newStaff, setNewStaff] = useState<NewStaffForm>(initialNewStaff);
   const [newTask, setNewTask] = useState<NewTaskForm>(initialNewTask);
+  const [showScheduleEditor, setShowScheduleEditor] = useState(false);
+  const [scheduleStaffId, setScheduleStaffId] = useState<string | null>(null);
+  const [scheduleStaffName, setScheduleStaffName] = useState('');
 
   const resolveDepartmentId = useCallback(
     (departmentName: string): string | undefined => {
@@ -97,6 +100,20 @@ export function StaffApiContainer() {
     setSelectedStaff(null);
     setShowAssignTaskDialog(true);
   }, [selectedStaff]);
+
+  const handleOpenScheduleEditor = useCallback((staffId: string, staffName: string) => {
+    setScheduleStaffId(staffId);
+    setScheduleStaffName(staffName);
+    setShowScheduleEditor(true);
+  }, []);
+
+  const handleCloseScheduleEditor = useCallback((open: boolean) => {
+    if (!open) {
+      setShowScheduleEditor(false);
+      setScheduleStaffId(null);
+      setScheduleStaffName('');
+    }
+  }, []);
 
   const handleCloseAssignTask = useCallback((open: boolean) => {
     if (!open) {
@@ -148,6 +165,11 @@ export function StaffApiContainer() {
       t={t}
       loading={loading}
       departments={departments}
+      showScheduleEditor={showScheduleEditor}
+      scheduleStaffId={scheduleStaffId}
+      scheduleStaffName={scheduleStaffName}
+      onOpenScheduleEditor={handleOpenScheduleEditor}
+      onCloseScheduleEditor={handleCloseScheduleEditor}
     />
   );
 }

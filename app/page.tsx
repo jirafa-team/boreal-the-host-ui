@@ -7,9 +7,10 @@ import { useDispatch, useSelector } from "react-redux"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Switch } from "@/components/ui/switch"
-import { User, Shield, X, Globe } from "lucide-react"
+import { User, Shield, X, Globe, Clock } from "lucide-react"
 import Image from "next/image"
 import { useLanguage } from "@/lib/i18n-context"
+import { latamTimezones, DEFAULT_TIMEZONE } from "@/lib/timezone-context"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { BorealLoadingBar } from "@/components/boreal-loading-bar"
 import type { RootState } from "@/store/store"
@@ -54,6 +55,16 @@ export default function HomePage() {
   }, [])
 
   const { language, setLanguage, t } = useLanguage()
+  const [timezone, setTimezoneState] = useState<string>(() => {
+    if (typeof window === 'undefined') return DEFAULT_TIMEZONE
+    return localStorage.getItem('timezone') || DEFAULT_TIMEZONE
+  })
+
+  const setTimezone = (tz: string) => {
+    setTimezoneState(tz)
+    localStorage.setItem('timezone', tz)
+    dispatch(updateUser({ timezone: tz }))
+  }
 
   // ─── Login handlers ────────────────────────────────────────────────────────
 
@@ -80,6 +91,7 @@ export default function HomePage() {
                 lastName: decoded.lastName ?? "",
               },
               isLoggedIn: true,
+              timezone,
             })
           )
           setIsLoading(true)
@@ -130,6 +142,7 @@ export default function HomePage() {
     setLoginError(null)
 
     if (dataSource === "mock") {
+      dispatch(updateUser({ timezone }))
       if (adminUser === "system" && adminPassword === "1234") {
         setIsLoading(true)
         setTimeout(() => router.push("/system/organizations"), 800)
@@ -168,6 +181,7 @@ export default function HomePage() {
             lastName: decoded.lastName ?? "",
           },
           isLoggedIn: true,
+          timezone,
         })
       )
 
@@ -288,7 +302,21 @@ export default function HomePage() {
 
       <div className="absolute inset-0 bg-black/40" />
 
-      <div className="absolute top-4 right-4 z-20">
+      <div className="absolute top-4 right-4 z-20 flex gap-2">
+        <Select value={timezone} onValueChange={setTimezone}>
+          <SelectTrigger className="w-[200px] bg-white/90 backdrop-blur-sm border-none">
+            <Clock className="w-4 h-4 mr-2" />
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            {latamTimezones.map((tz) => (
+              <SelectItem key={tz.value} value={tz.value}>
+                {tz.label}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+
         <Select value={language} onValueChange={(value) => setLanguage(value as any)}>
           <SelectTrigger className="w-[180px] bg-white/90 backdrop-blur-sm border-none">
             <Globe className="w-4 h-4 mr-2" />
@@ -400,7 +428,7 @@ export default function HomePage() {
                 ) : (
                   <>
                     <span className="text-sm font-medium text-gray-700">API</span>
-                    <Switch checked={false} onCheckedChange={() => {}} />
+                    <Switch checked={false} onCheckedChange={() => { }} />
                   </>
                 )}
               </div>

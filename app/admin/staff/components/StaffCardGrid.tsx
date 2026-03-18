@@ -4,6 +4,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { useLanguage } from '@/lib/i18n-context';
 import type { StaffMemberDisplay } from '@/interfaces/staff/StaffMemberDisplay';
+import { getTodayShift } from '../utils/staffDisplayToView';
 
 export interface StaffCardGridProps {
   staffList: StaffMemberDisplay[];
@@ -67,10 +68,11 @@ export function StaffCardGrid({ staffList, onEdit, onDelete, isLoading }: StaffC
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
       {staffList.map((member) => {
         const workStatus = (member.employee?.workStatus ?? 'available').toLowerCase();
-        const shift =
-          member.employee?.workStartTime && member.employee?.workEndTime
-            ? `${member.employee.workStartTime} - ${member.employee.workEndTime}`
-            : (t('admin.dayOff') ?? 'Día libre');
+        const shift = getTodayShift(
+          member.employee?.schedule,
+          member.employee?.workStartTime,
+          member.employee?.workEndTime,
+        ) ?? (t('admin.dayOff') ?? 'Día libre');
         const currentRoom = member.employee?.currentRoom;
         const totalTasks = member.employee?.totalTasks ?? 0;
         const completedTasks = member.employee?.completedTasks ?? 0;

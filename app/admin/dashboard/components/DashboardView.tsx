@@ -44,6 +44,7 @@ import {
   isMultiPartyFacility,
   STAFF_TIME_SLOTS,
   getFacilityTimeSlotsArray,
+  isSlotWithinSchedule,
 } from "../utils"
 import type {
   Booking,
@@ -61,6 +62,8 @@ import type {
   MaintenanceActivityFormPayload,
   FacilityBookingFormPayload,
 } from "./types"
+import type { StaffTask } from "@/interfaces/staff-task/StaffTask"
+import type { FacilitySlotResponse } from "@/interfaces/facility-slot/facility-slot-response"
 
 type TFunction = (key: string) => string
 
@@ -81,7 +84,7 @@ export type DashboardViewProps = {
   dateColumns: DateColumn[]
   staffMembers: StaffMember[]
   requests: CleaningRequest[]
-  getTasksForTimeSlot: (staffName: string, timeSlot: string) => CleaningRequest[]
+  getTasksForTimeSlot: (staffId: string, timeSlot: string) => StaffTask[]
   facilities: Facility[]
   bookings: Booking[]
   filteredCheckouts: Checkout[]
@@ -115,6 +118,7 @@ export type DashboardViewProps = {
   onCreateRoomBooking: (payload: RoomBookingFormPayload) => void
   onCreateMaintenanceActivity: (payload: MaintenanceActivityFormPayload) => void
   onAddFacilityBooking: (payload: FacilityBookingFormPayload) => void
+  facilitySlots?: Record<string, FacilitySlotResponse[]>
 }
 
 export function DashboardView({
@@ -164,7 +168,9 @@ export function DashboardView({
   onCreateRoomBooking,
   onCreateMaintenanceActivity,
   onAddFacilityBooking,
+  facilitySlots = {},
 }: DashboardViewProps) {
+  console.log(facilitySlots)
   const router = useRouter()
   const timeSlotsArray = getFacilityTimeSlotsArray()
 
@@ -236,6 +242,18 @@ export function DashboardView({
     () => rooms.find((r) => r.id === roomBookingRoomId),
     [rooms, roomBookingRoomId]
   )
+
+  function getSlotDataForFacilityAndTime(
+    facilityId: string,
+    timeSlot: string
+  ): FacilitySlotResponse | undefined {
+    return facilitySlots[facilityId]?.find((s) => {
+      const d = new Date(s.startAt)
+      const hh = d.getHours().toString().padStart(2, "0")
+      const mm = d.getMinutes().toString().padStart(2, "0")
+      return `${hh}:${mm}` === timeSlot
+    })
+  }
 
   return (
     <div>
@@ -1006,7 +1024,7 @@ export function DashboardView({
                                     {getStatusText(member.status)}
                                   </Badge>
                                   <span className="text-xs text-muted-foreground">
-                                    {member.tasksToday}/{member.maxCapacity}
+                                    {member.completedTasks}/{member.tasksToday}
                                   </span>
                                 </div>
                               </div>
@@ -1016,10 +1034,11 @@ export function DashboardView({
                         <div className="flex gap-2">
                           {STAFF_TIME_SLOTS.map((timeSlot) => {
                             const tasksInSlot = getTasksForTimeSlot(
-                              member.name,
+                              member.id,
                               timeSlot
                             )
                             const hasTask = tasksInSlot.length > 0
+                            const withinSchedule = isSlotWithinSchedule(timeSlot, member.schedule)
                             return (
                               <div
                                 key={timeSlot}
@@ -1033,39 +1052,35 @@ export function DashboardView({
                                         className="p-2 bg-gradient-to-r from-primary/10 to-primary/5 border-primary/30 hover:shadow-lg transition-all cursor-pointer h-full"
                                       >
                                         <div className="flex flex-col gap-1">
-                                          <div className="flex items-center justify-between">
-                                            <span className="font-semibold text-foreground text-xs">
-                                              {task.roomNumber}
-                                            </span>
-                                            {task.priority === "urgent" && (
-                                              <Badge
-                                                variant="destructive"
-                                                className="text-[10px] px-1 py-0"
-                                              >
-                                                !
-                                              </Badge>
-                                            )}
-                                          </div>
+                                          <span className="font-semibold text-foreground text-xs">
+                                            {new Date(task.scheduledStartAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                          </span>
                                           <p className="text-[10px] text-muted-foreground truncate">
-                                            {task.guestName}
+                                            {task.description}
                                           </p>
                                           <Badge
                                             className={
                                               getRequestStatusColor(
-                                                task.status
+                                                task.status?.toLowerCase() ?? 'pending'
                                               ) + " text-[10px] px-1 py-0"
                                             }
                                           >
-                                            {getRequestStatusText(task.status)}
+                                            {getRequestStatusText(task.status?.toLowerCase() ?? 'pending')}
                                           </Badge>
                                         </div>
                                       </Card>
                                     ))}
                                   </div>
-                                ) : (
-                                  <div className="h-full min-h-[80px] bg-muted/30 rounded-lg border border-dashed border-border flex items-center justify-center">
-                                    <span className="text-xs text-muted-foreground/50">
+                                ) : withinSchedule ? (
+                                  <div className="h-full min-h-[80px] bg-green-500/10 rounded-lg border border-dashed border-green-500/30 flex items-center justify-center">
+                                    <span className="text-xs text-green-600/70">
                                       Libre
+                                    </span>
+                                  </div>
+                                ) : (
+                                  <div className="h-full min-h-[80px] bg-muted/10 rounded-lg border border-dashed border-muted/20 flex items-center justify-center">
+                                    <span className="text-xs text-muted-foreground/30">
+                                      Fuera de turno
                                     </span>
                                   </div>
                                 )}
@@ -1386,12 +1401,13 @@ export function DashboardView({
                             bookings,
                             slot
                           )
-                          const occupancy = getOccupancyPercentage(
-                            facility.id,
-                            bookings,
-                            facilities,
-                            slot
-                          )
+                          const realSlotData = getSlotDataForFacilityAndTime(facility.id, slot)
+                          const occupancy = realSlotData
+                            ? realSlotData.occupationPercentage
+                            : getOccupancyPercentage(facility.id, bookings, facilities, slot)
+                          const currentOccupancy = realSlotData
+                            ? realSlotData.currentOccupancy
+                            : slotBookings.length
 
                           if (bookingAtStart) {
                             const durationHours = bookingAtStart.duration / 60
@@ -1416,7 +1432,7 @@ export function DashboardView({
                                   {isMultiPartyFacility(facility.type) ? (
                                     <div className="flex flex-col items-center justify-center gap-2">
                                       <p className="text-lg font-bold text-foreground">
-                                        {slotBookings.length}/
+                                        {currentOccupancy}/
                                         {facility.capacity}
                                       </p>
                                       <p className="text-[10px] text-muted-foreground">
@@ -1427,7 +1443,7 @@ export function DashboardView({
                                     <>
                                       <p className="text-sm font-bold truncate text-foreground">
                                         {slotBookings.length > 1
-                                          ? `${slotBookings.length} participantes`
+                                          ? `${currentOccupancy} participantes`
                                           : bookingAtStart.clientName}
                                       </p>
                                       <p className="text-[10px] text-muted-foreground truncate">
@@ -1441,7 +1457,7 @@ export function DashboardView({
                                         </span>
                                         {slotBookings.length > 0 && (
                                           <span className="text-xs px-1.5 py-0.5 rounded bg-primary/20 text-primary">
-                                            {slotBookings.length}/
+                                            {currentOccupancy}/
                                             {facility.capacity}
                                           </span>
                                         )}
@@ -1473,7 +1489,7 @@ export function DashboardView({
                                           <span className="font-medium">
                                             Ocupación:
                                           </span>{" "}
-                                          {slotBookings.length}/
+                                          {currentOccupancy}/
                                           {facility.capacity} ({occupancy}%)
                                         </p>
                                         {slotBookings.length <= 3 ? (
@@ -1520,12 +1536,13 @@ export function DashboardView({
                               bookings,
                               slot
                             )
-                            const occupancyAtTime = getOccupancyPercentage(
-                              facility.id,
-                              bookings,
-                              facilities,
-                              slot
-                            )
+                            const realSlotDataAtTime = getSlotDataForFacilityAndTime(facility.id, slot)
+                            const occupancyAtTime = realSlotDataAtTime
+                              ? realSlotDataAtTime.occupationPercentage
+                              : getOccupancyPercentage(facility.id, bookings, facilities, slot)
+                            const currentOccupancyAtTime = realSlotDataAtTime
+                              ? realSlotDataAtTime.currentOccupancy
+                              : slotBookingsAtTime.length
                             if (slotBookingsAtTime.length > 0) {
                               return (
                                 <div
@@ -1537,7 +1554,7 @@ export function DashboardView({
                                 >
                                   <div className="w-full space-y-2">
                                     <p className="text-xs font-medium text-foreground text-center">
-                                      {slotBookingsAtTime.length}/
+                                      {currentOccupancyAtTime}/
                                       {facility.capacity}
                                     </p>
                                     <div className="w-full bg-black/10 rounded-full h-2">
@@ -1558,6 +1575,34 @@ export function DashboardView({
                               )
                             }
                             return null
+                          }
+                          if (realSlotData && realSlotData.currentOccupancy > 0) {
+                            return (
+                              <div
+                                key={slot}
+                                className="w-32 border-r border-border p-2 shrink-0 min-h-[88px] flex items-center justify-center"
+                              >
+                                <div className="w-full space-y-2">
+                                  <p className="text-xs font-medium text-foreground text-center">
+                                    {realSlotData.currentOccupancy}/{facility.capacity}
+                                  </p>
+                                  <div className="w-full bg-black/10 rounded-full h-2">
+                                    <div
+                                      className={`h-2 rounded-full transition-all ${realSlotData.occupationPercentage > 80
+                                          ? "bg-red-500"
+                                          : realSlotData.occupationPercentage > 50
+                                            ? "bg-amber-500"
+                                            : "bg-green-500"
+                                        }`}
+                                      style={{ width: `${realSlotData.occupationPercentage}%` }}
+                                    />
+                                  </div>
+                                  <p className="text-[10px] text-muted-foreground text-center">
+                                    {realSlotData.occupationPercentage}%
+                                  </p>
+                                </div>
+                              </div>
+                            )
                           }
                           return (
                             <div

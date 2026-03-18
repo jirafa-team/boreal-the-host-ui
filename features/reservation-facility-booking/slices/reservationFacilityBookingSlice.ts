@@ -73,6 +73,7 @@ export const reservationFacilityBookingApi = createApi({
       {
         data: Array<{
           facilityId: string;
+          facility?: { name: string };
           amenityShiftSlot?: {
             startAt: string;
             endAt: string;

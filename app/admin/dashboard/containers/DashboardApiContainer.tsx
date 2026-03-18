@@ -1,10 +1,12 @@
 "use client"
 
-import { useCallback, useMemo, useState } from "react"
+import { useCallback, useEffect, useMemo, useState } from "react"
 import { useParams } from "next/navigation"
-import { useSelector } from "react-redux"
-import type { RootState } from "@/store/store"
+import { useDispatch, useSelector } from "react-redux"
+import type { RootState, AppDispatch } from "@/store/store"
 import { useLanguage } from "@/lib/i18n-context"
+import moment from "moment-timezone"
+import { useUserTimeZone } from "@/hooks/useUserTimeZone"
 import {
   Dumbbell,
   Waves,
@@ -15,11 +17,13 @@ import {
 } from "lucide-react"
 import { useGetRoomsQuery } from "@/app/admin/rooms/slice/roomSlice"
 import { useGetStaffQuery } from "@/app/admin/staff/slice/staffSlice"
-import { useGetFacilitiesQuery } from "@/app/admin/facilities/slice/facilitySlice"
+import { useGetFacilitiesQuery, facilityApi } from "@/app/admin/facilities/slice/facilitySlice"
+import type { FacilitySlotResponse } from "@/interfaces/facility-slot/facility-slot-response"
 import { useGetReservationFacilityBookingsQuery } from "@/features/reservation-facility-booking/slices/reservationFacilityBookingSlice"
 import { useGetClientsQuery, mapClientApiToClient } from "@/app/admin/clients/slice/clientSlice"
 import { useCreateReservationMutation, useGetReservationsQuery } from "@/features/reservation/slices/reservationSlice"
-import { useCreateStaffTaskMutation } from "@/features/staff-task/slices/staffTaskSlice"
+import { useCreateStaffTaskMutation, useGetStaffTasksQuery } from "@/features/staff-task/slices/staffTaskSlice"
+import type { StaffTask } from "@/interfaces/staff-task/StaffTask"
 import { useToast } from "@/hooks/use-toast"
 import type { Facility as ApiFacility } from "@/interfaces/facility/Facility"
 import type { StaffMemberDisplay } from "@/interfaces/staff/StaffMemberDisplay"
@@ -36,6 +40,7 @@ import type {
   RoomStatus,
   StaffStatus,
   StaffDepartment,
+  StaffScheduleEntry,
   RoomBookingClient,
   RoomBookingFormPayload,
   MaintenanceActivityFormPayload,
@@ -105,6 +110,10 @@ function mapStaffDisplayToMember(
   ]
   const department = validDepts.includes(dept) ? dept : "Recepción"
 
+  const schedule = emp?.schedule as StaffScheduleEntry[] | undefined
+  const todayDow = new Date().getDay()
+  const todaySchedule = schedule?.find((s) => s.dayOfWeek === todayDow && s.isActive)
+
   return {
     id: d.id,
     name:
@@ -112,13 +121,14 @@ function mapStaffDisplayToMember(
     avatar: getInitials(d.name ?? d.firstName ?? "U"),
     department,
     status,
-    tasksToday: emp?.tasksToday ?? 0,
+    tasksToday: emp?.totalTasks ?? emp?.tasksToday ?? 0,
+    completedTasks: emp?.completedTasks ?? 0,
     maxCapacity: emp?.maxCapacity ?? 8,
-    shift:
-      d.workStartTime && d.workEndTime
-        ? `${d.workStartTime} - ${d.workEndTime}`
-        : "—",
+    shift: todaySchedule
+      ? `${todaySchedule.startTime} - ${todaySchedule.endTime}`
+      : "—",
     currentRoom: emp?.currentRoom ?? undefined,
+    schedule,
   }
 }
 
@@ -183,12 +193,16 @@ function getRequestStatusText(status: string): string {
   return labels[status] ?? status
 }
 
-function getTasksForTimeSlot(): CleaningRequest[] {
-  return []
+const SLOT_BOUNDS: Record<string, [number, number]> = {
+  "7:00 AM": [7, 11],
+  "11:00 AM": [11, 15],
+  "3:00 PM": [15, 19],
+  "7:00 PM": [19, 24],
 }
 
 export function DashboardApiContainer() {
   const { t, language } = useLanguage()
+  const { formatDate, timezone } = useUserTimeZone()
   const params = useParams()
   const orgId = params?.orgId as string | undefined
   const dataSource = useSelector(
@@ -216,6 +230,22 @@ export function DashboardApiContainer() {
   const { data: reservationsData } = useGetReservationsQuery(
     { page: 1, limit: 500 },
     { skip }
+  )
+
+  const todayStart = useMemo(() => {
+    const d = new Date(); d.setHours(0, 0, 0, 0); return d.toISOString()
+  }, [])
+  const todayEnd = useMemo(() => {
+    const d = new Date(); d.setHours(23, 59, 59, 999); return d.toISOString()
+  }, [])
+
+  const { data: staffTasksData } = useGetStaffTasksQuery(
+    { scheduledFrom: todayStart, scheduledTo: todayEnd, limit: 200 },
+    { skip }
+  )
+  const staffTasks = useMemo((): StaffTask[] =>
+    staffTasksData?.data?.tasks ?? staffTasksData?.data?.staffTasks ?? [],
+    [staffTasksData]
   )
 
   const reservationsByRoomId = useMemo((): Record<string, RoomReservationRange[]> => {
@@ -292,6 +322,28 @@ export function DashboardApiContainer() {
     return (raw as ApiFacility[]).map(mapApiFacilityToDashboard)
   }, [facilitiesData?.data])
 
+  const dispatch = useDispatch<AppDispatch>()
+  const [facilitySlots, setFacilitySlots] = useState<Record<string, FacilitySlotResponse[]>>({})
+
+  const facilityIdsKey = useMemo(() => facilities.map((f) => f.id).join(","), [facilities])
+
+  useEffect(() => {
+    if (skip || !facilityIdsKey) return
+    const ids = facilityIdsKey.split(",").filter(Boolean)
+    const subscriptions = ids.map((id) => {
+      const sub = dispatch(facilityApi.endpoints.getFacilitySlots.initiate(id))
+      sub.then(({ data }) => {
+        if (data?.data) {
+          setFacilitySlots((prev) => ({ ...prev, [id]: data.data }))
+        }
+      })
+      return sub
+    })
+    return () => {
+      subscriptions.forEach((sub) => sub.unsubscribe())
+    }
+  }, [facilityIdsKey, skip, dispatch])
+
   const bookings: Booking[] = useMemo(() => {
     const raw =
       bookingsData?.data?.bookings ??
@@ -358,13 +410,7 @@ export function DashboardApiContainer() {
     setCurrentDate(newDate)
   }
 
-  const convertISOToLocaleFormat = (isoDate: string): string => {
-    const [year, month, day] = isoDate.split("-")
-    if (language === "es" || language === "pt") {
-      return `${day}/${month}/${year}`
-    }
-    return `${month}/${day}/${year}`
-  }
+  const convertISOToLocaleFormat = (isoDate: string): string => formatDate(isoDate)
 
   const handleCompleteCheckout = () => {
     // No-op in API mode; checkouts not yet integrated
@@ -376,6 +422,20 @@ export function DashboardApiContainer() {
         new Set(bookings.map((b) => b.clientName).filter(Boolean))
       ) as string[],
     [bookings]
+  )
+
+  const getTasksForTimeSlot = useCallback(
+    (staffId: string, timeSlot: string): StaffTask[] => {
+      const bounds = SLOT_BOUNDS[timeSlot]
+      if (!bounds) return []
+      const [start, end] = bounds
+      return staffTasks.filter((task) => {
+        if (task.userId !== staffId) return false
+        const hour = new Date(task.scheduledStartAt).getHours()
+        return hour >= start && hour < end
+      })
+    },
+    [staffTasks]
   )
 
   const handleCreateMaintenanceActivity = useCallback(
@@ -414,8 +474,8 @@ export function DashboardApiContainer() {
       await createReservation({
         roomId: payload.roomId,
         clientId: payload.clientId,
-        checkIn: payload.checkIn,
-        checkOut: payload.checkOut,
+        checkIn: moment.tz(payload.checkIn, 'YYYY-MM-DD', timezone).startOf('day').toISOString(),
+        checkOut: moment.tz(payload.checkOut, 'YYYY-MM-DD', timezone).startOf('day').toISOString(),
       }).unwrap()
       toast({
         title: "Éxito",
@@ -488,6 +548,7 @@ export function DashboardApiContainer() {
       onCreateRoomBooking={handleCreateRoomBooking}
       onCreateMaintenanceActivity={handleCreateMaintenanceActivity}
       onAddFacilityBooking={() => { }}
+      facilitySlots={facilitySlots}
     />
   )
 }

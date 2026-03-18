@@ -6,6 +6,7 @@ import { Badge } from '@/components/ui/badge';
 import { Edit, Trash2 } from 'lucide-react';
 import { useLanguage } from '@/lib/i18n-context';
 import type { StaffMemberDisplay } from '@/interfaces/staff/StaffMemberDisplay';
+import { getTodayShift } from '../utils/staffDisplayToView';
 
 export interface StaffListProps {
   staffList: StaffMemberDisplay[];
@@ -61,9 +62,11 @@ export function StaffList({ staffList, onEdit, onDelete, isLoading }: StaffListP
                   <td className="py-4 px-4">{getStatusBadge(staff.status, t)}</td>
                   <td className="py-4 px-4 text-gray-600">{staff.employee.departmentName ?? '—'}</td>
                   <td className="py-4 px-4 text-gray-600">
-                    {staff.employee.workStartTime && staff.employee.workEndTime
-                      ? `${staff.employee.workStartTime} - ${staff.employee.workEndTime}`
-                      : '—'}
+                    {getTodayShift(
+                      staff.employee?.schedule,
+                      staff.employee?.workStartTime,
+                      staff.employee?.workEndTime,
+                    ) ?? '—'}
                   </td>
                   <td className="py-4 px-4 text-gray-600">
                     {staff.employee?.totalTasks != null && staff.employee?.completedTasks != null

@@ -3,6 +3,7 @@
 import { useState, useMemo } from "react"
 import { useParams } from "next/navigation"
 import { useLanguage } from "@/lib/i18n-context"
+import { useUserTimeZone } from "@/hooks/useUserTimeZone"
 import {
   Dumbbell,
   Waves,
@@ -466,6 +467,7 @@ function getTasksForTimeSlot(
 
 export function DashboardMockContainer() {
   const { t, language } = useLanguage()
+  const { formatDate } = useUserTimeZone()
   const params = useParams()
   const orgId = params?.orgId as string | undefined
 
@@ -556,13 +558,7 @@ export function DashboardMockContainer() {
     setCurrentDate(newDate)
   }
 
-  const convertISOToLocaleFormat = (isoDate: string): string => {
-    const [year, month, day] = isoDate.split("-")
-    if (language === "es" || language === "pt") {
-      return `${day}/${month}/${year}`
-    }
-    return `${month}/${day}/${year}`
-  }
+  const convertISOToLocaleFormat = (isoDate: string): string => formatDate(isoDate)
 
   const handleCompleteCheckout = (checkoutId: number) => {
     setCheckouts((prev) =>

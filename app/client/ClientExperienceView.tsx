@@ -5,8 +5,8 @@ import { useSelector } from "react-redux"
 import type { RootState } from "@/store/store"
 import {
   Home, Calendar, Bell, User, MapPin, Clock, Utensils, ShoppingBag,
-  Coffee, Crown, ChevronRight, MessageCircle, Sparkles, Car, Pizza,
-  Dumbbell, Waves, UtensilsCrossed, Users, CalendarDays,
+  Crown, ChevronRight, MessageCircle, Sparkles, Car, Pizza,
+  Users, CalendarDays,
 } from "lucide-react"
 import { Card } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
@@ -31,6 +31,7 @@ export function ClientExperienceView({
   slotsLoading = false,
   onCreateBooking,
   confirmedBookings = {},
+  agendaBookings = [],
 }: {
   userData: ClientUserData
   clientType: ClientType
@@ -43,6 +44,11 @@ export function ClientExperienceView({
   slotsLoading?: boolean
   onCreateBooking?: (facilityId: string, slotId: string, people: number) => Promise<void>
   confirmedBookings?: Record<string, string>
+  agendaBookings?: Array<{
+    facilityId: string
+    facility?: { name: string }
+    amenityShiftSlot?: { startAt: string; endAt: string }
+  }>
 }) {
   const router = useRouter()
   const dataSource = useSelector((state: RootState) => state.dataSource.dataSource)
@@ -696,72 +702,70 @@ export function ClientExperienceView({
               </div>
             )}
 
-            {activeTab === "calendario" && (
-              <div className="space-y-6 px-4 pb-24">
-                <h2 className="text-2xl font-bold text-foreground">Mi Agenda</h2>
-                <div className="space-y-3">
-                  <div className="flex items-center gap-2">
-                    <div className="w-1 h-6 bg-[#11AFBF] rounded-full" />
-                    <h3 className="text-lg font-semibold">Hoy - {new Date().toLocaleDateString("es-ES", { weekday: "long", day: "numeric", month: "long" })}</h3>
-                  </div>
-                  <div className="space-y-2">
-                    {[
-                      { time: "08:00", icon: <Coffee className="w-5 h-5 text-[#773CCA]" />, title: "Desayuno", sub: "Restaurante Principal", badge: "Confirmado", badgeColor: "bg-[#11AFBF]" },
-                      { time: "10:00", icon: <Sparkles className="w-5 h-5 text-[#773CCA]" />, title: "Servicio de Limpieza", sub: "Habitación 305", badge: "Programado", badgeColor: "bg-[#11AFBF]" },
-                      { time: "18:00", icon: <Dumbbell className="w-5 h-5 text-[#773CCA]" />, title: "Gimnasio", sub: "Centro de Fitness - Piso 2", badge: "Reservado", badgeColor: "bg-[#11AFBF]" },
-                    ].map((item) => (
-                      <div key={item.time} className="bg-white rounded-xl p-4 shadow-sm border border-gray-100">
-                        <div className="flex gap-3">
-                          <span className="text-sm font-semibold text-[#773CCA] w-12 shrink-0">{item.time}</span>
-                          <div className="flex-1">
-                            <div className="flex items-center gap-2 mb-1">{item.icon}<h4 className="font-semibold">{item.title}</h4></div>
-                            <p className="text-sm text-muted-foreground">{item.sub}</p>
-                            <span className={`inline-block mt-2 px-3 py-1 text-xs font-medium ${item.badgeColor} text-white rounded-full`}>{item.badge}</span>
-                          </div>
-                        </div>
-                      </div>
-                    ))}
-                    <div className="bg-white rounded-xl p-4 shadow-sm border-2 border-orange-300">
-                      <div className="flex gap-3">
-                        <span className="text-sm font-semibold text-orange-600 w-12 shrink-0">19:30</span>
-                        <div className="flex-1">
-                          <div className="flex items-center gap-2 mb-1"><UtensilsCrossed className="w-5 h-5 text-orange-600" /><h4 className="font-semibold">Pizza Margherita</h4></div>
-                          <p className="text-sm text-muted-foreground">Room Service - Entrega a habitación</p>
-                          <div className="flex items-center gap-2 mt-2">
-                            <span className="inline-block px-3 py-1 text-xs font-medium bg-yellow-500 text-white rounded-full">En Preparación</span>
-                            <span className="text-xs text-orange-600 font-medium">Llega: 19:30 - 19:50</span>
-                          </div>
-                        </div>
-                      </div>
+            {activeTab === "calendario" && (() => {
+              const parseUTCTime = (iso: string) => {
+                const match = iso.match(/T(\d{2}):(\d{2})/)
+                return match ? `${match[1]}:${match[2]}` : "??:??"
+              }
+              const todayKey = new Date().toISOString().slice(0, 10)
+              const tomorrowKey = new Date(Date.now() + 86400000).toISOString().slice(0, 10)
+              const sorted = [...agendaBookings]
+                .filter((b) => b.amenityShiftSlot?.startAt)
+                .sort((a, b) => a.amenityShiftSlot!.startAt.localeCompare(b.amenityShiftSlot!.startAt))
+              const byDate = sorted.reduce<Record<string, typeof sorted>>((acc, b) => {
+                const key = b.amenityShiftSlot!.startAt.slice(0, 10)
+                if (!acc[key]) acc[key] = []
+                acc[key].push(b)
+                return acc
+              }, {})
+              const dateKeys = Object.keys(byDate).sort()
+              const labelFor = (key: string) => {
+                if (key === todayKey) return `Hoy - ${new Date(key + "T12:00:00").toLocaleDateString("es-ES", { weekday: "long", day: "numeric", month: "long" })}`
+                if (key === tomorrowKey) return `Mañana - ${new Date(key + "T12:00:00").toLocaleDateString("es-ES", { weekday: "long", day: "numeric", month: "long" })}`
+                return new Date(key + "T12:00:00").toLocaleDateString("es-ES", { weekday: "long", day: "numeric", month: "long" })
+              }
+              return (
+                <div className="space-y-6 px-4 pb-24">
+                  <h2 className="text-2xl font-bold text-foreground">Mi Agenda</h2>
+                  {dateKeys.length === 0 ? (
+                    <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100 text-center">
+                      <CalendarDays className="w-10 h-10 text-gray-300 mx-auto mb-2" />
+                      <p className="text-muted-foreground text-sm">No tienes actividades programadas</p>
                     </div>
-                  </div>
-                </div>
-                <div className="space-y-3">
-                  <div className="flex items-center gap-2">
-                    <div className="w-1 h-6 bg-gray-400 rounded-full" />
-                    <h3 className="text-lg font-semibold">Mañana - {new Date(Date.now() + 86400000).toLocaleDateString("es-ES", { weekday: "long", day: "numeric", month: "long" })}</h3>
-                  </div>
-                  <div className="space-y-2">
-                    {[
-                      { time: "08:00", icon: <Coffee className="w-5 h-5 text-[#773CCA]" />, title: "Desayuno", sub: "Restaurante Principal", badge: "Confirmado", badgeColor: "bg-[#11AFBF]" },
-                      { time: "10:00", icon: <Users className="w-5 h-5 text-[#773CCA]" />, title: "Conferencia Anual Q1", sub: "Salón Principal - 4 horas", badge: "Registrado", badgeColor: "bg-[#773CCA]" },
-                      { time: "15:00", icon: <Waves className="w-5 h-5 text-[#773CCA]" />, title: "Piscina", sub: "Terraza - Piso 8", badge: "Reservado", badgeColor: "bg-[#11AFBF]" },
-                    ].map((item) => (
-                      <div key={item.time} className="bg-white rounded-xl p-4 shadow-sm border border-gray-100">
-                        <div className="flex gap-3">
-                          <span className="text-sm font-semibold text-[#773CCA] w-12 shrink-0">{item.time}</span>
-                          <div className="flex-1">
-                            <div className="flex items-center gap-2 mb-1">{item.icon}<h4 className="font-semibold">{item.title}</h4></div>
-                            <p className="text-sm text-muted-foreground">{item.sub}</p>
-                            <span className={`inline-block mt-2 px-3 py-1 text-xs font-medium ${item.badgeColor} text-white rounded-full`}>{item.badge}</span>
-                          </div>
+                  ) : (
+                    dateKeys.map((key) => (
+                      <div key={key} className="space-y-3">
+                        <div className="flex items-center gap-2">
+                          <div className="w-1 h-6 bg-[#11AFBF] rounded-full" />
+                          <h3 className="text-lg font-semibold">{labelFor(key)}</h3>
+                        </div>
+                        <div className="space-y-2">
+                          {byDate[key].map((b, idx) => {
+                            const start = parseUTCTime(b.amenityShiftSlot!.startAt)
+                            const end = b.amenityShiftSlot?.endAt ? parseUTCTime(b.amenityShiftSlot.endAt) : null
+                            return (
+                              <div key={idx} className="bg-white rounded-xl p-4 shadow-sm border border-gray-100">
+                                <div className="flex gap-3">
+                                  <span className="text-sm font-semibold text-[#773CCA] w-12 shrink-0">{start}</span>
+                                  <div className="flex-1">
+                                    <div className="flex items-center gap-2 mb-1">
+                                      <CalendarDays className="w-5 h-5 text-[#773CCA]" />
+                                      <h4 className="font-semibold">{b.facility?.name ?? "Actividad"}</h4>
+                                    </div>
+                                    {end && <p className="text-sm text-muted-foreground">{start} - {end}</p>}
+                                    <span className="inline-block mt-2 px-3 py-1 text-xs font-medium bg-[#11AFBF] text-white rounded-full">Reservado</span>
+                                  </div>
+                                </div>
+                              </div>
+                            )
+                          })}
                         </div>
                       </div>
-                    ))}
-                  </div>
+                    ))
+                  )}
                 </div>
-              </div>
-            )}
+              )
+            })()}
           </main>
         </main>
       )}

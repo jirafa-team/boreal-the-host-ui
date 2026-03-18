@@ -4,6 +4,7 @@ import type {
   Facility,
   Room,
   RoomStatus,
+  StaffScheduleEntry,
 } from "./components/types"
 
 export function getBookingsAtSlot(
@@ -148,6 +149,42 @@ export function generateDateColumns(
 }
 
 export const STAFF_TIME_SLOTS = ["7:00 AM", "11:00 AM", "3:00 PM", "7:00 PM"]
+
+/** Maps each STAFF_TIME_SLOTS label to [startHour, endHour) in UTC */
+const SLOT_HOUR_BOUNDS: Record<string, [number, number]> = {
+  "7:00 AM":  [7,  11],
+  "11:00 AM": [11, 15],
+  "3:00 PM":  [15, 19],
+  "7:00 PM":  [19, 24],
+}
+
+/**
+ * Returns true if the given time slot overlaps with the staff member's
+ * schedule for today (matched by today's day-of-week).
+ */
+export function isSlotWithinSchedule(
+  timeSlot: string,
+  schedule?: StaffScheduleEntry[]
+): boolean {
+  if (!schedule || schedule.length === 0) return false
+  const todayDow = new Date().getDay()
+  const entry = schedule.find((s) => s.dayOfWeek === todayDow && s.isActive)
+  if (!entry) return false
+
+  const bounds = SLOT_HOUR_BOUNDS[timeSlot]
+  if (!bounds) return false
+  const [slotStart, slotEnd] = bounds
+
+  const [schedStartH, schedStartM = 0] = entry.startTime.split(":").map(Number)
+  const [schedEndH, schedEndM = 0] = entry.endTime.split(":").map(Number)
+  const schedStartMinutes = schedStartH * 60 + schedStartM
+  const schedEndMinutes = schedEndH * 60 + schedEndM
+  const slotStartMinutes = slotStart * 60
+  const slotEndMinutes = slotEnd * 60
+
+  // Overlap: slot starts before schedule ends AND slot ends after schedule starts
+  return slotStartMinutes < schedEndMinutes && slotEndMinutes > schedStartMinutes
+}
 
 export function getFacilityTimeSlotsArray(): string[] {
   return Array.from({ length: 17 }, (_, i) => {

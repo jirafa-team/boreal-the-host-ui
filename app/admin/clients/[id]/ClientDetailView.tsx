@@ -9,6 +9,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import Image from "next/image"
+import { useUserTimeZone } from "@/hooks/useUserTimeZone"
 
 // Mock data - In production this would come from API/database
 const clientDetails = {
@@ -186,6 +187,7 @@ const clientDetails = {
 export default function ClientDetailPage() {
   const params = useParams()
   const router = useRouter()
+  const { formatDate } = useUserTimeZone()
   const [selectedReservation, setSelectedReservation] = useState<any>(null)
   const [activeTab, setActiveTab] = useState<"current" | "history" | "events">("current")
 
@@ -357,10 +359,7 @@ export default function ClientDetailPage() {
                     <div className="flex items-center gap-2 text-muted-foreground">
                       <Calendar className="w-4 h-4" />
                       Miembro desde{" "}
-                      {new Date(clientDetails.memberSince).toLocaleDateString("es-ES", {
-                        month: "long",
-                        year: "numeric",
-                      })}
+                      {formatDate(clientDetails.memberSince)}
                     </div>
                   </div>
                 </div>
@@ -459,22 +458,14 @@ export default function ClientDetailPage() {
                 <Calendar className="w-5 h-5 text-blue-600 flex-shrink-0" />
                 <span className="text-sm text-muted-foreground">Check-in:</span>
                 <span className="font-semibold text-foreground">
-                  {new Date(clientDetails.currentReservation.checkIn).toLocaleDateString("es-ES", {
-                    day: "2-digit",
-                    month: "short",
-                    year: "numeric",
-                  })}
+                  {formatDate(clientDetails.currentReservation.checkIn)}
                 </span>
               </div>
               <div className="flex items-center gap-3">
                 <LogOut className="w-5 h-5 text-orange-600 flex-shrink-0" />
                 <span className="text-sm text-muted-foreground">Check-out:</span>
                 <span className="font-semibold text-foreground">
-                  {new Date(clientDetails.currentReservation.checkOut).toLocaleDateString("es-ES", {
-                    day: "2-digit",
-                    month: "short",
-                    year: "numeric",
-                  })}
+                  {formatDate(clientDetails.currentReservation.checkOut)}
                 </span>
               </div>
               <div className="flex items-center gap-3 pt-2 border-t">
@@ -507,7 +498,7 @@ export default function ClientDetailPage() {
                         <div className="flex-1 min-w-0">
                           <p className="font-semibold text-foreground text-sm truncate">{event.name}</p>
                           <p className="text-xs text-muted-foreground">
-                            {new Date(event.date).toLocaleDateString("es-ES", { day: "2-digit", month: "short" })} • {event.time}
+                            {formatDate(event.date)} • {event.time}
                           </p>
                         </div>
                         {event.price > 0 && (
@@ -572,7 +563,7 @@ export default function ClientDetailPage() {
 
                     return (
                       <tr key={idx} className="border-b border-border/50 hover:bg-accent/50 transition-colors">
-                        <td className="py-3 px-4 text-sm text-muted-foreground">{new Date(order.date).toLocaleDateString("es-ES", { day: "2-digit", month: "short" })}</td>
+                        <td className="py-3 px-4 text-sm text-muted-foreground">{formatDate(order.date)}</td>
                         <td className="py-3 px-4 text-sm font-medium text-foreground">{order.category}</td>
                         <td className="py-3 px-4 text-sm text-foreground">{order.description}</td>
                         <td className="py-3 px-4 text-sm">{getStatusBadgeOrder(order.status)}</td>
@@ -627,20 +618,12 @@ export default function ClientDetailPage() {
                           <div className="flex items-center gap-4 text-sm text-muted-foreground mt-1">
                             <div className="flex items-center gap-1">
                               <Calendar className="w-3 h-3" />
-                              {new Date(reservation.checkIn).toLocaleDateString("es-ES", {
-                                day: "2-digit",
-                                month: "short",
-                                year: "numeric",
-                              })}
+                              {formatDate(reservation.checkIn)}
                             </div>
                             <span>→</span>
                             <div className="flex items-center gap-1">
                               <Calendar className="w-3 h-3" />
-                              {new Date(reservation.checkOut).toLocaleDateString("es-ES", {
-                                day: "2-digit",
-                                month: "short",
-                                year: "numeric",
-                              })}
+                              {formatDate(reservation.checkOut)}
                             </div>
                           </div>
                         </div>
@@ -696,11 +679,7 @@ export default function ClientDetailPage() {
                         <div className="flex items-center gap-4 text-sm text-muted-foreground mt-2">
                           <div className="flex items-center gap-1">
                             <Calendar className="w-3 h-3" />
-                            {new Date(event.date).toLocaleDateString("es-ES", {
-                              day: "2-digit",
-                              month: "short",
-                              year: "numeric",
-                            })}
+                            {formatDate(event.date)}
                           </div>
                           <div className="flex items-center gap-1">
                             <Clock className="w-3 h-3" />

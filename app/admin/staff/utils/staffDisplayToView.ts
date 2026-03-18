@@ -1,4 +1,5 @@
 import type { StaffMemberDisplay } from '@/interfaces/staff/StaffMemberDisplay';
+import type { StaffScheduleEntry } from '@/interfaces/staff/StaffSchedule';
 import type { StaffMemberView, StaffStatus } from '../components/types';
 
 function getInitials(name: string): string {
@@ -23,6 +24,29 @@ function formatTimeForDisplay(hhmm: string): string {
   return `${hour - 12}:${minute.toString().padStart(2, '0')} PM`;
 }
 
+/**
+ * Returns the formatted shift string for today, or null if off/inactive today.
+ * Falls back to legacy workStartTime/workEndTime when no schedule exists.
+ */
+export function getTodayShift(
+  schedule: StaffScheduleEntry[] | undefined,
+  fallbackStart?: string | null,
+  fallbackEnd?: string | null,
+): string | null {
+  if (schedule && schedule.length > 0) {
+    const todayDayOfWeek = (new Date().getDay() + 6) % 7;
+    const entry = schedule.find((e) => e.dayOfWeek === todayDayOfWeek);
+    if (entry && entry.isActive) {
+      return `${formatTimeForDisplay(entry.startTime)} - ${formatTimeForDisplay(entry.endTime)}`;
+    }
+    return null;
+  }
+  if (fallbackStart && fallbackEnd) {
+    return `${formatTimeForDisplay(fallbackStart)} - ${formatTimeForDisplay(fallbackEnd)}`;
+  }
+  return null;
+}
+
 function toStaffStatus(s: string | undefined): StaffStatus {
   const v = (s ?? '').toLowerCase();
   if (v === 'available') return 'available';
@@ -32,12 +56,11 @@ function toStaffStatus(s: string | undefined): StaffStatus {
 }
 
 export function staffDisplayToView(d: StaffMemberDisplay): StaffMemberView {
-  const start = d.employee?.workStartTime ?? d.workStartTime ?? '07:00';
-  const end = d.employee?.workEndTime ?? d.workEndTime ?? '15:00';
-  const shiftStr =
-    start && end
-      ? `${formatTimeForDisplay(start)} - ${formatTimeForDisplay(end)}`
-      : '—';
+  const shiftStr = getTodayShift(
+    d.employee?.schedule,
+    d.employee?.workStartTime ?? d.workStartTime,
+    d.employee?.workEndTime ?? d.workEndTime,
+  ) ?? '—';
 
   return {
     id: d.id,
