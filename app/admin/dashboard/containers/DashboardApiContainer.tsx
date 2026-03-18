@@ -1,9 +1,9 @@
 "use client"
 
-import { useCallback, useMemo, useState } from "react"
+import { useCallback, useEffect, useMemo, useState } from "react"
 import { useParams } from "next/navigation"
-import { useSelector } from "react-redux"
-import type { RootState } from "@/store/store"
+import { useDispatch, useSelector } from "react-redux"
+import type { RootState, AppDispatch } from "@/store/store"
 import { useLanguage } from "@/lib/i18n-context"
 import moment from "moment-timezone"
 import { useUserTimeZone } from "@/hooks/useUserTimeZone"
@@ -17,7 +17,8 @@ import {
 } from "lucide-react"
 import { useGetRoomsQuery } from "@/app/admin/rooms/slice/roomSlice"
 import { useGetStaffQuery } from "@/app/admin/staff/slice/staffSlice"
-import { useGetFacilitiesQuery } from "@/app/admin/facilities/slice/facilitySlice"
+import { useGetFacilitiesQuery, facilityApi } from "@/app/admin/facilities/slice/facilitySlice"
+import type { FacilitySlotResponse } from "@/interfaces/facility-slot/facility-slot-response"
 import { useGetReservationFacilityBookingsQuery } from "@/features/reservation-facility-booking/slices/reservationFacilityBookingSlice"
 import { useGetClientsQuery, mapClientApiToClient } from "@/app/admin/clients/slice/clientSlice"
 import { useCreateReservationMutation, useGetReservationsQuery } from "@/features/reservation/slices/reservationSlice"
@@ -193,10 +194,10 @@ function getRequestStatusText(status: string): string {
 }
 
 const SLOT_BOUNDS: Record<string, [number, number]> = {
-  "7:00 AM":  [7,  11],
+  "7:00 AM": [7, 11],
   "11:00 AM": [11, 15],
-  "3:00 PM":  [15, 19],
-  "7:00 PM":  [19, 24],
+  "3:00 PM": [15, 19],
+  "7:00 PM": [19, 24],
 }
 
 export function DashboardApiContainer() {
@@ -320,6 +321,28 @@ export function DashboardApiContainer() {
       []
     return (raw as ApiFacility[]).map(mapApiFacilityToDashboard)
   }, [facilitiesData?.data])
+
+  const dispatch = useDispatch<AppDispatch>()
+  const [facilitySlots, setFacilitySlots] = useState<Record<string, FacilitySlotResponse[]>>({})
+
+  const facilityIdsKey = useMemo(() => facilities.map((f) => f.id).join(","), [facilities])
+
+  useEffect(() => {
+    if (skip || !facilityIdsKey) return
+    const ids = facilityIdsKey.split(",").filter(Boolean)
+    const subscriptions = ids.map((id) => {
+      const sub = dispatch(facilityApi.endpoints.getFacilitySlots.initiate(id))
+      sub.then(({ data }) => {
+        if (data?.data) {
+          setFacilitySlots((prev) => ({ ...prev, [id]: data.data }))
+        }
+      })
+      return sub
+    })
+    return () => {
+      subscriptions.forEach((sub) => sub.unsubscribe())
+    }
+  }, [facilityIdsKey, skip, dispatch])
 
   const bookings: Booking[] = useMemo(() => {
     const raw =
@@ -525,6 +548,7 @@ export function DashboardApiContainer() {
       onCreateRoomBooking={handleCreateRoomBooking}
       onCreateMaintenanceActivity={handleCreateMaintenanceActivity}
       onAddFacilityBooking={() => { }}
+      facilitySlots={facilitySlots}
     />
   )
 }
