@@ -44,6 +44,7 @@ import {
   isMultiPartyFacility,
   STAFF_TIME_SLOTS,
   getFacilityTimeSlotsArray,
+  isSlotWithinSchedule,
 } from "../utils"
 import type {
   Booking,
@@ -61,6 +62,7 @@ import type {
   MaintenanceActivityFormPayload,
   FacilityBookingFormPayload,
 } from "./types"
+import type { StaffTask } from "@/interfaces/staff-task/StaffTask"
 
 type TFunction = (key: string) => string
 
@@ -81,7 +83,7 @@ export type DashboardViewProps = {
   dateColumns: DateColumn[]
   staffMembers: StaffMember[]
   requests: CleaningRequest[]
-  getTasksForTimeSlot: (staffName: string, timeSlot: string) => CleaningRequest[]
+  getTasksForTimeSlot: (staffId: string, timeSlot: string) => StaffTask[]
   facilities: Facility[]
   bookings: Booking[]
   filteredCheckouts: Checkout[]
@@ -1006,7 +1008,7 @@ export function DashboardView({
                                     {getStatusText(member.status)}
                                   </Badge>
                                   <span className="text-xs text-muted-foreground">
-                                    {member.tasksToday}/{member.maxCapacity}
+                                    {member.completedTasks}/{member.tasksToday}
                                   </span>
                                 </div>
                               </div>
@@ -1016,10 +1018,11 @@ export function DashboardView({
                         <div className="flex gap-2">
                           {STAFF_TIME_SLOTS.map((timeSlot) => {
                             const tasksInSlot = getTasksForTimeSlot(
-                              member.name,
+                              member.id,
                               timeSlot
                             )
                             const hasTask = tasksInSlot.length > 0
+                            const withinSchedule = isSlotWithinSchedule(timeSlot, member.schedule)
                             return (
                               <div
                                 key={timeSlot}
@@ -1033,39 +1036,35 @@ export function DashboardView({
                                         className="p-2 bg-gradient-to-r from-primary/10 to-primary/5 border-primary/30 hover:shadow-lg transition-all cursor-pointer h-full"
                                       >
                                         <div className="flex flex-col gap-1">
-                                          <div className="flex items-center justify-between">
-                                            <span className="font-semibold text-foreground text-xs">
-                                              {task.roomNumber}
-                                            </span>
-                                            {task.priority === "urgent" && (
-                                              <Badge
-                                                variant="destructive"
-                                                className="text-[10px] px-1 py-0"
-                                              >
-                                                !
-                                              </Badge>
-                                            )}
-                                          </div>
+                                          <span className="font-semibold text-foreground text-xs">
+                                            {new Date(task.scheduledStartAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                          </span>
                                           <p className="text-[10px] text-muted-foreground truncate">
-                                            {task.guestName}
+                                            {task.description}
                                           </p>
                                           <Badge
                                             className={
                                               getRequestStatusColor(
-                                                task.status
+                                                task.status?.toLowerCase() ?? 'pending'
                                               ) + " text-[10px] px-1 py-0"
                                             }
                                           >
-                                            {getRequestStatusText(task.status)}
+                                            {getRequestStatusText(task.status?.toLowerCase() ?? 'pending')}
                                           </Badge>
                                         </div>
                                       </Card>
                                     ))}
                                   </div>
-                                ) : (
-                                  <div className="h-full min-h-[80px] bg-muted/30 rounded-lg border border-dashed border-border flex items-center justify-center">
-                                    <span className="text-xs text-muted-foreground/50">
+                                ) : withinSchedule ? (
+                                  <div className="h-full min-h-[80px] bg-green-500/10 rounded-lg border border-dashed border-green-500/30 flex items-center justify-center">
+                                    <span className="text-xs text-green-600/70">
                                       Libre
+                                    </span>
+                                  </div>
+                                ) : (
+                                  <div className="h-full min-h-[80px] bg-muted/10 rounded-lg border border-dashed border-muted/20 flex items-center justify-center">
+                                    <span className="text-xs text-muted-foreground/30">
+                                      Fuera de turno
                                     </span>
                                   </div>
                                 )}

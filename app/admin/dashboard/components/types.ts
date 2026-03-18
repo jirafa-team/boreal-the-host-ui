@@ -37,6 +37,13 @@ export type Booking = {
 
 export type StaffStatus = "available" | "busy" | "off"
 
+export type StaffScheduleEntry = {
+  dayOfWeek: number
+  startTime: string
+  endTime: string
+  isActive: boolean
+}
+
 export type StaffDepartment =
   | "Limpieza"
   | "Mantenimiento"
@@ -51,9 +58,11 @@ export type StaffMember = {
   department: StaffDepartment
   status: StaffStatus
   tasksToday: number
+  completedTasks: number
   maxCapacity: number
   shift: string
   currentRoom?: number
+  schedule?: StaffScheduleEntry[]
 }
 
 export type CleaningRequestStatus =
