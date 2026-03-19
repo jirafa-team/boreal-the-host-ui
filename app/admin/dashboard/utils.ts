@@ -187,8 +187,11 @@ export function isSlotWithinSchedule(
 }
 
 export function getFacilityTimeSlotsArray(): string[] {
-  return Array.from({ length: 17 }, (_, i) => {
+  const slots: string[] = []
+  for (let i = 0; i < 17; i++) {
     const hour = i + 7
-    return `${hour.toString().padStart(2, "0")}:00`
-  })
+    slots.push(`${hour.toString().padStart(2, "0")}:00`)
+    slots.push(`${hour.toString().padStart(2, "0")}:30`)
+  }
+  return slots
 }

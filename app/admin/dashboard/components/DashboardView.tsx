@@ -249,9 +249,29 @@ export function DashboardView({
   ): FacilitySlotResponse | undefined {
     return facilitySlots[facilityId]?.find((s) => {
       const d = new Date(s.startAt)
-      const hh = d.getHours().toString().padStart(2, "0")
-      const mm = d.getMinutes().toString().padStart(2, "0")
+      const hh = d.getUTCHours().toString().padStart(2, "0")
+      const mm = d.getUTCMinutes().toString().padStart(2, "0")
       return `${hh}:${mm}` === timeSlot
+    })
+  }
+
+  function isGridSlotCoveredByApiSlot(facilityId: string, timeSlot: string): boolean {
+    const ownData = getSlotDataForFacilityAndTime(facilityId, timeSlot)
+    if (ownData && ownData.currentOccupancy > 0) return false
+
+    const slots = facilitySlots[facilityId]
+    if (!slots) return false
+    const [slotH, slotM] = timeSlot.split(":").map(Number)
+    const slotMinutes = slotH * 60 + slotM
+    return slots.some((s) => {
+      if (s.currentOccupancy === 0) return false
+      const start = new Date(s.startAt)
+      const end = new Date(s.endAt)
+      const startMinutes = start.getUTCHours() * 60 + start.getUTCMinutes()
+      const endMinutes = end.getUTCHours() * 60 + end.getUTCMinutes()
+      if (slotMinutes > startMinutes && slotMinutes < endMinutes) return true
+      if (slotMinutes === endMinutes) return true
+      return false
     })
   }
 
@@ -1348,7 +1368,7 @@ export function DashboardView({
                   {timeSlotsArray.map((slot) => (
                     <div
                       key={slot}
-                      className="w-32 p-3 text-center text-sm font-medium border-r border-border shrink-0"
+                      className="w-16 p-3 text-center text-sm font-medium border-r border-border shrink-0"
                     >
                       {slot}
                     </div>
@@ -1410,13 +1430,13 @@ export function DashboardView({
                             : slotBookings.length
 
                           if (bookingAtStart) {
-                            const durationHours = bookingAtStart.duration / 60
+                            // +1 column extension so the block spans start→end (same logic as realSlotData)
                             return (
                               <div
                                 key={slot}
                                 className="relative border-r border-border group shrink-0"
                                 style={{
-                                  width: `${durationHours * 128}px`,
+                                  width: `${(bookingAtStart.duration / 30) * 64 + 64}px`,
                                 }}
                               >
                                 <div
@@ -1547,7 +1567,7 @@ export function DashboardView({
                               return (
                                 <div
                                   key={slot}
-                                  className="w-32 border-r border-border p-2 shrink-0 min-h-[88px] flex items-center justify-center cursor-pointer hover:bg-primary/5 transition-colors"
+                                  className="w-16 border-r border-border p-2 shrink-0 min-h-[88px] flex items-center justify-center cursor-pointer hover:bg-primary/5 transition-colors"
                                   onClick={() =>
                                     onShowBookingsDetail(slotBookingsAtTime)
                                   }
@@ -1577,37 +1597,60 @@ export function DashboardView({
                             return null
                           }
                           if (realSlotData && realSlotData.currentOccupancy > 0) {
+                            const startMs = new Date(realSlotData.startAt).getTime()
+                            const endMs = new Date(realSlotData.endAt).getTime()
+                            const durationMinutes = (endMs - startMs) / 60000
+                            // Extend +1 column (64px) into the endAt slot so the block spans
+                            // from start to end visually (e.g. 18:00–18:30 fills two columns)
+                            const endD = new Date(realSlotData.endAt)
+                            const endSlotKey = `${endD.getUTCHours().toString().padStart(2, "0")}:${endD.getUTCMinutes().toString().padStart(2, "0")}`
+                            const endSlotOccupied = facilitySlots[facility.id]?.some((s) => {
+                              const d = new Date(s.startAt)
+                              const key = `${d.getUTCHours().toString().padStart(2, "0")}:${d.getUTCMinutes().toString().padStart(2, "0")}`
+                              return key === endSlotKey && s.currentOccupancy > 0
+                            }) ?? false
+                            const spanWidth = (durationMinutes / 30) * 64 + (endSlotOccupied ? 0 : 64)
+                            const occ = realSlotData.occupationPercentage
                             return (
                               <div
                                 key={slot}
-                                className="w-32 border-r border-border p-2 shrink-0 min-h-[88px] flex items-center justify-center"
+                                className="relative border-r border-border group shrink-0"
+                                style={{ width: `${spanWidth}px` }}
                               >
-                                <div className="w-full space-y-2">
-                                  <p className="text-xs font-medium text-foreground text-center">
-                                    {realSlotData.currentOccupancy}/{facility.capacity}
-                                  </p>
-                                  <div className="w-full bg-black/10 rounded-full h-2">
+                                <div
+                                  className={`absolute inset-2 rounded-lg ${occ >= 100
+                                    ? "bg-gradient-to-br from-red-500/30 to-red-600/20 border-2 border-red-500"
+                                    : occ > 50
+                                      ? "bg-gradient-to-br from-amber-500/30 to-amber-600/20 border-2 border-amber-500"
+                                      : "bg-gradient-to-br from-green-500/30 to-green-600/20 border-2 border-green-500"
+                                    } p-3 flex flex-col justify-center min-h-[72px]`}
+                                >
+                                  <div className="flex flex-col items-center justify-center gap-2">
+                                    <p className="text-lg font-bold text-foreground">
+                                      {realSlotData.currentOccupancy}/{realSlotData.capacity}
+                                    </p>
+                                    <p className="text-[10px] text-muted-foreground">
+                                      Ocupación: {occ}%
+                                    </p>
+                                  </div>
+                                  <div className="mt-2 w-full bg-black/10 rounded-full h-1.5">
                                     <div
-                                      className={`h-2 rounded-full transition-all ${realSlotData.occupationPercentage > 80
-                                          ? "bg-red-500"
-                                          : realSlotData.occupationPercentage > 50
-                                            ? "bg-amber-500"
-                                            : "bg-green-500"
+                                      className={`h-1.5 rounded-full transition-all ${occ > 80 ? "bg-red-500" : occ > 50 ? "bg-amber-500" : "bg-green-500"
                                         }`}
-                                      style={{ width: `${realSlotData.occupationPercentage}%` }}
+                                      style={{ width: `${occ}%` }}
                                     />
                                   </div>
-                                  <p className="text-[10px] text-muted-foreground text-center">
-                                    {realSlotData.occupationPercentage}%
-                                  </p>
                                 </div>
                               </div>
                             )
                           }
+                          if (isGridSlotCoveredByApiSlot(facility.id, slot)) {
+                            return null
+                          }
                           return (
                             <div
                               key={slot}
-                              className="w-32 border-r border-border p-2 shrink-0 min-h-[88px] flex items-center"
+                              className="w-16 border-r border-border p-2 shrink-0 min-h-[88px] flex items-center"
                             >
                               <div className="w-full border-2 border-dashed border-muted-foreground/20 rounded-md h-16 flex items-center justify-center hover:border-primary/30 hover:bg-primary/5 transition-colors cursor-pointer">
                                 <span className="text-xs text-muted-foreground/50 font-medium">
