@@ -2,6 +2,7 @@ import { createSlice, type PayloadAction } from '@reduxjs/toolkit';
 import { createApi } from '@reduxjs/toolkit/query/react';
 import { ENDPOINTS } from '@/shared/types/api';
 import { baseQueryWithOrg } from '@/store/baseQuery';
+import { roomApi } from '@/app/admin/rooms/slice/roomSlice';
 import type { Reservation } from '@/interfaces/reservation/Reservation';
 import type { GetReservationsResponse } from '@/interfaces/reservation/GetReservationsResponse';
 
@@ -24,10 +25,23 @@ export const reservationSlice = createSlice({
   },
 });
 
+export interface CheckoutReservationDto {
+  id: string;
+  code: string;
+  clientId: string;
+  organizationId: string;
+  roomId: string;
+  checkIn: string;
+  checkOut: string;
+  status: string;
+  user?: { id: string; firstName: string; lastName: string; email: string; phoneNumber?: string };
+  room?: { id: string; number: string; status: string; checkIn?: string | null; checkOut?: string | null; guest?: string | null };
+}
+
 export const reservationApi = createApi({
   reducerPath: 'reservationApi',
   baseQuery: baseQueryWithOrg,
-  tagTypes: ['Reservations', 'UserReservationContexts'],
+  tagTypes: ['Reservations', 'UserReservationContexts', 'TodayCheckouts'],
   endpoints: (build) => ({
     getReservations: build.query<{ data: GetReservationsResponse }, { page?: number; limit?: number } | void>({
       query: (p) => ({
@@ -104,6 +118,35 @@ export const reservationApi = createApi({
       }),
       invalidatesTags: ['Reservations', 'UserReservationContexts'],
     }),
+    getTodayCheckouts: build.query<{ data: CheckoutReservationDto[] }, void>({
+      query: () => ({
+        url: ENDPOINTS.RESERVATION_CHECKOUTS_TODAY,
+        method: 'GET',
+        credentials: 'include',
+      }),
+      providesTags: ['TodayCheckouts'],
+    }),
+    completeCheckout: build.mutation<void, string>({
+      query: (id) => ({
+        url: `${ENDPOINTS.RESERVATION}/${id}/checkout`,
+        method: 'PATCH',
+        credentials: 'include',
+      }),
+      invalidatesTags: ['TodayCheckouts', 'Reservations'],
+      async onQueryStarted(_, { queryFulfilled, dispatch }) {
+        await queryFulfilled;
+        dispatch(roomApi.util.invalidateTags(['Rooms']));
+      },
+    }),
+    checkinReservationBulk: build.mutation<void, string[]>({
+      query: (reservationIds) => ({
+        url: `${ENDPOINTS.RESERVATION}/checkin-bulk`,
+        method: 'PATCH',
+        body: { reservationIds },
+        credentials: 'include',
+      }),
+      invalidatesTags: ['Reservations', 'UserReservationContexts'],
+    }),
   }),
 });
 
@@ -118,5 +161,8 @@ export const {
   useConfirmReservationMutation,
   useDeleteReservationMutation,
   useCompleteCheckInMutation,
+  useGetTodayCheckoutsQuery,
+  useCompleteCheckoutMutation,
+  useCheckinReservationBulkMutation,
 } = reservationApi;
 export default reservationSlice.reducer;

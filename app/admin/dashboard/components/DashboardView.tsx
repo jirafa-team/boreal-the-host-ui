@@ -96,7 +96,7 @@ export type DashboardViewProps = {
   onCheckoutSearchStatusChange: (value: string) => void
   checkoutsCompletedCount: number
   checkoutsPendingCount: number
-  onCompleteCheckout: (checkoutId: number) => void
+  onCompleteCheckout: (checkoutId: string) => void
   onShowBookingsDetail: (bookingsList: Booking[]) => void
   navigateDate: (direction: "prev" | "next") => void
   convertISOToLocaleFormat: (isoDate: string) => string

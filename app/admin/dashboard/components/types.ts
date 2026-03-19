@@ -84,7 +84,7 @@ export type CleaningRequest = {
 export type CheckoutStatus = "completed" | "pending"
 
 export type Checkout = {
-  id: number
+  id: string
   room: string
   guestName: string
   status: CheckoutStatus
