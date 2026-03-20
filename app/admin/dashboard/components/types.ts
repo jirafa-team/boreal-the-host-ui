@@ -125,6 +125,7 @@ export type MaintenanceActivityFormPayload = {
   description: string
   priority: "normal" | "urgent"
   deliveryTime: string
+  estimatedDurationMinutes: number
   assignedStaffId: string
   scheduledDate: string
   scheduledTime: string

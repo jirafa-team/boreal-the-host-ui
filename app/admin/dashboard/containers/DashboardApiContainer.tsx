@@ -116,7 +116,7 @@ function mapStaffDisplayToMember(
   const department = validDepts.includes(dept) ? dept : "Recepción"
 
   const schedule = emp?.schedule as StaffScheduleEntry[] | undefined
-  const todayDow = new Date().getDay()
+  const todayDow = (new Date().getDay() + 6) % 7
   const todaySchedule = schedule?.find((s) => s.dayOfWeek === todayDow && s.isActive)
 
   return {
@@ -220,7 +220,7 @@ export function DashboardApiContainer() {
   const [createReservation] = useCreateReservationMutation()
   const [createStaffTask] = useCreateStaffTaskMutation()
   const { toast } = useToast()
-  const { data: staffData } = useGetStaffQuery(undefined, { skip })
+  const { data: staffData, refetch: refetchStaff } = useGetStaffQuery(undefined, { skip })
   const { data: facilitiesData } = useGetFacilitiesQuery(undefined, {
     skip,
   })
@@ -251,7 +251,7 @@ export function DashboardApiContainer() {
     { skip }
   )
   const staffTasks = useMemo((): StaffTask[] =>
-    staffTasksData?.data?.tasks ?? staffTasksData?.data?.staffTasks ?? [],
+    staffTasksData?.data?.objects ?? staffTasksData?.data?.tasks ?? staffTasksData?.data?.staffTasks ?? [],
     [staffTasksData]
   )
 
@@ -477,8 +477,10 @@ export function DashboardApiContainer() {
             `${payload.scheduledDate}T${payload.scheduledTime}`
           ).toISOString(),
           description: payload.description,
+          estimatedDurationMinutes: payload.estimatedDurationMinutes ?? 30,
         }).unwrap()
         toast({ title: "Éxito", description: "Tarea creada correctamente." })
+        refetchStaff()
       } catch {
         toast({
           title: "Error",
@@ -547,6 +549,7 @@ export function DashboardApiContainer() {
       staffMembers={staffMembers}
       requests={requests}
       getTasksForTimeSlot={getTasksForTimeSlot}
+      staffTasks={staffTasks}
       facilities={facilities}
       bookings={bookings}
       filteredCheckouts={filteredCheckouts}

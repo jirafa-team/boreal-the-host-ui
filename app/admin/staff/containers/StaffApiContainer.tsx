@@ -24,8 +24,9 @@ const initialNewStaff: NewStaffForm = {
 const initialNewTask: NewTaskForm = {
   description: '',
   priority: 'normal',
-  deliveryTime: '1',
-  scheduledStartAt: '',
+  estimatedDurationMinutes: 30,
+  scheduledDate: '',
+  scheduledTime: '',
 };
 
 export function StaffApiContainer() {
@@ -123,13 +124,14 @@ export function StaffApiContainer() {
   }, []);
 
   const handleAssignTask = useCallback(async () => {
-    if (!staffForTask || !newTask.description.trim() || !newTask.scheduledStartAt) return;
+    if (!staffForTask || !newTask.description.trim() || !newTask.scheduledDate || !newTask.scheduledTime) return;
     try {
       setLoading(true);
       await createStaffTask({
         userId: staffForTask.id,
-        scheduledStartAt: new Date(newTask.scheduledStartAt).toISOString(),
+        scheduledStartAt: new Date(`${newTask.scheduledDate}T${newTask.scheduledTime}`).toISOString(),
         description: newTask.description.trim(),
+        estimatedDurationMinutes: newTask.estimatedDurationMinutes,
       }).unwrap();
       setShowAssignTaskDialog(false);
       setStaffForTask(null);

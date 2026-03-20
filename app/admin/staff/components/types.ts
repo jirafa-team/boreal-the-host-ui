@@ -35,6 +35,7 @@ export type NewStaffForm = {
 export type NewTaskForm = {
   description: string;
   priority: "normal" | "urgent";
-  deliveryTime: string;
-  scheduledStartAt: string;
+  estimatedDurationMinutes: number;
+  scheduledDate: string;
+  scheduledTime: string;
 };
