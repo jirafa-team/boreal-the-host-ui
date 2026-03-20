@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation"
 import { useSelector, useDispatch } from "react-redux"
 import type { RootState } from "@/store/store"
 import { useLanguage } from "@/lib/i18n-context"
-import { useGetUserReservationContextsQuery } from "@/features/reservation/slices/reservationSlice"
+import { useGetUserReservationContextsQuery, useCheckinReservationBulkMutation } from "@/features/reservation/slices/reservationSlice"
 import { useGetUserContextsQuery } from "@/features/auth/slices/authSlice"
 import { setCurrentOrganization } from "@/features/organization/slices/organizationSlice"
 import { StaysView } from "../components/StaysView"
@@ -63,6 +63,7 @@ export function StaysApiContainer() {
     return fromAuth?.id ?? undefined
   })
   const [isRedirecting, setIsRedirecting] = useState(false)
+  const [checkinReservationBulk] = useCheckinReservationBulkMutation()
 
   const { data: userContexts } = useGetUserContextsQuery(undefined, {
     skip: dataSource !== "api" || !!organizationId,
@@ -151,6 +152,24 @@ export function StaysApiContainer() {
     router.push("/client/checkin")
   }
 
+  const handleCheckinClick = async (_stayId: string) => {
+    const today = new Date()
+    today.setHours(0, 0, 0, 0)
+    const raw = reservationsList as ReservationWithDetails[]
+    const eligibleIds = raw
+      .filter((r) => {
+        const status = r.status?.toLowerCase()
+        const checkInDate = r.checkIn ? new Date(r.checkIn) : null
+        return status === "confirmed" && checkInDate != null && checkInDate <= today
+      })
+      .map((r) => r.id!)
+      .filter(Boolean)
+
+    if (eligibleIds.length > 0) {
+      await checkinReservationBulk(eligibleIds)
+    }
+  }
+
   // No renderizar nada mientras se evalúa la redirección
   if (!isLoaded || isLoading) return null
 
@@ -163,6 +182,7 @@ export function StaysApiContainer() {
       onAccessReservationClick={handleAccessReservationClick}
       onWaitingTripClick={handleWaitingTripClick}
       onFirstStayCheckinClick={handleFirstStayCheckinClick}
+      onCheckinClick={handleCheckinClick}
       t={t}
       isLoading={isLoading}
       error={error}

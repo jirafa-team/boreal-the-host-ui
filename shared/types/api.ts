@@ -24,6 +24,7 @@ export const ENDPOINTS = {
   RESERVATION: '/reservation',
   RESERVATION_WITH_DETAILS: '/reservation/with-details',
   RESERVATION_USER_CONTEXTS: '/reservation/user-contexts',
+  RESERVATION_CHECKOUTS_TODAY: '/reservation/checkouts-today',
   RESERVATION_FACILITY_BOOKING: '/reservation-facility-booking',
   TAXONOMY_DEPARTMENTS: '/taxonomy/departments',
   TAXONOMY_EVENT_CATEGORIES: '/taxonomy/event-categories',

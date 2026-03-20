@@ -4,6 +4,7 @@ export interface StaffTask {
   description: string;
   scheduledStartAt: string;
   scheduledEndAt?: string;
+  estimatedDurationMinutes?: number;
   status?: string;
   [key: string]: unknown;
 }

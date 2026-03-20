@@ -353,7 +353,7 @@ const MOCK_REQUESTS: CleaningRequest[] = [
 
 const INITIAL_CHECKOUTS: Checkout[] = [
   {
-    id: 1,
+    id: "mock-1",
     room: "301",
     guestName: "Carlos Mendoza",
     status: "completed",
@@ -361,7 +361,7 @@ const INITIAL_CHECKOUTS: Checkout[] = [
     lateCheckout: false,
   },
   {
-    id: 2,
+    id: "mock-2",
     room: "205",
     guestName: "María García",
     status: "completed",
@@ -369,7 +369,7 @@ const INITIAL_CHECKOUTS: Checkout[] = [
     lateCheckout: true,
   },
   {
-    id: 3,
+    id: "mock-3",
     room: "412",
     guestName: "John Smith",
     status: "pending",
@@ -560,7 +560,7 @@ export function DashboardMockContainer() {
 
   const convertISOToLocaleFormat = (isoDate: string): string => formatDate(isoDate)
 
-  const handleCompleteCheckout = (checkoutId: number) => {
+  const handleCompleteCheckout = (checkoutId: string) => {
     setCheckouts((prev) =>
       prev.map((checkout) =>
         checkout.id === checkoutId

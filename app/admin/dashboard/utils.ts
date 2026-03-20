@@ -167,7 +167,7 @@ export function isSlotWithinSchedule(
   schedule?: StaffScheduleEntry[]
 ): boolean {
   if (!schedule || schedule.length === 0) return false
-  const todayDow = new Date().getDay()
+  const todayDow = (new Date().getDay() + 6) % 7
   const entry = schedule.find((s) => s.dayOfWeek === todayDow && s.isActive)
   if (!entry) return false
 
@@ -187,8 +187,68 @@ export function isSlotWithinSchedule(
 }
 
 export function getFacilityTimeSlotsArray(): string[] {
-  return Array.from({ length: 17 }, (_, i) => {
+  const slots: string[] = []
+  for (let i = 0; i < 17; i++) {
     const hour = i + 7
-    return `${hour.toString().padStart(2, "0")}:00`
-  })
+    slots.push(`${hour.toString().padStart(2, "0")}:00`)
+    slots.push(`${hour.toString().padStart(2, "0")}:30`)
+  }
+  return slots
+}
+
+/**
+ * Returns true if the given 30-min slot (HH:MM) falls within the staff
+ * member's schedule for today.
+ */
+export function isTimeSlotWithinStaffSchedule(
+  slot: string,
+  schedule?: StaffScheduleEntry[]
+): boolean {
+  if (!schedule?.length) return false
+  const todayDow = (new Date().getDay() + 6) % 7
+  const entry = schedule.find((s) => s.dayOfWeek === todayDow && s.isActive)
+  if (!entry) return false
+
+  const [slotH, slotM] = slot.split(":").map(Number)
+  const slotMinutes = slotH * 60 + (slotM || 0)
+
+  const [schedStartH, schedStartM = 0] = entry.startTime.split(":").map(Number)
+  const [schedEndH, schedEndM = 0] = entry.endTime.split(":").map(Number)
+  const schedStartMinutes = schedStartH * 60 + schedStartM
+  const schedEndMinutes = schedEndH * 60 + schedEndM
+
+  return slotMinutes >= schedStartMinutes && slotMinutes < schedEndMinutes
+}
+
+/**
+ * Snaps a task's scheduledStartAt to the nearest preceding 30-min slot label.
+ * Returns format "HH:MM".
+ */
+export function getTaskSlotLabel(scheduledStartAt: string): string {
+  const d = new Date(scheduledStartAt)
+  const h = d.getHours().toString().padStart(2, "0")
+  const m = d.getMinutes() < 30 ? "00" : "30"
+  return `${h}:${m}`
+}
+
+/**
+ * Builds a Set of slot labels that are covered (occupied) by a task,
+ * given its start time and duration.
+ */
+export function getTaskCoveredSlots(
+  scheduledStartAt: string,
+  estimatedDurationMinutes: number
+): Set<string> {
+  const startSlot = getTaskSlotLabel(scheduledStartAt)
+  const [startH, startM] = startSlot.split(":").map(Number)
+  const startMinutes = startH * 60 + startM
+  const slotCount = Math.ceil(estimatedDurationMinutes / 30)
+  const covered = new Set<string>()
+  for (let i = 0; i < slotCount; i++) {
+    const totalMin = startMinutes + i * 30
+    const hh = Math.floor(totalMin / 60).toString().padStart(2, "0")
+    const mm = (totalMin % 60).toString().padStart(2, "0")
+    covered.add(`${hh}:${mm}`)
+  }
+  return covered
 }

@@ -84,7 +84,7 @@ export type CleaningRequest = {
 export type CheckoutStatus = "completed" | "pending"
 
 export type Checkout = {
-  id: number
+  id: string
   room: string
   guestName: string
   status: CheckoutStatus
@@ -125,6 +125,7 @@ export type MaintenanceActivityFormPayload = {
   description: string
   priority: "normal" | "urgent"
   deliveryTime: string
+  estimatedDurationMinutes: number
   assignedStaffId: string
   scheduledDate: string
   scheduledTime: string

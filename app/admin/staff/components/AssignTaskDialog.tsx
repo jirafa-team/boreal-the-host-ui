@@ -88,40 +88,68 @@ export function AssignTaskDialog({
             </Select>
           </div>
           <div>
-            <Label htmlFor="deliveryTime" className="text-sm font-medium">
-              {t('admin.deliveryTime')} (horas)
+            <Label htmlFor="estimatedDuration" className="text-sm font-medium">
+              {t('admin.estimatedDuration')}
             </Label>
-            <Input
-              id="deliveryTime"
-              type="number"
-              min={1}
-              max={24}
-              value={newTask.deliveryTime}
-              onChange={(e) =>
+            <Select
+              value={newTask.estimatedDurationMinutes.toString()}
+              onValueChange={(v) =>
                 onNewTaskChange((prev) => ({
                   ...prev,
-                  deliveryTime: e.target.value,
+                  estimatedDurationMinutes: Number(v),
                 }))
               }
-              className="mt-2"
-            />
+            >
+              <SelectTrigger className="mt-2">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="15">15 min</SelectItem>
+                <SelectItem value="30">30 min</SelectItem>
+                <SelectItem value="45">45 min</SelectItem>
+                <SelectItem value="60">1 hora</SelectItem>
+                <SelectItem value="90">1.5 horas</SelectItem>
+                <SelectItem value="120">2 horas</SelectItem>
+                <SelectItem value="180">3 horas</SelectItem>
+                <SelectItem value="240">4 horas</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
-          <div>
-            <Label htmlFor="scheduledStartAt" className="text-sm font-medium">
-              {t('admin.scheduledDate')}
-            </Label>
-            <Input
-              id="scheduledStartAt"
-              type="datetime-local"
-              value={newTask.scheduledStartAt}
-              onChange={(e) =>
-                onNewTaskChange((prev) => ({
-                  ...prev,
-                  scheduledStartAt: e.target.value,
-                }))
-              }
-              className="mt-2"
-            />
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <Label htmlFor="scheduledDate" className="text-sm font-medium">
+                {t('admin.scheduledDate')}
+              </Label>
+              <Input
+                id="scheduledDate"
+                type="date"
+                value={newTask.scheduledDate}
+                onChange={(e) =>
+                  onNewTaskChange((prev) => ({
+                    ...prev,
+                    scheduledDate: e.target.value,
+                  }))
+                }
+                className="mt-2"
+              />
+            </div>
+            <div>
+              <Label htmlFor="scheduledTime" className="text-sm font-medium">
+                {t('admin.scheduledTime')}
+              </Label>
+              <Input
+                id="scheduledTime"
+                type="time"
+                value={newTask.scheduledTime}
+                onChange={(e) =>
+                  onNewTaskChange((prev) => ({
+                    ...prev,
+                    scheduledTime: e.target.value,
+                  }))
+                }
+                className="mt-2"
+              />
+            </div>
           </div>
         </div>
         <div className="flex justify-end gap-2">

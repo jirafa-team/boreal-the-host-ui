@@ -21,7 +21,12 @@ import { useGetFacilitiesQuery, facilityApi } from "@/app/admin/facilities/slice
 import type { FacilitySlotResponse } from "@/interfaces/facility-slot/facility-slot-response"
 import { useGetReservationFacilityBookingsQuery } from "@/features/reservation-facility-booking/slices/reservationFacilityBookingSlice"
 import { useGetClientsQuery, mapClientApiToClient } from "@/app/admin/clients/slice/clientSlice"
-import { useCreateReservationMutation, useGetReservationsQuery } from "@/features/reservation/slices/reservationSlice"
+import {
+  useCreateReservationMutation,
+  useGetReservationsQuery,
+  useGetTodayCheckoutsQuery,
+  useCompleteCheckoutMutation,
+} from "@/features/reservation/slices/reservationSlice"
 import { useCreateStaffTaskMutation, useGetStaffTasksQuery } from "@/features/staff-task/slices/staffTaskSlice"
 import type { StaffTask } from "@/interfaces/staff-task/StaffTask"
 import { useToast } from "@/hooks/use-toast"
@@ -111,7 +116,7 @@ function mapStaffDisplayToMember(
   const department = validDepts.includes(dept) ? dept : "Recepción"
 
   const schedule = emp?.schedule as StaffScheduleEntry[] | undefined
-  const todayDow = new Date().getDay()
+  const todayDow = (new Date().getDay() + 6) % 7
   const todaySchedule = schedule?.find((s) => s.dayOfWeek === todayDow && s.isActive)
 
   return {
@@ -215,7 +220,7 @@ export function DashboardApiContainer() {
   const [createReservation] = useCreateReservationMutation()
   const [createStaffTask] = useCreateStaffTaskMutation()
   const { toast } = useToast()
-  const { data: staffData } = useGetStaffQuery(undefined, { skip })
+  const { data: staffData, refetch: refetchStaff } = useGetStaffQuery(undefined, { skip })
   const { data: facilitiesData } = useGetFacilitiesQuery(undefined, {
     skip,
   })
@@ -231,6 +236,8 @@ export function DashboardApiContainer() {
     { page: 1, limit: 500 },
     { skip }
   )
+  const { data: todayCheckoutsData } = useGetTodayCheckoutsQuery(undefined, { skip })
+  const [completeCheckout] = useCompleteCheckoutMutation()
 
   const todayStart = useMemo(() => {
     const d = new Date(); d.setHours(0, 0, 0, 0); return d.toISOString()
@@ -244,7 +251,7 @@ export function DashboardApiContainer() {
     { skip }
   )
   const staffTasks = useMemo((): StaffTask[] =>
-    staffTasksData?.data?.tasks ?? staffTasksData?.data?.staffTasks ?? [],
+    staffTasksData?.data?.objects ?? staffTasksData?.data?.tasks ?? staffTasksData?.data?.staffTasks ?? [],
     [staffTasksData]
   )
 
@@ -367,9 +374,26 @@ export function DashboardApiContainer() {
     [rooms, searchTerm]
   )
 
-  const filteredCheckouts: Checkout[] = []
-  const checkoutsCompletedCount = 0
-  const checkoutsPendingCount = 0
+  const filteredCheckouts: Checkout[] = useMemo(() => {
+    const list = todayCheckoutsData?.data ?? []
+    return list.map((r) => ({
+      id: r.id,
+      room: r.room?.number ?? r.roomId,
+      guestName: r.user ? `${r.user.firstName} ${r.user.lastName}` : r.clientId,
+      status: (r.status === "checked_out" ? "completed" : "pending") as Checkout["status"],
+      balance: 0,
+      lateCheckout: false,
+    }))
+  }, [todayCheckoutsData])
+
+  const checkoutsCompletedCount = useMemo(
+    () => filteredCheckouts.filter((c) => c.status === "completed").length,
+    [filteredCheckouts]
+  )
+  const checkoutsPendingCount = useMemo(
+    () => filteredCheckouts.filter((c) => c.status === "pending").length,
+    [filteredCheckouts]
+  )
   const requests: CleaningRequest[] = []
 
   const dateColumns = useMemo(
@@ -412,9 +436,14 @@ export function DashboardApiContainer() {
 
   const convertISOToLocaleFormat = (isoDate: string): string => formatDate(isoDate)
 
-  const handleCompleteCheckout = () => {
-    // No-op in API mode; checkouts not yet integrated
-  }
+  const handleCompleteCheckout = useCallback(async (checkoutId: string) => {
+    try {
+      await completeCheckout(checkoutId).unwrap()
+      toast({ title: "Checkout completado", description: "La habitación quedó liberada." })
+    } catch {
+      toast({ title: "Error", description: "No se pudo completar el checkout.", variant: "destructive" })
+    }
+  }, [completeCheckout, toast])
 
   const facilityBookingSuggestions = useMemo(
     () =>
@@ -448,8 +477,10 @@ export function DashboardApiContainer() {
             `${payload.scheduledDate}T${payload.scheduledTime}`
           ).toISOString(),
           description: payload.description,
+          estimatedDurationMinutes: payload.estimatedDurationMinutes ?? 30,
         }).unwrap()
         toast({ title: "Éxito", description: "Tarea creada correctamente." })
+        refetchStaff()
       } catch {
         toast({
           title: "Error",
@@ -518,6 +549,7 @@ export function DashboardApiContainer() {
       staffMembers={staffMembers}
       requests={requests}
       getTasksForTimeSlot={getTasksForTimeSlot}
+      staffTasks={staffTasks}
       facilities={facilities}
       bookings={bookings}
       filteredCheckouts={filteredCheckouts}

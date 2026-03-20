@@ -45,6 +45,9 @@ import {
   STAFF_TIME_SLOTS,
   getFacilityTimeSlotsArray,
   isSlotWithinSchedule,
+  isTimeSlotWithinStaffSchedule,
+  getTaskSlotLabel,
+  getTaskCoveredSlots,
 } from "../utils"
 import type {
   Booking,
@@ -85,6 +88,7 @@ export type DashboardViewProps = {
   staffMembers: StaffMember[]
   requests: CleaningRequest[]
   getTasksForTimeSlot: (staffId: string, timeSlot: string) => StaffTask[]
+  staffTasks?: StaffTask[]
   facilities: Facility[]
   bookings: Booking[]
   filteredCheckouts: Checkout[]
@@ -96,7 +100,7 @@ export type DashboardViewProps = {
   onCheckoutSearchStatusChange: (value: string) => void
   checkoutsCompletedCount: number
   checkoutsPendingCount: number
-  onCompleteCheckout: (checkoutId: number) => void
+  onCompleteCheckout: (checkoutId: string) => void
   onShowBookingsDetail: (bookingsList: Booking[]) => void
   navigateDate: (direction: "prev" | "next") => void
   convertISOToLocaleFormat: (isoDate: string) => string
@@ -138,6 +142,7 @@ export function DashboardView({
   dateColumns,
   staffMembers,
   getTasksForTimeSlot,
+  staffTasks = [],
   facilities,
   bookings,
   filteredCheckouts,
@@ -199,6 +204,7 @@ export function DashboardView({
     useState("")
   const [maintenanceScheduledDate, setMaintenanceScheduledDate] = useState("")
   const [maintenanceScheduledTime, setMaintenanceScheduledTime] = useState("")
+  const [maintenanceDurationMinutes, setMaintenanceDurationMinutes] = useState(30)
 
   const [facilityBookingFacilityId, setFacilityBookingFacilityId] = useState("")
   const [facilityBookingClientName, setFacilityBookingClientName] = useState("")
@@ -249,9 +255,29 @@ export function DashboardView({
   ): FacilitySlotResponse | undefined {
     return facilitySlots[facilityId]?.find((s) => {
       const d = new Date(s.startAt)
-      const hh = d.getHours().toString().padStart(2, "0")
-      const mm = d.getMinutes().toString().padStart(2, "0")
+      const hh = d.getUTCHours().toString().padStart(2, "0")
+      const mm = d.getUTCMinutes().toString().padStart(2, "0")
       return `${hh}:${mm}` === timeSlot
+    })
+  }
+
+  function isGridSlotCoveredByApiSlot(facilityId: string, timeSlot: string): boolean {
+    const ownData = getSlotDataForFacilityAndTime(facilityId, timeSlot)
+    if (ownData && ownData.currentOccupancy > 0) return false
+
+    const slots = facilitySlots[facilityId]
+    if (!slots) return false
+    const [slotH, slotM] = timeSlot.split(":").map(Number)
+    const slotMinutes = slotH * 60 + slotM
+    return slots.some((s) => {
+      if (s.currentOccupancy === 0) return false
+      const start = new Date(s.startAt)
+      const end = new Date(s.endAt)
+      const startMinutes = start.getUTCHours() * 60 + start.getUTCMinutes()
+      const endMinutes = end.getUTCHours() * 60 + end.getUTCMinutes()
+      if (slotMinutes > startMinutes && slotMinutes < endMinutes) return true
+      if (slotMinutes === endMinutes) return true
+      return false
     })
   }
 
@@ -840,22 +866,29 @@ export function DashboardView({
                       </div>
                       <div>
                         <Label
-                          htmlFor="maintenance-time"
+                          htmlFor="maintenance-duration"
                           className="text-sm font-medium"
                         >
-                          Tiempo de entrega (horas)
+                          Duración estimada (minutos)
                         </Label>
-                        <Input
-                          id="maintenance-time"
-                          type="number"
-                          min={1}
-                          max={24}
-                          value={maintenanceDeliveryTime}
-                          onChange={(e) =>
-                            setMaintenanceDeliveryTime(e.target.value)
-                          }
-                          className="mt-2"
-                        />
+                        <Select
+                          value={maintenanceDurationMinutes.toString()}
+                          onValueChange={(v) => setMaintenanceDurationMinutes(Number(v))}
+                        >
+                          <SelectTrigger className="mt-2">
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="15">15 min</SelectItem>
+                            <SelectItem value="30">30 min</SelectItem>
+                            <SelectItem value="45">45 min</SelectItem>
+                            <SelectItem value="60">1 hora</SelectItem>
+                            <SelectItem value="90">1.5 horas</SelectItem>
+                            <SelectItem value="120">2 horas</SelectItem>
+                            <SelectItem value="180">3 horas</SelectItem>
+                            <SelectItem value="240">4 horas</SelectItem>
+                          </SelectContent>
+                        </Select>
                       </div>
                       <div>
                         <Label
@@ -939,6 +972,7 @@ export function DashboardView({
                               description: maintenanceDescription,
                               priority: maintenancePriority,
                               deliveryTime: maintenanceDeliveryTime,
+                              estimatedDurationMinutes: maintenanceDurationMinutes,
                               assignedStaffId: maintenanceAssignedStaffId,
                               scheduledDate: maintenanceScheduledDate,
                               scheduledTime: maintenanceScheduledTime,
@@ -947,6 +981,7 @@ export function DashboardView({
                             setMaintenanceDescription("")
                             setMaintenancePriority("normal")
                             setMaintenanceDeliveryTime("1")
+                            setMaintenanceDurationMinutes(30)
                             setMaintenanceAssignedStaffId("")
                             setMaintenanceScheduledDate("")
                             setMaintenanceScheduledTime("")
@@ -962,134 +997,156 @@ export function DashboardView({
               </div>
             </Card>
 
-            <div className="overflow-x-auto">
-              <div className="min-w-max">
-                <div className="flex gap-2 mb-4 sticky left-0">
-                  <div className="w-48 flex-shrink-0">
-                    <div className="h-16 flex items-center justify-center bg-muted rounded-lg border border-border">
-                      <span className="text-sm font-semibold text-muted-foreground">
-                        Personal
-                      </span>
+            <div className="bg-card rounded-lg border border-border overflow-hidden">
+              <div className="overflow-x-auto">
+                <div style={{ width: "fit-content", minWidth: "100%" }}>
+                  {/* Header row */}
+                  <div className="flex border-b border-border bg-muted/50 sticky top-0 z-10">
+                    <div className="w-52 p-4 font-semibold border-r border-border bg-muted/50 shrink-0">
+                      Personal
                     </div>
-                  </div>
-                  <div className="flex gap-2">
-                    {STAFF_TIME_SLOTS.map((timeSlot) => (
+                    {timeSlotsArray.map((slot) => (
                       <div
-                        key={timeSlot}
-                        className="w-32 flex-shrink-0"
+                        key={slot}
+                        className="w-16 p-3 text-center text-sm font-medium border-r border-border shrink-0"
                       >
-                        <div className="h-16 flex flex-col items-center justify-center bg-gradient-to-br from-primary/5 to-primary/10 rounded-lg border border-primary/20">
-                          <Clock className="w-4 h-4 text-primary mb-1" />
-                          <span className="text-xs font-medium text-foreground">
-                            {timeSlot}
-                          </span>
-                        </div>
+                        {slot}
                       </div>
                     ))}
                   </div>
-                </div>
 
-                <div className="space-y-2">
+                  {/* Staff rows */}
                   {staffMembers
                     .filter((s) => s.status !== "off")
                     .filter((s) =>
-                      s.name
-                        .toLowerCase()
-                        .includes(searchName.toLowerCase())
+                      s.name.toLowerCase().includes(searchName.toLowerCase())
                     )
                     .filter(
                       (s) =>
                         filterDepartment === "all" ||
                         s.department === filterDepartment
                     )
-                    .map((member) => (
-                      <div key={member.id} className="flex gap-2">
-                        <div className="w-48 flex-shrink-0 sticky left-0 bg-background">
-                          <Card className="p-3 bg-gradient-to-br from-primary/5 to-primary/10 border-primary/20 h-full">
-                            <div className="flex items-center gap-3">
-                              <div className="w-10 h-10 bg-gradient-to-br from-primary to-primary/80 rounded-full flex items-center justify-center text-white font-bold text-sm shadow-md">
-                                {member.avatar}
-                              </div>
-                              <div className="flex-1 min-w-0">
-                                <h3 className="font-semibold text-foreground text-sm truncate">
-                                  {member.name}
-                                </h3>
-                                <div className="flex items-center gap-2 mt-1">
-                                  <Badge
-                                    className={
-                                      getStatusColor(member.status) +
-                                      " text-white text-xs py-0"
-                                    }
-                                  >
-                                    {getStatusText(member.status)}
-                                  </Badge>
-                                  <span className="text-xs text-muted-foreground">
-                                    {member.completedTasks}/{member.tasksToday}
-                                  </span>
-                                </div>
+                    .map((member, idx) => {
+                      const memberTasks = staffTasks.filter(
+                        (t) => t.userId === member.id
+                      )
+                      // Build a map of slot -> task that STARTS at that slot
+                      const taskStartSlots = new Map<string, StaffTask>()
+                      // Build a set of all slots covered by any task
+                      const coveredSlots = new Set<string>()
+                      for (const task of memberTasks) {
+                        const startSlot = getTaskSlotLabel(task.scheduledStartAt)
+                        taskStartSlots.set(startSlot, task)
+                        const covered = getTaskCoveredSlots(
+                          task.scheduledStartAt,
+                          task.estimatedDurationMinutes ?? 30
+                        )
+                        covered.forEach((s) => coveredSlots.add(s))
+                      }
+
+                      return (
+                        <div
+                          key={member.id}
+                          className={`flex ${idx % 2 === 0 ? "bg-background" : "bg-muted/30"}`}
+                        >
+                          {/* Staff info column */}
+                          <div className="w-52 p-3 border-r border-border flex items-center gap-3 shrink-0">
+                            <div className="w-10 h-10 bg-gradient-to-br from-primary to-primary/80 rounded-full flex items-center justify-center text-white font-bold text-sm shadow-md shrink-0">
+                              {member.avatar}
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <h3 className="font-semibold text-foreground text-sm truncate">
+                                {member.name}
+                              </h3>
+                              <p className="text-xs text-muted-foreground capitalize">
+                                {member.department}
+                              </p>
+                              <div className="flex items-center gap-2 mt-1">
+                                <Badge
+                                  className={
+                                    getStatusColor(member.status) +
+                                    " text-white text-[10px] py-0"
+                                  }
+                                >
+                                  {getStatusText(member.status)}
+                                </Badge>
+                                <span className="text-[10px] text-muted-foreground">
+                                  {member.completedTasks}/{member.tasksToday}
+                                </span>
                               </div>
                             </div>
-                          </Card>
+                          </div>
+
+                          {/* Time slots */}
+                          <div className="flex">
+                            {timeSlotsArray.map((slot) => {
+                              const taskAtStart = taskStartSlots.get(slot)
+                              const isCovered = coveredSlots.has(slot)
+                              const withinSchedule = isTimeSlotWithinStaffSchedule(slot, member.schedule)
+
+                              // Task starts at this slot - render spanning block
+                              if (taskAtStart) {
+                                const duration = taskAtStart.estimatedDurationMinutes ?? 30
+                                const spanSlots = Math.ceil(duration / 30)
+                                return (
+                                  <div
+                                    key={slot}
+                                    className="relative border-r border-border shrink-0"
+                                    style={{ width: `${spanSlots * 64}px` }}
+                                  >
+                                    <div className={`absolute inset-1 rounded-lg bg-gradient-to-br border-2 p-2 flex flex-col justify-center hover:shadow-lg transition-all cursor-pointer min-h-[72px] ${
+                                      taskAtStart.status?.toLowerCase() === "completed"
+                                        ? "from-green-500/30 to-green-600/20 border-green-500"
+                                        : taskAtStart.status?.toLowerCase() === "in-progress"
+                                          ? "from-blue-500/30 to-blue-600/20 border-blue-500"
+                                          : "from-yellow-500/30 to-yellow-600/20 border-yellow-500"
+                                    }`}>
+                                      <span className="text-xs font-semibold text-foreground">
+                                        {new Date(taskAtStart.scheduledStartAt).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
+                                      </span>
+                                      <p className="text-[10px] text-muted-foreground truncate">
+                                        {taskAtStart.description}
+                                      </p>
+                                    </div>
+                                  </div>
+                                )
+                              }
+
+                              // Slot is covered by a task that started earlier - skip
+                              if (isCovered) return null
+
+                              // Free slot within schedule
+                              if (withinSchedule) {
+                                return (
+                                  <div
+                                    key={slot}
+                                    className="w-16 border-r border-border shrink-0 min-h-[80px] flex items-center justify-center p-1"
+                                  >
+                                    <div className="w-full border-2 border-dashed border-muted-foreground/20 rounded-md h-16 flex items-center justify-center hover:border-primary/30 hover:bg-primary/5 transition-colors">
+                                      <span className="text-[10px] text-muted-foreground/50 font-medium">
+                                        Libre
+                                      </span>
+                                    </div>
+                                  </div>
+                                )
+                              }
+
+                              // Outside schedule
+                              return (
+                                <div
+                                  key={slot}
+                                  className="w-16 border-r border-border shrink-0 min-h-[80px] bg-muted/20 flex items-center justify-center"
+                                >
+                                  <span className="text-[10px] text-muted-foreground/30">
+                                    —
+                                  </span>
+                                </div>
+                              )
+                            })}
+                          </div>
                         </div>
-                        <div className="flex gap-2">
-                          {STAFF_TIME_SLOTS.map((timeSlot) => {
-                            const tasksInSlot = getTasksForTimeSlot(
-                              member.id,
-                              timeSlot
-                            )
-                            const hasTask = tasksInSlot.length > 0
-                            const withinSchedule = isSlotWithinSchedule(timeSlot, member.schedule)
-                            return (
-                              <div
-                                key={timeSlot}
-                                className="w-32 flex-shrink-0"
-                              >
-                                {hasTask ? (
-                                  <div className="space-y-2">
-                                    {tasksInSlot.map((task) => (
-                                      <Card
-                                        key={task.id}
-                                        className="p-2 bg-gradient-to-r from-primary/10 to-primary/5 border-primary/30 hover:shadow-lg transition-all cursor-pointer h-full"
-                                      >
-                                        <div className="flex flex-col gap-1">
-                                          <span className="font-semibold text-foreground text-xs">
-                                            {new Date(task.scheduledStartAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                                          </span>
-                                          <p className="text-[10px] text-muted-foreground truncate">
-                                            {task.description}
-                                          </p>
-                                          <Badge
-                                            className={
-                                              getRequestStatusColor(
-                                                task.status?.toLowerCase() ?? 'pending'
-                                              ) + " text-[10px] px-1 py-0"
-                                            }
-                                          >
-                                            {getRequestStatusText(task.status?.toLowerCase() ?? 'pending')}
-                                          </Badge>
-                                        </div>
-                                      </Card>
-                                    ))}
-                                  </div>
-                                ) : withinSchedule ? (
-                                  <div className="h-full min-h-[80px] bg-green-500/10 rounded-lg border border-dashed border-green-500/30 flex items-center justify-center">
-                                    <span className="text-xs text-green-600/70">
-                                      Libre
-                                    </span>
-                                  </div>
-                                ) : (
-                                  <div className="h-full min-h-[80px] bg-muted/10 rounded-lg border border-dashed border-muted/20 flex items-center justify-center">
-                                    <span className="text-xs text-muted-foreground/30">
-                                      Fuera de turno
-                                    </span>
-                                  </div>
-                                )}
-                              </div>
-                            )
-                          })}
-                        </div>
-                      </div>
-                    ))}
+                      )
+                    })}
                 </div>
               </div>
             </div>
@@ -1348,7 +1405,7 @@ export function DashboardView({
                   {timeSlotsArray.map((slot) => (
                     <div
                       key={slot}
-                      className="w-32 p-3 text-center text-sm font-medium border-r border-border shrink-0"
+                      className="w-16 p-3 text-center text-sm font-medium border-r border-border shrink-0"
                     >
                       {slot}
                     </div>
@@ -1410,13 +1467,13 @@ export function DashboardView({
                             : slotBookings.length
 
                           if (bookingAtStart) {
-                            const durationHours = bookingAtStart.duration / 60
+                            // +1 column extension so the block spans start→end (same logic as realSlotData)
                             return (
                               <div
                                 key={slot}
                                 className="relative border-r border-border group shrink-0"
                                 style={{
-                                  width: `${durationHours * 128}px`,
+                                  width: `${(bookingAtStart.duration / 30) * 64 + 64}px`,
                                 }}
                               >
                                 <div
@@ -1547,7 +1604,7 @@ export function DashboardView({
                               return (
                                 <div
                                   key={slot}
-                                  className="w-32 border-r border-border p-2 shrink-0 min-h-[88px] flex items-center justify-center cursor-pointer hover:bg-primary/5 transition-colors"
+                                  className="w-16 border-r border-border p-2 shrink-0 min-h-[88px] flex items-center justify-center cursor-pointer hover:bg-primary/5 transition-colors"
                                   onClick={() =>
                                     onShowBookingsDetail(slotBookingsAtTime)
                                   }
@@ -1577,37 +1634,60 @@ export function DashboardView({
                             return null
                           }
                           if (realSlotData && realSlotData.currentOccupancy > 0) {
+                            const startMs = new Date(realSlotData.startAt).getTime()
+                            const endMs = new Date(realSlotData.endAt).getTime()
+                            const durationMinutes = (endMs - startMs) / 60000
+                            // Extend +1 column (64px) into the endAt slot so the block spans
+                            // from start to end visually (e.g. 18:00–18:30 fills two columns)
+                            const endD = new Date(realSlotData.endAt)
+                            const endSlotKey = `${endD.getUTCHours().toString().padStart(2, "0")}:${endD.getUTCMinutes().toString().padStart(2, "0")}`
+                            const endSlotOccupied = facilitySlots[facility.id]?.some((s) => {
+                              const d = new Date(s.startAt)
+                              const key = `${d.getUTCHours().toString().padStart(2, "0")}:${d.getUTCMinutes().toString().padStart(2, "0")}`
+                              return key === endSlotKey && s.currentOccupancy > 0
+                            }) ?? false
+                            const spanWidth = (durationMinutes / 30) * 64 + (endSlotOccupied ? 0 : 64)
+                            const occ = realSlotData.occupationPercentage
                             return (
                               <div
                                 key={slot}
-                                className="w-32 border-r border-border p-2 shrink-0 min-h-[88px] flex items-center justify-center"
+                                className="relative border-r border-border group shrink-0"
+                                style={{ width: `${spanWidth}px` }}
                               >
-                                <div className="w-full space-y-2">
-                                  <p className="text-xs font-medium text-foreground text-center">
-                                    {realSlotData.currentOccupancy}/{facility.capacity}
-                                  </p>
-                                  <div className="w-full bg-black/10 rounded-full h-2">
+                                <div
+                                  className={`absolute inset-2 rounded-lg ${occ >= 100
+                                    ? "bg-gradient-to-br from-red-500/30 to-red-600/20 border-2 border-red-500"
+                                    : occ > 50
+                                      ? "bg-gradient-to-br from-amber-500/30 to-amber-600/20 border-2 border-amber-500"
+                                      : "bg-gradient-to-br from-green-500/30 to-green-600/20 border-2 border-green-500"
+                                    } p-3 flex flex-col justify-center min-h-[72px]`}
+                                >
+                                  <div className="flex flex-col items-center justify-center gap-2">
+                                    <p className="text-lg font-bold text-foreground">
+                                      {realSlotData.currentOccupancy}/{realSlotData.capacity}
+                                    </p>
+                                    <p className="text-[10px] text-muted-foreground">
+                                      Ocupación: {occ}%
+                                    </p>
+                                  </div>
+                                  <div className="mt-2 w-full bg-black/10 rounded-full h-1.5">
                                     <div
-                                      className={`h-2 rounded-full transition-all ${realSlotData.occupationPercentage > 80
-                                          ? "bg-red-500"
-                                          : realSlotData.occupationPercentage > 50
-                                            ? "bg-amber-500"
-                                            : "bg-green-500"
+                                      className={`h-1.5 rounded-full transition-all ${occ > 80 ? "bg-red-500" : occ > 50 ? "bg-amber-500" : "bg-green-500"
                                         }`}
-                                      style={{ width: `${realSlotData.occupationPercentage}%` }}
+                                      style={{ width: `${occ}%` }}
                                     />
                                   </div>
-                                  <p className="text-[10px] text-muted-foreground text-center">
-                                    {realSlotData.occupationPercentage}%
-                                  </p>
                                 </div>
                               </div>
                             )
                           }
+                          if (isGridSlotCoveredByApiSlot(facility.id, slot)) {
+                            return null
+                          }
                           return (
                             <div
                               key={slot}
-                              className="w-32 border-r border-border p-2 shrink-0 min-h-[88px] flex items-center"
+                              className="w-16 border-r border-border p-2 shrink-0 min-h-[88px] flex items-center"
                             >
                               <div className="w-full border-2 border-dashed border-muted-foreground/20 rounded-md h-16 flex items-center justify-center hover:border-primary/30 hover:bg-primary/5 transition-colors cursor-pointer">
                                 <span className="text-xs text-muted-foreground/50 font-medium">

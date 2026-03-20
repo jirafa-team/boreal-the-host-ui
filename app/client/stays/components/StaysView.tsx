@@ -22,6 +22,7 @@ export type StaysViewProps = {
   onAccessReservationClick?: (stayId: number | string) => void
   onWaitingTripClick?: (stayId: number | string) => void
   onFirstStayCheckinClick: () => void
+  onCheckinClick?: (stayId: string) => void
   t: TFunction
   isLoading?: boolean
   error?: unknown
@@ -40,6 +41,7 @@ export function StaysView({
   onAccessReservationClick,
   onWaitingTripClick,
   onFirstStayCheckinClick,
+  onCheckinClick,
   t,
   isLoading = false,
   error,
@@ -150,12 +152,20 @@ export function StaysView({
                 const isOngoing = checkInDate != null && checkInDate <= today && checkOutDate != null && checkOutDate > today
                 const isFuture = checkInDate != null && checkInDate > today
 
+                const isReadyToCheckin =
+                  hasCompletedCheckIn &&
+                  rawStatus === "confirmed" &&
+                  checkInDate != null &&
+                  checkInDate <= today
+
                 let buttonLabel: string | null = null
 
                 if (isFinalized) {
                   buttonLabel = t("stays.finalized") || "Finalizada"
                 } else if (!hasCompletedCheckIn) {
                   buttonLabel = t("stays.completeCheckin") || "Completar Check-in"
+                } else if (isReadyToCheckin) {
+                  buttonLabel = t("stays.doCheckin") || "Realizar Check-in"
                 } else if (isOngoing) {
                   buttonLabel = accessReservationLabel
                 } else if (isFuture) {
@@ -230,6 +240,8 @@ export function StaysView({
                                   const waitingLabel = t("stays.waitingTripStart") || "Esperando inicio de viaje! ⏳"
                                   if (!hasCompletedCheckIn) {
                                     onFirstStayCheckinClick()
+                                  } else if (isReadyToCheckin && onCheckinClick) {
+                                    onCheckinClick(stay.id)
                                   } else if (buttonLabel === accessReservationLabel && onAccessReservationClick) {
                                     onAccessReservationClick(stay.id)
                                   } else if (buttonLabel === waitingLabel && onWaitingTripClick) {
